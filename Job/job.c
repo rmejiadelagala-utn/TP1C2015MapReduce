@@ -8,11 +8,13 @@
 #include<stdlib.h>
 #include<string.h>
 #include<commons/config.h>
+#include<socketes/servidor.h>
 
 int main(int argc,char *argv[]) {
 
 	t_config *config;
 	char *c;
+	int sock;
 	if(argc!=2){
 		printf("Error: Uso: ./job path_archconfig\n");
 		return 1;
@@ -23,6 +25,7 @@ int main(int argc,char *argv[]) {
 	config = config_create(c);
 	printf("conectando a IP:  %s\n",config_get_string_value(config,"IP"));
 	printf("en el Puerto: %d\n",config_get_int_value(config, "PORT"));
+	sock= crearCliente(config_get_string_value(config,"IP"),config_get_int_value(config, "PORT"));
 	return 0;
 }
 
