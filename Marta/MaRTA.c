@@ -8,6 +8,8 @@
 #include<stdlib.h>
 #include<commons/config.h>
 #include<socketes/servidor.h>
+#include <pthread.h>
+#include "atencionJobs.h"
 
 
 int main(int argc, char *argv[]) {
@@ -15,6 +17,7 @@ int main(int argc, char *argv[]) {
 	t_config *config;
 	char *c;
 	int serv; //socket servidor
+	pthread_t thr;
 
 	if (argc != 2){
 		printf("Error: Se esperaba un parametro \nUso: ./Marta config.cfg\n");
@@ -23,6 +26,10 @@ int main(int argc, char *argv[]) {
 	c=argv[1];
 	config=config_create(c);
 	serv = crearServer(config_get_int_value(config, "PORT"));
+	pthread_create(&thr, NULL, atencionJobs, (void*) &serv );
+	pthread_join(thr,NULL);
+
+	printf("me voy\n");
 	return 0;
 }
 
