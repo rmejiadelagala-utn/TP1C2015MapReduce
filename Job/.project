@@ -3,6 +3,7 @@
 	<name>Job</name>
 	<comment></comment>
 	<projects>
+		<project>socketes</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
