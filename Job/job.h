@@ -15,13 +15,13 @@
 #define TRUE 1
 #define FALSE 0
 
-typedef char* filename_t;
+typedef char* t_filename;
 
 typedef struct {
-	filename_t* archivos;
-	filename_t  archivo_resultado;
+	t_filename* archivos;
+	t_filename  archivo_resultado;
 	uint16_t   combiner;
-} solicitud_t;
+} t_solicitud;
 
 typedef struct {
 	char* IP;
