@@ -5,13 +5,15 @@
  *      Author: utnso
  */
 
-#include<stdio.h>
+
 #include"atencionJobs.h"
 
-void* atencionJobs(void* sockServ){
-	int* p= (int*)sockServ;
-	printf("el valor del socket es: %d\n",*p);
-/*
+void* atencionJobs(void* sock){
+	int serv= *(int*)sock;
+	int fdmax, i,newSock;
+	int sin_size;
+	printf("estoy en el hilo\n");
+	printf("el valor del socket es: %d\n",serv);
 	struct sockaddr_in their_addr;
 	char* payload;
 	char* buff;
@@ -23,7 +25,35 @@ void* atencionJobs(void* sockServ){
 	FD_ZERO(&master);
 	FD_ZERO(&read_fds);
 	FD_SET(serv, &master);
-	fdmax = servProg;
-*/
+	fdmax = serv;
+	for (;;) {
+		read_fds = master; // copialo
+		if (select(fdmax + 1, &read_fds, NULL, NULL, NULL ) == -1) {
+			perror("select");
+			exit(1);
+		}
+		for(i=0; i<=fdmax; i++){
+			if (FD_ISSET(i, &read_fds)) { // tenemos datos!!
+				//printf("FD_ISSET %i\n",i);
+				if (i == serv) {
+					//conexion nueva
+					sin_size = sizeof(struct sockaddr_in);
+					if ((newSock = accept(serv, (struct sockaddr*) &their_addr,
+							(socklen_t *) &sin_size)) < 0) {
+						perror("accept");
+						exit(1);
+					}else {
+						FD_SET(newSock, &master); // aniadir al conjunto maestro
+						if (newSock > fdmax) {    // actualizar el maximo
+							fdmax = newSock;
+						}
+						printf("nuevo job en %s on socket %d\n", inet_ntoa(their_addr.sin_addr),
+									 newSock);
+					}
+				}
+			}
+		}
+	}
+
 }
 

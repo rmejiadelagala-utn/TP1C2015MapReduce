@@ -11,10 +11,11 @@
 #include <pthread.h>
 #include "atencionJobs.h"
 
+t_config *config;
 
 int main(int argc, char *argv[]) {
 
-	t_config *config;
+
 	char *c;
 	int serv; //socket servidor
 	pthread_t thr;

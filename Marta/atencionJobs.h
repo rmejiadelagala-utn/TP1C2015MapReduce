@@ -8,6 +8,20 @@
 #ifndef ATENCIONJOBS_H_
 #define ATENCIONJOBS_H_
 
+#include<stdio.h>
+#include<pthread.h>
+#include<stdlib.h>
+#include <sys/socket.h>
+
+#include<socketes/servidor.h>
+#include<socketes/estructuras.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <string.h>
+#include <unistd.h>
+
+
 void* atencionJobs(void*);
 
 
