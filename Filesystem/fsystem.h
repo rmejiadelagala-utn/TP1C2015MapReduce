@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <socketes/servidor.h>
 #include <socketes/estructuras.h>
+#include <socketes/servidorMultihilo.h>
 #include <commons/log.h>
 #include <sys/socket.h>
 #include <sys/types.h>

@@ -23,11 +23,14 @@ int main() {
 	printf("Nodo Nuevo: %s\n", config_get_string_value(config, "NODO_NUEVO"));
 	printf("IP Nodo: %s\n", config_get_string_value(config, "IP_NODO"));
 	printf("Puerto Nodo: %d\n", config_get_int_value(config, "PUERTO_NODO"));
+	char* ip = config_get_string_value(config, "IP_NODO");
+	char* archivo_bin = config_get_string_value(config, "ARCHIVO_BIN");
 
 	int sockfs;
 	sockfs = crearCliente(config_get_string_value(config,"IP_FS"),config_get_int_value(config, "PUERTO_FS"));
 
-
+	//Probando un mensaje mandado del nodo al FS
+	send(sockfs,ip,1000 ,0);
 	return 0;
 
 }
