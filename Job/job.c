@@ -26,6 +26,7 @@ int main(int argc,char *argv[]) {
 	info_config=leer_archivo_configuracion(c);
 //	Por ahora comento lo del socket, ya que voy a usar el puntero a t_config_job	
 	sock= crearCliente(info_config->IP,info_config->PORT);
+	free(info_config);
 	return 0;
 }
 

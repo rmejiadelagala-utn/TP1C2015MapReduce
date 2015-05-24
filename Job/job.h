@@ -60,7 +60,7 @@ t_config_job* leer_archivo_configuracion(char* arch){
 	   printf("archivo[%d]=  %s\n",i,info_config->archivos[i]);
 	   i++;
 	}
-	free(info_config);
+
 	return info_config;
 }
 
