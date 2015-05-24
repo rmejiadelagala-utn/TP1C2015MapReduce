@@ -41,7 +41,7 @@ char *fmmap(FILE *fd,long long FileSize)
  return mmap(0, FileSize, PROT_READ, MAP_PRIVATE, (int)fd, 0);
 }
 
-int main() {
+int pruebas() {
  FILE *fd;
  char *str;
 

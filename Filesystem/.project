@@ -3,6 +3,7 @@
 	<name>Filesystem</name>
 	<comment></comment>
 	<projects>
+		<project>socketes</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

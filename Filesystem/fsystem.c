@@ -6,8 +6,11 @@
  */
 
 #include "fsystem.h"
+#include "consolaFS.h"
 
-
+//interaccionFSNodo es la funcion que va a ejecutar cada hilo que esta en conexion con los nodos
+void *interaccionFSNodo(void*);
+int listaIDNodo[20];
 int main (){
 
 	system("clear");
@@ -21,7 +24,21 @@ int main (){
 	fd_set master;
     fd_set read_fds;
 
-    int servFS, fdmax, i, sin_size, nbytes;
+    pthread_t consola_hilo;
+    if( pthread_create( &consola_hilo , NULL ,  consola , NULL) < 0)
+                        {
+                            perror("could not create thread");
+                            return 1;
+                        }
+
+    crearServerMultiHilo(config_get_int_value(config, "PUERTO_FS"),interaccionFSNodo);
+
+    return 0;
+
+//Comente la otra parte por si al final nos decidimos por usar la opcion con select,
+//pero para ahora probar multihilo para sincronizar la lista de nodos.
+
+ /*   int servFS, fdmax, i, sin_size, nbytes;
     int newSock;
 
     struct sockaddr_in their_addr;
@@ -75,5 +92,28 @@ int main (){
 
 	close(servFS);
 
-	return 0;
+	return 0;*/
+}
+
+void *interaccionFSNodo(void* sock_ptr)
+{
+
+	int sock_desc = *(int*)sock_ptr;
+    char infoDeNodo[BUFFERSIZE];
+    int read_size;
+
+        //Receive a reply from the server
+        while( read_size=recv(sock_desc , infoDeNodo , 5000 , 0) > 0)
+        {
+            printf("%s \n",infoDeNodo);
+            memset(infoDeNodo,0,sizeof(infoDeNodo)); //Limpia el buffer de los mensajes que le manda ese nodo
+        }
+        if(read_size==0){
+        	printf("Nodo desconectado.\n");
+        }
+        if(read_size<0){
+        	printf("Error.");
+        }
+        close(sock_desc);
+        return 0;
 }

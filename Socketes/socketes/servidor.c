@@ -58,6 +58,7 @@ int crearCliente(char *ip, uint16_t port) {
 }
 
 int enviar(int socket, int id, void* payload, int length) {
+	printf("hola");
 	int ret;
 	header_t head;
 	head.id = (uint8_t) id;
@@ -95,7 +96,7 @@ int recibir(int socket, int* id, char** payload) {
 		*id = head.id;
 		*payload = malloc(head.length);
 		if (recv(socket, *payload, head.length, 0) > 0) {
-			//printf("socketes: paquete recibido de %d [%d|%d|%s]\n", socket, head.id,head.length, *payload);
+			printf("socketes: paquete recibido de %d [%d|%d|%s]\n", socket, head.id,head.length, *payload);
 		} else {
 			perror("socketes: error al leer el payload ");
 			exit(1);
