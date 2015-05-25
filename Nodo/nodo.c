@@ -4,12 +4,14 @@
  *  Created on: 27/4/2015
  *      Author: utnso
  */
-#include<stdio.h>
-#include<commons/config.h>
-#include<socketes/servidor.h>
+#include "nodo.h"
 
 int main() {
-	printf("Hola soy proceso Nodo\n");
+
+	int i;
+    char *DATOS, *DATOS_A;
+
+	printf("Hola soy un proceso Nodo\n");
 
 	char* path = "/home/utnso/ConfigNodo.txt";
 
@@ -23,14 +25,26 @@ int main() {
 	printf("Nodo Nuevo: %s\n", config_get_string_value(config, "NODO_NUEVO"));
 	printf("IP Nodo: %s\n", config_get_string_value(config, "IP_NODO"));
 	printf("Puerto Nodo: %d\n", config_get_int_value(config, "PUERTO_NODO"));
-	char* ip = config_get_string_value(config, "IP_NODO");
-	char* archivo_bin = config_get_string_value(config, "ARCHIVO_BIN");
+
+	DATOS = mapeo_disco("/home/utnso/midata1.bin");
+	memset(DATOS + obtenerDirBloque(1),0, BLKSIZE );
+
+	DATOS_A = mapeo_archivo("/home/utnso/Testeo.txt");
+	memcpy(DATOS, DATOS_A + obtenerDirBloque(1), BLKSIZE);
+
+
+	for(i=0; i<20; i++) {
+		printf("%c", DATOS[i]);
+	}
 
 	int sockfs;
 	sockfs = crearCliente(config_get_string_value(config,"IP_FS"),config_get_int_value(config, "PUERTO_FS"));
 
+
 	//Probando un mensaje mandado del nodo al FS
-	send(sockfs,ip,1000 ,0);
+	//send(sockfs,ip,1000 ,0);
+
+	munmap(DATOS,sizeof(DATOS));
 	return 0;
 
 }
