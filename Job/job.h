@@ -20,7 +20,7 @@ typedef char* t_filename;
 typedef struct {
 	t_filename* archivos;
 	t_filename  archivo_resultado;
-	uint16_t   combiner;
+	uint32_t   combiner;
 } t_solicitud;
 
 typedef struct {
@@ -64,4 +64,22 @@ t_config_job* leer_archivo_configuracion(char* arch){
 	return info_config;
 }
 
+int cantidadArchivosToProcesar(t_solicitud sol){
+	int i=0;
+	while(sol.archivos[i] != 0){
+		i++;
+	}
+	return i;
+}
+
+int tamanioBufferSerializar(t_solicitud sol) {
+	int i=0;
+	int tam = strlen(sol.archivo_resultado);
+	tam += sizeof(sol.combiner);
+	while(sol.archivos[i] != 0){
+		tam+= strlen(sol.archivos[i]);
+		i++;
+	}
+	return tam++;
+}
 #endif /* JOB_H_ */
