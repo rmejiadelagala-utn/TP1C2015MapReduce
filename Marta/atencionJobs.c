@@ -11,7 +11,7 @@
 void* atencionJobs(void* sock){
 	int serv= *(int*)sock;
 	int fdmax, i,newSock;
-	int sin_size;
+	int sin_size, nbytes;
 	printf("estoy en el hilo\n");
 	printf("el valor del socket es: %d\n",serv);
 	struct sockaddr_in their_addr;
@@ -51,9 +51,30 @@ void* atencionJobs(void* sock){
 									 newSock);
 					}
 				}
+				else {
+                    // gestionar datos de un cliente
+					buff=(char*)malloc(128);
+                    if ((nbytes = recv(i, buff, 1, 0)) <= 0) {
+                        // error o conexión cerrada por el cliente
+                        if (nbytes == 0) {
+                            // conexión cerrada
+                            printf("selectserver: socket %d cerró conexión\n", i);
+                        } else {
+                            perror("recv");
+                        }
+                        close(i); // bye!
+                        FD_CLR(i, &master); // eliminar del conjunto maestro
+                    } else {
+                        // tenemos datos de algún cliente
+                        // ahora lo muestro por stdout pero debo deserealizar y usar la data
+                    	printf("En teoría este sería el buffer recibido:\n");
+                        printf("%s\n", buff);
+
+                    }
+				}
 			}
 		}
 	}
-
+	free(buff);
 }
 
