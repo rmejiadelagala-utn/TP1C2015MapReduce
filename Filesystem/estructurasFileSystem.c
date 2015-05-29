@@ -2,8 +2,17 @@
  estructuras del fileSystem con funciones para inicializarlas
 
  */
- //Archivo
-   struct t_archivo
+ //estructura FileSytem
+ struct t_fileSystem
+   {
+   	t_archivo *archivo;
+   	t_nodo *nodo;
+   	t_directorio *directorio;
+  } ;
+
+
+ //estructura Archivo
+struct t_archivo
   {
       char[255] nombre;
       int padre;
@@ -14,15 +23,33 @@
   } ;
 
 
-  struct t_bloquesArch
+struct t_bloquesArch
   {
-  	t_bloquesEnNodo *copiasDeBloque;
+  	t_bloqueEnNodo *copiasDeBloque;
   } ;
 
-    struct t_bloquesEnNodo
+struct t_bloqueEnNodo
   {
-      t_ip ip;//a desarrollar
-      t_puerto puerto;//a desarrolar
+      char[255] ip;//quizas conviene en un futuro que
+      int puerto;//ip y puerto sean un solo char
       int numeroDeBloqueEnNodo;
 
   };
+  //estructura nodo
+
+struct t_nodo
+  {
+  	char[255] ip;//quizas conviene en un futuro que
+  	int puerto;//ip y puerto sean un solo char
+  	int tamanio;
+  	int bloquesOcupados;
+  	int activo;//para saber si el bloque se cayo o esta activo
+  };
+
+//estructura tabla de directorios
+struct t_directorio
+  {
+  	int index;
+  	char[255] nombre;
+  	int padre;
+  };  
