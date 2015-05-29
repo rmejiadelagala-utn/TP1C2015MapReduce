@@ -55,6 +55,12 @@ t_nodo nuevoNodo(char[255] ip, int puerto, int tamanio){
   return unNodo;
 }
 
+void activarNodo(t_nodo unNodo){
+  unNodo.activo = 1;
+}
+void desactivarNodo(t_nodo unNodo){
+  unNodo.activo = 0;
+}
 //funciones para la estructura tabla de directorios
 
 t_directorio nuevoDirectorio(int index, char[255] nombre, int padre){

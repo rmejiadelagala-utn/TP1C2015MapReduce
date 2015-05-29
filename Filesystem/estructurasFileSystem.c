@@ -26,6 +26,7 @@ struct t_archivo
 struct t_bloqueArch
   {
   	t_bloqueEnNodo *copiaDeBloque;
+    t_info info;//informacion del archivo
   } ;
 
 struct t_bloqueEnNodo
