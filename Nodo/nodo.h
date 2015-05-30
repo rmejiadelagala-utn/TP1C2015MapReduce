@@ -29,8 +29,19 @@
 //#define BLKSIZE 1024*1024*20
 #define BLKSIZE 10 //Ejemplo para probar el data.bin
 
+typedef struct {
+	char* IP_FS;
+	uint16_t PUERTO_FS;
+	char* ARCH_BIN;
+	char* DIR_TEMP;
+	char* NODO_NEW;
+	char* IP_NODO;
+	uint16_t PUERTO_NODO;
+} t_config_nodo;
+
 uint32_t TAMANIODISCO, TAMANIOARCHIVO;
 
+t_config_nodo* leerArchivoConfig(char *);
 char* mapeo_archivo(char*);
 char* mapeo_disco(char*);
 uint32_t obtenerDirBloque(uint32_t);

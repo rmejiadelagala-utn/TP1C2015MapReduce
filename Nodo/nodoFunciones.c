@@ -1,10 +1,46 @@
 /*
- * nodoFunc.c
+ * nodoFunciones.c
  *
  *  Created on: 18/5/2015
  *      Author: utnso
  */
 #include "nodo.h"
+
+t_config_nodo* leerArchivoConfig(char *path_config){
+
+	t_config *config;
+	t_config_nodo* configNodo = malloc(sizeof(t_config_nodo));
+
+	config = config_create(path_config);
+
+	if (config->properties->elements_amount == 0) {
+		printf("\nERROR AL LEER ARCHIVO DE CONFIGURACION %s \n", path_config);
+		config_destroy(config);
+		exit(-1);
+	}
+
+	configNodo->IP_FS     = config_get_string_value(config, "IP_FS");
+	configNodo->PUERTO_FS = config_get_int_value(config, "PUERTO_FS");
+	configNodo->ARCH_BIN  = config_get_string_value(config, "ARCHIVO_BIN");
+	configNodo->DIR_TEMP  = config_get_string_value(config, "DIR_TEMP");
+	configNodo->NODO_NEW  = config_get_string_value(config, "NODO_NUEVO");
+	configNodo->IP_NODO   = config_get_string_value(config, "IP_NODO");
+	configNodo->PUERTO_NODO = config_get_int_value(config, "PUERTO_NODO");
+
+/*	printf("Conectando a IP: %s\n", config_get_string_value(config, "IP_FS"));
+	printf("Puerto: %d\n", config_get_int_value(config, "PUERTO_FS"));
+	printf("Archivo_bin: %s\n", config_get_string_value(config, "ARCHIVO_BIN"));
+	printf("Directorio Temporal: %s\n", config_get_string_value(config, "DIR_TEMP"));
+	printf("Nodo Nuevo: %s\n", config_get_string_value(config, "NODO_NUEVO"));
+	printf("IP Nodo: %s\n", config_get_string_value(config, "IP_NODO"));
+	printf("Puerto Nodo: %d\n", config_get_int_value(config, "PUERTO_NODO"));*/
+
+	/* Una vez que se levantaron los datos del archivo de configuracion
+	   puedo destruir la estructura config. */
+	config_destroy(config);
+
+	return configNodo;
+}
 
 
 char* mapeo_archivo(char* path){

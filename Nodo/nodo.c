@@ -5,6 +5,7 @@
  *      Author: utnso
  */
 #include "nodo.h"
+#include "interfaces.h"
 
 int main() {
 
@@ -15,16 +16,11 @@ int main() {
 
 	char* path = "/home/utnso/ConfigNodo.txt";
 
-	t_config* config;
-	config = config_create(path);
+	t_config_nodo* arch_config;
 
-	printf("Conectando a IP: %s\n", config_get_string_value(config, "IP_FS"));
-	printf("Puerto: %d\n", config_get_int_value(config, "PUERTO_FS"));
-	printf("Archivo_bin: %s\n", config_get_string_value(config, "ARCHIVO_BIN"));
-	printf("Directorio Temporal: %s\n", config_get_string_value(config, "DIR_TEMP"));
-	printf("Nodo Nuevo: %s\n", config_get_string_value(config, "NODO_NUEVO"));
-	printf("IP Nodo: %s\n", config_get_string_value(config, "IP_NODO"));
-	printf("Puerto Nodo: %d\n", config_get_int_value(config, "PUERTO_NODO"));
+    arch_config= malloc(sizeof(t_config_nodo));
+
+	arch_config = leerArchivoConfig(path);
 
 	DATOS = mapeo_disco("/home/utnso/midata1.bin");
 	memset(DATOS + obtenerDirBloque(1),0, BLKSIZE );
@@ -38,8 +34,17 @@ int main() {
 	}
 
 	int sockfs;
-	sockfs = crearCliente(config_get_string_value(config,"IP_FS"),config_get_int_value(config, "PUERTO_FS"));
+	pthread_t hiloFS;
+	pthread_t hiloJobsNodos;
 
+
+	sockfs = crearCliente(arch_config->IP_FS,arch_config->PUERTO_FS);
+	pthread_create(&hiloFS, NULL, (void*)interfazFS, (void*) &sockfs);
+	pthread_create(&hiloJobsNodos, NULL, (void*)interfazJobNodos, (void*) &arch_config->PUERTO_NODO);
+
+
+    pthread_join(hiloFS,NULL);
+    pthread_join(hiloJobsNodos,NULL);
 
 	//Probando un mensaje mandado del nodo al FS
 	//send(sockfs,ip,1000 ,0);
