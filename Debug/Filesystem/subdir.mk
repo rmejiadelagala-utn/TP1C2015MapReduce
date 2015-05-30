@@ -4,16 +4,22 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../Filesystem/AlgoritmoParaGuardardeFS.c \
 ../Filesystem/consolaFS.c \
-../Filesystem/fsystem.c 
+../Filesystem/fsystem.c \
+../Filesystem/funcionesDeEstructurasFileSystem.c 
 
 OBJS += \
+./Filesystem/AlgoritmoParaGuardardeFS.o \
 ./Filesystem/consolaFS.o \
-./Filesystem/fsystem.o 
+./Filesystem/fsystem.o \
+./Filesystem/funcionesDeEstructurasFileSystem.o 
 
 C_DEPS += \
+./Filesystem/AlgoritmoParaGuardardeFS.d \
 ./Filesystem/consolaFS.d \
-./Filesystem/fsystem.d 
+./Filesystem/fsystem.d \
+./Filesystem/funcionesDeEstructurasFileSystem.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

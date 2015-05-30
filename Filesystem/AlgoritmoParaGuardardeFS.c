@@ -1,9 +1,10 @@
-//
+/*/
 #include"estructurasFileSystem.h"
-
+//
 void distribuirBloquesEnNodos(t_bloqueArch *bloquesEnArch, t_nodo *nodos){
 	t_nodo *nodosOrdenados = ordenarPorMenorUso(nodos);//falta definir
-	for (t_nodo nodoInicial = *nodosOrdenados ; *bloquesEnArch.sgte != NULL ; *bloquesEnArch = *bloquesEnArch.sgte ){
+	t_nodo *nodoInicial = nodosOrdenados;
+	for ( ; bloquesEnArch->sgte != NULL ; bloquesEnArch = bloquesEnArch->9sgte ){
 		//Creo que el primer campo del for no es necesario ya que *nodosOrdenas es algo interno de esta funcion, y *nodos No se toca
 		for ( ;*bloquesEnArch.*copiaDelBloque.sgte != NULL ; *bloquesEnArch.*copiaDelBloque = *bloquesEnArch.*copiaDelBloque.sgte ){
 			*bloquesEnArch.*copiaDelBloque.ip = *nodosOrdenados.ip;
@@ -43,4 +44,5 @@ else {
 //Se carga el archivo en las estructuras y se distribuye el archivo en bloques
 
 //Una vez terminado se distribuyen los bloques en los nodos
-
+*/
+S
