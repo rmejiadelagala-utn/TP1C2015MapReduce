@@ -1,4 +1,6 @@
 //
+#include"estructurasFileSystem.h"
+
 void distribuirBloquesEnNodos(t_bloqueArch *bloquesEnArch, t_nodo *nodos){
 	t_nodo *nodosOrdenados = ordenarPorMenorUso(*nodos);
 	for (t_nodo nodoInicial = *nodosOrdenados ; *bloquesEnArch.sgte != NULL ; *bloquesEnArch = *bloquesEnArch.sgte ){
