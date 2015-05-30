@@ -2,7 +2,7 @@
 #include"estructurasFileSystem.h"
 
 void distribuirBloquesEnNodos(t_bloqueArch *bloquesEnArch, t_nodo *nodos){
-	t_nodo *nodosOrdenados = ordenarPorMenorUso(*nodos);
+	t_nodo *nodosOrdenados = ordenarPorMenorUso(nodos);//falta definir
 	for (t_nodo nodoInicial = *nodosOrdenados ; *bloquesEnArch.sgte != NULL ; *bloquesEnArch = *bloquesEnArch.sgte ){
 		//Creo que el primer campo del for no es necesario ya que *nodosOrdenas es algo interno de esta funcion, y *nodos No se toca
 		for ( ;*bloquesEnArch.*copiaDelBloque.sgte != NULL ; *bloquesEnArch.*copiaDelBloque = *bloquesEnArch.*copiaDelBloque.sgte ){
@@ -20,7 +20,7 @@ void distribuirBloquesEnNodos(t_bloqueArch *bloquesEnArch, t_nodo *nodos){
 
 }
 
-void enviarBloques(t_nodot_nodo *nodosOrdenados,t_info info){
+void enviarBloques(t_nodo *nodosOrdenados,t_info info){
 	//ACA SE ENVIA LA INFORMACION DEL BLOQUE
 }
 t_nodo *ordenarPorMenorUso(t_nodo *nodos){

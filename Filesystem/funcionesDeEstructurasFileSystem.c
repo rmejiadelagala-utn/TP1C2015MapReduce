@@ -14,7 +14,7 @@
   strcpy(unArchivo.nombre,nombre); //la forma de insetar valores a un tipo char en una estructura es usando strcpy de la libreria string.h
   unArchivo.padre = padre;
   unArchivo.tamanio = tamanio;
-  unArchivo.*bloqueArch = *bloqueArch;
+  unArchivo.bloqueArch = bloqueArch;
   unArchivo.estado = estado;
   //devuelvo el archivo
   return unArchivo;
@@ -25,7 +25,7 @@ t_bloqueArch nuevoBloqueEnArchivo(int numeroDeBloqueEnArchivo, t_bloqueEnNodo *c
   struct t_bloquesArch unBloqueEnArchivo;//nueva estructura
   //asignacion de campos a la estructura
   unBloqueEnArchivo.numeroDeBloqueEnArchivo = numeroDeBloqueEnArchivo;
-  unBloqueEnArchivo.*copiaDeBloque = *copiaDeBloque;
+  unBloqueEnArchivo.copiaDeBloque = copiaDeBloque;
   //devuelvo el bloqueDeArchivo
   return unBloqueEnArchivo;
 }
