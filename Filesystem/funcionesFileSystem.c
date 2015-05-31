@@ -75,11 +75,64 @@ else {
 //Una vez terminado se distribuyen los bloques en los nodos
 */
 
+t_fileSystem formatear(t_fileSystem fileSystem) {
+	//Poner vacía la lista de directorios del FS completa
+	list_clean(fileSystem.directorio);
+	//Poner vacía de la lista de nodos todos los nodos asginados al FS
+	list_clean(fileSystem.nodo);
+	//Poner vacía de la lista de archivos todos los archivos que tenga el FS
+	list_clean(fileSystem.archivo);
 
+	return fileSystem;
+}
 
-	/********* PRIVATE FUNCTIONS **************/
+void eliminarArchivo(char *nomArchivo, t_fileSystem fileSystem) {
+	int posicionEnListaArchivos = buscarArchivoPorNombre(nomArchivo,
+			fileSystem.archivo);
 
-static	bool ordenarPorMenorUso(t_nodo *data,t_nodo *dataSiguiente){
-	return dataSiguiente->cantidadBloquesOcupados < data->cantidadBloquesOcupados;
+	if (posicionEnListaArchivos == -1) {
+		//No encontró ese archivo, debería devolver un mensaje de error
+	} else {
+		list_remove(fileSystem.archivo, posicionEnListaArchivos);
+	}
+}
+
+void renombrarArchivo(char *nomArchivo, char *nuevoNombreArchivo,
+		t_fileSystem fileSystem) {
+	//Debo buscar el archivo de nombre nomArchivo y reemplazarlo por el
+	//nuevo nombre
+	int posicionEnListaArchivos = buscarArchivoPorNombre(nomArchivo,
+			fileSystem.archivo);
+
+	//Creo un nuevo archivo, igual al anterior pero con el nombre nuevo
+	t_archivo nuevoArchivo = fileSystem.archivo[posicionEnListaArchivos];
+	nuevoArchivo.nombre = nuevoNombreArchivo;
+
+	if (posicionEnListaArchivos == -1) {
+		//No encontró ese archivo, debería devolver un mensaje de error
+	} else {
+		list_replace(fileSystem.archivo, posicionEnListaArchivos, nuevoArchivo);
+	}
+}
+
+/********* PRIVATE FUNCTIONS **************/
+
+static bool ordenarPorMenorUso(t_nodo *data, t_nodo *dataSiguiente) {
+	return dataSiguiente->cantidadBloquesOcupados
+			< data->cantidadBloquesOcupados;
+}
+
+static int buscarArchivoPorNombre(char *nomArchivo, t_list* listaArchivo) {
+	//En cosa de no encontrar, devuelve -1
+	int tamanioListaArchivos = listaArchivo->elements_count;
+	int posicionEnListaArchivos = -1;
+
+	//Busca en la lista de archivos, aquel que tenga nombre *archivo y devuelve su posición
+	for (int i = 0; i < tamanioListaArchivos; i++) {
+		if (strcmp(listaArchivo[i].head->data->nombre, nomArchivo) == 0) {
+			posicionEnListaArchivos = i;
+		}
+	}
+	return posicionEnListaArchivos;
 }
 
