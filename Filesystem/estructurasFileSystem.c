@@ -5,30 +5,21 @@
 #include"estructurasFileSystem.h"
 
  //funciones para estructura Archivo
+/*
  t_archivo nuevoArchivo(char nombre[255], int padre, float tamanio,
-            t_bloqueArch *bloqueArch, int estado, int numeroDeBloqueEnArchivo)
+            t_list bloquesDeArch, int estado)
 {
-  t_archivo unArchivo; /* definimos una nueva estructura llamado unArchivo */
+  t_archivo unArchivo; // definimos una nueva estructura llamado unArchivo
  
-  /* asignacion de  campos a la estructura */
+  // asignacion de  campos a la estructura
   strcpy(unArchivo.nombre,nombre); //la forma de insetar valores a un tipo char en una estructura es usando strcpy de la libreria string.h
   unArchivo.padre = padre;
   unArchivo.tamanio = tamanio;
-  unArchivo.bloqueArch = bloqueArch;
+  unArchivo.bloquesDeArch = bloquesDeArch;
   unArchivo.estado = estado;
   //devuelvo el archivo
   return unArchivo;
-}
-
-
-t_bloqueArch nuevoBloqueEnArchivo(int numeroDeBloqueEnArchivo, t_bloqueEnNodo *copiaDeBloque){
-  t_bloqueArch unBloqueEnArchivo;//nueva estructura
-  //asignacion de campos a la estructura
-  unBloqueEnArchivo.numeroDeBloqueEnArchivo = numeroDeBloqueEnArchivo;
-  unBloqueEnArchivo.copiaDeBloque = copiaDeBloque;
-  //devuelvo el bloqueDeArchivo
-  return unBloqueEnArchivo;
-}
+}*/
 
 t_bloqueEnNodo nuevoBloqueEnNodo(char ip[255], int puerto, int numeroDeBloqueEnNodo){
   t_bloqueEnNodo unBloqueEnNodo;//nueva estructura
@@ -67,7 +58,7 @@ t_directorio nuevoDirectorio(int index, char nombre[255], int padre){
   t_directorio unDirectorio;
   //asignacion de campos a la estructura
   unDirectorio.index = index;
-  strcpy(unDirectorio.index,index);
+  strcpy(unDirectorio.nombre,nombre);
   unDirectorio.padre = padre;
   //devuelvo la estructura
   return unDirectorio;
