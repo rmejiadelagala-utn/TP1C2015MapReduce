@@ -57,9 +57,9 @@ typedef struct
 //estructura del fileSystem
 typedef struct
    {
-	t_list archivo;
-	t_list nodo;
-	t_list directorio;
+	t_list *archivo;
+	t_list *nodo;
+	t_list *directorio;
   }t_fileSystem ;
 
   //Funciones de estructura

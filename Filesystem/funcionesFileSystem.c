@@ -36,8 +36,12 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos){
 		for (j = 0 ;j<2 ; j++){
 			nodoActual = list_get(nodosOrdenados,k);
 			nodoActual->cantidadBloquesOcupados++;
-			bloqueEnNodo = nuevoBloqueEnNodo(nodoActual->ip, nodoActual->puerto, nodoActual->cantidadBloquesOcupados);
-			bloqueEnNodoP = &bloqueEnNodo;//Esto porque nuevoBloqueEnNodo retorna una estructura y para el list_add me pide un puntero al dato
+			bloqueEnNodo = nuevoBloqueEnNodo(nodoActual->ip, nodoActual->puerto, nodoActual->cantidadBloquesOcupados);/*
+			***FIXME***
+			Ahora que escribo esto para ustedes me doy cuenta que acá va a haber un bug porque al eliminar un archivo
+			esta variable va a disminuir, y puede que los bloquesEnNodo que elimine no sean los últimos sino los primeros, 
+			entonces estaría pisando bloquesEnNodo valido.Posible solución sería meter una variable más en algún lugar
+			bloqueEnNodoP = &bloqueEnNodo;//Esto porque nuevoBloqueEnNodo retorna una estructura y para el list_add me pide un puntero al dato*/
 			list_add(copiasDeBloque,bloqueEnNodoP);
 			k++;
 			if (list_size(nodosOrdenados) == k){
