@@ -7,6 +7,9 @@
 
 #include "fsystem.h"
 #include "consolaFS.h"
+#include"estructurasFileSystem.h"
+#include<commons/collections/list.h>
+#include"funcionesFileSystem.h"
 
 //interaccionFSNodo es la funcion que va a ejecutar cada hilo que esta en conexion con los nodos
 void *interaccionFSNodo(void*);
