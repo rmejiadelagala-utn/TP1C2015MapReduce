@@ -1,9 +1,16 @@
-	/*
 #include"estructurasFileSystem.h"
-#include"funcionesDeEstructurasFileSystem.h"
 #include<commons/collections/list.h>
-#include<stdlib.h>
 //
+//variables auxiliares para la funcion
+	t_bloqueEnNodo bloqueEnNodo;
+	t_nodo *nodoActual;
+	t_bloqueEnNodo *bloqueEnNodoP;
+	t_bloqueArch *bloqueArch;
+	int i;//lo pongo aca porque si lo pongo adentro del for me tira error
+	int j;
+	int k;
+	t_list *copiasDeBloque;
+	t_list *copiasDeBloqueAUX;
 bool ordenarPorMenorUso(t_nodo *data,t_nodo *dataSiguiente){
 	return dataSiguiente->cantidadBloquesOcupados < data->cantidadBloquesOcupados;
 }
@@ -12,33 +19,32 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos){
 	t_list *nodosOrdenados = list_create();//Esto se hace para poder trabajar multihilo sino varios hilos me tocan el puntero de referencia de la lista de nodos y sonaste
 	list_add_all(nodosOrdenados, nodos);//Agrega todos los elementos de la segunda lista en la primera
 	list_sort(nodosOrdenados, (void*) ordenarPorMenorUso);//falta definir ordenarPorMenorUso()
-	t_list *nodoInicial = nodosOrdenados;
-	t_list *bloqueEnArchCursor = bloquesEnArch;
-	int i;//lo pongo aca porque si lo pongo adentro del for me tira error
-	int j;
-	int k = 0;
-	for (i = 0; i<(bloquesEnArch->elements_count) ; i++ ){
+
+	for (i = 0; i<list_size(bloquesEnArch) ; i++ ){
 		//Creo que el primer campo del for no es necesario ya que *nodosOrdenas es algo interno de esta funcion, y *nodos No se toca
-		t_list *copiasDeBloque = list_create();
-		t_bloqueArch bloqueArch = list_get(bloquesEnArch, i + 1);
+		copiasDeBloque = list_create();
 
 		for (j = 0 ;j<2 ; j++){
-			t_nodo nodoActual = list_get(nodosOrdenados,k);
+			nodoActual = list_get(nodosOrdenados,k);
 			nodoActual->cantidadBloquesOcupados++;
-			t_bloqueEnNodo bloqueEnNodo = nuevoBloqueEnNodo(nodoActual->ip, nodoActual->puerto, nodoActual->cantidadBloquesOcupados);
-			list_add(copiasDeBloque);
+			bloqueEnNodo = nuevoBloqueEnNodo(nodoActual->ip, nodoActual->puerto, nodoActual->cantidadBloquesOcupados);
+			bloqueEnNodoP = &bloqueEnNodo;//Esto porque nuevoBloqueEnNodo retorna una estructura y para el list_add me pide un puntero al dato
+			list_add(copiasDeBloque,bloqueEnNodoP);
 			k++;
 			if (list_size(nodosOrdenados) == k){
 				k = 0;
 			}
-			bloqueArch->copiaDeBloque=list_get(copiasDeBloque,1);
+			bloqueArch = (list_get(bloquesEnArch, i + 1));
+			//cargarCopiasABloqueDeArch(bloqueArch,copiasDeBloque);
+			copiasDeBloqueAUX = &bloqueArch->copiasDeBloque;
+			list_add_all(copiasDeBloqueAUX,copiasDeBloque);
 		}
 	
 	}
 
 }
 
-
+/*
 void enviarBloques(t_nodo *nodosOrdenados,t_info info){
 	//ACA SE ENVIA LA INFORMACION DEL BLOQUE
 }
