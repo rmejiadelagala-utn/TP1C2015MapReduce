@@ -45,4 +45,3 @@ else {
 
 //Una vez terminado se distribuyen los bloques en los nodos
 */
-S

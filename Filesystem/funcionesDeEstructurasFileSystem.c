@@ -22,7 +22,7 @@
 
 
 t_bloqueArch nuevoBloqueEnArchivo(int numeroDeBloqueEnArchivo, t_bloqueEnNodo *copiaDeBloque){
-  struct t_bloquesArch unBloqueEnArchivo;//nueva estructura
+  t_bloqueArch unBloqueEnArchivo;//nueva estructura
   //asignacion de campos a la estructura
   unBloqueEnArchivo.numeroDeBloqueEnArchivo = numeroDeBloqueEnArchivo;
   unBloqueEnArchivo.copiaDeBloque = copiaDeBloque;
@@ -44,7 +44,7 @@ t_bloqueEnNodo nuevoBloqueEnNodo(char ip[255], int puerto, int numeroDeBloqueEnN
 
 //funciones para la estructura nodo
 t_nodo nuevoNodo(char ip[255], int puerto, int tamanio){
-  struct t_nodo unNodo;//nueva estructura 
+  t_nodo unNodo;//nueva estructura
   //asignacion de campos a la estructura
   strcpy(unNodo.ip,ip);
   unNodo.puerto = puerto;
@@ -64,7 +64,7 @@ void desactivarNodo(t_nodo unNodo){
 //funciones para la estructura tabla de directorios
 
 t_directorio nuevoDirectorio(int index, char nombre[255], int padre){
-  struct t_directorio unDirectorio;
+  t_directorio unDirectorio;
   //asignacion de campos a la estructura
   unDirectorio.index = index;
   strcpy(unDirectorio.index,index);
