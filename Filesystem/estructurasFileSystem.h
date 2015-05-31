@@ -3,7 +3,7 @@
 
  */
  //estructura FileSytem
-
+#include<commons/collections/list.h>
 
 
  //estructura Archivo
@@ -15,6 +15,7 @@ typedef struct
       int numeroDeBloqueEnNodo;
 
   }t_bloqueEnNodo;
+
 
 typedef struct
   {
@@ -50,9 +51,10 @@ typedef struct
   	char nombre[255];
   	int padre;
   }t_directorio;
+//estructura del fileSystem
 typedef struct
    {
-   	t_archivo *archivo;
-   	t_nodo *nodo;
-   	t_directorio *directorio;
+	t_list *archivo;
+	t_list *nodo;
+	t_list *directorio;
   }t_fileSystem ;

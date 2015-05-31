@@ -42,7 +42,6 @@
 								<option id="gnu.c.link.option.libs.1689436552" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="commons"/>
 									<listOptionValue builtIn="false" value="socketes"/>
-									<listOptionValue builtIn="false" value="cspecs"/>
 									<listOptionValue builtIn="false" value="pthread"/>
 								</option>
 								<option id="gnu.c.link.option.paths.239155481" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
