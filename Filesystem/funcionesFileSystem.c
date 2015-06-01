@@ -8,6 +8,8 @@
 #include"estructurasFileSystem.h"
 #include<commons/collections/list.h>
 #include <stdlib.h>
+#include <string.h>
+
 typedef struct  {
 	  char nombre[255];
 	  bool(*mismoNombreArch)(void*);
@@ -165,6 +167,11 @@ t_list* renombrarArchivoPorNombre(char nombreBuscado[255],
 	//retorno la lista de archivos del FS ya modificada
 	return listaArchivos;
 }
+
+void moverArchivoPorNombre(){
+
+}
+
 /*
 void enviarBloques(t_nodo *nodosOrdenados,t_info info){
 	//ACA SE ENVIA LA INFORMACION DEL BLOQUE
