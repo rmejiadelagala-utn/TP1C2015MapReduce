@@ -20,4 +20,12 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos);
   	*/
 void *eliminarArchivoPorNombre(char nombreBuscado[255],t_list *listaArchivos);
 
+	/*
+	* @NAME: esNodoNuevo
+	* @DESC: recibe una lista de nodos y un nodo, y se fija si ese nodo esta en la lista comparando puerto e ip
+	*/
+bool esNodoNuevo(t_nodo *nodoABuscar,t_list *listaNodos);
+
+
+
 #endif /* FUNCIONESFILESYSTEM_H_ */

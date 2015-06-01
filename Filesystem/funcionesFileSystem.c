@@ -48,6 +48,7 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos){
 			esta variable va a disminuir, y puede que los bloquesEnNodo que elimine no sean los últimos sino los primeros, 
 			entonces estaría pisando bloquesEnNodo valido.Posible solución sería meter una variable más en algún lugar
 			bloqueEnNodoP = &bloqueEnNodo;//Esto porque nuevoBloqueEnNodo retorna una estructura y para el list_add me pide un puntero al dato*/
+			bloqueEnNodoP = &bloqueEnNodo;
 			list_add(copiasDeBloque,bloqueEnNodoP);
 			k++;
 			if (list_size(nodosOrdenados) == k){
@@ -61,6 +62,15 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos){
 
 	}
 }
+bool esNodoNuevo(t_nodo *nodoABuscar,t_list *listaNodos){
+	bool mismosNodos(t_nodo *nodoDeLista){
+		return (nodoABuscar->ip==nodoDeLista->ip)&& (nodoABuscar->puerto==nodoDeLista->puerto);
+	}
+
+	return list_any_satisfy(listaNodos, (bool*)mismosNodos);
+}
+
+
 void* eliminarArchivoPorNombre(char nombreBuscado[255],t_list *listaArchivos){
 	int archivoConNombreBuscado(t_archivo *unArchivo) {
 		return strcmp(nombreBuscado,unArchivo->nombre);
