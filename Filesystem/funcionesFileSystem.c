@@ -121,6 +121,50 @@ void* eliminarArchivoPorNombre(char nombreBuscado[255],t_list *listaArchivos){
 	return list_remove_by_condition(listaArchivos, (void*) archivoConNombreBuscado);
 }
 
+void formatear(t_list *listaNodos, t_list *listaArchivos,
+		t_list *listaDirectorios) {
+	list_clean(listaArchivos);
+	list_clean(listaNodos);
+	list_clean(listaDirectorios);
+}
+
+t_list* renombrarArchivoPorNombre(char nombreBuscado[255],
+		char nuevoNombre[255], t_list *listaArchivos) {
+	t_archivo *archivoAModificar;
+	int posDondeReemplazar = -1;
+
+	int archivoConNombreBuscado(t_archivo *unArchivo) {
+		return strcmp(nombreBuscado, unArchivo->nombre);
+	}
+
+	//Busco cual es el archivo a modificar, dado el nombre
+	archivoAModificar = list_find(listaArchivos,
+			(void*) archivoConNombreBuscado);
+
+	if (archivoAModificar == NULL) {
+		//tirar error de que no se encuentra ese archivo
+	}
+
+	//Busco la posición en la lista de este archivo que debo modificar
+	int i = 0;
+	for (i = 0; i < listaArchivos->elements_count; i++) {
+		if (list_get(listaArchivos, i) == archivoAModificar) {
+			posDondeReemplazar = i;
+		}
+	}
+
+	//genero un archivo nuevo, que va a ser el anterior con un nuevo nombre
+	t_archivo *archivoModificado;
+	archivoModificado = archivoAModificar;
+	strcpy(archivoModificado->nombre, nuevoNombre);
+
+	//reemplazo en la posicion donde se hallaba el original en la lista,
+	//el nuevo archivo con solo el nombre cambiado
+	list_replace(listaArchivos, posDondeReemplazar, archivoModificado);
+
+	//retorno la lista de archivos del FS ya modificada
+	return listaArchivos;
+}
 /*
 void enviarBloques(t_nodo *nodosOrdenados,t_info info){
 	//ACA SE ENVIA LA INFORMACION DEL BLOQUE
