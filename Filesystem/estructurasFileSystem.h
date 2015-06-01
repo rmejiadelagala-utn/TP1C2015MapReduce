@@ -55,13 +55,13 @@ typedef struct
   	int padre;
   }t_directorio;
 //estructura del fileSystem
-typedef struct
+/*typedef struct//No vamos a usar esta estructura, directamente vamos a usar las 3 listas en el FS
    {
 	t_list *archivo;
-	t_list *nodo;
+	t_list *nodo
 	t_list *directorio;
   }t_fileSystem ;
-
+*/
   //Funciones de estructura
 
 

@@ -14,6 +14,9 @@
 //interaccionFSNodo es la funcion que va a ejecutar cada hilo que esta en conexion con los nodos
 void *interaccionFSNodo(void*);
 int listaIDNodo[20];
+t_list *listaArchivos;
+t_list *listaNodos;
+t_list *listaDirectorios;
 int main (){
 
 	system("clear");
@@ -120,3 +123,14 @@ void *interaccionFSNodo(void* sock_ptr)
         close(sock_desc);
         return 0;
 }
+void eliminarArchivoPorNombre(char nombreBuscado[255]){
+	int archivoConNombreBuscado(t_archivo *unArchivo) {
+		return strcmp(nombreBuscado,unArchivo->nombre);
+	}
+
+	list_remove_by_condition(listaArchivos, (void*) archivoConNombreBuscado);
+}
+
+
+
+
