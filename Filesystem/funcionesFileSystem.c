@@ -69,7 +69,36 @@ bool esNodoNuevo(t_nodo *nodoABuscar,t_list *listaNodos){
 
 	return list_any_satisfy(listaNodos, (bool*)mismosNodos);
 }
+//elimina el nodo y los bloques de copia que cada archivo contaba en ese nodo
+void eliminarNodoDeLista(t_nodo *nodoAEliminar,t_list *listaNodos){
+	bool mismosNodos(t_nodo *nodoDeLista){
+			return (nodoAEliminar->ip==nodoDeLista->ip)&& (nodoAEliminar->puerto==nodoDeLista->puerto);
+		}
 
+	list_remove_by_condition(listaNodos, (bool*) mismosNodos);
+}
+void eliminarReferencias(t_nodo *nodoAEliminar,t_list *archivos){
+
+	bool copiaEstaEnNodo(t_bloqueEnNodo *copiaDeBloque){
+		return (nodoAEliminar->ip==copiaDeBloque->ip)&&(nodoAEliminar->puerto==copiaDeBloque->puerto);
+	}
+
+	void _list_elements2(t_list *copiasDeBloques){
+		list_remove_by_condition(copiasDeBloques, (bool*) copiaEstaEnNodo);
+	}
+
+	void _list_elements1(t_archivo *unArchivo){
+		t_list *bloquesDeArchivo = &(unArchivo->bloquesDeArch);
+		list_iterate(bloquesDeArchivo, (void*) _list_elements2);
+	}
+
+	list_iterate(archivos, (void*) _list_elements1);
+}
+void eliminarNodoYRerencias(t_nodo *nodoAEliminar,t_list *listaNodos,t_list *archivos){
+	eliminarNodoDeLista(nodoAEliminar, listaNodos);
+	eliminarReferencias(nodoAEliminar, archivos);
+
+}
 
 void* eliminarArchivoPorNombre(char nombreBuscado[255],t_list *listaArchivos){
 	int archivoConNombreBuscado(t_archivo *unArchivo) {

@@ -26,6 +26,23 @@ void *eliminarArchivoPorNombre(char nombreBuscado[255],t_list *listaArchivos);
 	*/
 bool esNodoNuevo(t_nodo *nodoABuscar,t_list *listaNodos);
 
+	/*
+	* @NAME: eliminarNodoYRerencias
+	* @DESC: elimina nodo de la lista nodos y las referencias de las copias en los archivos si es que pertenecen a ese nodo
+	*/
+void eliminarNodoYRerencias(t_nodo *nodoAEliminar,t_list *listaNodos,t_list *archivos);
 
+
+	/*
+	* @NAME: eliminarReferencias
+	* @DESC: //recorro una lista de archivos y por cada archivo recorro cada lista de bloques de archivo, por cada bloque de archivo veo si tengo que eliminar alguna copia de su lista de copias
+	*/
+void eliminarReferencias(t_nodo *nodoAEliminar,t_list *archivos);
+
+/*
+* @NAME: eliminarNodoDeLista
+* @DESC: elimina nodo de la lista nodos
+*/
+void eliminarNodoDeLista(t_nodo *nodoAEliminar,t_list *listaNodos);
 
 #endif /* FUNCIONESFILESYSTEM_H_ */
