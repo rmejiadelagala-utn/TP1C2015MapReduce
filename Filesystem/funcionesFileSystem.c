@@ -15,7 +15,11 @@ typedef struct  {
 
 static bool ordenarPorMenorUso(t_nodo *data,t_nodo *dataSiguiente);
 //
-//variables auxiliares para la funcion
+
+
+
+void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos){
+	//variables auxiliares para la funcion
 	t_bloqueEnNodo bloqueEnNodo;
 	t_nodo *nodoActual;
 	t_bloqueEnNodo *bloqueEnNodoP;
@@ -25,10 +29,9 @@ static bool ordenarPorMenorUso(t_nodo *data,t_nodo *dataSiguiente);
 	int k;
 	t_list *copiasDeBloque;
 	t_list *copiasDeBloqueAUX;
-
-
-void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos){
 	t_list *nodosOrdenados = list_create();//Esto se hace para poder trabajar multihilo sino varios hilos me tocan el puntero de referencia de la lista de nodos y sonaste
+	//fin de variables auxs
+
 	list_add_all(nodosOrdenados, nodos);//Agrega todos los elementos de la segunda lista en la primera
 	list_sort(nodosOrdenados, (void*) ordenarPorMenorUso);//falta definir ordenarPorMenorUso()
 
@@ -57,6 +60,13 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos){
 		}
 
 	}
+}
+void eliminarArchivoPorNombre(char nombreBuscado[255],t_list *listaArchivos){
+	int archivoConNombreBuscado(t_archivo *unArchivo) {
+		return strcmp(nombreBuscado,unArchivo->nombre);
+	}
+
+	list_remove_by_condition(listaArchivos, (void*) archivoConNombreBuscado);
 }
 
 /*

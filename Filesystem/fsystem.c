@@ -123,13 +123,6 @@ void *interaccionFSNodo(void* sock_ptr)
         close(sock_desc);
         return 0;
 }
-void eliminarArchivoPorNombre(char nombreBuscado[255]){
-	int archivoConNombreBuscado(t_archivo *unArchivo) {
-		return strcmp(nombreBuscado,unArchivo->nombre);
-	}
-
-	list_remove_by_condition(listaArchivos, (void*) archivoConNombreBuscado);
-}
 
 
 
