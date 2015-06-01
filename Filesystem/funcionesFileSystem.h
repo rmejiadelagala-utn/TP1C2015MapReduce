@@ -26,6 +26,13 @@ void *eliminarArchivoPorNombre(char nombreBuscado[255],t_list *listaArchivos);
 	*/
 bool esNodoNuevo(t_nodo *nodoABuscar,t_list *listaNodos);
 
+
+	/*
+	* @NAME: activarNodoReconectado
+	* @DESC: busca en la lista de nodos el nodo reconectado y le cambia el flag activandolo
+	*/
+void activarNodoReconectado(t_nodo *nodoABuscar,t_list *listaNodos);
+
 	/*
 	* @NAME: eliminarNodoYRerencias
 	* @DESC: elimina nodo de la lista nodos y las referencias de las copias en los archivos si es que pertenecen a ese nodo

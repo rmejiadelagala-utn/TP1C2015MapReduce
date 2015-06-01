@@ -62,6 +62,19 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos){
 
 	}
 }
+void activarNodoReconectado(t_nodo *nodoABuscar,t_list *listaNodos){
+	int i;
+	t_nodo *nodoActual;
+	for(i=0 ; i<list_size(listaNodos) ; i++){
+		nodoActual = list_get(listaNodos,i+1);
+		if((nodoABuscar->ip==nodoActual->ip)&& (nodoABuscar->puerto==nodoActual->puerto)){
+			nodoActual->activo=1;
+			i=list_size(listaNodos);//corto el ciclo como un campeon
+
+		}
+	}
+
+}
 bool esNodoNuevo(t_nodo *nodoABuscar,t_list *listaNodos){
 	bool mismosNodos(t_nodo *nodoDeLista){
 		return (nodoABuscar->ip==nodoDeLista->ip)&& (nodoABuscar->puerto==nodoDeLista->puerto);
