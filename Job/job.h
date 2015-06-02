@@ -15,6 +15,14 @@
 #define TRUE 1
 #define FALSE 0
 
+//esta estructura también va a estar replicada en MaRTA/atencion_Job.h con lo cual habría que ponerla en socketes/estructuras.h
+typedef struct {
+	int length;
+	char* data;
+}t_steam;
+
+
+
 typedef char* t_filename;
 
 typedef struct {
@@ -64,22 +72,23 @@ t_config_job* leer_archivo_configuracion(char* arch){
 	return info_config;
 }
 
-int cantidadArchivosToProcesar(t_solicitud sol){
-	int i=0;
-	while(sol.archivos[i] != 0){
+uint32_t cantidadArchivosToProcesar(t_solicitud* sol){
+	uint32_t i=0;
+	while(sol->archivos[i] != 0){
 		i++;
 	}
 	return i;
 }
 
-int tamanioBufferSerializar(t_solicitud sol) {
+uint32_t tamanioBufferSerializar(t_solicitud* sol) {
 	int i=0;
-	int tam = strlen(sol.archivo_resultado);
-	tam += sizeof(sol.combiner);
-	while(sol.archivos[i] != 0){
-		tam+= strlen(sol.archivos[i]);
+	size_t tam = strlen(sol->archivo_resultado);
+	tam += sizeof(sol->combiner);
+	while(sol->archivos[i] != 0){
+		tam+= strlen(sol->archivos[i]);
 		i++;
 	}
-	return tam++;
+	return (uint32_t)tam++;
 }
 #endif /* JOB_H_ */
+
