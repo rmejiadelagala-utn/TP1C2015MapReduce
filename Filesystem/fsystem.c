@@ -21,7 +21,7 @@ int main (){
 
 	system("clear");
 
-	char* path = "/home/utnso/ConfigFS.cfg";
+	char* path = "ConfigFS.cfg";
 
 	config = config_create(path);
 
