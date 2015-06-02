@@ -34,6 +34,12 @@ void *renombrarArchivoPorNombre(char nombreBuscado[255],
 	char nuevoNombre[255], t_list *listaArchivos);
 
 	/*
+	* @NAME: moverArchivoPorNombreYPadre
+	* @DESC: recibe una lista de archivos, un nombre de un archivo y un nuevo padre para el mismo, y lo modifica en la lista de archivos
+	*/
+void* moverArchivoPorNombreYPadre(char nombreBuscado[255],
+		t_list *listaArchivos, int padre);
+	/*
 	* @NAME: esNodoNuevo
 	* @DESC: recibe una lista de nodos y un nodo, y se fija si ese nodo esta en la lista comparando puerto e ip
 	*/
