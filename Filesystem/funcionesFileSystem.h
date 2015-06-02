@@ -39,6 +39,14 @@ void *renombrarArchivoPorNombre(char nombreBuscado[255],
 	*/
 void* moverArchivoPorNombreYPadre(char nombreBuscado[255],
 		t_list *listaArchivos, int padre);
+
+	/*
+	* @NAME: crearDirectorioDadoPadreYNom
+	* @DESC: recibe una lista de directorios, un nombre de un directorio y un padre para el mismo, y lo crea agregando a lista de directorios
+	*/
+void* crearDirectorioDadoPadreYNom(char nombre[255], int padre,
+		t_list *listaDirectorio);
+
 	/*
 	* @NAME: esNodoNuevo
 	* @DESC: recibe una lista de nodos y un nodo, y se fija si ese nodo esta en la lista comparando puerto e ip

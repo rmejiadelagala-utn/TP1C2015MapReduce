@@ -198,6 +198,21 @@ t_list* moverArchivoPorNombreYPadre(char nombreBuscado[255],
 	return listaArchivos;
 }
 
+t_list* crearDirectorioDadoPadreYNom(char nombre[255], int padre,
+		t_list *listaDirectorio) {
+
+	//genero el nuevo directorio con sus datos, y le pongo el indice del ultimo + 1
+	//No se si esta forma es la correcta de hacerlo. Me tira un Warning "a veces"
+	t_directorio *nuevoDirectorio;
+	nuevoDirectorio->index = listaDirectorio->elements_count + 1;
+	strcpy(nuevoDirectorio->nombre, nombre);
+	nuevoDirectorio->padre = padre;
+
+	list_add(listaDirectorio, nuevoDirectorio);
+
+	return listaDirectorio;
+}
+
 /*
  void enviarBloques(t_nodo *nodosOrdenados,t_info info){
  //ACA SE ENVIA LA INFORMACION DEL BLOQUE
