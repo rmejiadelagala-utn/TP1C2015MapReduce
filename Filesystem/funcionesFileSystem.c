@@ -17,6 +17,7 @@ typedef struct {
 
 static bool ordenarPorMenorUso(t_nodo *data, t_nodo *dataSiguiente);
 static int buscarPosicionEnListaDadoUnArchivo(t_list *lista, t_archivo *archivo);
+static int indiceNuevo(t_list *listaDirectorio);
 //
 
 void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {
@@ -209,11 +210,7 @@ t_list* crearDirectorioDadoPadreYNom(char nombre[255], int padre,
 		//genero el nuevo directorio con sus datos, y le pongo el indice del ultimo + 1
 		t_directorio *nuevoDirectorio = malloc(sizeof(t_directorio));
 
-		//Esto del índice que asigna tiene un ERROR. No debe asignar eso, sino
-		//El índice que le sigue al último valor de índice.
-		//Esto pasa porque usamos el índice en la estructura y no el de la lista
-		//Y cuando elimino un directorio, los demás índices no cambian
-		nuevoDirectorio->index = listaDirectorio->elements_count + 1;
+		nuevoDirectorio->index = indiceNuevo(listaDirectorio);
 		strcpy(nuevoDirectorio->nombre, nombre);
 		nuevoDirectorio->padre = padre;
 
@@ -235,6 +232,11 @@ t_list* eliminarDirectorioDadoElIndice(int indice, t_list *listaDirectorio) {
 			(void*) directorioConIndiceBuscado) == NULL) {
 		//tira error de que no lo encontró en la lista.
 	}
+
+	//Me faltó considerar que además del directorio borrado, debe borrar a
+	//los hijos del mismo, ya que no tienen un padre. Y así sucesivamente.
+
+	//borrarDescendientesDe(indice, listaDirectorio);
 
 	return listaDirectorio;
 }
@@ -306,4 +308,27 @@ static int buscarPosicionEnListaDadoUnArchivo(t_list *listaArchivos,
 		}
 	}
 	return posDondeReemplazar;
+}
+
+static int indiceNuevo(t_list *listaDirectorio) {
+	int nuevoIndice = -1;
+
+	int i = 0;
+	for (i = 0; i < listaDirectorio->elements_count; i++) {
+		t_directorio *dirAuxiliar = malloc(sizeof(t_directorio));
+
+		dirAuxiliar = listaDirectorio[i].head->data;
+		if (dirAuxiliar->index != (i + 1)) {
+			nuevoIndice = i + 1;
+
+			i = listaDirectorio->elements_count;		//Para salir a lo rambo
+		}
+		free(dirAuxiliar);
+	}
+
+	if (nuevoIndice == -1) {
+		nuevoIndice = listaDirectorio->elements_count + 1;
+	}
+
+	return nuevoIndice;
 }
