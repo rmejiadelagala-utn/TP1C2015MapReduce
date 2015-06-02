@@ -202,13 +202,27 @@ t_list* crearDirectorioDadoPadreYNom(char nombre[255], int padre,
 		t_list *listaDirectorio) {
 
 	//genero el nuevo directorio con sus datos, y le pongo el indice del ultimo + 1
-	//No se si esta forma es la correcta de hacerlo. Me tira un Warning "a veces"
-	t_directorio *nuevoDirectorio;
+	t_directorio *nuevoDirectorio = malloc(sizeof(t_directorio));
 	nuevoDirectorio->index = listaDirectorio->elements_count + 1;
 	strcpy(nuevoDirectorio->nombre, nombre);
 	nuevoDirectorio->padre = padre;
 
 	list_add(listaDirectorio, nuevoDirectorio);
+
+	return listaDirectorio;
+}
+
+//Este se podría hacer dado nombre, pero preferí así porque el índice es único.
+//Si no, se reutiliza esta función para hacerla por nombre, ruta o lo que sea.
+t_list* eliminarDirectorioDadoElIndice(int indice, t_list *listaDirectorio) {
+
+	int directorioConIndiceBuscado(t_directorio *directorio){
+		return indice == directorio->index;
+	}
+
+	if(list_remove_by_condition(listaDirectorio, (void*) directorioConIndiceBuscado) == NULL){
+		//tira error de que no lo encontró en la lista.
+	}
 
 	return listaDirectorio;
 }

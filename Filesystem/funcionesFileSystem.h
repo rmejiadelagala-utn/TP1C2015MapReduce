@@ -48,6 +48,12 @@ void* crearDirectorioDadoPadreYNom(char nombre[255], int padre,
 		t_list *listaDirectorio);
 
 	/*
+	 * @NAME: eliminarDirectorioDadoElIndice
+	 * @DESC: recibe una lista de directorios, un indice de un directorio y lo elimina
+	 */
+void* eliminarDirectorioDadoElIndice(int indice, t_list *listaDirectorio);
+
+	/*
 	* @NAME: esNodoNuevo
 	* @DESC: recibe una lista de nodos y un nodo, y se fija si ese nodo esta en la lista comparando puerto e ip
 	*/
