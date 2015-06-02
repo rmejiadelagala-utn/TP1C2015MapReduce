@@ -201,14 +201,25 @@ t_list* moverArchivoPorNombreYPadre(char nombreBuscado[255],
 t_list* crearDirectorioDadoPadreYNom(char nombre[255], int padre,
 		t_list *listaDirectorio) {
 
-	//genero el nuevo directorio con sus datos, y le pongo el indice del ultimo + 1
-	t_directorio *nuevoDirectorio = malloc(sizeof(t_directorio));
-	nuevoDirectorio->index = listaDirectorio->elements_count + 1;
-	strcpy(nuevoDirectorio->nombre, nombre);
-	nuevoDirectorio->padre = padre;
+	//Verifico que no se pase de los 1024 directorios permitidos
+	if (list_size(listaDirectorio) > 1024) {
+		//tira error de que supera máxima cant de directorios permitidos
+	} else {
 
-	list_add(listaDirectorio, nuevoDirectorio);
+		//genero el nuevo directorio con sus datos, y le pongo el indice del ultimo + 1
+		t_directorio *nuevoDirectorio = malloc(sizeof(t_directorio));
 
+		//Esto del índice que asigna tiene un ERROR. No debe asignar eso, sino
+		//El índice que le sigue al último valor de índice.
+		//Esto pasa porque usamos el índice en la estructura y no el de la lista
+		//Y cuando elimino un directorio, los demás índices no cambian
+		nuevoDirectorio->index = listaDirectorio->elements_count + 1;
+		strcpy(nuevoDirectorio->nombre, nombre);
+		nuevoDirectorio->padre = padre;
+
+		list_add(listaDirectorio, nuevoDirectorio);
+
+	}
 	return listaDirectorio;
 }
 
@@ -216,11 +227,12 @@ t_list* crearDirectorioDadoPadreYNom(char nombre[255], int padre,
 //Si no, se reutiliza esta función para hacerla por nombre, ruta o lo que sea.
 t_list* eliminarDirectorioDadoElIndice(int indice, t_list *listaDirectorio) {
 
-	int directorioConIndiceBuscado(t_directorio *directorio){
+	int directorioConIndiceBuscado(t_directorio *directorio) {
 		return indice == directorio->index;
 	}
 
-	if(list_remove_by_condition(listaDirectorio, (void*) directorioConIndiceBuscado) == NULL){
+	if (list_remove_by_condition(listaDirectorio,
+			(void*) directorioConIndiceBuscado) == NULL) {
 		//tira error de que no lo encontró en la lista.
 	}
 
