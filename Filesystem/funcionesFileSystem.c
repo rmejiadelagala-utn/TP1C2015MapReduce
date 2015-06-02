@@ -323,7 +323,6 @@ static int indiceNuevo(t_list *listaDirectorio) {
 
 			i = listaDirectorio->elements_count;		//Para salir a lo rambo
 		}
-		free(dirAuxiliar);
 	}
 
 	if (nuevoIndice == -1) {
