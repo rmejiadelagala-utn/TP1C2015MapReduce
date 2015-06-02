@@ -5,8 +5,15 @@
  *      Author: utnso
  */
 
-
 #include"atencionJobs.h"
+
+typedef char* t_filename;
+
+typedef struct {
+	t_filename* archivos;
+	t_filename  archivo_resultado;
+	uint32_t   combiner;
+} t_solicitud;
 
 void* atencionJobs(void* sock){
 	int serv= *(int*)sock;
@@ -53,8 +60,8 @@ void* atencionJobs(void* sock){
 				}
 				else {
                     // gestionar datos de un cliente
-					buff=(char*)malloc(128);
-                    if ((nbytes = recv(i, buff, 1, 0)) <= 0) {
+					buff=(char*)malloc(sizeof(uint32_t));
+                    if ((nbytes = recv(i, buff, sizeof(uint32_t), 0)) <= 0) {
                         // error o conexión cerrada por el cliente
                         if (nbytes == 0) {
                             // conexión cerrada
@@ -67,9 +74,8 @@ void* atencionJobs(void* sock){
                     } else {
                         // tenemos datos de algún cliente
                         // ahora lo muestro por stdout pero debo deserealizar y usar la data
-                    	printf("En teoría este sería el buffer recibido:\n");
-                        printf("%s\n", buff);
-
+                        deserealizar(buff,i);
+                        FD_CLR(i, &master); // eliminar del conjunto maestro, seguira la atencion con hilo
                     }
 				}
 			}
@@ -78,3 +84,47 @@ void* atencionJobs(void* sock){
 	free(buff);
 }
 
+void deserealizar(char* buffer, int sockCliente) {
+	char* payload;
+	int nbytes;
+	uint32_t tam_payload;
+	memcpy(&tam_payload,buffer,sizeof(uint32_t));
+	printf("tam_payload: %d\n", tam_payload);
+	payload=(char*)malloc(tam_payload);
+	if((nbytes=recv(sockCliente,payload,tam_payload,0))<=0) {
+        // error o conexión cerrada por el cliente
+        if (nbytes == 0) {
+            // conexión cerrada
+            printf("selectserver: socket %d cerró conexión\n", sockCliente);
+        } else {
+            perror("recv");
+        }
+        close(sockCliente); // bye! tal vez aca no tenga que cerrarlo sino en la funcion que me llamó.
+	}
+	else {
+		int i=0;
+		t_solicitud solicitud;
+		uint32_t long_arch;
+		uint32_t cant_arch; //cantidad de archivos a procesar
+		int cursor;
+		memcpy(&cant_arch,payload+sizeof(uint32_t),sizeof(uint32_t));
+		printf("cant_arch: %s\n",cant_arch);
+		cursor=2*sizeof(uint32_t);
+		while (i<cant_arch){
+			memcpy( &long_arch,payload + cursor	, sizeof(uint32_t));
+			//solicitud.archivos[i]=malloc(long_arch+1);
+			cursor+=sizeof(uint32_t);
+			memcpy(solicitud.archivos[i],payload + cursor,  long_arch);
+			cursor+=long_arch;
+			i++;
+		}
+		memcpy(&long_arch ,payload + cursor,sizeof(uint32_t));
+		cursor+=sizeof(uint32_t);
+		memcpy(solicitud.archivo_resultado,payload + cursor, long_arch );
+		cursor+=long_arch;
+		memcpy(&solicitud.combiner,payload + cursor,  sizeof(uint32_t));
+		printf("Mostrando archivo_resultado deserealizado\n");
+		printf("%s\n",solicitud.archivo_resultado);
+	}
+
+}
