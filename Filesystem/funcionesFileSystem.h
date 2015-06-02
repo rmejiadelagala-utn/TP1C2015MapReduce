@@ -21,9 +21,24 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos);
 void *eliminarArchivoPorNombre(char nombreBuscado[255],t_list *listaArchivos);
 
 	/*
+	* @NAME: formatear
+	* @DESC: recibe la lista de archivos, nodos y directorios, y las vacía
+	*/
+void formatear();
+
+	/*
+	* @NAME: renombrarArchivoPorNombre
+	* @DESC: recibe una lista de archivos, un nombre de un archivo y un nuevo nombre para el mismo, y lo modifica en la lista de archivos
+	*/
+void *renombrarArchivoPorNombre(char nombreBuscado[255],
+	char nuevoNombre[255], t_list *listaArchivos);
+
+	/*
 	* @NAME: esNodoNuevo
 	* @DESC: recibe una lista de nodos y un nodo, y se fija si ese nodo esta en la lista comparando puerto e ip
 	*/
+
+
 bool esNodoNuevo(t_nodo *nodoABuscar,t_list *listaNodos);
 
 
