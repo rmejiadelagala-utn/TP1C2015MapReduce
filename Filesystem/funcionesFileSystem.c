@@ -9,6 +9,12 @@
 #include<commons/collections/list.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/mman.h>
+#include <stdint.h>
+#include <fcntl.h>
+#include <err.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 typedef struct {
 	char nombre[255];
@@ -19,6 +25,34 @@ static bool ordenarPorMenorUso(t_nodo *data, t_nodo *dataSiguiente);
 static int buscarPosicionEnListaDadoUnArchivo(t_list *lista, t_archivo *archivo);
 static int indiceNuevo(t_list *listaDirectorio);
 //
+
+t_list* divideArchivoEnBloques(char* pathArch){
+
+	int fd_a = -1, i;
+	uint32_t tamanio_arch;
+
+	if ((fd_a = open(pathArch, O_RDWR)) == -1)
+		err(1, "FS: Error al abrir archivo (open)");
+
+	struct stat bufa;
+
+	stat(pathArch, &bufa);
+	tamanio_arch = bufa.st_size;
+
+	int cant_bloques = (tamanio_arch / BLKSIZE) + (tamanio_arch % BLKSIZE != 0);
+
+	t_list * bloquesArchivo = list_create();
+	t_bloquesEnArch * elem;
+
+	for (i = 0; i < cant_bloques; i++) {
+
+//		elem->nombre = pathArch; -> Nombre del Archivo
+		elem->nroBloqueArch = i;
+		list_add(bloquesArchivo, elem);
+
+	}
+   return bloquesArchivo;
+}
 
 void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {
 	//variables auxiliares para la funcion
