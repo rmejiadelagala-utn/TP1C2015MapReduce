@@ -26,6 +26,11 @@ typedef struct
   	t_list copiasDeBloque;
   }t_bloqueArch ;
 
+typedef struct
+    {
+	   char nombre[255];
+	   int nroBloqueArch;
+    }t_bloquesEnArch; 
 
 typedef struct
   {
@@ -106,5 +111,7 @@ typedef struct
   	*/
   t_directorio nuevoDirectorio(int index, char nombre[255], int padre);
 
+//funcion para dividir el archivo en bloques
+  t_list* divideArchivoEnBloques(char* pathArch);
 
   #endif /* ESTRUCTURASFILESYSTEM_H_ */
