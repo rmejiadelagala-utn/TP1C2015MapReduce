@@ -6,7 +6,7 @@ int consola() {
 	char **comandoSeparado;
 	char comando[100];
 	char *comandosValidos[18];
-	int exit=0;
+	int exit = 0;
 
 	//Incializo los comandos en un array para despues poder hacer
 	//el switch y llamar a la funcion correspondiente
@@ -44,12 +44,15 @@ int consola() {
 		//Una vez que lo separe reviso si la primera parte de las separaciones comandoSeparado[0]
 		//se corresponde con alguno de los comandos validos para asignar a entrada
 		for (i = 0; i < 18; i++) {
-			if (string_equals_ignore_case(comandoSeparado[0], comandosValidos[i])) {
+			if (string_equals_ignore_case(comandoSeparado[0],
+					comandosValidos[i])) {
 				entrada = i;
 			}
 		}
 		//Si el comando es uno de aquellos que necesitan parametros, valida el parametro antes de ejecutarlo
-		if((entrada>=ELIMINAR_ARCHIVO) && (entrada<=ELIMINAR_NODO) && (comandoSeparado[1]==NULL)) entrada=FALTA_PARAMETRO;
+		if ((entrada >= ELIMINAR_ARCHIVO) && (entrada <= ELIMINAR_NODO)
+				&& (comandoSeparado[1] == NULL))
+			entrada = FALTA_PARAMETRO;
 		switch (entrada) {
 		case FORMATEAR:
 			formatearMDFS();
@@ -103,7 +106,7 @@ int consola() {
 			help();
 			break;
 		case SALIR:
-			exit=1;
+			exit = 1;
 			break;
 		case COMANDO_INVALIDO:
 			printf("Comando Invalido\n");
@@ -112,13 +115,11 @@ int consola() {
 			printf("Parametro invalido\n");
 			break;
 
-		//para evitar que halla perdidas de memoria, esta funcion va liberando uno por uno los strings en comandoSeparado
-		freeSeparaciones(comandoSeparado);
+			//para evitar que halla perdidas de memoria, esta funcion va liberando uno por uno los strings en comandoSeparado
+			freeSeparaciones(comandoSeparado);
 		}
 
 	} while (!exit);
-
-
 
 	return 0;
 }
@@ -152,63 +153,63 @@ void formatearMDFS() {
 }
 
 void eliminarArchivo(char *archivo) {
-		printf("Borra el archivo %s\n", archivo);
+	printf("Borra el archivo %s\n", archivo);
 }
 
 void renombrarArchivo(char *archivo) {
-		printf("Renombra el archivo %s\n", archivo);
+	printf("Renombra el archivo %s\n", archivo);
 }
 
 void moverArchivo(char *archivo) {
-		printf("Mueve el archivo %s\n", archivo);
+	printf("Mueve el archivo %s\n", archivo);
 }
 
 void crearDirectorio(char *directorio) {
-		printf("Crea el directorio %s\n", directorio);
+	printf("Crea el directorio %s\n", directorio);
 }
 
 void eliminarDirectorio(char *directorio) {
-		printf("Borra el directorio %s\n", directorio);
+	printf("Borra el directorio %s\n", directorio);
 }
 
 void renombrarDirectorio(char *directorio) {
-		printf("Renombra el directorio %s\n", directorio);
+	printf("Renombra el directorio %s\n", directorio);
 }
 
 void moverDirectorio(char *directorio) {
-		printf("Mueve el directorio %s\n", directorio);
+	printf("Mueve el directorio %s\n", directorio);
 }
 
 void copiarAMDFS(char *archivo) {
-		printf("Copia el archivo %s al MDFS\n", archivo);
+	printf("Copia el archivo %s al MDFS\n", archivo);
 }
 
 void copiarAFS(char *archivo) {
-		printf("Copia el archivo %s al FileSystem\n", archivo);
+	printf("Copia el archivo %s al FileSystem\n", archivo);
 }
 
 void solicitarMD5(char *archivo) {
-		printf("Obtiene el solicitarMD5 de %s\n", archivo);
+	printf("Obtiene el solicitarMD5 de %s\n", archivo);
 }
 
 void verBloque(char *bloque) {
-		printf("Vee el Bloque nro %s\n", bloque);
+	printf("Vee el Bloque nro %s\n", bloque);
 }
 
 void eliminarBloque(char *bloque) {
-		printf("Borra el Bloque nro %s\n", bloque);
+	printf("Borra el Bloque nro %s\n", bloque);
 }
 
 void copiarBloque(char *bloque) {
-		printf("Copia el Bloque nro %s\n", bloque);
+	printf("Copia el Bloque nro %s\n", bloque);
 }
 
 void levantarNodo(char *nodo) {
-		printf("Agrega el nodo %s\n", nodo);
+	printf("Agrega el nodo %s\n", nodo);
 }
 
 void eliminarNodo(char *nodo) {
-		printf("Borra el nodo %s\n", nodo);
+	printf("Borra el nodo %s\n", nodo);
 }
 
 void help() {
@@ -217,9 +218,11 @@ void help() {
 	printf("eliminarArchivo archivo		Borra el archivo 'archivo'\n");
 	printf("renombarArchivo archivo		Renombra el archivo 'archivo'\n");
 	printf("moverArchivo archivo		Mueve el archivo 'archivo'\n");
-	printf("crearDirectorio directorio		Crea un directorio llamado 'directorio'\n");
+	printf(
+			"crearDirectorio directorio		Crea un directorio llamado 'directorio'\n");
 	printf("eliminarDirectorio directorio		Borra el directorio 'directorio'\n");
-	printf("renombrarDirectorio directorio		Renombra el directorio 'directorio'\n");
+	printf(
+			"renombrarDirectorio directorio		Renombra el directorio 'directorio'\n");
 	printf("moverDirectorio directorio		Mueve el directorio 'directorio'\n");
 	printf("copiarAMDFS archivo		Copia el archivo file al MDFS\n");
 	printf("copiarAFS archivo		Copia el archivo file al File System\n");

@@ -7,6 +7,7 @@
 #include<stdbool.h>
 #include"estructurasFileSystem.h"
 #include<commons/collections/list.h>
+#include<commons/collections/queue.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
@@ -25,35 +26,35 @@ static bool ordenarPorMenorUso(t_nodo *data, t_nodo *dataSiguiente);
 static int buscarPosicionEnListaDadoUnArchivo(t_list *lista, t_archivo *archivo);
 static int indiceNuevo(t_list *listaDirectorio);
 //
+/*
+ t_list* divideArchivoEnBloques(char* pathArch){
 
-t_list* divideArchivoEnBloques(char* pathArch){
+ int fd_a = -1, i;
+ uint32_t tamanio_arch;
 
-	int fd_a = -1, i;
-	uint32_t tamanio_arch;
+ if ((fd_a = open(pathArch, O_RDWR)) == -1)
+ err(1, "FS: Error al abrir archivo (open)");
 
-	if ((fd_a = open(pathArch, O_RDWR)) == -1)
-		err(1, "FS: Error al abrir archivo (open)");
+ struct stat bufa;
 
-	struct stat bufa;
+ stat(pathArch, &bufa);
+ tamanio_arch = bufa.st_size;
 
-	stat(pathArch, &bufa);
-	tamanio_arch = bufa.st_size;
+ int cant_bloques = (tamanio_arch / BLKSIZE) + (tamanio_arch % BLKSIZE != 0);
 
-	int cant_bloques = (tamanio_arch / BLKSIZE) + (tamanio_arch % BLKSIZE != 0);
+ t_list * bloquesArchivo = list_create();
+ t_bloquesEnArch * elem;
 
-	t_list * bloquesArchivo = list_create();
-	t_bloquesEnArch * elem;
+ for (i = 0; i < cant_bloques; i++) {
 
-	for (i = 0; i < cant_bloques; i++) {
+ //		elem->nombre = pathArch; -> Nombre del Archivo
+ elem->nroBloqueArch = i;
+ list_add(bloquesArchivo, elem);
 
-//		elem->nombre = pathArch; -> Nombre del Archivo
-		elem->nroBloqueArch = i;
-		list_add(bloquesArchivo, elem);
-
-	}
-   return bloquesArchivo;
-}
-
+ }
+ return bloquesArchivo;
+ }
+ */
 void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {
 	//variables auxiliares para la funcion
 	t_bloqueEnNodo bloqueEnNodo;
@@ -62,7 +63,9 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {
 	t_bloqueArch *bloqueArch;
 	int i; //lo pongo aca porque si lo pongo adentro del for me tira error
 	int j;
-	int k;
+	int k = 0;
+	int *aux;
+	int posicionEnNodo;
 	t_list *copiasDeBloque;
 	t_list *copiasDeBloqueAUX;
 	t_list *nodosOrdenados = list_create(); //Esto se hace para poder trabajar multihilo sino varios hilos me tocan el puntero de referencia de la lista de nodos y sonaste
@@ -77,14 +80,15 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {
 
 		for (j = 0; j < 2; j++) {
 			nodoActual = list_get(nodosOrdenados, k);
+			if (queue_is_empty(nodoActual->bloqueLiberados)) {
+				posicionEnNodo = nodoActual->cantidadBloquesOcupados + 1;
+			} else {
+				aux = queue_pop(nodoActual->bloqueLiberados);
+				posicionEnNodo = *aux;
+			}
 			nodoActual->cantidadBloquesOcupados++;
 			bloqueEnNodo = nuevoBloqueEnNodo(nodoActual->ip, nodoActual->puerto,
-					nodoActual->cantidadBloquesOcupados);/*
-					 ***FIXME***
-					 Ahora que escribo esto para ustedes me doy cuenta que acá va a haber un bug porque al eliminar un archivo
-					 esta variable va a disminuir, y puede que los bloquesEnNodo que elimine no sean los últimos sino los primeros,
-					 entonces estaría pisando bloquesEnNodo valido.Posible solución sería meter una variable más en algún lugar
-					 bloqueEnNodoP = &bloqueEnNodo;//Esto porque nuevoBloqueEnNodo retorna una estructura y para el list_add me pide un puntero al dato*/
+					posicionEnNodo);
 			bloqueEnNodoP = &bloqueEnNodo;
 			list_add(copiasDeBloque, bloqueEnNodoP);
 			k++;

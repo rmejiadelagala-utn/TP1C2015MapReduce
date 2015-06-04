@@ -55,8 +55,8 @@ void agregar_tests() {
 			"test crear directorio nuevo y ver que tiene un elemento mas",
 			test_crear_directorio_nuevo_y_contar_directorios_totales);
 	CU_add_test(pSuite,
-				"test crear directorio nuevo y ver que tiene el indice correcto",
-				test_crear_directorio_nuevo_y_verificar_su_indice);
+			"test crear directorio nuevo y ver que tiene el indice correcto",
+			test_crear_directorio_nuevo_y_verificar_su_indice);
 }
 
 //interaccionFSNodo es la funcion que va a ejecutar cada hilo que esta en conexion con los nodos
@@ -101,7 +101,6 @@ int main() {
 	 crearServerMultiHilo(config_get_int_value(config, "PUERTO_FS"),interaccionFSNodo);
 	 */
 	//return 0;
-
 //Comente la otra parte por si al final nos decidimos por usar la opcion con select,
 //pero para ahora probar multihilo para sincronizar la lista de nodos.
 	/*   int servFS, fdmax, i, sin_size, nbytes;
