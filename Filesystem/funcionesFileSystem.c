@@ -386,13 +386,14 @@ static int obtenerArchivo(char *nombreArchivo, t_list *archivosDelFS, t_list *no
 				return unNodo.ipPuerto==bloque.ipPuerto;
 			}
 		t_nodo nodoEncontrado = list_find(nodosDelFS,(void*) ipPuertoCoincide);
-		int socket_desc = nodoEncontrado.socket;
+		//HAY QUE CREAR EL CAMPO SOCKET EN NODO
+		/*int socket_desc = nodoEncontrado.socket;
 		send(socket_desc,1,sizeOf(1),0);
 		int tamanioData;
 		recv(socket_desc, &tamanioData,1,0);
 		char **data = malloc(&tamanioData);
 		recv(socket_desc, *data, tamanioData, 0);
-		puts(*data);
+		puts(*data);*/
 		//FALTA ESCRIBIR EN ARCHIVO EN VEZ DE MOSTRAR POR PANTALLA
 	}
 	list_iterate(archivoEncontrado.bloquesDeArch, (void *) obtenerBloque);
