@@ -1,65 +1,66 @@
- /*
+/*
  funciones para inicializar las estructuras del fileSystem
-*/
+ */
 
 #include"estructurasFileSystem.h"
+#include<string.h>
 
- //funciones para estructura Archivo
+//funciones para estructura Archivo
 /*
  t_archivo nuevoArchivo(char nombre[255], int padre, float tamanio,
-            t_list bloquesDeArch, int estado)
-{
-  t_archivo unArchivo; // definimos una nueva estructura llamado unArchivo
+ t_list bloquesDeArch, int estado)
+ {
+ t_archivo unArchivo; // definimos una nueva estructura llamado unArchivo
  
-  // asignacion de  campos a la estructura
-  strcpy(unArchivo.nombre,nombre); //la forma de insetar valores a un tipo char en una estructura es usando strcpy de la libreria string.h
-  unArchivo.padre = padre;
-  unArchivo.tamanio = tamanio;
-  unArchivo.bloquesDeArch = bloquesDeArch;
-  unArchivo.estado = estado;
-  //devuelvo el archivo
-  return unArchivo;
-}*/
+ // asignacion de  campos a la estructura
+ strcpy(unArchivo.nombre,nombre); //la forma de insetar valores a un tipo char en una estructura es usando strcpy de la libreria string.h
+ unArchivo.padre = padre;
+ unArchivo.tamanio = tamanio;
+ unArchivo.bloquesDeArch = bloquesDeArch;
+ unArchivo.estado = estado;
+ //devuelvo el archivo
+ return unArchivo;
+ }*/
 
-t_bloqueEnNodo nuevoBloqueEnNodo(char ip[255], int puerto, int numeroDeBloqueEnNodo){
-  t_bloqueEnNodo unBloqueEnNodo;//nueva estructura
-  //asignacion de valores a la estructura
-  strcpy(unBloqueEnNodo.ip,ip);
-  unBloqueEnNodo.puerto = puerto;
-  unBloqueEnNodo.numeroDeBloqueEnNodo = numeroDeBloqueEnNodo;
-  //devuelvo la estructura
-  return unBloqueEnNodo;
+t_bloqueEnNodo nuevoBloqueEnNodo(char ip[255], int puerto,
+		int numeroDeBloqueEnNodo) {
+	t_bloqueEnNodo unBloqueEnNodo; //nueva estructura
+	//asignacion de valores a la estructura
+	strcpy(unBloqueEnNodo.ip, ip);
+	unBloqueEnNodo.puerto = puerto;
+	unBloqueEnNodo.numeroDeBloqueEnNodo = numeroDeBloqueEnNodo;
+	//devuelvo la estructura
+	return unBloqueEnNodo;
 }
-
-
 
 //funciones para la estructura nodo
-t_nodo nuevoNodo(char ip[255], int puerto, int tamanio){
-  t_nodo unNodo;//nueva estructura
-  //asignacion de campos a la estructura
-  strcpy(unNodo.ip,ip);
-  unNodo.puerto = puerto;
-  unNodo.tamanio = tamanio;
-  unNodo.cantidadBloquesOcupados = 0;//SE SUPONE QUE SI EL NODO ES NUEVO NO TIENE BLOQUES ESCRITOS
-  unNodo.activo = 1;//SE SUPONE QUE SI EL NODO SE ESTA CONECTANDO, ENTONCES ESTA ACTIVO
-  //devuelvo la estructura
-  return unNodo;
+t_nodo nuevoNodo(char ip[255], int puerto, int tamanio) {
+	t_nodo unNodo;  //nueva estructura
+	//asignacion de campos a la estructura
+	strcpy(unNodo.ip, ip);
+	unNodo.puerto = puerto;
+	unNodo.tamanio = tamanio;
+	unNodo.cantidadBloquesOcupados = 0; //SE SUPONE QUE SI EL NODO ES NUEVO NO TIENE BLOQUES ESCRITOS
+	unNodo.activo = 1; //SE SUPONE QUE SI EL NODO SE ESTA CONECTANDO, ENTONCES ESTA ACTIVO
+	unNodo.bloqueLiberados = queue_create();
+	//devuelvo la estructura
+	return unNodo;
 }
 
-void activarNodo(t_nodo unNodo){
-  unNodo.activo = 1;
+void activarNodo(t_nodo unNodo) {
+	unNodo.activo = 1;
 }
-void desactivarNodo(t_nodo unNodo){
-  unNodo.activo = 0;
+void desactivarNodo(t_nodo unNodo) {
+	unNodo.activo = 0;
 }
 //funciones para la estructura tabla de directorios
 
-t_directorio nuevoDirectorio(int index, char nombre[255], int padre){
-  t_directorio unDirectorio;
-  //asignacion de campos a la estructura
-  unDirectorio.index = index;
-  strcpy(unDirectorio.nombre,nombre);
-  unDirectorio.padre = padre;
-  //devuelvo la estructura
-  return unDirectorio;
+t_directorio nuevoDirectorio(int index, char nombre[255], int padre) {
+	t_directorio unDirectorio;
+	//asignacion de campos a la estructura
+	unDirectorio.index = index;
+	strcpy(unDirectorio.nombre, nombre);
+	unDirectorio.padre = padre;
+	//devuelvo la estructura
+	return unDirectorio;
 }
