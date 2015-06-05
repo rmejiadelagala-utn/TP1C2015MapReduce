@@ -23,7 +23,7 @@ typedef struct {
 	t_list copiasDeBloque;
 } t_bloqueArch;
 
-typedef struct {
+typedef struct { //XXX hace falta esta estructura  t_bloquesEnArch;
 	char nombre[255];
 	int nroBloqueArch;
 } t_bloquesEnArch;
@@ -43,7 +43,7 @@ typedef struct {
 	int puerto; //ip y puerto sean un solo char
 	int tamanio;
 	int cantidadBloquesOcupados;
-	t_queue *bloqueLiberados;
+	t_queue *bloquesLiberados;
 	int activo; //para saber si el bloque se cayo o esta activo
 } t_nodo;
 
@@ -105,5 +105,37 @@ t_directorio nuevoDirectorio(int index, char nombre[255], int padre);
 
 //funcion para dividir el archivo en bloques
 t_list* divideArchivoEnBloques(char* pathArch);
+
+//Funciones para liberar estructuras
+
+/**
+ * @NAME: liberarBloqueEnNodo
+ * @DESC: Libera la estructura bloqueEnNodo
+ */
+void liberarBloqueEnNodo(t_bloqueEnNodo *bloqueEnNodo);
+
+/**
+ * @NAME: liberarBloqueArch
+ * @DESC: Libera la estructura bloqueArch
+ */
+void liberarBloqueArch(t_bloqueArch *bloqueArch);
+
+/**
+ * @NAME: liberarArchivo
+ * @DESC: Libera la estructura archivo
+ */
+void liberarArchivo(t_archivo *unArchivo);
+
+/**
+ * @NAME: liberarNodo
+ * @DESC: Libera la estructura nodo
+ */
+void liberarNodo(t_nodo *unNodo);
+
+/**
+ * @NAME: liberarDirectorio
+ * @DESC: Libera la estructura directorio
+ */
+void liberarDirectorio(t_directorio *unDirectorio);
 
 #endif /* ESTRUCTURASFILESYSTEM_H_ */

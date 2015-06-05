@@ -80,10 +80,10 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {
 
 		for (j = 0; j < 2; j++) {
 			nodoActual = list_get(nodosOrdenados, k);
-			if (queue_is_empty(nodoActual->bloqueLiberados)) {
+			if (queue_is_empty(nodoActual->bloquesLiberados)) {
 				posicionEnNodo = nodoActual->cantidadBloquesOcupados + 1;
 			} else {
-				aux = queue_pop(nodoActual->bloqueLiberados);
+				aux = queue_pop(nodoActual->bloquesLiberados);
 				posicionEnNodo = *aux;
 			}
 			nodoActual->cantidadBloquesOcupados++;

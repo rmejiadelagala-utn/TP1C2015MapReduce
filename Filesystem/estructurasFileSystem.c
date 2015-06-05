@@ -4,7 +4,7 @@
 
 #include"estructurasFileSystem.h"
 #include<string.h>
-
+#include<stdlib.h>
 //funciones para estructura Archivo
 /*
  t_archivo nuevoArchivo(char nombre[255], int padre, float tamanio,
@@ -42,7 +42,7 @@ t_nodo nuevoNodo(char ip[255], int puerto, int tamanio) {
 	unNodo.tamanio = tamanio;
 	unNodo.cantidadBloquesOcupados = 0; //SE SUPONE QUE SI EL NODO ES NUEVO NO TIENE BLOQUES ESCRITOS
 	unNodo.activo = 1; //SE SUPONE QUE SI EL NODO SE ESTA CONECTANDO, ENTONCES ESTA ACTIVO
-	unNodo.bloqueLiberados = queue_create();
+	unNodo.bloquesLiberados = queue_create();
 	//devuelvo la estructura
 	return unNodo;
 }
@@ -63,4 +63,44 @@ t_directorio nuevoDirectorio(int index, char nombre[255], int padre) {
 	unDirectorio.padre = padre;
 	//devuelvo la estructura
 	return unDirectorio;
+}
+//Funciones Para liberar
+void liberarBloqueEnNodo(t_bloqueEnNodo *bloqueEnNodo) {
+	free(&bloqueEnNodo->ip);
+	free(&bloqueEnNodo->numeroDeBloqueEnNodo);
+	free(&bloqueEnNodo->puerto);
+	free(bloqueEnNodo);
+}
+
+void liberarBloqueArch(t_bloqueArch *bloqueArch) {
+	list_destroy_and_destroy_elements(&(bloqueArch->copiasDeBloque),
+			(void*) liberarBloqueEnNodo);
+	free(bloqueArch);
+}
+
+void liberarArchivo(t_archivo *unArchivo) {
+	list_destroy_and_destroy_elements(&(unArchivo->bloquesDeArch),
+			(void*) liberarBloqueArch);
+	free(&unArchivo->estado);
+	free(&unArchivo->nombre);
+	free(&unArchivo->padre);
+	free(&unArchivo->tamanio);
+	free(unArchivo);
+}
+
+void liberarNodo(t_nodo *unNodo) {
+	queue_destroy_and_destroy_elements(unNodo->bloquesLiberados, (void*) free);
+	free(&unNodo->activo);
+	free(&unNodo->cantidadBloquesOcupados);
+	free(&unNodo->ip);
+	free(&unNodo->puerto);
+	free(&unNodo->tamanio);
+	free(unNodo);
+}
+
+void liberarDirectorio(t_directorio *unDirectorio) {
+	free(&unDirectorio->index);
+	free(&unDirectorio->nombre);
+	free(&unDirectorio->padre);
+	free(unDirectorio);
 }
