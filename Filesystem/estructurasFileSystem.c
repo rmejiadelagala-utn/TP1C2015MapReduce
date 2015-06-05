@@ -5,6 +5,7 @@
 #include"estructurasFileSystem.h"
 #include<string.h>
 #include<stdlib.h>
+#include<stdio.h>
 //funciones para estructura Archivo
 /*
  t_archivo nuevoArchivo(char nombre[255], int padre, float tamanio,
@@ -64,6 +65,7 @@ t_directorio nuevoDirectorio(int index, char nombre[255], int padre) {
 	//devuelvo la estructura
 	return unDirectorio;
 }
+
 //Funciones Para liberar
 void liberarBloqueEnNodo(t_bloqueEnNodo *bloqueEnNodo) {
 	free(&bloqueEnNodo->ip);
@@ -104,3 +106,59 @@ void liberarDirectorio(t_directorio *unDirectorio) {
 	free(&unDirectorio->padre);
 	free(unDirectorio);
 }
+
+//Funciones para mostrar estructuras por pantalla
+
+void mostrarBloqueEnNodo(t_bloqueEnNodo *bloqueEnNodo) {
+	printf("\tIp: %s\n", bloqueEnNodo->ip);
+	printf("\tPuerto: %d\n", bloqueEnNodo->puerto);
+	printf("\tNumeroDeBloqueEnNodo %d\n", bloqueEnNodo->numeroDeBloqueEnNodo);
+}
+
+void mostrarBloqueArch(t_bloqueArch *bloqueArch) {
+	printf("\n\n\n");
+	list_iterate(&(bloqueArch->copiasDeBloque),
+			(void*) mostrarBloqueEnNodo);
+}
+
+void mostrarArchivo(t_archivo *unArchivo) {
+	printf("Estado: %d\n", unArchivo->estado);
+	printf("Nombre: %s\n", unArchivo->nombre);
+	printf("Padre: %d\n", unArchivo->padre);
+	printf("Tamanio: %f\n", unArchivo->tamanio);
+	list_iterate(&(unArchivo->bloquesDeArch),
+				(void*) mostrarBloqueArch);
+}
+
+void mostrarColaDeInt(t_nodo *unNodo) {
+	if (queue_is_empty(unNodo->bloquesLiberados)) {
+		printf("No hay bloques liberados en el medio en el nodo");
+	}
+	else {
+		int *primeroAux = queue_peek(unNodo->bloquesLiberados);
+		int *aux = queue_pop(unNodo->bloquesLiberados);
+		printf("BloqueLiberado: %d\n",*primeroAux);
+		queue_push(unNodo->bloquesLiberados, primeroAux);
+		while(queue_peek(unNodo->bloquesLiberados)!=primeroAux) {
+			aux = queue_pop(unNodo->bloquesLiberados);
+			queue_push(unNodo->bloquesLiberados,aux);
+			printf("BloqueLiberado: %d\n",*aux);
+		}
+	}
+}
+
+void mostrarNodo(t_nodo *unNodo) {
+	printf("Activo: %d\n", unNodo->activo);
+	printf("CantidadBloquesOcupados: %d\n", unNodo->cantidadBloquesOcupados);
+	printf("Ip: %s\n", unNodo->ip);
+	printf("Puerto: %d\n", unNodo->puerto);
+	printf("Tamanio: %f\n", unNodo->tamanio);
+	mostrarColaDeInt(unNodo);
+}
+
+void mostrarDirectorio(t_directorio *unDirectorio) {
+	printf("Index: %d\n", unDirectorio->index);
+	printf("Nombre: %s\n", unDirectorio->nombre);
+	printf("Padre: %d\n", unDirectorio->padre);
+}
+

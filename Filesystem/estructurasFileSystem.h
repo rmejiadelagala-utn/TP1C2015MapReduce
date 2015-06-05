@@ -41,7 +41,7 @@ typedef struct {
 typedef struct {
 	char ip[255]; //quizas conviene en un futuro que
 	int puerto; //ip y puerto sean un solo char
-	int tamanio;
+	float tamanio;
 	int cantidadBloquesOcupados;
 	t_queue *bloquesLiberados;
 	int activo; //para saber si el bloque se cayo o esta activo
@@ -137,5 +137,37 @@ void liberarNodo(t_nodo *unNodo);
  * @DESC: Libera la estructura directorio
  */
 void liberarDirectorio(t_directorio *unDirectorio);
+
+//Funciones para mostrar estructuras
+
+/**
+ * @NAME: mostrarBloqueEnNodo
+ * @DESC: muestra la estructura bloqueEnNodo
+ */
+void mostrarBloqueEnNodo(t_bloqueEnNodo *bloqueEnNodo);
+
+/**
+ * @NAME: mostrarBloqueArch
+ * @DESC: muestra la estructura bloqueArch
+ */
+void mostrarBloqueArch(t_bloqueArch *bloqueArch);
+
+/**
+ * @NAME: mostrarArchivo
+ * @DESC: muestra la estructura archivo
+ */
+void mostrarArchivo(t_archivo *unArchivo);
+
+/**
+ * @NAME: mostrarNodo
+ * @DESC: muestra la estructura nodo
+ */
+void mostrarNodo(t_nodo *unNodo);
+
+/**
+ * @NAME: mostrarDirectorio
+ * @DESC: muestra la estructura directorio
+ */
+void mostrarDirectorio(t_directorio *unDirectorio);
 
 #endif /* ESTRUCTURASFILESYSTEM_H_ */
