@@ -63,79 +63,111 @@ void agregar_tests() {
 void *interaccionFSNodo(void*);
 int listaIDNodo[20];
 
-
 int main() {
 	t_list *listaArchivos = list_create();
 	t_list *listaNodos = list_create();
 	t_list *listaDirectorios = list_create();
 	//probando funcion de mostrar listas
 
-	t_directorio *directorioHome  = nuevoDirectorio(1,"home",0);
-	t_directorio *directorioMedia = nuevoDirectorio(2,"media",0);
-	t_directorio *directorioFotos = nuevoDirectorio(3,"fotos",2);
+	t_directorio *directorioHome = nuevoDirectorio(1, "home", 0);
+	t_directorio *directorioMedia = nuevoDirectorio(2, "media", 0);
+	t_directorio *directorioFotos = nuevoDirectorio(3, "fotos", 2);
 
-	list_add(listaDirectorios,directorioHome);
-	list_add(listaDirectorios,directorioMedia);
-	list_add(listaDirectorios,directorioFotos);
+	list_add(listaDirectorios, directorioHome);
+	list_add(listaDirectorios, directorioMedia);
+	list_add(listaDirectorios, directorioFotos);
 
-
-	mostrarLista(listaDirectorios,(void*)mostrarDirectorio);
+	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 
 	//Muestro nodos
-	t_nodo *nodoA  = nuevoNodo("192.168.0.1",1000);
-	t_nodo *nodoB = nuevoNodo("192.168.0.2",20000);
-	t_nodo *nodoC = nuevoNodo("192.168.0.3",65000);
+	t_nodo *nodoA = nuevoNodo("192.168.0.1:80", 1000);
+	t_nodo *nodoB = nuevoNodo("192.168.0.2:127", 20000);
+	t_nodo *nodoC = nuevoNodo("192.168.0.3.243", 65000);
 
-	list_add(listaNodos,nodoA);
-	list_add(listaNodos,nodoB);
-	list_add(listaNodos,nodoC);
+	list_add(listaNodos, nodoA);
+	list_add(listaNodos, nodoB);
+	list_add(listaNodos, nodoC);
 
-
-	mostrarLista(listaNodos,(void*)mostrarNodo);
-
-
+	mostrarLista(listaNodos, (void*) mostrarNodo);
 
 	//muestro archivos
-/*
-		t_bloqueArch *bloqueArchivoA1 = nuevo))
-		list_add(listaNodos,nodoA);
-		list_add(listaNodos,nodoB);
-		list_add(listaNodos,nodoC);
 
-		t_archivo *archivoA  = nuevoArchivo("Archivo A", 1, 3000,
-						 bloquesDeArchivoA, 1);
+	t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo("copiaBloqueA1C1", 11);
+	t_bloqueEnNodo *copiaBloqueA1C2 = nuevoBloqueEnNodo("copiaBloqueA1C2", 12);
+	t_bloqueEnNodo *copiaBloqueA1C3 = nuevoBloqueEnNodo("copiaBloqueA1C3", 13);
+	t_list *copiasBloqueA1 = list_create();
+	list_add(copiasBloqueA1, copiaBloqueA1C1);
+	list_add(copiasBloqueA1, copiaBloqueA1C2);
+	list_add(copiasBloqueA1, copiaBloqueA1C3);
 
-		mostrarLista(listaNodos,(void*)mostrarNodo);*/
+
+
+	t_bloqueEnNodo *copiaBloqueA2C1 = nuevoBloqueEnNodo("copiaBloqueA2C1", 21);
+	t_bloqueEnNodo *copiaBloqueA2C2 = nuevoBloqueEnNodo("copiaBloqueA2C2", 22);
+	t_bloqueEnNodo *copiaBloqueA2C3 = nuevoBloqueEnNodo("copiaBloqueA2C3", 23);
+	t_list *copiasBloqueA2 = list_create();
+	list_add(copiasBloqueA2, copiaBloqueA2C1);
+	list_add(copiasBloqueA2, copiaBloqueA2C2);
+	list_add(copiasBloqueA2, copiaBloqueA2C3);
+
+	t_bloqueEnNodo *copiaBloqueA3C1 = nuevoBloqueEnNodo("copiaBloqueA3C1", 31);
+	t_bloqueEnNodo *copiaBloqueA3C2 = nuevoBloqueEnNodo("copiaBloqueA3C2", 32);
+	t_bloqueEnNodo *copiaBloqueA3C3 = nuevoBloqueEnNodo("copiaBloqueA3C3", 33);
+	t_list *copiasBloqueA3 = list_create();
+	list_add(copiasBloqueA3, copiaBloqueA3C1);
+	list_add(copiasBloqueA3, copiaBloqueA3C2);
+	list_add(copiasBloqueA3, copiaBloqueA3C3);
+
+	//mostrarLista(copiasBloqueA1, (void*) mostrarBloqueEnNodo);
+	//mostrarLista(copiasBloqueA2, (void*) mostrarBloqueEnNodo);
+//	mostrarLista(copiasBloqueA3, (void*) mostrarBloqueEnNodo);
+
+	t_bloqueArch *bloqueArchivoA1 = nuevoBloqueArchivo(copiasBloqueA1);
+	t_bloqueArch *bloqueArchivoA2 = nuevoBloqueArchivo(copiasBloqueA2);
+	t_bloqueArch *bloqueArchivoA3 = nuevoBloqueArchivo(copiasBloqueA3);
+
+	t_list * bloquesDeArchivoA = list_create();
+
+	list_add(bloquesDeArchivoA, bloqueArchivoA1);
+	list_add(bloquesDeArchivoA, bloqueArchivoA2);
+	list_add(bloquesDeArchivoA, bloqueArchivoA3);
+
+
+	t_archivo *archivoA = nuevoArchivo("Archivo A", 1, 3000, bloquesDeArchivoA,
+			1);
+
+	list_add(listaArchivos, archivoA);
+
+	mostrarLista(listaArchivos, (void*) mostrarArchivo);
 	//fin de prueba de funciond de mostrar listas
-/*	system("clear");
+	/*	system("clear");
 
-	char* path = "ConfigFS.cfg";
+	 char* path = "ConfigFS.cfg";
 
-	config = config_create(path);
+	 config = config_create(path);
 
-	printf("*************** SE INICIA EL PROCESO FILESYSTEM ***************\n");
-//	log_info(logFS, "*************** SE INICIA EL FILESYSTEM *************");
-	fd_set master;
-	fd_set read_fds;
+	 printf("*************** SE INICIA EL PROCESO FILESYSTEM ***************\n");
+	 //	log_info(logFS, "*************** SE INICIA EL FILESYSTEM *************");
+	 fd_set master;
+	 fd_set read_fds;
 
-	pthread_t consola_hilo;
-	if (pthread_create(&consola_hilo, NULL, consola, NULL) < 0) {
-		perror("could not create thread");
-		return 1;
-	}
+	 pthread_t consola_hilo;
+	 if (pthread_create(&consola_hilo, NULL, consola, NULL) < 0) {
+	 perror("could not create thread");
+	 return 1;
+	 }
 
-	//Probando el agregar test
-	CU_initialize_registry();
+	 //Probando el agregar test
+	 CU_initialize_registry();
 
-	agregar_tests();
+	 agregar_tests();
 
-	CU_basic_set_mode(CU_BRM_VERBOSE);
-	CU_basic_run_tests();
-	CU_cleanup_registry();
+	 CU_basic_set_mode(CU_BRM_VERBOSE);
+	 CU_basic_run_tests();
+	 CU_cleanup_registry();
 
-	return CU_get_error();*/
+	 return CU_get_error();*/
 	//Acá termina lo de los test en el main
-
 	//Comenté esto porque me tiraba error
 	/*
 	 crearServerMultiHilo(config_get_int_value(config, "PUERTO_FS"),interaccionFSNodo);
@@ -195,11 +227,12 @@ int main() {
 
 	 } //Fin de for;;*/
 
-	 //close(servFS);
-	list_destroy_and_destroy_elements(listaArchivos,(void*)liberarArchivo);
-	list_destroy_and_destroy_elements(listaNodos,(void*)liberarNodo);
-	list_destroy_and_destroy_elements(listaDirectorios,(void*)liberarDirectorio);
-	 return 0;
+//close(servFS);
+	list_destroy_and_destroy_elements(listaArchivos, (void*) liberarArchivo);
+	list_destroy_and_destroy_elements(listaNodos, (void*) liberarNodo);
+	list_destroy_and_destroy_elements(listaDirectorios,
+			(void*) liberarDirectorio);
+	return 0;
 }
 
 void *interaccionFSNodo(void* sock_ptr) {

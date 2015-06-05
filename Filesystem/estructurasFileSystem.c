@@ -13,7 +13,7 @@
  {
 
 	t_archivo *unArchivo = malloc(sizeof(t_archivo)); // definimos una nueva estructura llamado unArchivo
-	unArchivo->nombre = malloc(sizeof(nombre));
+	unArchivo->nombre = malloc(strlen(nombre)+1);
 	// asignacion de  campos a la estructura
 	strcpy(unArchivo->nombre, nombre); //la forma de insetar valores a un tipo char en una estructura es usando strcpy de la libreria string.h
 	unArchivo->padre = padre;
@@ -32,7 +32,7 @@ t_bloqueArch *nuevoBloqueArchivo(t_list *copiasDeBloques){
 t_bloqueEnNodo *nuevoBloqueEnNodo(char *ipPuerto,
 		int numeroDeBloqueEnNodo) {
 	t_bloqueEnNodo *unBloqueEnNodo = malloc(sizeof(t_bloqueEnNodo)); //nueva estructura
-	unBloqueEnNodo->ipPuerto = malloc(sizeof(ipPuerto));
+	unBloqueEnNodo->ipPuerto = malloc(strlen(ipPuerto)+1);
 	//asignacion de valores a la estructura
 	strcpy(unBloqueEnNodo->ipPuerto, ipPuerto);
 	unBloqueEnNodo->numeroDeBloqueEnNodo = numeroDeBloqueEnNodo;
@@ -43,7 +43,7 @@ t_bloqueEnNodo *nuevoBloqueEnNodo(char *ipPuerto,
 //funciones para la estructura nodo
 t_nodo *nuevoNodo(char *ipPuerto, int tamanio) {
 	t_nodo *unNodo = malloc(sizeof(t_nodo));  //nueva estructura
-	unNodo->ipPuerto = malloc(sizeof(ipPuerto));
+	unNodo->ipPuerto = malloc(strlen(ipPuerto)+1);
 	//asignacion de campos a la estructura
 	strcpy(unNodo->ipPuerto, ipPuerto);
 	unNodo->tamanio = tamanio;
@@ -64,7 +64,7 @@ void desactivarNodo(t_nodo unNodo) {
 
 t_directorio *nuevoDirectorio(int index, char *nombre, int padre) {
 	t_directorio *unDirectorio = malloc(sizeof(t_directorio));
-	unDirectorio->nombre = malloc(sizeof(nombre));
+	unDirectorio->nombre = malloc(strlen(nombre)+1);
 	//asignacion de campos a la estructura
 	unDirectorio->index = index;
 	strcpy(unDirectorio->nombre, nombre);
@@ -106,13 +106,13 @@ void liberarDirectorio(t_directorio *unDirectorio) {
 //Funciones para mostrar estructuras por pantalla
 
 void mostrarBloqueEnNodo(t_bloqueEnNodo *bloqueEnNodo) {
-	printf("\tIpPueto: %s\n", bloqueEnNodo->ipPuerto);
-	printf("\tNumeroDeBloqueEnNodo %d\n", bloqueEnNodo->numeroDeBloqueEnNodo);
+	printf("\tIpPuerto: %s\n", bloqueEnNodo->ipPuerto);
+	printf("\tNumeroDeBloqueEnNodo %d\n\n", bloqueEnNodo->numeroDeBloqueEnNodo);
 }
 
 void mostrarBloqueArch(t_bloqueArch *bloqueArch) {
 	printf("\n\n\n");
-	list_iterate(&(bloqueArch->copiasDeBloque), (void*) mostrarBloqueEnNodo);
+	list_iterate((bloqueArch->copiasDeBloque), (void*) mostrarBloqueEnNodo);
 }
 
 void mostrarArchivo(t_archivo *unArchivo) {
@@ -125,7 +125,7 @@ void mostrarArchivo(t_archivo *unArchivo) {
 
 void mostrarColaDeInt(t_nodo *unNodo) {
 	if (queue_is_empty(unNodo->bloquesLiberados)) {
-		printf("No hay bloques liberados en el medio en el nodo\n");
+		printf("No hay bloques liberados en el medio en el nodo\n\n");
 	} else {
 		int *primeroAux = queue_peek(unNodo->bloquesLiberados);
 		int *aux = queue_pop(unNodo->bloquesLiberados);
@@ -134,7 +134,7 @@ void mostrarColaDeInt(t_nodo *unNodo) {
 		while (queue_peek(unNodo->bloquesLiberados) != primeroAux) {
 			aux = queue_pop(unNodo->bloquesLiberados);
 			queue_push(unNodo->bloquesLiberados, aux);
-			printf("BloqueLiberado: %d\n", *aux);
+			printf("BloqueLiberado: %d\n\n", *aux);
 		}
 	}
 }
@@ -142,8 +142,8 @@ void mostrarColaDeInt(t_nodo *unNodo) {
 void mostrarNodo(t_nodo *unNodo) {
 	printf("Activo: %d\n", unNodo->activo);
 	printf("CantidadBloquesOcupados: %d\n", unNodo->cantidadBloquesOcupados);
-	printf("Ip: %s\n", unNodo->ipPuerto);
-	printf("Tamanio: %f\n\n", unNodo->tamanio);
+	printf("IpPuerto: %s\n", unNodo->ipPuerto);
+	printf("Tamanio: %f\n", unNodo->tamanio);
 	mostrarColaDeInt(unNodo);
 }
 
