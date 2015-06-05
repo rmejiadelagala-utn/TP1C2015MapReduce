@@ -158,4 +158,6 @@ void mostrarDirectorio(t_directorio *unDirectorio) {
 	printf("Nombre: %s\n", unDirectorio->nombre);
 	printf("Padre: %d\n", unDirectorio->padre);
 }
-
+void mostrarLista(t_list *unaLista, void(*shower)(void*)) {
+		list_iterate(unaLista, shower);
+}

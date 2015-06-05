@@ -170,4 +170,10 @@ void mostrarNodo(t_nodo *unNodo);
  */
 void mostrarDirectorio(t_directorio *unDirectorio);
 
+/**
+ * @NAME: mostrarLista
+ * @DESC: muestra una lista con el shower de dicha estructura
+ */
+void mostrarLista(t_list *unaLista, void(*shower)(void*));
+
 #endif /* ESTRUCTURASFILESYSTEM_H_ */

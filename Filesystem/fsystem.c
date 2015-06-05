@@ -65,8 +65,22 @@ int listaIDNodo[20];
 t_list *listaArchivos;
 t_list *listaNodos;
 t_list *listaDirectorios;
-int main() {
 
+int main() {
+	//probando funcion de mostrar listas
+	/*
+	t_directorio directorioHome  = nuevoDirectorio(1,"home",0);
+	t_directorio directorioMedia = nuevoDirectorio(2,"media",0);
+	t_directorio directorioFotos = nuevoDirectorio(3,"fotos",2);
+
+	list_add(listaDirectorios,&directorioHome);
+	list_add(listaDirectorios,&directorioMedia);
+	list_add(listaDirectorios,&directorioFotos);
+
+	mostrarLista(listaDirectorios,(void*)mostrarDirectorio);
+	*/
+	//Creo que voy a tener que hacer un refactor de todos los metodos nuevaEstructura que me devuelvan un puntero a la estructura en vez de dicha estructura
+	//fin de prueba de funciond de mostrar listas
 	system("clear");
 
 	char* path = "ConfigFS.cfg";
