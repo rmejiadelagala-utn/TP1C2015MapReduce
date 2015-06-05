@@ -19,7 +19,7 @@ void eliminarDirectorio(char *directorio);
 void renombrarDirectorio(char *directorio);
 void moverDirectorio(char *directorio);
 void copiarAMDFS(char *archivo);
-void copiarAFS(char *archivo);
+void copiarAFS(char *archivo, t_list*);
 void solicitarMD5(char *archivo);
 void verBloque(char *bloque);
 void eliminarBloque(char *bloque);

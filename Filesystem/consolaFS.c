@@ -1,13 +1,14 @@
 #include "consolaFS.h"
 
-int consola() {
+
+int consola(void* unListaNodo) {
+	t_list *listaNodo = unListaNodo;
 	// // lo defino como un char** porque necesito tener un "array"
 	//con todas las cadenas, donde la primera es el comando y las demas los parametros
 	char **comandoSeparado;
 	char comando[100];
 	char *comandosValidos[18];
 	int exit = 0;
-
 	//Incializo los comandos en un array para despues poder hacer
 	//el switch y llamar a la funcion correspondiente
 	comandosValidos[0] = string_duplicate("formatear");
@@ -82,7 +83,7 @@ int consola() {
 			copiarAMDFS(comandoSeparado[1]);
 			break;
 		case COPIAR_A_FS:
-			copiarAFS(comandoSeparado[1]);
+			copiarAFS(comandoSeparado[1],listaNodo);
 			break;
 		case SOLICITAR_MD5:
 			solicitarMD5(comandoSeparado[1]);
@@ -184,7 +185,14 @@ void copiarAMDFS(char *archivo) {
 	printf("Copia el archivo %s al MDFS\n", archivo);
 }
 
-void copiarAFS(char *archivo) {
+void copiarAFS(char *archivo, t_list *unaListaNodo) {
+	int i=0;
+	int imprimirValores (){
+		printf("%d",list_get(unaListaNodo,i));
+		i++;
+	}
+	list_iterate(unaListaNodo,imprimirValores);
+	send(list_get(unaListaNodo,4),"Nodo, dame tu bloque\n",strlen("Nodo, dame tu bloque\n"),0);
 	printf("Copia el archivo %s al FileSystem\n", archivo);
 }
 

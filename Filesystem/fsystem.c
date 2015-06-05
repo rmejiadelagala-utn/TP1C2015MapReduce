@@ -154,13 +154,19 @@ int main() {
 	 fd_set master;
 	 fd_set read_fds;
 
+
+	 listaNodo = list_create();
+
 	 pthread_t consola_hilo;
-	 if (pthread_create(&consola_hilo, NULL, consola, NULL) < 0) {
+	 if (pthread_create(&consola_hilo, NULL, consola, (void*) listaNodo) < 0) {
 	 perror("could not create thread");
 	 return 1;
 	 }
+	 //POR ALGUN MOTIVO ESTO NO ANDA:
+	 //int puerto = config_get_int_value(config, "PUERTO_FS");
 
-	 crearServerMultiHilo(config_get_int_value(config, "PUERTO_FS"),interaccionFSNodo);
+
+	 crearServerMultiHilo(8888,interaccionFSNodo);
 
 	 //Probando el agregar test
 
@@ -245,15 +251,15 @@ void *interaccionFSNodo(void* sock_ptr) {
 	int sock_desc = *(int*) sock_ptr;
 	char infoDeNodo[BUFFERSIZE];
 	int read_size;
-	listaNodo = list_create();
-	list_add(listaNodo,sock_ptr);
 
+	list_add(listaNodo,sock_desc);
 	//Receive a reply from the server
 	read_size = recv((int)sock_desc, infoDeNodo, 5000, 0);
 
 	while (read_size > 0) {
 		printf("%s \n", infoDeNodo);
 		memset(infoDeNodo, 0, sizeof(infoDeNodo));
+		send(list_get(listaNodo,4),"Nodo, dame tu bloque\n",strlen("Nodo, dame tu bloque\n"),0);
 		//Limpia el buffer de los mensajes que le manda ese nodo
 		read_size = recv((int)sock_desc, infoDeNodo, 5000, 0);
 	}
