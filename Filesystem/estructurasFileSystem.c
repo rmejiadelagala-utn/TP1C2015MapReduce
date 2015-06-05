@@ -117,8 +117,7 @@ void mostrarBloqueEnNodo(t_bloqueEnNodo *bloqueEnNodo) {
 
 void mostrarBloqueArch(t_bloqueArch *bloqueArch) {
 	printf("\n\n\n");
-	list_iterate(&(bloqueArch->copiasDeBloque),
-			(void*) mostrarBloqueEnNodo);
+	list_iterate(&(bloqueArch->copiasDeBloque), (void*) mostrarBloqueEnNodo);
 }
 
 void mostrarArchivo(t_archivo *unArchivo) {
@@ -126,23 +125,21 @@ void mostrarArchivo(t_archivo *unArchivo) {
 	printf("Nombre: %s\n", unArchivo->nombre);
 	printf("Padre: %d\n", unArchivo->padre);
 	printf("Tamanio: %f\n", unArchivo->tamanio);
-	list_iterate(&(unArchivo->bloquesDeArch),
-				(void*) mostrarBloqueArch);
+	list_iterate(&(unArchivo->bloquesDeArch), (void*) mostrarBloqueArch);
 }
 
 void mostrarColaDeInt(t_nodo *unNodo) {
 	if (queue_is_empty(unNodo->bloquesLiberados)) {
 		printf("No hay bloques liberados en el medio en el nodo");
-	}
-	else {
+	} else {
 		int *primeroAux = queue_peek(unNodo->bloquesLiberados);
 		int *aux = queue_pop(unNodo->bloquesLiberados);
-		printf("BloqueLiberado: %d\n",*primeroAux);
+		printf("BloqueLiberado: %d\n", *primeroAux);
 		queue_push(unNodo->bloquesLiberados, primeroAux);
-		while(queue_peek(unNodo->bloquesLiberados)!=primeroAux) {
+		while (queue_peek(unNodo->bloquesLiberados) != primeroAux) {
 			aux = queue_pop(unNodo->bloquesLiberados);
-			queue_push(unNodo->bloquesLiberados,aux);
-			printf("BloqueLiberado: %d\n",*aux);
+			queue_push(unNodo->bloquesLiberados, aux);
+			printf("BloqueLiberado: %d\n", *aux);
 		}
 	}
 }
