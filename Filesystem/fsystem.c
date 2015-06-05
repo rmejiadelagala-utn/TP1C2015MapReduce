@@ -13,6 +13,9 @@
 #include "CUnit/Basic.h"
 #include <unistd.h>
 
+t_list *listaNodo;
+
+
 t_list *listaDirectorio;
 t_directorio *directorioUser;
 int inicializar() {
@@ -61,7 +64,7 @@ void agregar_tests() {
 
 //interaccionFSNodo es la funcion que va a ejecutar cada hilo que esta en conexion con los nodos
 void *interaccionFSNodo(void*);
-int listaIDNodo[20];
+
 
 int main() {
 	t_list *listaArchivos = list_create();
@@ -133,14 +136,14 @@ int main() {
 	list_add(bloquesDeArchivoA, bloqueArchivoA3);
 
 
-	t_archivo *archivoA = nuevoArchivo("Archivo A", 1, 3000, bloquesDeArchivoA,
+	 t_archivo *archivoA = nuevoArchivo("Archivo A", 1, 3000, bloquesDeArchivoA,
 			1);
 
-	list_add(listaArchivos, archivoA);
+	 list_add(listaArchivos, archivoA);
 
-	mostrarLista(listaArchivos, (void*) mostrarArchivo);
-	//fin de prueba de funciond de mostrar listas
-	/*	system("clear");
+	 mostrarLista(listaArchivos, (void*) mostrarArchivo);
+	 //fin de prueba de funciond de mostrar listas
+	 system("clear");
 
 	 char* path = "ConfigFS.cfg";
 
@@ -157,8 +160,11 @@ int main() {
 	 return 1;
 	 }
 
+	 crearServerMultiHilo(config_get_int_value(config, "PUERTO_FS"),interaccionFSNodo);
+
 	 //Probando el agregar test
-	 CU_initialize_registry();
+
+	 /*CU_initialize_registry();
 
 	 agregar_tests();
 
@@ -170,7 +176,7 @@ int main() {
 	//Acá termina lo de los test en el main
 	//Comenté esto porque me tiraba error
 	/*
-	 crearServerMultiHilo(config_get_int_value(config, "PUERTO_FS"),interaccionFSNodo);
+
 	 */
 	//return 0;
 //Comente la otra parte por si al final nos decidimos por usar la opcion con select,
@@ -236,15 +242,20 @@ int main() {
 }
 
 void *interaccionFSNodo(void* sock_ptr) {
-
 	int sock_desc = *(int*) sock_ptr;
 	char infoDeNodo[BUFFERSIZE];
 	int read_size;
+	listaNodo = list_create();
+	list_add(listaNodo,sock_ptr);
 
 	//Receive a reply from the server
-	while (read_size = recv(sock_desc, infoDeNodo, 5000, 0) > 0) {
+	read_size = recv((int)sock_desc, infoDeNodo, 5000, 0);
+
+	while (read_size > 0) {
 		printf("%s \n", infoDeNodo);
-		memset(infoDeNodo, 0, sizeof(infoDeNodo)); //Limpia el buffer de los mensajes que le manda ese nodo
+		memset(infoDeNodo, 0, sizeof(infoDeNodo));
+		//Limpia el buffer de los mensajes que le manda ese nodo
+		read_size = recv((int)sock_desc, infoDeNodo, 5000, 0);
 	}
 	if (read_size == 0) {
 		printf("Nodo desconectado.\n");

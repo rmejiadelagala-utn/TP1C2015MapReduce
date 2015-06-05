@@ -42,7 +42,8 @@ typedef struct {
 	float tamanio;
 	int cantidadBloquesOcupados;
 	t_queue *bloquesLiberados;
-	int activo; //para saber si el bloque se cayo o esta activo
+	int activo;//para saber si el bloque se cayo o esta activo
+	int socket;
 } t_nodo;
 
 //estructura tabla de directorios

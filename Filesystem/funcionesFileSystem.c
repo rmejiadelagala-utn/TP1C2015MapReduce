@@ -365,27 +365,27 @@ static int indiceNuevo(t_list *listaDirectorio) {
 }
 
 static int obtenerArchivo(char *nombreArchivo, t_list *archivosDelFS, t_list *nodosDelFS, char* path){
-	t_archivo archivoEncontrado;
-	int nombreCoincide(t_archivo unArchivo){
-		return unArchivo.nombre == nombreArchivo;
+	t_archivo *archivoEncontrado;
+	int nombreCoincide(t_archivo *unArchivo){
+		return unArchivo->nombre == nombreArchivo;
 	}
-	if(archivoEncontrado = list_find(archivosDelFS,(void *) nombreCoincide) == NULL){
+	if((archivoEncontrado = list_find(archivosDelFS,(void *) nombreCoincide)) == NULL){
 		puts("Archivo no encontrado.");
 		return 0;
 	}
-	if(!archivoEncontrado.estado){
+	if(!archivoEncontrado->estado){
 		puts("Archivo no está disponible.");
 		return 0;
 	}
-	int noEsNull(t_bloqueEnNodo unBloque){
+	int noEsNull(void* unBloque){
 		return unBloque!=NULL;
 	}
-	int obtenerBloque(t_bloqueArch bloqueDeArchivo){
-		t_bloqueEnNodo bloque= list_find(bloqueDeArchivo.copiasDeBloque,(void*) noEsNull);
-		int ipPuertoCoincide(t_nodo unNodo){
-				return unNodo.ipPuerto==bloque.ipPuerto;
+	int obtenerBloque(t_bloqueArch *bloqueDeArchivo){
+		t_bloqueEnNodo *bloque= list_find(bloqueDeArchivo->copiasDeBloque,(void*) noEsNull);
+		int ipPuertoCoincide(t_nodo *unNodo){
+				return unNodo->ipPuerto==bloque->ipPuerto;
 			}
-		t_nodo nodoEncontrado = list_find(nodosDelFS,(void*) ipPuertoCoincide);
+		t_nodo *nodoEncontrado = list_find(nodosDelFS,(void*) ipPuertoCoincide);
 		//HAY QUE CREAR EL CAMPO SOCKET EN NODO
 		/*int socket_desc = nodoEncontrado.socket;
 		send(socket_desc,1,sizeOf(1),0);
@@ -396,5 +396,5 @@ static int obtenerArchivo(char *nombreArchivo, t_list *archivosDelFS, t_list *no
 		puts(*data);*/
 		//FALTA ESCRIBIR EN ARCHIVO EN VEZ DE MOSTRAR POR PANTALLA
 	}
-	list_iterate(archivoEncontrado.bloquesDeArch, (void *) obtenerBloque);
+	list_iterate(archivoEncontrado->bloquesDeArch, (void *) obtenerBloque);
 }
