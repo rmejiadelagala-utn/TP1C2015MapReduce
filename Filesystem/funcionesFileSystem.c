@@ -16,6 +16,7 @@
 #include <err.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <stdio.h>
 
 typedef struct {
 	char nombre[255];
@@ -24,6 +25,7 @@ typedef struct {
 
 static bool ordenarPorMenorUso(t_nodo *data, t_nodo *dataSiguiente);
 static int buscarPosicionEnListaDadoUnArchivo(t_list *lista, t_archivo *archivo);
+static bool existeEseIndiceComoPadre(t_list *listaDirectorios, int padre);
 static int indiceNuevo(t_list *listaDirectorio);
 //
 /*
@@ -95,7 +97,7 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {
 			}
 			bloqueArch = (list_get(bloquesEnArch, i + 1));
 			//cargarCopiasABloqueDeArch(bloqueArch,copiasDeBloque);
-			copiasDeBloqueAUX = &bloqueArch->copiasDeBloque;
+			copiasDeBloqueAUX = bloqueArch->copiasDeBloque;
 			list_add_all(copiasDeBloqueAUX, copiasDeBloque);
 		}
 
@@ -162,45 +164,35 @@ void* eliminarArchivoPorNombre(char nombreBuscado[255], t_list *listaArchivos) {
 			(void*) archivoConNombreBuscado);
 }
 
-void formatear(t_list *listaNodos, t_list *listaArchivos,
-		t_list *listaDirectorios) {
-	list_clean(listaArchivos);
-	list_clean(listaNodos);
-	list_clean(listaDirectorios);
+void formatear(t_list **listaNodos, t_list **listaArchivos,
+		t_list **listaDirectorios) {
+	list_destroy_and_destroy_elements(*listaArchivos, (void*) liberarArchivo);
+	list_destroy_and_destroy_elements(*listaNodos, (void*) liberarNodo);
+	list_destroy_and_destroy_elements(*listaDirectorios,
+			(void*) liberarDirectorio);
+	*listaNodos = list_create();
+	*listaArchivos = list_create();
+	*listaDirectorios = list_create();
 }
 
-t_list* renombrarArchivoPorNombre(char nombreBuscado[255],
-		char nuevoNombre[255], t_list *listaArchivos) {
-	t_archivo *archivoAModificar;
-	int posDondeReemplazar = -1;
+void renombrarArchivoPorNombre(char *nombreBuscado, char *nuevoNombre,
+		t_list *listaArchivos) {
 
 	int archivoConNombreBuscado(t_archivo *unArchivo) {
-		return strcmp(nombreBuscado, unArchivo->nombre);
+		return !strcmp(nombreBuscado, unArchivo->nombre);
 	}
 
 	//Busco cual es el archivo a modificar, dado el nombre
-	archivoAModificar = list_find(listaArchivos,
+	t_archivo *archivoAModificar = list_find(listaArchivos,
 			(void*) archivoConNombreBuscado);
-
-	if (archivoAModificar == NULL) {
-		//tirar error de que no se encuentra ese archivo
+	if (!archivoAModificar) {
+		printf("el archivo %s no se encuentra en el sistema", nombreBuscado);
+	} else {
+		//genero un archivo nuevo, que va a ser el anterior con un nuevo nombre
+		free(archivoAModificar->nombre);
+		archivoAModificar->nombre = malloc(strlen(nuevoNombre) + 1);
+		strcpy(archivoAModificar->nombre, nuevoNombre);
 	}
-
-	//busco la posicion en la lista, donde se encuantra el archivo con ese nombre
-	posDondeReemplazar = buscarPosicionEnListaDadoUnArchivo(listaArchivos,
-			archivoAModificar);
-
-	//genero un archivo nuevo, que va a ser el anterior con un nuevo nombre
-	t_archivo *archivoModificado;
-	archivoModificado = archivoAModificar;
-	strcpy(archivoModificado->nombre, nuevoNombre);
-
-	//reemplazo en la posicion donde se hallaba el original en la lista,
-	//el nuevo archivo con solo el nombre cambiado
-	list_replace(listaArchivos, posDondeReemplazar, archivoModificado);
-
-	//retorno la lista de archivos del FS ya modificada
-	return listaArchivos;
 }
 
 //Esto de recibir al padre no esta del todo bien. Debería poder mover archivo
@@ -208,48 +200,42 @@ t_list* renombrarArchivoPorNombre(char nombreBuscado[255],
 //ruta a la que quiere moverse. Esta ruta sería una cadena de nombre de
 //directorio separados por /. Eso me daría el padre del directorio al que quiero
 //moverme.
-t_list* moverArchivoPorNombreYPadre(char nombreBuscado[255],
-		t_list *listaArchivos, int padre) {
+void moverArchivoPorNombreYPadre(char *nombreBuscado, t_list *listaArchivos,
+		t_list *listaDirectorios, int padre) {
 
-	int archivoConNombreBuscado(t_archivo *unArchivo) {
-		return strcmp(nombreBuscado, unArchivo->nombre);
+	if (!existeEseIndiceComoPadre(listaDirectorios, padre)) {
+		printf("el directorio a donde mover no existe\n", nombreBuscado);
+	} else {
+
+		int archivoConNombreBuscado(t_archivo *unArchivo) {
+			return !strcmp(nombreBuscado, unArchivo->nombre);
+		}
+		t_archivo *archivoAModificarPadre;
+
+		archivoAModificarPadre = list_find(listaArchivos,
+				(void*) archivoConNombreBuscado);
+
+		if (!archivoAModificarPadre) {
+			printf("el archivo %s no se encuentra en el sistema",
+					nombreBuscado);
+		} else {
+			archivoAModificarPadre->padre = padre;
+		}
 	}
-
-	int posEnLista = -1;
-	t_archivo *archivoAModificarPadre;
-
-	archivoAModificarPadre = list_find(listaArchivos,
-			(void*) archivoConNombreBuscado);
-
-	posEnLista = buscarPosicionEnListaDadoUnArchivo(listaArchivos,
-			archivoAModificarPadre);
-
-	archivoAModificarPadre->padre = padre;
-
-	list_replace(listaArchivos, posEnLista, archivoAModificarPadre);
-
-	return listaArchivos;
 }
 
-t_list* crearDirectorioDadoPadreYNom(char nombre[255], int padre,
+void crearDirectorioDadoPadreYNom(char *nombre, int padre,
 		t_list *listaDirectorio) {
 
 	//Verifico que no se pase de los 1024 directorios permitidos
 	if (list_size(listaDirectorio) > 1024) {
-		//tira error de que supera máxima cant de directorios permitidos
+		printf("No se pueden cargar mas de 1024\n");
 	} else {
-
 		//genero el nuevo directorio con sus datos, y le pongo el indice del ultimo + 1
-		t_directorio *nuevoDirectorio = malloc(sizeof(t_directorio));
-
-		nuevoDirectorio->index = indiceNuevo(listaDirectorio);
-		strcpy(nuevoDirectorio->nombre, nombre);
-		nuevoDirectorio->padre = padre;
-
-		list_add(listaDirectorio, nuevoDirectorio);
-
+		t_directorio *directorioNuevo = nuevoDirectorio(indiceNuevo(listaDirectorio), nombre, padre);
+		list_add(listaDirectorio, directorioNuevo);
+		printf("El directorio se creo bien\n");
 	}
-	return listaDirectorio;
 }
 
 //Este se podría hacer dado nombre, pero preferí así porque el índice es único.
@@ -347,9 +333,9 @@ static int indiceNuevo(t_list *listaDirectorio) {
 
 	int i = 0;
 	for (i = 0; i < listaDirectorio->elements_count; i++) {
-		t_directorio *dirAuxiliar = malloc(sizeof(t_directorio));
+		t_directorio *dirAuxiliar;
 
-		dirAuxiliar = listaDirectorio[i].head->data;
+		dirAuxiliar =list_get(listaDirectorio,i);
 		if (dirAuxiliar->index != (i + 1)) {
 			nuevoIndice = i + 1;
 
@@ -362,4 +348,13 @@ static int indiceNuevo(t_list *listaDirectorio) {
 	}
 
 	return nuevoIndice;
+}
+
+static bool existeEseIndiceComoPadre(t_list *listaDirectorios, int padre) {
+
+	bool existePadre(t_directorio *directorio) {
+		return (directorio->index == padre);
+	}
+
+	return list_any_satisfy(listaDirectorios, (bool*) existePadre);
 }

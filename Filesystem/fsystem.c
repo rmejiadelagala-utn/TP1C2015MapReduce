@@ -71,7 +71,7 @@ int main() {
 
 	t_directorio *directorioHome = nuevoDirectorio(1, "home", 0);
 	t_directorio *directorioMedia = nuevoDirectorio(2, "media", 0);
-	t_directorio *directorioFotos = nuevoDirectorio(3, "fotos", 2);
+	t_directorio *directorioFotos = nuevoDirectorio(10, "fotos", 2);
 
 	list_add(listaDirectorios, directorioHome);
 	list_add(listaDirectorios, directorioMedia);
@@ -99,8 +99,6 @@ int main() {
 	list_add(copiasBloqueA1, copiaBloqueA1C1);
 	list_add(copiasBloqueA1, copiaBloqueA1C2);
 	list_add(copiasBloqueA1, copiaBloqueA1C3);
-
-
 
 	t_bloqueEnNodo *copiaBloqueA2C1 = nuevoBloqueEnNodo("copiaBloqueA2C1", 21);
 	t_bloqueEnNodo *copiaBloqueA2C2 = nuevoBloqueEnNodo("copiaBloqueA2C2", 22);
@@ -133,11 +131,27 @@ int main() {
 	list_add(bloquesDeArchivoA, bloqueArchivoA3);
 
 
+
+	t_bloqueEnNodo *copiaBloqueB1C1 = nuevoBloqueEnNodo("copiaBloqueB1C1", 11);
+	t_list *copiasBloqueB1 = list_create();
+	list_add(copiasBloqueB1, copiaBloqueB1C1);
+	t_bloqueArch *bloqueArchivoB1 = nuevoBloqueArchivo(copiasBloqueB1);
+	t_list *bloquesDeArchivoB = list_create();
+	list_add(bloquesDeArchivoB, bloqueArchivoB1);
+
 	t_archivo *archivoA = nuevoArchivo("Archivo A", 1, 3000, bloquesDeArchivoA,
+			1);
+	t_archivo *archivoB = nuevoArchivo("Archivo B", 1, 3000, bloquesDeArchivoB,
 			1);
 
 	list_add(listaArchivos, archivoA);
+	list_add(listaArchivos, archivoB);
+//	formatear(&listaNodos, &listaArchivos, &listaDirectorios);
+//	renombrarArchivoPorNombre("Archivo A","Archivo con nombre cambiado",listaArchivos);
+//	moverArchivoPorNombreYPadre("Archivo A", listaArchivos, listaDirectorios, 10);
 
+	crearDirectorioDadoPadreYNom("Directorio Nuevo", 1,listaDirectorios);
+	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 	mostrarLista(listaArchivos, (void*) mostrarArchivo);
 	//fin de prueba de funciond de mostrar listas
 	/*	system("clear");
@@ -228,10 +242,12 @@ int main() {
 	 } //Fin de for;;*/
 
 //close(servFS);
+
 	list_destroy_and_destroy_elements(listaArchivos, (void*) liberarArchivo);
 	list_destroy_and_destroy_elements(listaNodos, (void*) liberarNodo);
 	list_destroy_and_destroy_elements(listaDirectorios,
 			(void*) liberarDirectorio);
+
 	return 0;
 }
 

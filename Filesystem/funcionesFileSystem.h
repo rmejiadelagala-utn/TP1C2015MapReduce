@@ -24,27 +24,28 @@ void *eliminarArchivoPorNombre(char nombreBuscado[255], t_list *listaArchivos);
  * @NAME: formatear
  * @DESC: recibe la lista de archivos, nodos y directorios, y las vacía
  */
-void formatear();
+void formatear(t_list **listaNodos, t_list **listaArchivos,
+		t_list **listaDirectorios);
 
 /*
  * @NAME: renombrarArchivoPorNombre
  * @DESC: recibe una lista de archivos, un nombre de un archivo y un nuevo nombre para el mismo, y lo modifica en la lista de archivos
  */
-void *renombrarArchivoPorNombre(char nombreBuscado[255], char nuevoNombre[255],
+void *renombrarArchivoPorNombre(char *nombreBuscado, char *nuevoNombre,
 		t_list *listaArchivos);
 
 /*
  * @NAME: moverArchivoPorNombreYPadre
  * @DESC: recibe una lista de archivos, un nombre de un archivo y un nuevo padre para el mismo, y lo modifica en la lista de archivos
  */
-void* moverArchivoPorNombreYPadre(char nombreBuscado[255],
-		t_list *listaArchivos, int padre);
+void moverArchivoPorNombreYPadre(char *nombreBuscado, t_list *listaArchivos,
+		t_list *listaDirectorios, int padre) ;
 
 /*
  * @NAME: crearDirectorioDadoPadreYNom
  * @DESC: recibe una lista de directorios, un nombre de un directorio y un padre para el mismo, y lo crea agregando a lista de directorios
  */
-void* crearDirectorioDadoPadreYNom(char nombre[255], int padre,
+void crearDirectorioDadoPadreYNom(char *nombre, int padre,
 		t_list *listaDirectorio);
 
 /*
