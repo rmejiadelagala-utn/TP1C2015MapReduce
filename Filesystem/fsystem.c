@@ -13,11 +13,7 @@
 #include "CUnit/Basic.h"
 #include <unistd.h>
 
-t_list *listaNodo;
 
-
-t_list *listaDirectorio;
-t_directorio *directorioUser;
 int inicializar() {
 	directorioUser = malloc(sizeof(t_directorio));
 

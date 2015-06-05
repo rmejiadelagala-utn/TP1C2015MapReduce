@@ -85,4 +85,6 @@ void eliminarReferencias(t_nodo *nodoAEliminar, t_list *archivos);
  */
 void eliminarNodoDeLista(t_nodo *nodoAEliminar, t_list *listaNodos);
 
+int obtenerArchivo(char *nombreArchivo, char* path);
+
 #endif /* FUNCIONESFILESYSTEM_H_ */

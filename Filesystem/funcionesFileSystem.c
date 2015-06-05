@@ -16,6 +16,7 @@
 #include <err.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include "fsystem.h"
 
 typedef struct {
 	char nombre[255];
@@ -364,12 +365,12 @@ static int indiceNuevo(t_list *listaDirectorio) {
 	return nuevoIndice;
 }
 
-static int obtenerArchivo(char *nombreArchivo, t_list *archivosDelFS, t_list *nodosDelFS, char* path){
+static int obtenerArchivo(char *nombreArchivo, char* path){
 	t_archivo *archivoEncontrado;
 	int nombreCoincide(t_archivo *unArchivo){
 		return unArchivo->nombre == nombreArchivo;
 	}
-	if((archivoEncontrado = list_find(archivosDelFS,(void *) nombreCoincide)) == NULL){
+	if((archivoEncontrado = list_find(listaArchivo,(void *) nombreCoincide)) == NULL){
 		puts("Archivo no encontrado.");
 		return 0;
 	}
@@ -385,7 +386,7 @@ static int obtenerArchivo(char *nombreArchivo, t_list *archivosDelFS, t_list *no
 		int ipPuertoCoincide(t_nodo *unNodo){
 				return unNodo->ipPuerto==bloque->ipPuerto;
 			}
-		t_nodo *nodoEncontrado = list_find(nodosDelFS,(void*) ipPuertoCoincide);
+		t_nodo *nodoEncontrado = list_find(listaNodo,(void*) ipPuertoCoincide);
 		//HAY QUE CREAR EL CAMPO SOCKET EN NODO
 		/*int socket_desc = nodoEncontrado.socket;
 		send(socket_desc,1,sizeOf(1),0);

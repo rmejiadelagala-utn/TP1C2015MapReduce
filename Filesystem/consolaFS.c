@@ -1,4 +1,5 @@
 #include "consolaFS.h"
+#include "funcionesFileSystem.h"
 
 
 int consola(void* unListaNodo) {
@@ -186,13 +187,15 @@ void copiarAMDFS(char *archivo) {
 }
 
 void copiarAFS(char *archivo, t_list *unaListaNodo) {
+
+	//obtenerArchivo(archivo, "path");
 	int i=0;
-	int imprimirValores (){
-		printf("%d",list_get(unaListaNodo,i));
+	int pedirBloques (){
+		send(list_get(unaListaNodo,i),"Nodo, dame tu bloque\n",strlen("Nodo, dame tu bloque\n"),0);
 		i++;
 	}
-	list_iterate(unaListaNodo,imprimirValores);
-	send(list_get(unaListaNodo,4),"Nodo, dame tu bloque\n",strlen("Nodo, dame tu bloque\n"),0);
+	list_iterate(unaListaNodo,pedirBloques);
+
 	printf("Copia el archivo %s al FileSystem\n", archivo);
 }
 

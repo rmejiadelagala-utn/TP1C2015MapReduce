@@ -181,4 +181,8 @@ void mostrarDirectorio(t_directorio *unDirectorio);
  */
 void mostrarLista(t_list *unaLista, void(*shower)(void*));
 
+t_list *listaNodo;
+t_list *listaDirectorio;
+t_directorio *directorioUser;
+t_archivo *listaArchivo;
 #endif /* ESTRUCTURASFILESYSTEM_H_ */
