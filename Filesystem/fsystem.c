@@ -62,26 +62,52 @@ void agregar_tests() {
 //interaccionFSNodo es la funcion que va a ejecutar cada hilo que esta en conexion con los nodos
 void *interaccionFSNodo(void*);
 int listaIDNodo[20];
-t_list *listaArchivos;
-t_list *listaNodos;
-t_list *listaDirectorios;
+
 
 int main() {
+	t_list *listaArchivos = list_create();
+	t_list *listaNodos = list_create();
+	t_list *listaDirectorios = list_create();
 	//probando funcion de mostrar listas
-	/*
-	t_directorio directorioHome  = nuevoDirectorio(1,"home",0);
-	t_directorio directorioMedia = nuevoDirectorio(2,"media",0);
-	t_directorio directorioFotos = nuevoDirectorio(3,"fotos",2);
 
-	list_add(listaDirectorios,&directorioHome);
-	list_add(listaDirectorios,&directorioMedia);
-	list_add(listaDirectorios,&directorioFotos);
+	t_directorio *directorioHome  = nuevoDirectorio(1,"home",0);
+	t_directorio *directorioMedia = nuevoDirectorio(2,"media",0);
+	t_directorio *directorioFotos = nuevoDirectorio(3,"fotos",2);
+
+	list_add(listaDirectorios,directorioHome);
+	list_add(listaDirectorios,directorioMedia);
+	list_add(listaDirectorios,directorioFotos);
+
 
 	mostrarLista(listaDirectorios,(void*)mostrarDirectorio);
-	*/
-	//Creo que voy a tener que hacer un refactor de todos los metodos nuevaEstructura que me devuelvan un puntero a la estructura en vez de dicha estructura
+
+	//Muestro nodos
+	t_nodo *nodoA  = nuevoNodo("192.168.0.1",1000);
+	t_nodo *nodoB = nuevoNodo("192.168.0.2",20000);
+	t_nodo *nodoC = nuevoNodo("192.168.0.3",65000);
+
+	list_add(listaNodos,nodoA);
+	list_add(listaNodos,nodoB);
+	list_add(listaNodos,nodoC);
+
+
+	mostrarLista(listaNodos,(void*)mostrarNodo);
+
+
+
+	//muestro archivos
+/*
+		t_bloqueArch *bloqueArchivoA1 = nuevo))
+		list_add(listaNodos,nodoA);
+		list_add(listaNodos,nodoB);
+		list_add(listaNodos,nodoC);
+
+		t_archivo *archivoA  = nuevoArchivo("Archivo A", 1, 3000,
+						 bloquesDeArchivoA, 1);
+
+		mostrarLista(listaNodos,(void*)mostrarNodo);*/
 	//fin de prueba de funciond de mostrar listas
-	system("clear");
+/*	system("clear");
 
 	char* path = "ConfigFS.cfg";
 
@@ -107,7 +133,7 @@ int main() {
 	CU_basic_run_tests();
 	CU_cleanup_registry();
 
-	return CU_get_error();
+	return CU_get_error();*/
 	//Acá termina lo de los test en el main
 
 	//Comenté esto porque me tiraba error
@@ -167,11 +193,13 @@ int main() {
 	 }
 	 }
 
-	 } //Fin de for;;
+	 } //Fin de for;;*/
 
-	 close(servFS);
-
-	 return 0;*/
+	 //close(servFS);
+	list_destroy_and_destroy_elements(listaArchivos,(void*)liberarArchivo);
+	list_destroy_and_destroy_elements(listaNodos,(void*)liberarNodo);
+	list_destroy_and_destroy_elements(listaDirectorios,(void*)liberarDirectorio);
+	 return 0;
 }
 
 void *interaccionFSNodo(void* sock_ptr) {

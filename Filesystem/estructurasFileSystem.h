@@ -13,14 +13,13 @@
 //estructura Archivo
 
 typedef struct {
-	char ip[255]; //quizas conviene en un futuro que
-	int puerto; //ip y puerto sean un solo char
+	char *ipPuerto; //quizas conviene en un futuro que
 	int numeroDeBloqueEnNodo;
 
 } t_bloqueEnNodo;
 
 typedef struct {
-	t_list copiasDeBloque;
+	t_list *copiasDeBloque;
 } t_bloqueArch;
 
 typedef struct { //XXX hace falta esta estructura  t_bloquesEnArch;
@@ -29,18 +28,17 @@ typedef struct { //XXX hace falta esta estructura  t_bloquesEnArch;
 } t_bloquesEnArch;
 
 typedef struct {
-	char nombre[255];
+	char *nombre;
 	int padre;
 	float tamanio;
-	t_list bloquesDeArch;
+	t_list *bloquesDeArch;
 	int estado;
 } t_archivo;
 
 //estructura nodo
 
 typedef struct {
-	char ip[255]; //quizas conviene en un futuro que
-	int puerto; //ip y puerto sean un solo char
+	char *ipPuerto;
 	float tamanio;
 	int cantidadBloquesOcupados;
 	t_queue *bloquesLiberados;
@@ -50,7 +48,7 @@ typedef struct {
 //estructura tabla de directorios
 typedef struct {
 	int index;
-	char nombre[255];
+	char *nombre;
 	int padre;
 } t_directorio;
 //estructura del fileSystem
@@ -67,14 +65,20 @@ typedef struct {
  * @NAME: nuevoArchivo
  * @DESC: Inicializa un nuevo archivo
  */
-t_archivo nuevoArchivo(char nombre[255], int padre, float tamanio,
-		t_bloqueArch *bloqueArch, int estado);
+t_archivo *nuevoArchivo(char *nombre, int padre, float tamanio,
+		t_list *bloquesDeArch, int estado);
+
+/**
+ * @NAME: nuevoBloqueArchivo
+ * @DESC: Inicializa un nuevo bloqueArchivo
+ */
+t_bloqueArch *nuevoBloqueArchivo(t_list *copiasDeBloques);
 
 /**
  * @NAME: nuevoBloqueEnNodo
  * @DESC: Inicializa un nuevo bloqueNodo
  */
-t_bloqueEnNodo nuevoBloqueEnNodo(char ip[255], int puerto,
+t_bloqueEnNodo *nuevoBloqueEnNodo(char *ipPuerto,
 		int numeroDeBloqueEnNodo);
 
 //funciones para la estructura nodo
@@ -82,7 +86,7 @@ t_bloqueEnNodo nuevoBloqueEnNodo(char ip[255], int puerto,
  * @NAME: nuevoNodo
  * @DESC: Inicializa un nuevo nodo
  */
-t_nodo nuevoNodo(char ip[255], int puerto, int tamanio);
+t_nodo *nuevoNodo(char *ipPuerto, int tamanio);
 
 /**
  * @NAME: activarNodo
@@ -101,7 +105,7 @@ void desactivarNodo(t_nodo unNodo);
  * @NAME: nuevoDirectorio
  * @DESC: crea una nueva entrada para el directorio
  */
-t_directorio nuevoDirectorio(int index, char nombre[255], int padre);
+t_directorio *nuevoDirectorio(int index, char *nombre, int padre);
 
 //funcion para dividir el archivo en bloques
 t_list* divideArchivoEnBloques(char* pathArch);

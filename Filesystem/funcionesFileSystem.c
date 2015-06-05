@@ -57,9 +57,8 @@ static int indiceNuevo(t_list *listaDirectorio);
  */
 void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {
 	//variables auxiliares para la funcion
-	t_bloqueEnNodo bloqueEnNodo;
+	t_bloqueEnNodo *bloqueEnNodo;
 	t_nodo *nodoActual;
-	t_bloqueEnNodo *bloqueEnNodoP;
 	t_bloqueArch *bloqueArch;
 	int i; //lo pongo aca porque si lo pongo adentro del for me tira error
 	int j;
@@ -87,10 +86,9 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {
 				posicionEnNodo = *aux;
 			}
 			nodoActual->cantidadBloquesOcupados++;
-			bloqueEnNodo = nuevoBloqueEnNodo(nodoActual->ip, nodoActual->puerto,
+			bloqueEnNodo = nuevoBloqueEnNodo(nodoActual->ipPuerto,
 					posicionEnNodo);
-			bloqueEnNodoP = &bloqueEnNodo;
-			list_add(copiasDeBloque, bloqueEnNodoP);
+			list_add(copiasDeBloque, bloqueEnNodo);
 			k++;
 			if (list_size(nodosOrdenados) == k) {
 				k = 0;
@@ -108,8 +106,7 @@ void activarNodoReconectado(t_nodo *nodoABuscar, t_list *listaNodos) {
 	t_nodo *nodoActual;
 	for (i = 0; i < list_size(listaNodos); i++) {
 		nodoActual = list_get(listaNodos, i + 1);
-		if ((nodoABuscar->ip == nodoActual->ip)
-				&& (nodoABuscar->puerto == nodoActual->puerto)) {
+		if (!strcmp(nodoABuscar->ipPuerto, nodoActual->ipPuerto)) {
 			nodoActual->activo = 1;
 			i = list_size(listaNodos);	//corto el ciclo como un campeon
 
@@ -119,8 +116,7 @@ void activarNodoReconectado(t_nodo *nodoABuscar, t_list *listaNodos) {
 }
 bool esNodoNuevo(t_nodo *nodoABuscar, t_list *listaNodos) {
 	bool mismosNodos(t_nodo *nodoDeLista) {
-		return (nodoABuscar->ip == nodoDeLista->ip)
-				&& (nodoABuscar->puerto == nodoDeLista->puerto);
+		return (!strcmp(nodoABuscar->ipPuerto, nodoDeLista->ipPuerto));
 	}
 
 	return list_any_satisfy(listaNodos, (bool*) mismosNodos);
@@ -128,8 +124,7 @@ bool esNodoNuevo(t_nodo *nodoABuscar, t_list *listaNodos) {
 //elimina el nodo y los bloques de copia que cada archivo contaba en ese nodo
 void eliminarNodoDeLista(t_nodo *nodoAEliminar, t_list *listaNodos) {
 	bool mismosNodos(t_nodo *nodoDeLista) {
-		return (nodoAEliminar->ip == nodoDeLista->ip)
-				&& (nodoAEliminar->puerto == nodoDeLista->puerto);
+		return (!strcmp(nodoAEliminar->ipPuerto, nodoDeLista->ipPuerto));
 	}
 
 	list_remove_by_condition(listaNodos, (bool*) mismosNodos);
@@ -137,8 +132,7 @@ void eliminarNodoDeLista(t_nodo *nodoAEliminar, t_list *listaNodos) {
 void eliminarReferencias(t_nodo *nodoAEliminar, t_list *archivos) {
 
 	bool copiaEstaEnNodo(t_bloqueEnNodo *copiaDeBloque) {
-		return (nodoAEliminar->ip == copiaDeBloque->ip)
-				&& (nodoAEliminar->puerto == copiaDeBloque->puerto);
+		return (!strcmp(nodoAEliminar->ipPuerto, copiaDeBloque->ipPuerto));
 	}
 
 	void _list_elements2(t_list *copiasDeBloques) {
