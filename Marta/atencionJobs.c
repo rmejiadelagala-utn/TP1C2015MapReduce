@@ -15,6 +15,59 @@ typedef struct {
 	uint32_t   combiner;
 } t_solicitud;
 
+void deserealizar(char* buffer, int sockCliente) {
+	char* payload;
+	int nbytes;
+	uint32_t tam_payload;
+	memcpy(&tam_payload,buffer,sizeof(uint32_t));
+	printf("tam_payload: %d\n", tam_payload);
+	//payload tiene los datos sin el tamaño total
+	payload=(char*)malloc(tam_payload);
+	if((nbytes=recv(sockCliente,payload,tam_payload,0))<=0) {
+        // error o conexión cerrada por el cliente
+        if (nbytes == 0) {
+            // conexión cerrada
+            printf("selectserver: socket %d cerró conexión\n", sockCliente);
+        } else {
+            perror("recv");
+        }
+        close(sockCliente); // bye! tal vez aca no tenga que cerrarlo sino en la funcion que me llamó.
+	}
+	else {
+		int i=0;
+		t_solicitud solicitud;
+		uint32_t long_arch;
+		uint32_t cant_arch; //cantidad de archivos a procesar
+		int cursor;
+		//el primer campo de payload es cant_arch a procesar
+		printf("Mostrare los datos del paquete deserealizados\n");
+		memcpy(&cant_arch,payload,sizeof(uint32_t));
+		printf("cant_arch: %d\n",cant_arch);
+		cursor=sizeof(uint32_t);
+		while (i<cant_arch){
+			memcpy( &long_arch,payload + cursor	, sizeof(uint32_t));
+			cursor+=sizeof(uint32_t);
+			//reservo espacio para archivo[i]
+			solicitud.archivos[i]=malloc(long_arch+1);
+			//relleno con \0
+			memset(solicitud.archivos[i],'\0',long_arch+1);
+			memcpy(solicitud.archivos[i],payload + cursor,  long_arch);
+			printf(" archivos[%d]: %s\n",i,solicitud.archivos[i]);
+			cursor+=long_arch;
+			i++;
+		}
+		memcpy(&long_arch ,payload + cursor,sizeof(uint32_t));
+		cursor+=sizeof(uint32_t);
+		solicitud.archivo_resultado=malloc(long_arch+1);
+		memset(solicitud.archivo_resultado,'\0',long_arch+1);
+		memcpy(solicitud.archivo_resultado,payload + cursor, long_arch );
+		cursor+=long_arch;
+		memcpy(&solicitud.combiner,payload + cursor,  sizeof(uint32_t));
+		printf("%s\n",solicitud.archivo_resultado);
+	}
+
+}
+
 void* atencionJobs(void* sock){
 	int serv= *(int*)sock;
 	int fdmax, i,newSock;
@@ -22,13 +75,11 @@ void* atencionJobs(void* sock){
 	printf("estoy en el hilo\n");
 	printf("el valor del socket es: %d\n",serv);
 	struct sockaddr_in their_addr;
-	char* payload;
 	char* buff;
 	//char* prog_socket_str;
 
 	fd_set master;
 	fd_set read_fds;
-	header_t head;
 	FD_ZERO(&master);
 	FD_ZERO(&read_fds);
 	FD_SET(serv, &master);
@@ -82,49 +133,4 @@ void* atencionJobs(void* sock){
 		}
 	}
 	free(buff);
-}
-
-void deserealizar(char* buffer, int sockCliente) {
-	char* payload;
-	int nbytes;
-	uint32_t tam_payload;
-	memcpy(&tam_payload,buffer,sizeof(uint32_t));
-	printf("tam_payload: %d\n", tam_payload);
-	payload=(char*)malloc(tam_payload);
-	if((nbytes=recv(sockCliente,payload,tam_payload,0))<=0) {
-        // error o conexión cerrada por el cliente
-        if (nbytes == 0) {
-            // conexión cerrada
-            printf("selectserver: socket %d cerró conexión\n", sockCliente);
-        } else {
-            perror("recv");
-        }
-        close(sockCliente); // bye! tal vez aca no tenga que cerrarlo sino en la funcion que me llamó.
-	}
-	else {
-		int i=0;
-		t_solicitud solicitud;
-		uint32_t long_arch;
-		uint32_t cant_arch; //cantidad de archivos a procesar
-		int cursor;
-		memcpy(&cant_arch,payload+sizeof(uint32_t),sizeof(uint32_t));
-		printf("cant_arch: %s\n",cant_arch);
-		cursor=2*sizeof(uint32_t);
-		while (i<cant_arch){
-			memcpy( &long_arch,payload + cursor	, sizeof(uint32_t));
-			//solicitud.archivos[i]=malloc(long_arch+1);
-			cursor+=sizeof(uint32_t);
-			memcpy(solicitud.archivos[i],payload + cursor,  long_arch);
-			cursor+=long_arch;
-			i++;
-		}
-		memcpy(&long_arch ,payload + cursor,sizeof(uint32_t));
-		cursor+=sizeof(uint32_t);
-		memcpy(solicitud.archivo_resultado,payload + cursor, long_arch );
-		cursor+=long_arch;
-		memcpy(&solicitud.combiner,payload + cursor,  sizeof(uint32_t));
-		printf("Mostrando archivo_resultado deserealizado\n");
-		printf("%s\n",solicitud.archivo_resultado);
-	}
-
 }

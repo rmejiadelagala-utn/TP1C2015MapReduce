@@ -4,12 +4,9 @@
  *  Created on: 25/4/2015
  *      Author: utnso
  */
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
-#include<commons/config.h>
-#include<socketes/servidor.h>
+
 #include"job.h"
+#include"funcionesJob.h"
 
 int main(int argc,char *argv[]) {
 
@@ -31,64 +28,23 @@ int main(int argc,char *argv[]) {
 //	Armar la estructura solicitud
 	printf("voy a armar solicitud\n");
 	solicitud.archivos=info_config->archivos;
-	printf("%s\n",solicitud.archivos[1]);
 	solicitud.archivo_resultado=info_config->archivo_resultado;
-	solicitud.combiner=strcmp(info_config->COMBINER,"NO")?0:1;
-	printf("%d\n",solicitud.combiner);
-	serializer_y_send_solicitud(sock, &solicitud);
-
-	free(info_config);
-	getchar();
-return 0;
-}
-
-
-void serializer_y_send_solicitud(int sock, t_solicitud* solicitud) {
-//  Armar Paquete a enviar
-
-/*<-------------------------------- p a y l o a d ----------------------------------------->
- *
- ********************************************************************************************
- *              |______________________p_a_q_u_e_t_e________________________________________|
- *  tam_paquete | cant_arch | tam_  |arch1 | tam_  |arch2 |...| tam_arch |arch_  | conbiner |
- *              | _a_proc   | arch1 |      | arch2 |      |   |  result  |result |          |
- ********************************************************************************************
- *
- |<--uint32_t-->|<-----------------------tam_paquete -------------------------------------->|
- *
- */
-
-	printf("voy a armar paquete\n");
-	char* payload;
-	uint32_t long_arch, cursor, i, nbytes;
-	uint32_t tam_paquete;
-
-	tam_paquete = tamanioBufferSerializar(solicitud);
-	payload=(char*)malloc(tam_paquete + sizeof(uint32_t));
-
-	memcpy(payload,&tam_paquete,sizeof(uint32_t));
-	uint32_t cant_arch=cantidadArchivosToProcesar(solicitud);
-	memcpy(payload+sizeof(uint32_t),&cant_arch,sizeof(uint32_t));
-	i=0;
-	cursor=2*sizeof(uint32_t);
-	while (solicitud->archivos[i] != 0){
-			long_arch=strlen(solicitud->archivos[i]);
-			memcpy(payload + cursor, &long_arch	, sizeof(uint32_t));
-			cursor+=sizeof(uint32_t);
-			memcpy(payload + cursor , solicitud->archivos[i], long_arch);
-			cursor+=long_arch;
-			i++;
+	if (!strcmp(info_config->COMBINER,"NO")){
+		solicitud.combiner=0;
+	} else {
+		if (!strcmp(info_config->COMBINER,"SI")){
+			solicitud.combiner=1;
+		} else {
+			printf("el valor ingresado para el combiner es incorrecto\n");
+			printf("me las tomo, bye!\n");
+			exit(1);
 		}
-	long_arch=strlen(solicitud->archivo_resultado);
-	memcpy(payload + cursor,&long_arch ,sizeof(uint32_t));
-	cursor+=sizeof(uint32_t);
-	memcpy(payload + cursor, solicitud->archivo_resultado,strlen(solicitud->archivo_resultado) );
-	cursor+=strlen(solicitud->archivo_resultado);
-	memcpy(payload + cursor, &solicitud->combiner, sizeof(uint32_t));
-
-	if ((nbytes=send(sock, payload,tam_paquete+sizeof(uint32_t) , 0)) < 0) {
-					perror("error en el send del paquete a MaRTA");
-					exit(1);
 	}
+	serializer_y_send_solicitud(sock, &solicitud);
+	printf("termine de enviar solicitud a MaRTA\n");
+	printf("iniciare mapper y reducers");
+	recv_y_respuesta_operaciones();
+	free(info_config);
+return 0;
 }
 
