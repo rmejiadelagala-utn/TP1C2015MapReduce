@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include "fsystem.h"
+#include"funcionesFileSystem.h"
 
 typedef struct {
 	char nombre[255];
@@ -28,6 +29,7 @@ static bool ordenarPorMenorUso(t_nodo *data, t_nodo *dataSiguiente);
 static int buscarPosicionEnListaDadoUnArchivo(t_list *lista, t_archivo *archivo);
 static bool existeEseIndiceComoPadre(t_list *listaDirectorios, int padre);
 static int indiceNuevo(t_list *listaDirectorio);
+static int obtenerArchivo(char *nombreArchivo, char* path);
 //
 /*
  t_list* divideArchivoEnBloques(char* pathArch){
@@ -143,7 +145,7 @@ void eliminarReferencias(t_nodo *nodoAEliminar, t_list *archivos) {
 	}
 
 	void _list_elements1(t_archivo *unArchivo) {
-		t_list *bloquesDeArchivo = &(unArchivo->bloquesDeArch);
+		t_list *bloquesDeArchivo = (unArchivo->bloquesDeArch);
 		list_iterate(bloquesDeArchivo, (void*) _list_elements2);
 	}
 
@@ -233,7 +235,8 @@ void crearDirectorioDadoPadreYNom(char *nombre, int padre,
 		printf("No se pueden cargar mas de 1024\n");
 	} else {
 		//genero el nuevo directorio con sus datos, y le pongo el indice del ultimo + 1
-		t_directorio *directorioNuevo = nuevoDirectorio(indiceNuevo(listaDirectorio), nombre, padre);
+		t_directorio *directorioNuevo = nuevoDirectorio(
+				indiceNuevo(listaDirectorio), nombre, padre);
 		list_add(listaDirectorio, directorioNuevo);
 		printf("El directorio se creo bien\n");
 	}
@@ -241,7 +244,7 @@ void crearDirectorioDadoPadreYNom(char *nombre, int padre,
 
 //Este se podría hacer dado nombre, pero preferí así porque el índice es único.
 //Si no, se reutiliza esta función para hacerla por nombre, ruta o lo que sea.
-t_list* eliminarDirectorioDadoElIndice(int indice, t_list *listaDirectorio) {
+void eliminarDirectorioDadoElIndice(int indice, t_list *listaDirectorio) {
 
 	int directorioConIndiceBuscado(t_directorio *directorio) {
 		return indice == directorio->index;
@@ -257,7 +260,6 @@ t_list* eliminarDirectorioDadoElIndice(int indice, t_list *listaDirectorio) {
 
 	//borrarDescendientesDe(indice, listaDirectorio);
 
-	return listaDirectorio;
 }
 
 /*
@@ -336,7 +338,7 @@ static int indiceNuevo(t_list *listaDirectorio) {
 	for (i = 0; i < listaDirectorio->elements_count; i++) {
 		t_directorio *dirAuxiliar;
 
-		dirAuxiliar =list_get(listaDirectorio,i);
+		dirAuxiliar = list_get(listaDirectorio, i);
 		if (dirAuxiliar->index != (i + 1)) {
 			nuevoIndice = i + 1;
 
@@ -358,4 +360,41 @@ static bool existeEseIndiceComoPadre(t_list *listaDirectorios, int padre) {
 	}
 
 	return list_any_satisfy(listaDirectorios, (bool*) existePadre);
+}
+static int obtenerArchivo(char *nombreArchivo, char* path) {
+	t_archivo *archivoEncontrado;
+	int nombreCoincide(t_archivo *unArchivo) {
+		return unArchivo->nombre == nombreArchivo;
+	}
+	if ((archivoEncontrado = list_find(listaArchivo, (void *) nombreCoincide))
+			== NULL) {
+		puts("Archivo no encontrado.");
+		return 0;
+	}
+	if (!archivoEncontrado->estado) {
+		puts("Archivo no está disponible.");
+		return 0;
+	}
+	int noEsNull(void* unBloque) {
+		return unBloque != NULL;
+	}
+	int obtenerBloque(t_bloqueArch *bloqueDeArchivo) {
+		t_bloqueEnNodo *bloque = list_find(bloqueDeArchivo->copiasDeBloque,
+				(void*) noEsNull);
+		int ipPuertoCoincide(t_nodo *unNodo) {
+			return unNodo->ipPuerto == bloque->ipPuerto;
+		}
+		t_nodo *nodoEncontrado = list_find(listaNodo, (void*) ipPuertoCoincide);
+		//HAY QUE CREAR EL CAMPO SOCKET EN NODO
+		/*int socket_desc = nodoEncontrado.socket;
+		 send(socket_desc,1,sizeOf(1),0);
+		 int tamanioData;
+		 recv(socket_desc, &tamanioData,1,0);
+		 char **data = malloc(&tamanioData);
+		 recv(socket_desc, *data, tamanioData, 0);
+		 puts(*data);*/
+		//FALTA ESCRIBIR EN ARCHIVO EN VEZ DE MOSTRAR POR PANTALLA
+	}
+	list_iterate(archivoEncontrado->bloquesDeArch, (void *) obtenerBloque);
+
 }

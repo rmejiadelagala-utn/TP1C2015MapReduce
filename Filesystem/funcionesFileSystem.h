@@ -7,7 +7,7 @@
 
 #ifndef FUNCIONESFILESYSTEM_H_
 #define FUNCIONESFILESYSTEM_H_
-
+#include"estructurasFileSystem.h"
 /*
  * @NAME: distribuirBloquesEnNodos
  * @DESC: recibe una lista de bloques de archivo, por la cual crea 3 copias y cada una se la asigna a un nodo específico. Ademas internamente ordena la lista para lograr una mejor distribucion
@@ -31,7 +31,7 @@ void formatear(t_list **listaNodos, t_list **listaArchivos,
  * @NAME: renombrarArchivoPorNombre
  * @DESC: recibe una lista de archivos, un nombre de un archivo y un nuevo nombre para el mismo, y lo modifica en la lista de archivos
  */
-void *renombrarArchivoPorNombre(char *nombreBuscado, char *nuevoNombre,
+void renombrarArchivoPorNombre(char *nombreBuscado, char *nuevoNombre,
 		t_list *listaArchivos);
 
 /*
@@ -52,7 +52,7 @@ void crearDirectorioDadoPadreYNom(char *nombre, int padre,
  * @NAME: eliminarDirectorioDadoElIndice
  * @DESC: recibe una lista de directorios, un indice de un directorio y lo elimina
  */
-void* eliminarDirectorioDadoElIndice(int indice, t_list *listaDirectorio);
+void eliminarDirectorioDadoElIndice(int indice, t_list *listaDirectorio);
 
 /*
  * @NAME: esNodoNuevo
@@ -86,6 +86,5 @@ void eliminarReferencias(t_nodo *nodoAEliminar, t_list *archivos);
  */
 void eliminarNodoDeLista(t_nodo *nodoAEliminar, t_list *listaNodos);
 
-int obtenerArchivo(char *nombreArchivo, char* path);
 
 #endif /* FUNCIONESFILESYSTEM_H_ */
