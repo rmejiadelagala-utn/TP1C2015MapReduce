@@ -42,7 +42,8 @@ typedef struct {
 	float tamanio;
 	int cantidadBloquesOcupados;
 	t_queue *bloquesLiberados;
-	int activo; //para saber si el bloque se cayo o esta activo
+	int activo;//para saber si el bloque se cayo o esta activo
+	int socket;
 } t_nodo;
 
 //estructura tabla de directorios
@@ -180,4 +181,8 @@ void mostrarDirectorio(t_directorio *unDirectorio);
  */
 void mostrarLista(t_list *unaLista, void(*shower)(void*));
 
+t_list *listaNodo;
+t_list *listaDirectorio;
+t_directorio *directorioUser;
+t_archivo *listaArchivo;
 #endif /* ESTRUCTURASFILESYSTEM_H_ */

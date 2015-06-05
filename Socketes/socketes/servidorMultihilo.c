@@ -40,7 +40,7 @@ int crearServerMultiHilo(uint16_t puerto, void* funcion_hilo)
         puts("Connection accepted");
 
         pthread_t hilo;
-        new_sock = malloc(1);
+        new_sock = malloc(sizeof(int));
         *new_sock = client_sock;
 
         if( pthread_create( &hilo , NULL ,  funcion_hilo , (void*) new_sock) < 0)

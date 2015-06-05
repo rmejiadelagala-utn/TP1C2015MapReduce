@@ -17,6 +17,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <stdio.h>
+#include "fsystem.h"
 
 typedef struct {
 	char nombre[255];
