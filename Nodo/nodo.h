@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <commons/config.h>
+#include <commons/string.h>
 #include <socketes/servidor.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,11 +40,18 @@ typedef struct {
 	uint16_t PUERTO_NODO;
 } t_config_nodo;
 
+typedef struct {
+	 int socket;
+	char* IP_NODO;
+	uint16_t PUERTO_NODO;
+}t_hilofs;
+
 uint32_t TAMANIODISCO, TAMANIOARCHIVO;
 
 t_config_nodo* leerArchivoConfig(char *);
 char* mapeo_archivo(char*);
 char* mapeo_disco(char*);
 uint32_t obtenerDirBloque(uint32_t);
+uint32_t obtener_tamanio_disco(char*);
 
 #endif /* NODO_H_ */
