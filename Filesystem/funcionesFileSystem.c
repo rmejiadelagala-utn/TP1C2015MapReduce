@@ -127,34 +127,33 @@ bool esNodoNuevo(t_nodo *nodoABuscar, t_list *listaNodos) {	//probada
 	return !list_any_satisfy(listaNodos, (bool*) mismosNodos);
 }
 //elimina el nodo y los bloques de copia que cada archivo contaba en ese nodo
-void eliminarNodoDeLista(t_nodo *nodoAEliminar, t_list *listaNodos) {
+void eliminarNodoDeLista(t_nodo *nodoAEliminar, t_list *listaNodos) {//probada
 	bool mismosNodos(t_nodo *nodoDeLista) {
 		return (!strcmp(nodoAEliminar->ipPuerto, nodoDeLista->ipPuerto));
 	}
 
 	list_remove_and_destroy_by_condition(listaNodos, (bool*) mismosNodos, (void*) liberarNodo);
 }
-void eliminarReferencias(t_nodo *nodoAEliminar, t_list *archivos) {
+void eliminarReferencias(t_nodo *nodoAEliminar, t_list *archivos) { //probada
 
 	bool copiaEstaEnNodo(t_bloqueEnNodo *copiaDeBloque) {
-		return (!strcmp(nodoAEliminar->ipPuerto, copiaDeBloque->ipPuerto));
+		return (strcmp(nodoAEliminar->ipPuerto, copiaDeBloque->ipPuerto) == 0);
 	}
 
-	void _list_elements2(t_list *copiasDeBloques) {
-		list_remove_by_condition(copiasDeBloques, (bool*) copiaEstaEnNodo);
+	void _list_elements2(t_bloqueArch *bloqueDeArch) {
+		list_remove_and_destroy_by_condition(bloqueDeArch->copiasDeBloque, (bool*) copiaEstaEnNodo, (void*) liberarBloqueEnNodo);
 	}
 
 	void _list_elements1(t_archivo *unArchivo) {
-		t_list *bloquesDeArchivo = (unArchivo->bloquesDeArch);
-		list_iterate(bloquesDeArchivo, (void*) _list_elements2);
+		list_iterate(unArchivo->bloquesDeArch, (void*) _list_elements2);
 	}
 
 	list_iterate(archivos, (void*) _list_elements1);
 }
-void eliminarNodoYRerencias(t_nodo *nodoAEliminar, t_list *listaNodos,
+void eliminarNodoYRerencias(t_nodo *nodoAEliminar, t_list *listaNodos, //probada
 		t_list *archivos) {
-	eliminarNodoDeLista(nodoAEliminar, listaNodos);
 	eliminarReferencias(nodoAEliminar, archivos);
+	eliminarNodoDeLista(nodoAEliminar, listaNodos);
 
 }
 
