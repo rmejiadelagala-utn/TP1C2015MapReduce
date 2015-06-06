@@ -52,11 +52,11 @@ t_nodo *nuevoNodo(char *ipPuerto, int tamanio) {
 	return unNodo;
 }
 
-void activarNodo(t_nodo unNodo) {
-	unNodo.activo = 1;
+void activarNodo(t_nodo *unNodo) {
+	unNodo->activo = 1;
 }
-void desactivarNodo(t_nodo unNodo) {
-	unNodo.activo = 0;
+void desactivarNodo(t_nodo *unNodo) {
+	unNodo->activo = 0;
 }
 //funciones para la estructura tabla de directorios
 

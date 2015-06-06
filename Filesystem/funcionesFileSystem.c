@@ -29,7 +29,7 @@ static bool ordenarPorMenorUso(t_nodo *data, t_nodo *dataSiguiente);
 static int buscarPosicionEnListaDadoUnArchivo(t_list *lista, t_archivo *archivo);
 static bool existeEseIndiceComoPadre(t_list *listaDirectorios, int padre);
 static int indiceNuevo(t_list *listaDirectorio);
-static int obtenerArchivo(char *nombreArchivo, char* path);
+static int obtenerArchivo(char *nombreArchivo, char* path, int directorioActual);
 //
 /*
  t_list* divideArchivoEnBloques(char* pathArch){
@@ -106,25 +106,25 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {
 
 	}
 }
-void activarNodoReconectado(t_nodo *nodoABuscar, t_list *listaNodos) {
+void activarNodoReconectado(t_nodo *nodoABuscar, t_list *listaNodos) {//probada
 	int i;
 	t_nodo *nodoActual;
 	for (i = 0; i < list_size(listaNodos); i++) {
-		nodoActual = list_get(listaNodos, i + 1);
+		nodoActual = list_get(listaNodos, i);
 		if (!strcmp(nodoABuscar->ipPuerto, nodoActual->ipPuerto)) {
-			nodoActual->activo = 1;
+			activarNodo(nodoActual);
 			i = list_size(listaNodos);	//corto el ciclo como un campeon
 
 		}
 	}
 
 }
-bool esNodoNuevo(t_nodo *nodoABuscar, t_list *listaNodos) {
+bool esNodoNuevo(t_nodo *nodoABuscar, t_list *listaNodos) {	//probada
 	bool mismosNodos(t_nodo *nodoDeLista) {
 		return (!strcmp(nodoABuscar->ipPuerto, nodoDeLista->ipPuerto));
 	}
 
-	return list_any_satisfy(listaNodos, (bool*) mismosNodos);
+	return !list_any_satisfy(listaNodos, (bool*) mismosNodos);
 }
 //elimina el nodo y los bloques de copia que cada archivo contaba en ese nodo
 void eliminarNodoDeLista(t_nodo *nodoAEliminar, t_list *listaNodos) {
@@ -132,7 +132,7 @@ void eliminarNodoDeLista(t_nodo *nodoAEliminar, t_list *listaNodos) {
 		return (!strcmp(nodoAEliminar->ipPuerto, nodoDeLista->ipPuerto));
 	}
 
-	list_remove_by_condition(listaNodos, (bool*) mismosNodos);
+	list_remove_and_destroy_by_condition(listaNodos, (bool*) mismosNodos, (void*) liberarNodo);
 }
 void eliminarReferencias(t_nodo *nodoAEliminar, t_list *archivos) {
 
@@ -167,7 +167,7 @@ void* eliminarArchivoPorNombre(char nombreBuscado[255], t_list *listaArchivos) {
 			(void*) archivoConNombreBuscado);
 }
 
-void formatear(t_list **listaNodos, t_list **listaArchivos,
+void formatear(t_list **listaNodos, t_list **listaArchivos,	//probada
 		t_list **listaDirectorios) {
 	list_destroy_and_destroy_elements(*listaArchivos, (void*) liberarArchivo);
 	list_destroy_and_destroy_elements(*listaNodos, (void*) liberarNodo);
@@ -178,7 +178,7 @@ void formatear(t_list **listaNodos, t_list **listaArchivos,
 	*listaDirectorios = list_create();
 }
 
-void renombrarArchivoPorNombre(char *nombreBuscado, char *nuevoNombre,
+void renombrarArchivoPorNombre(char *nombreBuscado, char *nuevoNombre, //probada
 		t_list *listaArchivos) {
 
 	int archivoConNombreBuscado(t_archivo *unArchivo) {
@@ -203,7 +203,7 @@ void renombrarArchivoPorNombre(char *nombreBuscado, char *nuevoNombre,
 //ruta a la que quiere moverse. Esta ruta sería una cadena de nombre de
 //directorio separados por /. Eso me daría el padre del directorio al que quiero
 //moverme.
-void moverArchivoPorNombreYPadre(char *nombreBuscado, t_list *listaArchivos,
+void moverArchivoPorNombreYPadre(char *nombreBuscado, t_list *listaArchivos, //probada
 		t_list *listaDirectorios, int padre) {
 
 	if (!existeEseIndiceComoPadre(listaDirectorios, padre)) {
@@ -227,7 +227,7 @@ void moverArchivoPorNombreYPadre(char *nombreBuscado, t_list *listaArchivos,
 	}
 }
 
-void crearDirectorioDadoPadreYNom(char *nombre, int padre,
+void crearDirectorioDadoPadreYNom(char *nombre, int padre, //probada
 		t_list *listaDirectorio) {
 
 	//Verifico que no se pase de los 1024 directorios permitidos
@@ -361,10 +361,11 @@ static bool existeEseIndiceComoPadre(t_list *listaDirectorios, int padre) {
 
 	return list_any_satisfy(listaDirectorios, (bool*) existePadre);
 }
-static int obtenerArchivo(char *nombreArchivo, char* path) {
+static int obtenerArchivo(char *nombreArchivo, char* path, int directorioActual) {
 	t_archivo *archivoEncontrado;
 	int nombreCoincide(t_archivo *unArchivo) {
-		return unArchivo->nombre == nombreArchivo;
+		return (unArchivo->padre == directorioActual)
+				&& (unArchivo->nombre == nombreArchivo);
 	}
 	if ((archivoEncontrado = list_find(listaArchivo, (void *) nombreCoincide))
 			== NULL) {

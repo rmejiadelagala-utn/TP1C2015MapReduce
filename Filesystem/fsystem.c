@@ -89,6 +89,7 @@ int main() {
 
 	mostrarLista(listaNodos, (void*) mostrarNodo);
 
+
 	//muestro archivos
 
 	t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo("copiaBloqueA1C1", 11);
@@ -147,10 +148,26 @@ int main() {
 //	formatear(&listaNodos, &listaArchivos, &listaDirectorios);
 //	renombrarArchivoPorNombre("Archivo A","Archivo con nombre cambiado",listaArchivos);
 //	moverArchivoPorNombreYPadre("Archivo A", listaArchivos, listaDirectorios, 10);
+//	crearDirectorioDadoPadreYNom("Directorio Nuevo", 1,listaDirectorios);
+//	eliminarNodoDeLista(nodoA, listaNodos);
+//	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
+//	mostrarLista(listaArchivos, (void*) mostrarArchivo);
+//	mostrarLista(listaNodos, (void*) mostrarNodo);
 
-	crearDirectorioDadoPadreYNom("Directorio Nuevo", 1,listaDirectorios);
-	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
-	mostrarLista(listaArchivos, (void*) mostrarArchivo);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	//fin de prueba de funciond de mostrar listas
 	/*	system("clear");
 
