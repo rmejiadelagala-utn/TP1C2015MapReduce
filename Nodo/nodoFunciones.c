@@ -71,14 +71,7 @@ char* mapeo_disco(char* path){
 	int fd = -1;
 	uint32_t TAMANIODISCO;
 
-	if ((fd = open(path, O_RDWR)) == -1)
-			err(1, "Nodo: Error al abrir midata1.bin (open)");
-
-	struct stat buf;
-
-	stat(path, &buf);
-
-	TAMANIODISCO = buf.st_size;
+	TAMANIODISCO = obtener_tamanio_disco(path);
 
 	if ((data_disco = mmap(NULL, TAMANIODISCO, PROT_READ|PROT_WRITE, MAP_FILE|MAP_SHARED, fd, 0))== MAP_FAILED){;
 		close(fd);
@@ -93,6 +86,19 @@ uint32_t obtenerDirBloque(uint32_t nroBloque){
 	return nroBloque;
 }
 
+uint32_t obtener_tamanio_disco(char* path){
+	int fd = -1;
+	uint32_t tamanio_disco;
+
+	if ((fd = open(path, O_RDWR)) == -1)
+				err(1, "Nodo: Error al abrir midata1.bin (open)");
+
+		struct stat buf;
+		stat(path, &buf);
+		tamanio_disco = buf.st_size;
+
+	return tamanio_disco;
+}
 
 
 
