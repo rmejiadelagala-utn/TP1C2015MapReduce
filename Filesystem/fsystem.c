@@ -79,38 +79,42 @@ int main() {
 	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 
 	//Muestro nodos
-	t_nodo *nodoA = nuevoNodo("192.168.0.1:80", 1000);
-	t_nodo *nodoB = nuevoNodo("192.168.0.2:127", 20000);
-	t_nodo *nodoC = nuevoNodo("192.168.0.3.243", 65000);
+	t_nodo *nodoA = nuevoNodo("192.168.0.1:80A", 10);
+	t_nodo *nodoB = nuevoNodo("192.168.0.2:127B", 20);
+	t_nodo *nodoC = nuevoNodo("192.168.0.3.243C", 60);
+
+	nodoA->cantidadBloquesOcupados = 4;
+	nodoC->cantidadBloquesOcupados = 3;
+	nodoB->cantidadBloquesOcupados = 3;
 
 	list_add(listaNodos, nodoA);
 	list_add(listaNodos, nodoB);
 	list_add(listaNodos, nodoC);
 
-	mostrarLista(listaNodos, (void*) mostrarNodo);
+//	mostrarLista(listaNodos, (void*) mostrarNodo);
 
 
 	//muestro archivos
 
-	t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo("copiaBloqueA1C1", 11);
-	t_bloqueEnNodo *copiaBloqueA1C2 = nuevoBloqueEnNodo("copiaBloqueA1C2", 12);
-	t_bloqueEnNodo *copiaBloqueA1C3 = nuevoBloqueEnNodo("copiaBloqueA1C3", 13);
+	t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo("192.168.0.1:80A", 11);
+	t_bloqueEnNodo *copiaBloqueA1C2 = nuevoBloqueEnNodo("192.168.0.2:127B", 12);
+	t_bloqueEnNodo *copiaBloqueA1C3 = nuevoBloqueEnNodo("192.168.0.3.243C", 13);
 	t_list *copiasBloqueA1 = list_create();
 	list_add(copiasBloqueA1, copiaBloqueA1C1);
 	list_add(copiasBloqueA1, copiaBloqueA1C2);
 	list_add(copiasBloqueA1, copiaBloqueA1C3);
 
-	t_bloqueEnNodo *copiaBloqueA2C1 = nuevoBloqueEnNodo("copiaBloqueA2C1", 21);
-	t_bloqueEnNodo *copiaBloqueA2C2 = nuevoBloqueEnNodo("copiaBloqueA2C2", 22);
-	t_bloqueEnNodo *copiaBloqueA2C3 = nuevoBloqueEnNodo("copiaBloqueA2C3", 23);
+	t_bloqueEnNodo *copiaBloqueA2C1 = nuevoBloqueEnNodo("192.168.0.1:80A", 21);
+	t_bloqueEnNodo *copiaBloqueA2C2 = nuevoBloqueEnNodo("192.168.0.2:127B", 22);
+	t_bloqueEnNodo *copiaBloqueA2C3 = nuevoBloqueEnNodo("192.168.0.3.243C", 23);
 	t_list *copiasBloqueA2 = list_create();
 	list_add(copiasBloqueA2, copiaBloqueA2C1);
 	list_add(copiasBloqueA2, copiaBloqueA2C2);
 	list_add(copiasBloqueA2, copiaBloqueA2C3);
 
-	t_bloqueEnNodo *copiaBloqueA3C1 = nuevoBloqueEnNodo("copiaBloqueA3C1", 31);
-	t_bloqueEnNodo *copiaBloqueA3C2 = nuevoBloqueEnNodo("copiaBloqueA3C2", 32);
-	t_bloqueEnNodo *copiaBloqueA3C3 = nuevoBloqueEnNodo("copiaBloqueA3C3", 33);
+	t_bloqueEnNodo *copiaBloqueA3C1 = nuevoBloqueEnNodo("192.168.0.1:80A", 31);
+	t_bloqueEnNodo *copiaBloqueA3C2 = nuevoBloqueEnNodo("192.168.0.2:127B", 32);
+	t_bloqueEnNodo *copiaBloqueA3C3 = nuevoBloqueEnNodo("192.168.0.3.243C", 33);
 	t_list *copiasBloqueA3 = list_create();
 	list_add(copiasBloqueA3, copiaBloqueA3C1);
 	list_add(copiasBloqueA3, copiaBloqueA3C2);
@@ -132,7 +136,7 @@ int main() {
 
 
 
-	t_bloqueEnNodo *copiaBloqueB1C1 = nuevoBloqueEnNodo("copiaBloqueB1C1", 11);
+	t_bloqueEnNodo *copiaBloqueB1C1 = nuevoBloqueEnNodo("192.168.0.1:80A", 41);
 	t_list *copiasBloqueB1 = list_create();
 	list_add(copiasBloqueB1, copiaBloqueB1C1);
 	t_bloqueArch *bloqueArchivoB1 = nuevoBloqueArchivo(copiasBloqueB1);
@@ -151,16 +155,15 @@ int main() {
 //	crearDirectorioDadoPadreYNom("Directorio Nuevo", 1,listaDirectorios);
 //	eliminarNodoDeLista(nodoA, listaNodos);
 //	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
-//	mostrarLista(listaArchivos, (void*) mostrarArchivo);
-//	mostrarLista(listaNodos, (void*) mostrarNodo);
+	mostrarLista(listaArchivos, (void*) mostrarArchivo);
+	mostrarLista(listaNodos, (void*) mostrarNodo);
 
 
+//	eliminarReferencias(nodoA, listaArchivos);
+//	eliminarNodoYRerencias(nodoA, listaNodos,listaArchivos);
 
-
-
-
-
-
+	mostrarLista(listaArchivos, (void*) mostrarArchivo);
+	mostrarLista(listaNodos, (void*) mostrarNodo);
 
 
 
