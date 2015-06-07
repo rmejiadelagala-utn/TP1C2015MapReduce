@@ -162,8 +162,13 @@ int main() {
 //	eliminarReferencias(nodoA, listaArchivos);
 //	eliminarNodoYRerencias(nodoA, listaNodos,listaArchivos);
 
-	mostrarLista(listaArchivos, (void*) mostrarArchivo);
-	mostrarLista(listaNodos, (void*) mostrarNodo);
+//	mostrarArchivo(buscarArchPorNombre("Archivo A", listaArchivos));
+//	mostrarDirectorio(buscarDirPorNombre("home",listaDirectorios));
+//	mostrarNodo(buscarNodoPorIpPuerto("192.168.0.1:80A",listaNodos));
+
+
+//	mostrarLista(listaArchivos, (void*) mostrarArchivo);
+//	mostrarLista(listaNodos, (void*) mostrarNodo);
 
 
 

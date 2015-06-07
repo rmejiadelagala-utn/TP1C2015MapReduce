@@ -181,6 +181,26 @@ void mostrarDirectorio(t_directorio *unDirectorio);
  */
 void mostrarLista(t_list *unaLista, void(*shower)(void*));
 
+//funciones de busquedas
+
+/**
+ * @NAME: buscarNodoPorIpPuerto
+ * @DESC: busca un nodo por ipPuerto en una lista de nodos
+ */
+t_nodo *buscarNodoPorIpPuerto(char *ipPuerto,t_list *listaNodos);
+
+/**
+ * @NAME: buscarDirPorNombre
+ * @DESC: busca un directorio por nombre en una lista de directorios
+ */
+t_directorio *buscarDirPorNombre(char *nombre,t_list *listaDirectorios);
+
+/**
+ * @NAME: buscarArchPorNombre
+ * @DESC: busca un archivo por nombre en una lista de archivos
+ */
+t_archivo *buscarArchPorNombre(char *nombre,t_list *listaArchivos);
+
 t_list *listaNodo;
 t_list *listaDirectorio;
 t_directorio *directorioUser;
