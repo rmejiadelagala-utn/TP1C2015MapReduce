@@ -30,6 +30,12 @@ static int buscarPosicionEnListaDadoUnArchivo(t_list *lista, t_archivo *archivo)
 static bool existeEseIndiceComoPadre(t_list *listaDirectorios, int padre);
 static int indiceNuevo(t_list *listaDirectorio);
 static int obtenerArchivo(char *nombreArchivo, char* path, int directorioActual);
+static char* nodoIpPuerto(t_nodo *unNodo);
+static char* dirNombre(t_directorio *unDir);
+static char* archNombre(t_archivo *unArch);
+static void *buscarEnListaPorStrKey(t_list *lista, char *key,
+		char *keyGetter(void*));
+
 //
 /*
  t_list* divideArchivoEnBloques(char* pathArch){
@@ -106,6 +112,24 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {
 
 	}
 }
+
+//Funciones de busqueda
+t_nodo *buscarNodoPorIpPuerto(char *ipPuerto, t_list *listaNodos) {
+	t_nodo *nodo = buscarEnListaPorStrKey(listaNodos, ipPuerto,
+			(char*) nodoIpPuerto);
+	return nodo != NULL ? nodo : NULL;
+}
+t_directorio *buscarDirPorNombre(char *nombre, t_list *listaDirectorios) {
+	t_archivo *dir = buscarEnListaPorStrKey(listaDirectorios, nombre,
+			(char*) dirNombre);
+	return dir != NULL ? dir : NULL;
+}
+t_archivo *buscarArchPorNombre(char *nombre, t_list *listaArchivos) {
+	t_archivo *arch = buscarEnListaPorStrKey(listaArchivos, nombre,
+			(char*) archNombre);
+	return arch != NULL ? arch : NULL;
+}
+
 void activarNodoReconectado(t_nodo *nodoABuscar, t_list *listaNodos) {//probada
 	int i;
 	t_nodo *nodoActual;
@@ -132,7 +156,8 @@ void eliminarNodoDeLista(t_nodo *nodoAEliminar, t_list *listaNodos) {//probada
 		return (!strcmp(nodoAEliminar->ipPuerto, nodoDeLista->ipPuerto));
 	}
 
-	list_remove_and_destroy_by_condition(listaNodos, (bool*) mismosNodos, (void*) liberarNodo);
+	list_remove_and_destroy_by_condition(listaNodos, (bool*) mismosNodos,
+			(void*) liberarNodo);
 }
 void eliminarReferencias(t_nodo *nodoAEliminar, t_list *archivos) { //probada
 
@@ -141,7 +166,8 @@ void eliminarReferencias(t_nodo *nodoAEliminar, t_list *archivos) { //probada
 	}
 
 	void _list_elements2(t_bloqueArch *bloqueDeArch) {
-		list_remove_and_destroy_by_condition(bloqueDeArch->copiasDeBloque, (bool*) copiaEstaEnNodo, (void*) liberarBloqueEnNodo);
+		list_remove_and_destroy_by_condition(bloqueDeArch->copiasDeBloque,
+				(bool*) copiaEstaEnNodo, (void*) liberarBloqueEnNodo);
 	}
 
 	void _list_elements1(t_archivo *unArchivo) {
@@ -310,11 +336,30 @@ void eliminarDirectorioDadoElIndice(int indice, t_list *listaDirectorio) {
  }
  }
  */
+/******************************************/
 /********* PRIVATE FUNCTIONS **************/
+/******************************************/
 
 static bool ordenarPorMenorUso(t_nodo *data, t_nodo *dataSiguiente) {
 	return dataSiguiente->cantidadBloquesOcupados
 			< data->cantidadBloquesOcupados;
+}
+static void *buscarEnListaPorStrKey(t_list *lista, char *key,
+		char *keyGetter(void*)) {
+	bool _comparacion(void* data) {
+		return (strcmp(keyGetter(data), key)) == 0;
+	}
+
+	return list_find(lista, (bool*) _comparacion);
+}
+static char* nodoIpPuerto(t_nodo *unNodo) {
+	return unNodo->ipPuerto;
+}
+static char* dirNombre(t_directorio *unDir) {
+	return unDir->nombre;
+}
+static char* archNombre(t_archivo *unArch) {
+	return unArch->nombre;
 }
 
 static int buscarPosicionEnListaDadoUnArchivo(t_list *listaArchivos,

@@ -117,12 +117,13 @@ int consola(void* unListaNodo) {
 			printf("Parametro invalido\n");
 			break;
 
-			//para evitar que halla perdidas de memoria, esta funcion va liberando uno por uno los strings en comandoSeparado
-			freeSeparaciones(comandoSeparado);
 		}
+			//para evitar que halla perdidas de memoria, esta funcion va liberando uno por uno los strings en comandoSeparado
+		freeSeparaciones(comandoSeparado);
+
 
 	} while (!exit);
-
+	for (i = 0; i < 18; i++) free(comandosValidos[i]);
 	return 0;
 }
 
@@ -132,7 +133,12 @@ void leerComando(char *lectura, int maximoLargo) {
 
 	if ((strlen(lectura) > 0) && (lectura[strlen(lectura) - 1] == '\n')) {
 		//agrego el /0 para que lo considere como una cadena
-		lectura[strlen(lectura) - 1] = '\0';
+		if((strlen(lectura)!=1) && (lectura[strlen(lectura) - 2] != ' ')){
+			lectura[strlen(lectura) - 1] = '\0';
+		}
+		else{
+			lectura[strlen(lectura)] = '\0';
+		}
 	}
 
 }
@@ -193,6 +199,7 @@ void copiarAFS(char *archivo, t_list *unaListaNodo) {
 	int pedirBloques (){
 		send(list_get(unaListaNodo,i),"Nodo, dame tu bloque\n",strlen("Nodo, dame tu bloque\n"),0);
 		i++;
+		return i;
 	}
 	list_iterate(unaListaNodo,pedirBloques);
 
