@@ -36,34 +36,36 @@ void deserealizar(char* buffer, int sockCliente) {
 	else {
 		int i=0;
 		t_solicitud solicitud;
-		uint32_t long_arch;
+		size_t long_arch;
 		uint32_t cant_arch; //cantidad de archivos a procesar
 		int cursor;
+		char* bufftmp;
 		//el primer campo de payload es cant_arch a procesar
 		printf("Mostrare los datos del paquete deserealizados\n");
 		memcpy(&cant_arch,payload,sizeof(uint32_t));
 		printf("cant_arch: %d\n",cant_arch);
-		cursor=sizeof(uint32_t);
-		while (i<cant_arch){
-			memcpy( &long_arch,payload + cursor	, sizeof(uint32_t));
+		cursor= 1*sizeof(uint32_t);
+		solicitud.archivos = malloc(sizeof(char*)*cant_arch);
+		while (i < cant_arch){
+			memcpy( &long_arch,(payload+cursor), sizeof(uint32_t));
 			cursor+=sizeof(uint32_t);
-			//reservo espacio para archivo[i]
-			solicitud.archivos[i]=malloc(long_arch+1);
-			//relleno con \0
-			memset(solicitud.archivos[i],'\0',long_arch+1);
-			memcpy(solicitud.archivos[i],payload + cursor,  long_arch);
-			printf(" archivos[%d]: %s\n",i,solicitud.archivos[i]);
+			bufftmp=malloc(long_arch);
+			bufftmp[long_arch]='\0';
+			memcpy(bufftmp,payload+cursor,long_arch);
+			solicitud.archivos[i]=strdup(bufftmp);
+			printf("solicitud_archivo: %s\n", solicitud.archivos[i]);
 			cursor+=long_arch;
 			i++;
 		}
-		memcpy(&long_arch ,payload + cursor,sizeof(uint32_t));
+		memcpy(&long_arch ,(payload+cursor),sizeof(uint32_t));
 		cursor+=sizeof(uint32_t);
 		solicitud.archivo_resultado=malloc(long_arch+1);
 		memset(solicitud.archivo_resultado,'\0',long_arch+1);
-		memcpy(solicitud.archivo_resultado,payload + cursor, long_arch );
+		memcpy(solicitud.archivo_resultado,(payload + cursor), long_arch );
 		cursor+=long_arch;
 		memcpy(&solicitud.combiner,payload + cursor,  sizeof(uint32_t));
 		printf("%s\n",solicitud.archivo_resultado);
+		free(bufftmp);
 	}
 
 }
