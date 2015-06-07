@@ -39,7 +39,7 @@ void renombrarArchivoPorNombre(char *nombreBuscado, char *nuevoNombre,
  * @DESC: recibe una lista de archivos, un nombre de un archivo y un nuevo padre para el mismo, y lo modifica en la lista de archivos
  */
 void moverArchivoPorNombreYPadre(char *nombreBuscado, t_list *listaArchivos,
-		t_list *listaDirectorios, int padre) ;
+		t_list *listaDirectorios, int padre);
 
 /*
  * @NAME: crearDirectorioDadoPadreYNom
@@ -86,5 +86,24 @@ void eliminarReferencias(t_nodo *nodoAEliminar, t_list *archivos);
  */
 void eliminarNodoDeLista(t_nodo *nodoAEliminar, t_list *listaNodos);
 
+//funciones de busquedas
+
+/**
+ * @NAME: buscarNodoPorIpPuerto
+ * @DESC: busca un nodo por ipPuerto en una lista de nodos
+ */
+t_nodo *buscarNodoPorIpPuerto(char *ipPuerto, t_list *listaNodos);
+
+/**
+ * @NAME: buscarDirPorNombre
+ * @DESC: busca un directorio por nombre en una lista de directorios
+ */
+t_directorio *buscarDirPorNombre(char *nombre, t_list *listaDirectorios);
+
+/**
+ * @NAME: buscarArchPorNombre
+ * @DESC: busca un archivo por nombre en una lista de archivos
+ */
+t_archivo *buscarArchPorNombre(char *nombre, t_list *listaArchivos);
 
 #endif /* FUNCIONESFILESYSTEM_H_ */

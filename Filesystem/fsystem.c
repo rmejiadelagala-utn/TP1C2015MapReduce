@@ -13,7 +13,6 @@
 #include "CUnit/Basic.h"
 #include <unistd.h>
 
-
 int inicializar() {
 	directorioUser = malloc(sizeof(t_directorio));
 
@@ -61,7 +60,6 @@ void agregar_tests() {
 //interaccionFSNodo es la funcion que va a ejecutar cada hilo que esta en conexion con los nodos
 void *interaccionFSNodo(void*);
 
-
 int main() {
 	t_list *listaArchivos = list_create();
 	t_list *listaNodos = list_create();
@@ -93,8 +91,7 @@ int main() {
 
 //	mostrarLista(listaNodos, (void*) mostrarNodo);
 
-
-	//muestro archivos
+//muestro archivos
 
 	t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo("192.168.0.1:80A", 11);
 	t_bloqueEnNodo *copiaBloqueA1C2 = nuevoBloqueEnNodo("192.168.0.2:127B", 12);
@@ -134,8 +131,6 @@ int main() {
 	list_add(bloquesDeArchivoA, bloqueArchivoA2);
 	list_add(bloquesDeArchivoA, bloqueArchivoA3);
 
-
-
 	t_bloqueEnNodo *copiaBloqueB1C1 = nuevoBloqueEnNodo("192.168.0.1:80A", 41);
 	t_list *copiasBloqueB1 = list_create();
 	list_add(copiasBloqueB1, copiaBloqueB1C1);
@@ -143,9 +138,10 @@ int main() {
 	t_list *bloquesDeArchivoB = list_create();
 	list_add(bloquesDeArchivoB, bloqueArchivoB1);
 
-	 t_archivo *archivoA = nuevoArchivo("Archivo A", 1, 3000, bloquesDeArchivoA,1);
-	t_archivo *archivoB = nuevoArchivo("Archivo B", 1, 3000, bloquesDeArchivoB,1);
-
+	t_archivo *archivoA = nuevoArchivo("Archivo A", 1, 3000, bloquesDeArchivoA,
+			1);
+	t_archivo *archivoB = nuevoArchivo("Archivo B", 1, 3000, bloquesDeArchivoB,
+			1);
 
 	list_add(listaArchivos, archivoA);
 	list_add(listaArchivos, archivoB);
@@ -158,7 +154,6 @@ int main() {
 	mostrarLista(listaArchivos, (void*) mostrarArchivo);
 	mostrarLista(listaNodos, (void*) mostrarNodo);
 
-
 //	eliminarReferencias(nodoA, listaArchivos);
 //	eliminarNodoYRerencias(nodoA, listaNodos,listaArchivos);
 
@@ -166,15 +161,8 @@ int main() {
 //	mostrarDirectorio(buscarDirPorNombre("home",listaDirectorios));
 //	mostrarNodo(buscarNodoPorIpPuerto("192.168.0.1:80A",listaNodos));
 
-
 //	mostrarLista(listaArchivos, (void*) mostrarArchivo);
 //	mostrarLista(listaNodos, (void*) mostrarNodo);
-
-
-
-
-
-
 
 	//fin de prueba de funciond de mostrar listas
 	/*	system("clear");
@@ -274,7 +262,6 @@ int main() {
 	 } //Fin de for;;*/
 
 //close(servFS);
-
 	list_destroy_and_destroy_elements(listaArchivos, (void*) liberarArchivo);
 	list_destroy_and_destroy_elements(listaNodos, (void*) liberarNodo);
 	list_destroy_and_destroy_elements(listaDirectorios,
@@ -283,22 +270,22 @@ int main() {
 	return 0;
 }
 
-
 void *interaccionFSNodo(void* sock_ptr) {
 	int sock_desc = *(int*) sock_ptr;
 	char infoDeNodo[BUFFERSIZE];
 	int read_size;
 
-	list_add(listaNodo,sock_desc);
+	list_add(listaNodo, sock_desc);
 	//Receive a reply from the server
-	read_size = recv((int)sock_desc, infoDeNodo, 5000, 0);
+	read_size = recv((int) sock_desc, infoDeNodo, 5000, 0);
 
 	while (read_size > 0) {
 		printf("%s \n", infoDeNodo);
 		memset(infoDeNodo, 0, sizeof(infoDeNodo));
-		send(list_get(listaNodo,4),"Nodo, dame tu bloque\n",strlen("Nodo, dame tu bloque\n"),0);
+		send(list_get(listaNodo, 4), "Nodo, dame tu bloque\n",
+				strlen("Nodo, dame tu bloque\n"), 0);
 		//Limpia el buffer de los mensajes que le manda ese nodo
-		read_size = recv((int)sock_desc, infoDeNodo, 5000, 0);
+		read_size = recv((int) sock_desc, infoDeNodo, 5000, 0);
 	}
 	if (read_size == 0) {
 		printf("Nodo desconectado.\n");
