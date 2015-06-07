@@ -129,6 +129,17 @@ t_archivo *buscarArchPorNombre(char *nombre, t_list *listaArchivos) {
 			(char*) archNombre);
 	return arch != NULL ? arch : NULL;
 }
+void recorrerCopiasDeUnArch(t_archivo *unArchivo, void (*accionACopia)(t_bloqueEnNodo*)){
+	void _recorrerCopias(t_bloqueArch *bloqueArchivo){
+		list_iterate(bloqueArchivo->copiasDeBloque,(void*)accionACopia);
+	}
+	list_iterate(unArchivo->bloquesDeArch,(void*) _recorrerCopias);
+}
+
+
+
+
+
 
 void activarNodoReconectado(t_nodo *nodoABuscar, t_list *listaNodos) {//probada
 	int i;
