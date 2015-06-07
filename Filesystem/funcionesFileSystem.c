@@ -135,7 +135,11 @@ void recorrerCopiasDeUnArch(t_archivo *unArchivo, void (*accionACopia)(t_bloqueE
 	}
 	list_iterate(unArchivo->bloquesDeArch,(void*) _recorrerCopias);
 }
-
+void disminuirNodo (t_bloqueEnNodo *copia,t_list *listaNodos){
+	t_nodo *nodo = buscarNodoPorIpPuerto(copia->ipPuerto,listaNodos);
+	nodo->cantidadBloquesOcupados--;
+	queue_push(nodo->bloquesLiberados,copia->numeroDeBloqueEnNodo);
+}
 
 
 
