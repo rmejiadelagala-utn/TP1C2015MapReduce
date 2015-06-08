@@ -31,6 +31,7 @@ void cd(char *nombreDirectorio);
 void ls();
 
 //Auxiliares
+int comprobarParametros(int cantParametros, char** parametros);
 t_list *directoriosVisiblesDesdeActual(void);
 t_list *archivosVisiblesDesdeActual(void);
 //

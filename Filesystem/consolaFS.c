@@ -59,76 +59,90 @@ int consola(void* unListaNodo) {
 			}
 		}
 		//Si el comando es uno de aquellos que necesitan parametros, valida el parametro antes de ejecutarlo
-		if ((entrada >= ELIMINAR_ARCHIVO) && (entrada <= ELIMINAR_NODO)
-				&& (comandoSeparado[1] == NULL))
-			entrada = FALTA_PARAMETRO;
 		if(entrada==CD && (comandoSeparado[1] == NULL)) entrada = FALTA_PARAMETRO;
 		switch (entrada) {
 		case FORMATEAR:
+			if(comprobarParametros(0,comandoSeparado)==1)
 			formatearMDFS();
 			break;
 		case ELIMINAR_ARCHIVO:
+			if(comprobarParametros(1,comandoSeparado)==1)
 			eliminarArchivo(comandoSeparado[1]);
 			break;
 		case RENOMBRAR_ARCHIVO:
-			renombrarArchivo(comandoSeparado[1],comandoSeparado[1]);
+			if(comprobarParametros(2,comandoSeparado)==1)
+			renombrarArchivo(comandoSeparado[1],comandoSeparado[2]);
 			break;
 		case MOVER_ARCHIVO:
+			if(comprobarParametros(2,comandoSeparado)==1)
 			moverArchivo(comandoSeparado[1],comandoSeparado[2]);
 			break;
 		case CREAR_DIRECTORIO:
+			if(comprobarParametros(2,comandoSeparado)==1)
 			crearDirectorio(comandoSeparado[1],comandoSeparado[2]);
 			break;
 		case ELIMINAR_DIRECTORIO:
+			if(comprobarParametros(2,comandoSeparado)==1)
 			eliminarDirectorio(comandoSeparado[1],comandoSeparado[2]);
 			break;
 		case RENOMBRAR_DIRECTORIO:
+			if(comprobarParametros(2,comandoSeparado)==1)
 			renombrarDirectorio(comandoSeparado[1],comandoSeparado[2]);
 			break;
 		case MOVER_DIRECTORIO:
+			if(comprobarParametros(2,comandoSeparado)==1)
 			moverDirectorio(comandoSeparado[1],comandoSeparado[2]);
 			break;
 		case COPIAR_A_MDFS:
+			if(comprobarParametros(1,comandoSeparado)==1)
 			copiarAMDFS(comandoSeparado[1]);
 			break;
 		case COPIAR_A_FS:
+			if(comprobarParametros(1,comandoSeparado)==1)
 			copiarAFS(comandoSeparado[1],listaNodo);
 			break;
 		case SOLICITAR_MD5:
+			if(comprobarParametros(1,comandoSeparado)==1)
 			solicitarMD5(comandoSeparado[1]);
 			break;
 		case VER_BLOQUE:
+			if(comprobarParametros(1,comandoSeparado)==1)
 			verBloque(comandoSeparado[1]);
 			break;
 		case ELIMINAR_BLOQUE:
+			if(comprobarParametros(1,comandoSeparado)==1)
 			eliminarBloque(comandoSeparado[1]);
 			break;
 		case COPIAR_BLOQUE:
+			if(comprobarParametros(1,comandoSeparado)==1)
 			copiarBloque(comandoSeparado[1]);
 			break;
 		case LEVANTAR_NODO:
+			if(comprobarParametros(1,comandoSeparado)==1)
 			levantarNodo(comandoSeparado[1]);
 			break;
 		case ELIMINAR_NODO:
+			if(comprobarParametros(1,comandoSeparado)==1)
 			eliminarNodo(comandoSeparado[1]);
 			break;
 		case HELP:
+			if(comprobarParametros(0,comandoSeparado)==1)
 			help();
 			break;
 		case SALIR:
+			if(comprobarParametros(0,comandoSeparado)==1)
 			exit = 1;
 			break;
 		case CD:
+			if(comprobarParametros(1,comandoSeparado)==1)
 			cd(comandoSeparado[1]);
 			break;
 		case LS:
+			if(comprobarParametros(0,comandoSeparado)==1)
 			ls();
 			break;
 		case COMANDO_INVALIDO:
 			printf("Comando Invalido\n");
-			break;
-		case FALTA_PARAMETRO:
-			printf("Parametro invalido\n");
 			break;
 
 		}
@@ -188,17 +202,17 @@ void renombrarArchivo(char *archivo, char *nuevoNombre) {
 
 void moverArchivo(char *archivo, char* padreString) {
 	int string_to_int(char* string){
-		int i; int j;
-		for (i=0;i<strlen(string);i++){
-			if(string[i]>='0' && string[i]<='9') j=10*j+i-string[i];
+		int i; int j=0;
+		for (i=0;i<(strlen(string));i++){
+			if(string[i]>='0' && string[i]<='9') j=10*j+string[i]-'0';
 			else return -1;
 		}
-		if(j==-1) return 0;
-		else return j;
+		return j;
 	}
 	int padre = string_to_int(padreString);
-	if (padre) moverArchivoPorNombreYPadre(archivo, archivosVisiblesDesdeActual(),	listaDirectorios, padre);
-	else printf("Parametro invalido");
+	printf("%d",padre);
+	if (padre!=(-1)) moverArchivoPorNombreYPadre(archivo, archivosVisiblesDesdeActual(),	listaDirectorios, padre);
+	else printf("Parametro invalido.\n");
 }
 
 void crearDirectorio(char *nomDirectorio, char* padre) {
@@ -342,4 +356,20 @@ t_list *archivosVisiblesDesdeActual(void){
 		return unArchivo->padre==directorioActual->index;
 	}
 	return list_filter(listaArchivos,(void *) esArchivoHijo);
+}
+int comprobarParametros(int cantParametros, char** parametros){
+	int cant;
+	for(cant=0;parametros[cant]!=NULL;cant++);
+	cant-=1;
+	if(cantParametros<cant) {
+		printf("Demasiados parametros.\n");
+		return 2;
+	}
+	if(cantParametros==cant) {
+		return 1;
+	}
+	else {
+		printf("Faltan parametros.\n");
+		return 0;
+	}
 }
