@@ -71,7 +71,7 @@ static void disminuirNodo(t_bloqueEnNodo *copia);
  return bloquesArchivo;
  }
  */
-void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {
+void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {//Probada :D
 	//variables auxiliares para la funcion
 	t_bloqueEnNodo *bloqueEnNodo;
 	t_nodo *nodoActual;
@@ -90,15 +90,13 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {
 
 	for (i = 0; i < list_size(bloquesEnArch); i++) {
 
-	//	copiasDeBloque = list_create();
-
 		for (j = 0; j < 3; j++) {
 			nodoActual = list_get(nodosOrdenados, k);
 			if (queue_is_empty(nodoActual->bloquesLiberados)) {
 				posicionEnNodo = nodoActual->cantidadBloquesOcupados + 1;
 			} else {
 				aux = queue_pop(nodoActual->bloquesLiberados);
-				posicionEnNodo = *aux;//posible
+				posicionEnNodo = *aux;
 				free(aux);
 			}
 			nodoActual->cantidadBloquesOcupados++;
@@ -115,7 +113,11 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {
 	}
 	list_destroy(nodosOrdenados);
 }
-//120 lugar de trabajo de juanchi
+//116 lugar de trabajo de juanchi
+
+
+
+
 
 
 

@@ -158,7 +158,7 @@ int main() {
 
 
 //160 lugar de trabajo de juanchi
-//	formatear(&listaNodos, &listaArchivos, &listaDirectorios);
+/*
 	t_list *copiasbloques1 = list_create();
 	t_list * copiasbloques2 = list_create();
 	t_list * copiasbloques3 = list_create();
@@ -173,7 +173,26 @@ list_add(bloquesDeArchivo,bloquearch3);
 	mostrarLista(listaNodos, (void*) mostrarNodo);
 	mostrarLista(bloquesDeArchivo, (void*) mostrarBloqueArch);
 	list_destroy_and_destroy_elements(bloquesDeArchivo,(void*)liberarBloqueArch);
-//175 fin	lugar de trabajo de juanchi
+//176 fin	lugar de trabajo de juanchi*/
+//177 lugar de trabajo de juanchi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	//195 fin	lugar de trabajo de juanchi
 
 //	mostrarArchivo(buscarArchPorNombre("Archivo A", listaArchivos));
 //	mostrarDirectorio(buscarDirPorNombre("home",listaDirectorios));
