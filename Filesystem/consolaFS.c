@@ -71,22 +71,22 @@ int consola(void* unListaNodo) {
 			eliminarArchivo(comandoSeparado[1]);
 			break;
 		case RENOMBRAR_ARCHIVO:
-			renombrarArchivo(comandoSeparado[1]);
+			renombrarArchivo(comandoSeparado[1],comandoSeparado[1]);
 			break;
 		case MOVER_ARCHIVO:
-			moverArchivo(comandoSeparado[1]);
+			moverArchivo(comandoSeparado[1],comandoSeparado[2]);
 			break;
 		case CREAR_DIRECTORIO:
-			crearDirectorio(comandoSeparado[1]);
+			crearDirectorio(comandoSeparado[1],comandoSeparado[2]);
 			break;
 		case ELIMINAR_DIRECTORIO:
-			eliminarDirectorio(comandoSeparado[1]);
+			eliminarDirectorio(comandoSeparado[1],comandoSeparado[2]);
 			break;
 		case RENOMBRAR_DIRECTORIO:
-			renombrarDirectorio(comandoSeparado[1]);
+			renombrarDirectorio(comandoSeparado[1],comandoSeparado[2]);
 			break;
 		case MOVER_DIRECTORIO:
-			moverDirectorio(comandoSeparado[1]);
+			moverDirectorio(comandoSeparado[1],comandoSeparado[2]);
 			break;
 		case COPIAR_A_MDFS:
 			copiarAMDFS(comandoSeparado[1]);
@@ -145,7 +145,6 @@ int consola(void* unListaNodo) {
 void leerComando(char *lectura, int maximoLargo) {
 
 	fgets(lectura, maximoLargo, stdin);
-
 	//Reemplazo \n por \0
 	if ((strlen(lectura)>0)&&(lectura[strlen(lectura)-1]=='\n')) lectura[strlen(lectura)-1]=0;
 	//Borro los ultimos espacios;
@@ -170,35 +169,60 @@ void freeSeparaciones(char ** separaciones) {
 
 //Todas estas excepto el help son las que vamos a tener que ir desarrollando cuando hagamos el FileSystem
 void formatearMDFS() {
-	printf("Formatea el MDFS\n");
+	formatear(&listaNodos,&listaArchivos,&listaDirectorios);
+	directorioActual = nuevoDirectorio(1, "root", 0);
+	list_add(listaDirectorios,directorioActual);
+	free(direccion);
+	direccion = string_duplicate(directorioActual->nombre);
 }
 
 void eliminarArchivo(char *archivo) {
-	printf("Borra el archivo %s\n", archivo);
+	t_archivo *archivoObjetivo = buscarArchPorNombre(archivo,archivosVisiblesDesdeActual());
+	if(archivoObjetivo!=NULL) eliminarArchivoYreferencias(archivoObjetivo, listaArchivos,listaNodos);
+	else printf("Archivo no encontrado.\n");
 }
 
-void renombrarArchivo(char *archivo) {
-	printf("Renombra el archivo %s\n", archivo);
+void renombrarArchivo(char *archivo, char *nuevoNombre) {
+	renombrarArchivoPorNombre(archivo, nuevoNombre,archivosVisiblesDesdeActual());
 }
 
-void moverArchivo(char *archivo) {
-	printf("Mueve el archivo %s\n", archivo);
+void moverArchivo(char *archivo, char* padreString) {
+	int string_to_int(char* string){
+		int i; int j;
+		for (i=0;i<strlen(string);i++){
+			if(string[i]>='0' && string[i]<='9') j=10*j+i-string[i];
+			else return -1;
+		}
+		if(j==-1) return 0;
+		else return j;
+	}
+	int padre = string_to_int(padreString);
+	if (padre) moverArchivoPorNombreYPadre(archivo, archivosVisiblesDesdeActual(),	listaDirectorios, padre);
+	else printf("Parametro invalido");
 }
 
-void crearDirectorio(char *directorio) {
-	printf("Crea el directorio %s\n", directorio);
+void crearDirectorio(char *nomDirectorio, char* padre) {
+	//crearDirectorioDadoPadreYNom(nomDirectorio, directorioActual->padre, listaDirectorios);
 }
 
-void eliminarDirectorio(char *directorio) {
-	printf("Borra el directorio %s\n", directorio);
+void eliminarDirectorio(char *directorio, char* indice) {
+	//eliminarDirectorioDadoElIndice(indice,listaDirectorios);
 }
 
-void renombrarDirectorio(char *directorio) {
-	printf("Renombra el directorio %s\n", directorio);
+void renombrarDirectorio(char *directorio, char* nuevoNombre) {
+	int nombreCoincide (t_directorio *unDirectorio){
+			return !strcmp(unDirectorio->nombre,directorio);
+		}
+	t_directorio *directorioObjetivo = list_find(directoriosVisiblesDesdeActual(),(void *) nombreCoincide);
+	renombrarDirectorioConNombre(nuevoNombre,directorioObjetivo);
 }
 
-void moverDirectorio(char *directorio) {
-	printf("Mueve el directorio %s\n", directorio);
+void moverDirectorio(char *directorio, char* padre) {
+	/*int nombreCoincide (t_directorio *unDirectorio){
+				return !strcmp(unDirectorio->nombre,directorio);
+			}
+		t_directorio *directorioObjetivo = list_find(directoriosVisiblesDesdeActual(),(void *) nombreCoincide);
+	moverDirectorioConPadre(padre,directorioObjetivo);*/
 }
 
 void copiarAMDFS(char *archivo) {
