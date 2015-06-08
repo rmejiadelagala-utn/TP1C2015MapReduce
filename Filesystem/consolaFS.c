@@ -82,8 +82,8 @@ int consola(void* unListaNodo) {
 			crearDirectorio(comandoSeparado[1],comandoSeparado[2]);
 			break;
 		case ELIMINAR_DIRECTORIO:
-			if(comprobarParametros(2,comandoSeparado)==1)
-			eliminarDirectorio(comandoSeparado[1],comandoSeparado[2]);
+			if(comprobarParametros(1,comandoSeparado)==1)
+			eliminarDirectorio(comandoSeparado[1]);
 			break;
 		case RENOMBRAR_DIRECTORIO:
 			if(comprobarParametros(2,comandoSeparado)==1)
@@ -131,6 +131,7 @@ int consola(void* unListaNodo) {
 			break;
 		case SALIR:
 			if(comprobarParametros(0,comandoSeparado)==1)
+			printf("Gracias, vuelvan pronto.\n");
 			exit = 1;
 			break;
 		case CD:
@@ -183,17 +184,25 @@ void freeSeparaciones(char ** separaciones) {
 
 //Todas estas excepto el help son las que vamos a tener que ir desarrollando cuando hagamos el FileSystem
 void formatearMDFS() {
+	//Formateo las 3 listas
 	formatear(&listaNodos,&listaArchivos,&listaDirectorios);
+	//Vuelvo a crear el root
 	directorioActual = nuevoDirectorio(1, "root", 0);
 	list_add(listaDirectorios,directorioActual);
+	//Actualizo el string que dice donde estoy parado
 	free(direccion);
 	direccion = string_duplicate(directorioActual->nombre);
+
+	printf("El file system ha sido formateado.\n");
 }
 
 void eliminarArchivo(char *archivo) {
-	t_archivo *archivoObjetivo = buscarArchPorNombre(archivo,archivosVisiblesDesdeActual());
-	if(archivoObjetivo!=NULL) eliminarArchivoYreferencias(archivoObjetivo, listaArchivos,listaNodos);
-	else printf("Archivo no encontrado.\n");
+
+	void eliminarArch(t_archivo *unArchivo){
+		eliminarArchivoYreferencias(unArchivo,listaArchivos,listaNodos);
+	}
+
+	validarArchivoYEjecutar(archivo,(void*) eliminarArch);
 }
 
 void renombrarArchivo(char *archivo, char *nuevoNombre) {
@@ -201,44 +210,55 @@ void renombrarArchivo(char *archivo, char *nuevoNombre) {
 }
 
 void moverArchivo(char *archivo, char* padreString) {
-	int string_to_int(char* string){
-		int i; int j=0;
-		for (i=0;i<(strlen(string));i++){
-			if(string[i]>='0' && string[i]<='9') j=10*j+string[i]-'0';
-			else return -1;
-		}
-		return j;
-	}
+
 	int padre = string_to_int(padreString);
-	printf("%d",padre);
-	if (padre!=(-1)) moverArchivoPorNombreYPadre(archivo, archivosVisiblesDesdeActual(),	listaDirectorios, padre);
-	else printf("Parametro invalido.\n");
+	if (padre!=(-1)) {
+		t_list *archivosVisibles = archivosVisiblesDesdeActual();
+		moverArchivoPorNombreYPadre(archivo, archivosVisibles,	listaDirectorios, padre);
+		free(archivosVisibles);
+	}
 }
 
-void crearDirectorio(char *nomDirectorio, char* padre) {
-	//crearDirectorioDadoPadreYNom(nomDirectorio, directorioActual->padre, listaDirectorios);
+void crearDirectorio(char *nomDirectorio, char* padreString) {
+	int padre = string_to_int(padreString);
+	if (padre!=(-1)){
+		crearDirectorioDadoPadreYNom(nomDirectorio, directorioActual->padre, listaDirectorios);
+	}
+
 }
 
-void eliminarDirectorio(char *directorio, char* indice) {
-	//eliminarDirectorioDadoElIndice(indice,listaDirectorios);
+void eliminarDirectorio(char *directorio) {
+
+	void eliminarDir(t_directorio *unDirectorio){
+		eliminarDirectorioDadoElIndice(unDirectorio->index, listaDirectorios);
+	}
+
+	validarDirectorioYEjecutar(directorio,eliminarDir);
+
 }
 
 void renombrarDirectorio(char *directorio, char* nuevoNombre) {
-	int nombreCoincide (t_directorio *unDirectorio){
-			return !strcmp(unDirectorio->nombre,directorio);
+
+	void renombrarDir(t_directorio *unDirectorio){
+		renombrarDirectorioConNombre(nuevoNombre,unDirectorio);
+	}
+
+	validarDirectorioYEjecutar(directorio,(void*) renombrarDir);
+
+}
+
+void moverDirectorio(char *directorio, char* padreString) {
+
+	int padre = string_to_int(padreString);
+	if (padreString!=(-1)){
+
+		void moverDir(t_directorio *unDirectorio){
+				moverDirectorioConPadre(padre,unDirectorio);
 		}
-	t_directorio *directorioObjetivo = list_find(directoriosVisiblesDesdeActual(),(void *) nombreCoincide);
-	renombrarDirectorioConNombre(nuevoNombre,directorioObjetivo);
-}
+		validarDirectorioYEjecutar(directorio,(void*) moverDir);
 
-void moverDirectorio(char *directorio, char* padre) {
-	/*int nombreCoincide (t_directorio *unDirectorio){
-				return !strcmp(unDirectorio->nombre,directorio);
-			}
-		t_directorio *directorioObjetivo = list_find(directoriosVisiblesDesdeActual(),(void *) nombreCoincide);
-	moverDirectorioConPadre(padre,directorioObjetivo);*/
+	}
 }
-
 void copiarAMDFS(char *archivo) {
 	printf("Copia el archivo %s al MDFS\n", archivo);
 }
@@ -372,4 +392,35 @@ int comprobarParametros(int cantParametros, char** parametros){
 		printf("Faltan parametros.\n");
 		return 0;
 	}
+}
+
+void validarArchivoYEjecutar(char* unArch,void (*funcion)(void*)){
+	t_list *archivosVisibles = archivosVisiblesDesdeActual();
+	t_archivo *archivoObjetivo = buscarArchPorNombre(unArch,archivosVisibles);
+	list_destroy(archivosVisibles);
+	if(archivoObjetivo!=NULL) funcion(archivoObjetivo);
+	else printf("Archivo no encontrado.\n");
+}
+
+void validarDirectorioYEjecutar(char* unDirectorio, void (*funcion)(void*)){
+	int nombreCoincide (t_directorio *unDir){
+			return !strcmp(unDir->nombre,unDirectorio);
+		}
+	t_list *directoriosVisibles = directoriosVisiblesDesdeActual();
+	t_directorio *directorioObjetivo = list_find(directoriosVisibles,(void *) nombreCoincide);
+	list_destroy(directoriosVisibles);
+	if(directorioObjetivo!=NULL) funcion(directorioObjetivo);
+	else printf("Directorio no encontrado.\n");
+}
+
+int string_to_int(char* string){
+		int i; int j=0;
+		for (i=0;i<(strlen(string));i++){
+			if(string[i]>='0' && string[i]<='9') j=10*j+string[i]-'0';
+			else {
+				printf("Parametro invalido.\n");
+				return -1;
+			}
+		}
+		return j;
 }
