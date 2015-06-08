@@ -132,4 +132,19 @@ void renombrarDirectorioConNombre(char *nombre,t_directorio *unDirectorio);
 void moverDirectorioConPadre(int padre,t_directorio *unDirectorio);
 
 
+//135 lugar de trabajo de juanchi
+
+
+
+
+
+
+
+
+
+
+
+
+//148 fin de lugar de trabajo de juanchi
+
 #endif /* FUNCIONESFILESYSTEM_H_ */

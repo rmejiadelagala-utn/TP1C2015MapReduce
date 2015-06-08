@@ -157,7 +157,22 @@ int main() {
 
 
 
+//160 lugar de trabajo de juanchi
 
+
+
+
+
+
+
+
+
+//
+
+
+
+
+//175 fin	lugar de trabajo de juanchi
 
 //	mostrarArchivo(buscarArchPorNombre("Archivo A", listaArchivos));
 //	mostrarDirectorio(buscarDirPorNombre("home",listaDirectorios));
