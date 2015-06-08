@@ -81,7 +81,6 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {
 	int k = 0;
 	int *aux;
 	int posicionEnNodo;
-	t_list *copiasDeBloque;
 	t_list *copiasDeBloqueAUX;
 	t_list *nodosOrdenados = list_create();
 	//fin de variables auxs
@@ -91,7 +90,7 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {
 
 	for (i = 0; i < list_size(bloquesEnArch); i++) {
 
-		copiasDeBloque = list_create();
+	//	copiasDeBloque = list_create();
 
 		for (j = 0; j < 3; j++) {
 			nodoActual = list_get(nodosOrdenados, k);
@@ -99,23 +98,22 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {
 				posicionEnNodo = nodoActual->cantidadBloquesOcupados + 1;
 			} else {
 				aux = queue_pop(nodoActual->bloquesLiberados);
-				posicionEnNodo = *aux;
+				posicionEnNodo = *aux;//posible
+				free(aux);
 			}
 			nodoActual->cantidadBloquesOcupados++;
 			bloqueEnNodo = nuevoBloqueEnNodo(nodoActual->ipPuerto,
 					posicionEnNodo);
-			list_add(copiasDeBloque, bloqueEnNodo);
 			k++;
 			if (list_size(nodosOrdenados) == k) {
 				k = 0;
 			}
-			bloqueArch = (list_get(bloquesEnArch, i ));//i+1??
-			//cargarCopiasABloqueDeArch(bloqueArch,copiasDeBloque);
+			bloqueArch = (list_get(bloquesEnArch, i ));
 			copiasDeBloqueAUX = bloqueArch->copiasDeBloque;
-			list_add_all(copiasDeBloqueAUX, copiasDeBloque);
+			list_add(copiasDeBloqueAUX, bloqueEnNodo);
 		}
-
 	}
+	list_destroy(nodosOrdenados);
 }
 //120 lugar de trabajo de juanchi
 
