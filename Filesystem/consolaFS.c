@@ -284,7 +284,7 @@ void cd(char* nombreDirectorio){
 	}
 	if(!strcmp(nombreDirectorio,"..")){
 		if(directorioActual->index > 1) {
-			t_directorio *directorioObjetivo = encontrarDirectorioHijo(directorioActual,listaDirectorios);
+			t_directorio *directorioObjetivo = encontrarDirectorioHijo(listaDirectorios,directorioActual);
 			if(directorioObjetivo!=NULL){
 				directorioActual=directorioObjetivo;
 				//Modifico la salida por pantalla (Socketes:~root/etc)

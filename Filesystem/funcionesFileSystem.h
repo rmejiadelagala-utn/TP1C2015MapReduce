@@ -101,6 +101,12 @@ t_directorio *buscarDirPorNombre(char *nombre, t_list *listaDirectorios);
 t_archivo *buscarArchPorNombre(char *nombre, t_list *listaArchivos);
 
 /**
+ * @NAME: encontrarDirectorioHijo
+ * @DESC: Devuelve el primer directorio de listaDirectorios que tenga como padre a directorioPadre
+ */
+t_directorio *encontrarDirectorioHijo(t_list *listaDirectorios,t_directorio *directorioPadre);
+
+/**
  * @NAME: eliminarArchivoYreferencias
  * @DESC: elimina un archivo sacandolo de la lista y ademas en el nodo correspondiente elimina la copia que estaba y guarda en la cola de liberados el espacio liberado
  */

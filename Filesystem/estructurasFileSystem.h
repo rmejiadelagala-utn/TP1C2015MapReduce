@@ -110,6 +110,12 @@ t_directorio *nuevoDirectorio(int index, char *nombre, int padre);
 //funcion para dividir el archivo en bloques
 t_list* divideArchivoEnBloques(char* pathArch);
 
+/**
+ * @NAME: esHijo
+ * @DESC: Devuelve 1 si directorioHijo tiene como padre a directorioPadre, sino 0.
+ */
+int esHijo(t_directorio *directorioHijo, t_directorio *directorioPadre);
+
 //Funciones para liberar estructuras
 
 /**
