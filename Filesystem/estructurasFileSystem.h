@@ -13,7 +13,7 @@
 //estructura Archivo
 
 typedef struct {
-	char *ipPuerto; //quizas conviene en un futuro que
+	char *ipPuerto;
 	int numeroDeBloqueEnNodo;
 
 } t_bloqueEnNodo;
@@ -42,7 +42,7 @@ typedef struct {
 	float tamanio;
 	int cantidadBloquesOcupados;
 	t_queue *bloquesLiberados;
-	int activo;//para saber si el bloque se cayo o esta activo
+	int activo; //para saber si el bloque se cayo o esta activo
 	int socket;
 } t_nodo;
 
@@ -79,8 +79,7 @@ t_bloqueArch *nuevoBloqueArchivo(t_list *copiasDeBloques);
  * @NAME: nuevoBloqueEnNodo
  * @DESC: Inicializa un nuevo bloqueNodo
  */
-t_bloqueEnNodo *nuevoBloqueEnNodo(char *ipPuerto,
-		int numeroDeBloqueEnNodo);
+t_bloqueEnNodo *nuevoBloqueEnNodo(char *ipPuerto, int numeroDeBloqueEnNodo);
 
 //funciones para la estructura nodo
 /**
@@ -179,10 +178,11 @@ void mostrarDirectorio(t_directorio *unDirectorio);
  * @NAME: mostrarLista
  * @DESC: muestra una lista con el shower de dicha estructura
  */
-void mostrarLista(t_list *unaLista, void(*shower)(void*));
+void mostrarLista(t_list *unaLista, void (*shower)(void*));
 
 t_list *listaNodo;
 t_list *listaDirectorio;
 t_directorio *directorioUser;
 t_archivo *listaArchivo;
+
 #endif /* ESTRUCTURASFILESYSTEM_H_ */

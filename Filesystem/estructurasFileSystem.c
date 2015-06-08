@@ -6,6 +6,9 @@
 #include<string.h>
 #include<stdlib.h>
 #include<stdio.h>
+
+static void mostrarEntero(int *numero);
+static void mostrarColaDeInt(t_queue *cola);
 //funciones para estructura Archivo
 
 t_archivo *nuevoArchivo(char *nombre, int padre, float tamanio,
@@ -121,28 +124,12 @@ void mostrarArchivo(t_archivo *unArchivo) {
 	list_iterate((unArchivo->bloquesDeArch), (void*) mostrarBloqueArch);
 }
 
-void mostrarColaDeInt(t_nodo *unNodo) {
-	if (queue_is_empty(unNodo->bloquesLiberados)) {
-		printf("No hay bloques liberados en el medio en el nodo\n\n");
-	} else {
-		int *primeroAux = queue_peek(unNodo->bloquesLiberados);
-		int *aux = queue_pop(unNodo->bloquesLiberados);
-		printf("BloqueLiberado: %d\n", *primeroAux);
-		queue_push(unNodo->bloquesLiberados, primeroAux);
-		while (queue_peek(unNodo->bloquesLiberados) != primeroAux) {
-			aux = queue_pop(unNodo->bloquesLiberados);
-			queue_push(unNodo->bloquesLiberados, aux);
-			printf("BloqueLiberado: %d\n\n", *aux);
-		}
-	}
-}
-
 void mostrarNodo(t_nodo *unNodo) {
 	printf("Activo: %d\n", unNodo->activo);
 	printf("CantidadBloquesOcupados: %d\n", unNodo->cantidadBloquesOcupados);
 	printf("IpPuerto: %s\n", unNodo->ipPuerto);
 	printf("Tamanio: %f\n", unNodo->tamanio);
-	mostrarColaDeInt(unNodo);
+	mostrarColaDeInt(unNodo->bloquesLiberados);
 }
 
 void mostrarDirectorio(t_directorio *unDirectorio) {
@@ -150,6 +137,38 @@ void mostrarDirectorio(t_directorio *unDirectorio) {
 	printf("Nombre: %s\n", unDirectorio->nombre);
 	printf("Padre: %d\n\n", unDirectorio->padre);
 }
+
 void mostrarLista(t_list *unaLista, void (*shower)(void*)) {
 	list_iterate(unaLista, shower);
+}
+
+/******************************************/
+/********* PRIVATE FUNCTIONS **************/
+/******************************************/
+
+static void mostrarEntero(int *numero) {
+	printf("%d\t", *numero);
+}
+static void mostrarColaDeInt(t_queue *cola) {
+	if (queue_is_empty(cola)) {
+		printf("No hay bloques liberados en el medio en el nodo");
+	} else {/*
+	 int *primeroAux = malloc(sizeof(int));
+	 int *aux = malloc(sizeof(int));
+	 primeroAux = queue_peek(cola);
+	 aux = queue_pop(cola);
+	 printf("BloquesLiberados: %d\t", *aux);
+	 queue_push(cola, primeroAux);
+	 while (queue_peek(cola) != primeroAux) {
+	 aux = queue_pop(cola);
+	 printf("%d\t", *aux);
+	 queue_push(cola, aux);
+
+	 }
+	 free(primeroAux);
+	 free (aux);*/
+		printf("BloquesLiberados:\t");
+		mostrarLista(cola->elements, (void*) mostrarEntero);
+	}
+	printf("\n\n");
 }

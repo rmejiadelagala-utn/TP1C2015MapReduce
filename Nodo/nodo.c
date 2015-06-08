@@ -12,9 +12,6 @@ char* ARCHIVO_CONFIG = "/home/utnso/ConfigNodo.txt";
 
 int main() {
 
-	int i;
-    char *DATOS, *DATOS_A;
-
 	printf("***************HOLA SOY UN PROCESO NODO\n****************");
 
 	t_config_nodo* arch_config;
@@ -45,6 +42,7 @@ int main() {
 
 	paramHiloFS.IP_NODO = arch_config->IP_NODO;
 	paramHiloFS.PUERTO_NODO = arch_config->PUERTO_NODO;
+	paramHiloFS.ARCH_BIN = arch_config->ARCH_BIN;
 	paramHiloFS.socket = sockfs;
 
 	pthread_create(&hiloFS, NULL, (void*)conexionFS, (void*) &paramHiloFS);

@@ -19,6 +19,9 @@
 #include <stdio.h>
 #include "fsystem.h"
 #include"funcionesFileSystem.h"
+t_list *listaArchivos;
+t_list *listaNodos;
+t_list *listaDirectorios;
 
 typedef struct {
 	char nombre[255];
@@ -30,6 +33,14 @@ static int buscarPosicionEnListaDadoUnArchivo(t_list *lista, t_archivo *archivo)
 static bool existeEseIndiceComoPadre(t_list *listaDirectorios, int padre);
 static int indiceNuevo(t_list *listaDirectorio);
 static int obtenerArchivo(char *nombreArchivo, char* path, int directorioActual);
+static char* nodoIpPuerto(t_nodo *unNodo);
+static char* dirNombre(t_directorio *unDir);
+static char* archNombre(t_archivo *unArch);
+static void *buscarEnListaPorStrKey(t_list *lista, char *key,
+		char *keyGetter(void*));
+static void recorrerCopiasDeUnArch(t_archivo *unArchivo,
+		void (*accionACopia)(t_bloqueEnNodo*));
+static void disminuirNodo(t_bloqueEnNodo *copia);
 //
 /*
  t_list* divideArchivoEnBloques(char* pathArch){
@@ -65,24 +76,24 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {
 	t_bloqueEnNodo *bloqueEnNodo;
 	t_nodo *nodoActual;
 	t_bloqueArch *bloqueArch;
-	int i; //lo pongo aca porque si lo pongo adentro del for me tira error
+	int i;
 	int j;
 	int k = 0;
 	int *aux;
 	int posicionEnNodo;
 	t_list *copiasDeBloque;
 	t_list *copiasDeBloqueAUX;
-	t_list *nodosOrdenados = list_create(); //Esto se hace para poder trabajar multihilo sino varios hilos me tocan el puntero de referencia de la lista de nodos y sonaste
+	t_list *nodosOrdenados = list_create();
 	//fin de variables auxs
 
 	list_add_all(nodosOrdenados, nodos);//Agrega todos los elementos de la segunda lista en la primera
-	list_sort(nodosOrdenados, (void*) ordenarPorMenorUso);//falta definir ordenarPorMenorUso()
+	list_sort(nodosOrdenados, (void*) ordenarPorMenorUso);
 
 	for (i = 0; i < list_size(bloquesEnArch); i++) {
-		//Creo que el primer campo del for no es necesario ya que *nodosOrdenas es algo interno de esta funcion, y *nodos No se toca
+
 		copiasDeBloque = list_create();
 
-		for (j = 0; j < 2; j++) {
+		for (j = 0; j < 3; j++) {
 			nodoActual = list_get(nodosOrdenados, k);
 			if (queue_is_empty(nodoActual->bloquesLiberados)) {
 				posicionEnNodo = nodoActual->cantidadBloquesOcupados + 1;
@@ -98,13 +109,44 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {
 			if (list_size(nodosOrdenados) == k) {
 				k = 0;
 			}
-			bloqueArch = (list_get(bloquesEnArch, i + 1));
+			bloqueArch = (list_get(bloquesEnArch, i ));//i+1??
 			//cargarCopiasABloqueDeArch(bloqueArch,copiasDeBloque);
 			copiasDeBloqueAUX = bloqueArch->copiasDeBloque;
 			list_add_all(copiasDeBloqueAUX, copiasDeBloque);
 		}
 
 	}
+}
+
+//Funciones de busqueda
+t_nodo *buscarNodoPorIpPuerto(char *ipPuerto, t_list *listaNodos) {	//probada
+	t_nodo *nodo = buscarEnListaPorStrKey(listaNodos, ipPuerto,
+			(char*) nodoIpPuerto);
+	return nodo != NULL ? nodo : NULL;
+}
+t_directorio *buscarDirPorNombre(char *nombre, t_list *listaDirectorios) {//probada
+	t_archivo *dir = buscarEnListaPorStrKey(listaDirectorios, nombre,
+			(char*) dirNombre);
+	return dir != NULL ? dir : NULL;
+}
+t_archivo *buscarArchPorNombre(char *nombre, t_list *listaArchivos) {//probada
+	t_archivo *arch = buscarEnListaPorStrKey(listaArchivos, nombre,
+			(char*) archNombre);
+	return arch != NULL ? arch : NULL;
+}
+
+void eliminarArchivoYreferencias(t_archivo *unArchivo, t_list *listaArchivos,//probada
+		t_list *listaNodos) {
+	recorrerCopiasDeUnArch(unArchivo, (void*) disminuirNodo);
+	eliminarArchivoDeLista(unArchivo, listaArchivos);
+
+}
+void eliminarArchivoDeLista(t_archivo *unArchivo, t_list *listaArchivos) {//probada
+	bool archivoConNombreBuscado(t_archivo *archivoDeLista) {
+		return (strcmp(archivoDeLista->nombre, unArchivo->nombre) == 0);
+	}
+	return list_remove_and_destroy_by_condition(listaArchivos,
+			(bool*) archivoConNombreBuscado, (void*) liberarArchivo);
 }
 void activarNodoReconectado(t_nodo *nodoABuscar, t_list *listaNodos) {//probada
 	int i;
@@ -132,7 +174,8 @@ void eliminarNodoDeLista(t_nodo *nodoAEliminar, t_list *listaNodos) {//probada
 		return (!strcmp(nodoAEliminar->ipPuerto, nodoDeLista->ipPuerto));
 	}
 
-	list_remove_and_destroy_by_condition(listaNodos, (bool*) mismosNodos, (void*) liberarNodo);
+	list_remove_and_destroy_by_condition(listaNodos, (bool*) mismosNodos,
+			(void*) liberarNodo);
 }
 void eliminarReferencias(t_nodo *nodoAEliminar, t_list *archivos) { //probada
 
@@ -141,7 +184,8 @@ void eliminarReferencias(t_nodo *nodoAEliminar, t_list *archivos) { //probada
 	}
 
 	void _list_elements2(t_bloqueArch *bloqueDeArch) {
-		list_remove_and_destroy_by_condition(bloqueDeArch->copiasDeBloque, (bool*) copiaEstaEnNodo, (void*) liberarBloqueEnNodo);
+		list_remove_and_destroy_by_condition(bloqueDeArch->copiasDeBloque,
+				(bool*) copiaEstaEnNodo, (void*) liberarBloqueEnNodo);
 	}
 
 	void _list_elements1(t_archivo *unArchivo) {
@@ -155,15 +199,6 @@ void eliminarNodoYRerencias(t_nodo *nodoAEliminar, t_list *listaNodos, //probada
 	eliminarReferencias(nodoAEliminar, archivos);
 	eliminarNodoDeLista(nodoAEliminar, listaNodos);
 
-}
-
-void* eliminarArchivoPorNombre(char nombreBuscado[255], t_list *listaArchivos) {
-	int archivoConNombreBuscado(t_archivo *unArchivo) {
-		return strcmp(nombreBuscado, unArchivo->nombre);
-	}
-
-	return list_remove_by_condition(listaArchivos,
-			(void*) archivoConNombreBuscado);
 }
 
 void formatear(t_list **listaNodos, t_list **listaArchivos,	//probada
@@ -184,7 +219,7 @@ void renombrarArchivoPorNombre(char *nombreBuscado, char *nuevoNombre, //probada
 		return !strcmp(nombreBuscado, unArchivo->nombre);
 	}
 
-	//Busco cual es el archivo a modificar, dado el nombre
+//Busco cual es el archivo a modificar, dado el nombre
 	t_archivo *archivoAModificar = list_find(listaArchivos,
 			(void*) archivoConNombreBuscado);
 	if (!archivoAModificar) {
@@ -229,7 +264,7 @@ void moverArchivoPorNombreYPadre(char *nombreBuscado, t_list *listaArchivos, //p
 void crearDirectorioDadoPadreYNom(char *nombre, int padre, //probada
 		t_list *listaDirectorio) {
 
-	//Verifico que no se pase de los 1024 directorios permitidos
+//Verifico que no se pase de los 1024 directorios permitidos
 	if (list_size(listaDirectorio) > 1024) {
 		printf("No se pueden cargar mas de 1024\n");
 	} else {
@@ -240,6 +275,21 @@ void crearDirectorioDadoPadreYNom(char *nombre, int padre, //probada
 		printf("El directorio se creo bien\n");
 	}
 }
+
+void renombrarDirectorioConNombre(char *nombre,t_directorio *unDirectorio) {//probada
+	free(unDirectorio->nombre);
+	unDirectorio->nombre = malloc(strlen(nombre)+1);
+	strcpy(unDirectorio->nombre,nombre);
+}
+void moverDirectorioConPadre(int padre,t_directorio *unDirectorio) {//probada
+	unDirectorio->padre = padre;
+}
+
+void eliminarUnDirectorio(t_directorio unDirectorio) {
+
+}
+
+
 
 //Este se podría hacer dado nombre, pero preferí así porque el índice es único.
 //Si no, se reutiliza esta función para hacerla por nombre, ruta o lo que sea.
@@ -254,10 +304,10 @@ void eliminarDirectorioDadoElIndice(int indice, t_list *listaDirectorio) {
 		//tira error de que no lo encontró en la lista.
 	}
 
-	//Me faltó considerar que además del directorio borrado, debe borrar a
-	//los hijos del mismo, ya que no tienen un padre. Y así sucesivamente.
+//Me faltó considerar que además del directorio borrado, debe borrar a
+//los hijos del mismo, ya que no tienen un padre. Y así sucesivamente.
 
-	//borrarDescendientesDe(indice, listaDirectorio);
+//borrarDescendientesDe(indice, listaDirectorio);
 
 }
 
@@ -310,17 +360,38 @@ void eliminarDirectorioDadoElIndice(int indice, t_list *listaDirectorio) {
  }
  }
  */
+
+
+/******************************************/
 /********* PRIVATE FUNCTIONS **************/
+/******************************************/
 
 static bool ordenarPorMenorUso(t_nodo *data, t_nodo *dataSiguiente) {
 	return dataSiguiente->cantidadBloquesOcupados
 			< data->cantidadBloquesOcupados;
 }
+static void *buscarEnListaPorStrKey(t_list *lista, char *key,
+		char *keyGetter(void*)) {
+	bool _comparacion(void* data) {
+		return (strcmp(keyGetter(data), key)) == 0;
+	}
+
+	return list_find(lista, (bool*) _comparacion);
+}
+static char* nodoIpPuerto(t_nodo *unNodo) {
+	return unNodo->ipPuerto;
+}
+static char* dirNombre(t_directorio *unDir) {
+	return unDir->nombre;
+}
+static char* archNombre(t_archivo *unArch) {
+	return unArch->nombre;
+}
 
 static int buscarPosicionEnListaDadoUnArchivo(t_list *listaArchivos,
 		t_archivo *archivo) {
 	int posDondeReemplazar = -1;
-	//Busco la posición en la lista de este archivo que debo modificar
+//Busco la posición en la lista de este archivo que debo modificar
 	int i = 0;
 	for (i = 0; i < listaArchivos->elements_count; i++) {
 		if (list_get(listaArchivos, i) == archivo) {
@@ -397,4 +468,19 @@ static int obtenerArchivo(char *nombreArchivo, char* path, int directorioActual)
 	}
 	list_iterate(archivoEncontrado->bloquesDeArch, (void *) obtenerBloque);
 
+}
+static void recorrerCopiasDeUnArch(t_archivo *unArchivo,
+		void (*accionACopia)(t_bloqueEnNodo*)) {
+	void _recorrerCopias(t_bloqueArch *bloqueArchivo) {
+		list_iterate(bloqueArchivo->copiasDeBloque, (void*) accionACopia);
+	}
+	list_iterate(unArchivo->bloquesDeArch, (void*) _recorrerCopias);
+}
+
+static void disminuirNodo(t_bloqueEnNodo *copia) {
+	t_nodo *nodo = buscarNodoPorIpPuerto(copia->ipPuerto, listaNodos);
+	nodo->cantidadBloquesOcupados = nodo->cantidadBloquesOcupados - 1;
+	int *numero = malloc(sizeof(int));
+	*numero = copia->numeroDeBloqueEnNodo;
+	queue_push(nodo->bloquesLiberados, numero);
 }

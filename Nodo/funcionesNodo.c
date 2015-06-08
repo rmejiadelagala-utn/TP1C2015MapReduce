@@ -1,10 +1,13 @@
 /*
- * nodoFunciones.c
+ * funcionesNodo.c
  *
  *  Created on: 18/5/2015
  *      Author: utnso
  */
-#include "nodo.h"
+#include "funcionesNodo.h"
+
+uint32_t TAMANIODISCO, TAMANIOARCHIVO;
+int fd = -1, fd_a;
 
 t_config_nodo* leerArchivoConfig(char *path_config){
 
@@ -46,8 +49,7 @@ t_config_nodo* leerArchivoConfig(char *path_config){
 char* mapeo_archivo(char* path){
 
 	char* data_archivo;
-	int fd_a = -1;
-	uint32_t TAMANIOARCHIVO;
+//	uint32_t TAMANIOARCHIVO;
 
 	if ((fd_a = open(path, O_RDONLY)) == -1)
 		err(1, "Nodo: Error al abrir archivo (open)");
@@ -58,6 +60,7 @@ char* mapeo_archivo(char* path){
 	TAMANIOARCHIVO = bufa.st_size;
 
 	if ((data_archivo = mmap(0, TAMANIOARCHIVO, PROT_READ, MAP_SHARED, fd_a, 0)) == MAP_FAILED){
+		printf("Error al iniciar el mapeo de disco %s. '%s' ", obtenerNombreArchivo(path), strerror(errno));
 		close(fd_a);
 		exit(1);
 	}
@@ -68,12 +71,12 @@ char* mapeo_archivo(char* path){
 char* mapeo_disco(char* path){
 
 	char* data_disco;
-	int fd = -1;
-	uint32_t TAMANIODISCO;
+	//uint32_t TAMANIODISCO;
 
 	TAMANIODISCO = obtener_tamanio_disco(path);
 
 	if ((data_disco = mmap(NULL, TAMANIODISCO, PROT_READ|PROT_WRITE, MAP_FILE|MAP_SHARED, fd, 0))== MAP_FAILED){;
+		printf("Error al iniciar el mapeo de disco %s. '%s' ", obtenerNombreArchivo(path), strerror(errno));
 		close(fd);
 	    exit(1);
 	}
@@ -87,11 +90,11 @@ uint32_t obtenerDirBloque(uint32_t nroBloque){
 }
 
 uint32_t obtener_tamanio_disco(char* path){
-	int fd = -1;
+
 	uint32_t tamanio_disco;
 
 	if ((fd = open(path, O_RDWR)) == -1)
-				err(1, "Nodo: Error al abrir midata1.bin (open)");
+		err(1, "Nodo: Error al abrir midata1.bin (open)");
 
 		struct stat buf;
 		stat(path, &buf);
@@ -100,7 +103,28 @@ uint32_t obtener_tamanio_disco(char* path){
 	return tamanio_disco;
 }
 
+int obtener_cant_elem_array(char **array){
 
+	int elem = 0;
 
+	while(array[elem]!=NULL){
+		elem++;
+	}
+
+  return elem;
+}
+
+char* obtenerNombreArchivo(char* ruta){
+
+	char* file_name;
+	char** array_path;
+	int cant_elem;
+
+	array_path = string_split(ruta, "/");
+	cant_elem = obtener_cant_elem_array(array_path);
+    file_name = array_path[cant_elem-1];
+
+	return file_name;
+}
 
 
