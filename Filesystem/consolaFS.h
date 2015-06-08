@@ -30,6 +30,11 @@ void help();
 void cd(char *nombreDirectorio);
 void ls();
 
+//Auxiliares
+t_list *directoriosVisiblesDesdeActual(void);
+t_list *archivosVisiblesDesdeActual(void);
+//
+
 enum entrada {
 	FORMATEAR,
 	ELIMINAR_ARCHIVO,

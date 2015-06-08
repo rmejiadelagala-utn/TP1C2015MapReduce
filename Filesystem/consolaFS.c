@@ -267,62 +267,37 @@ void help() {
 }
 
 void ls(){
-	int indexActual = directorioActual->index;
-	int esDirectorioHijo(t_directorio* unDirectorio){
-		return unDirectorio->padre==indexActual;
-	}
-	int esArchivoHijo(t_archivo* unArchivo){
-		return unArchivo->padre==indexActual;
-	}
-	t_list *directoriosVisibles = list_filter(listaDirectorios,(void *) esDirectorioHijo);
-	t_list *archivosVisibles  = list_filter(listaArchivos,(void *) esArchivoHijo);
+	t_list *directoriosVisibles = directoriosVisiblesDesdeActual();
+	t_list *archivosVisibles  = archivosVisiblesDesdeActual();
 
-	void listarArchivo(t_archivo* unArchivo){
-		printf("%s \n",unArchivo->nombre);
-	}
+	mostrarLista(archivosVisibles, (void*) mostrarNombreArchivo);
+	mostrarLista(directoriosVisibles, (void*) mostrarNombreDirectorio);
 
-	void listarDirectorio(t_directorio* unDirectorio){
-		printf("%s \n",unDirectorio->nombre);
-	}
-	if (archivosVisibles!=NULL){
-	mostrarLista(archivosVisibles, (void*) listarArchivo);
-
-
-	}
-	if(directoriosVisibles!=NULL){
-		mostrarLista(directoriosVisibles, (void*) listarDirectorio);
-
-	}
 	list_destroy(directoriosVisibles);
 	list_destroy(archivosVisibles);
 
 }
 
 void cd(char* nombreDirectorio){
-	int esDirectorioPadre(t_directorio *unDirectorio){
-		return directorioActual->padre==unDirectorio->index;
-	}
-	int esDirectorioHijo(t_directorio *unDirectorio){
-		return unDirectorio->padre==directorioActual->index;
-	}
 	int nombreCoincide (t_directorio *unDirectorio){
 		return !strcmp(unDirectorio->nombre,nombreDirectorio);
 	}
 	if(!strcmp(nombreDirectorio,"..")){
 		if(directorioActual->index > 1) {
-			t_directorio *directorioObjetivo;
-			directorioObjetivo = list_find(listaDirectorios,(void *) esDirectorioPadre);
+			t_directorio *directorioObjetivo = encontrarDirectorioHijo(directorioActual,listaDirectorios);
 			if(directorioObjetivo!=NULL){
 				directorioActual=directorioObjetivo;
+				//Modifico la salida por pantalla (Socketes:~root/etc)
 				int i=0;
 				for(i=strlen(direccion)-1;direccion[i]!='/';i--);
 				direccion[i]='\0';
+				//
 			}
 		}
 
 	}
 	else{
-		t_list *directoriosVisibles = list_filter(listaDirectorios,(void *) esDirectorioHijo);
+		t_list *directoriosVisibles = directoriosVisiblesDesdeActual();
 		if(directoriosVisibles!=NULL){
 			t_directorio *directorioObjetivo = list_find(directoriosVisibles,(void *) nombreCoincide);
 			if(directorioObjetivo!=NULL){
@@ -333,4 +308,14 @@ void cd(char* nombreDirectorio){
 
 	}
 }
+}
+t_list *directoriosVisiblesDesdeActual(void){
+	return list_filter(listaDirectorios,({ bool esHijoDeActual(t_directorio* unDir)
+	{return esHijo(unDir,directorioActual);}esHijoDeActual;}));
+}
+t_list *archivosVisiblesDesdeActual(void){
+	int esArchivoHijo(t_archivo* unArchivo){
+		return unArchivo->padre==directorioActual->index;
+	}
+	return list_filter(listaArchivos,(void *) esArchivoHijo);
 }

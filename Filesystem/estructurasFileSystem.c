@@ -74,6 +74,10 @@ t_directorio *nuevoDirectorio(int index, char *nombre, int padre) {
 	return unDirectorio;
 }
 
+int esHijo(t_directorio *dirHijo, t_directorio *dirPadre){
+	return dirHijo->padre==dirPadre->index;
+}
+
 //Funciones Para liberar
 void liberarBloqueEnNodo(t_bloqueEnNodo *bloqueEnNodo) {
 	free(bloqueEnNodo->ipPuerto);
@@ -124,6 +128,10 @@ void mostrarArchivo(t_archivo *unArchivo) {
 	list_iterate((unArchivo->bloquesDeArch), (void*) mostrarBloqueArch);
 }
 
+void mostrarNombreArchivo(t_archivo *unArchivo){
+	printf("%s\n",unArchivo->nombre);
+}
+
 void mostrarNodo(t_nodo *unNodo) {
 	printf("Activo: %d\n", unNodo->activo);
 	printf("CantidadBloquesOcupados: %d\n", unNodo->cantidadBloquesOcupados);
@@ -136,6 +144,10 @@ void mostrarDirectorio(t_directorio *unDirectorio) {
 	printf("Index: %d\n", unDirectorio->index);
 	printf("Nombre: %s\n", unDirectorio->nombre);
 	printf("Padre: %d\n\n", unDirectorio->padre);
+}
+
+void mostrarNombreDirectorio(t_directorio *unDirectorio){
+	printf("%s\n",unDirectorio->nombre);
 }
 
 void mostrarLista(t_list *unaLista, void (*shower)(void*)) {

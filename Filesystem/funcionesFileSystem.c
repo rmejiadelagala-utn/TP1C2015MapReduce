@@ -135,6 +135,12 @@ t_archivo *buscarArchPorNombre(char *nombre, t_list *listaArchivos) {//probada
 	return arch != NULL ? arch : NULL;
 }
 
+t_directorio *encontrarDirectorioHijo(t_list *listaDirectorios,t_directorio *directorioPadre){
+	return list_find(listaDirectorios,({ bool esPadre(t_directorio* unDir)
+					{return esHijo(directorioPadre,unDir);}esPadre;}));
+}
+
+
 void eliminarArchivoYreferencias(t_archivo *unArchivo, t_list *listaArchivos,//probada
 		t_list *listaNodos) {
 	recorrerCopiasDeUnArch(unArchivo, (void*) disminuirNodo);

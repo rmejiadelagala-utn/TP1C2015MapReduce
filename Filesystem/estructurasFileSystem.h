@@ -163,6 +163,13 @@ void mostrarBloqueArch(t_bloqueArch *bloqueArch);
 void mostrarArchivo(t_archivo *unArchivo);
 
 /**
+ * @NAME: mostrarNombreArchivo
+ * @DESC: muestra el nombre de un archivo
+ */
+
+void mostrarNombreArchivo(t_archivo *unArchivo);
+
+/**
  * @NAME: mostrarNodo
  * @DESC: muestra la estructura nodo
  */
@@ -173,6 +180,12 @@ void mostrarNodo(t_nodo *unNodo);
  * @DESC: muestra la estructura directorio
  */
 void mostrarDirectorio(t_directorio *unDirectorio);
+
+/**
+ * @NAME: mostrarNombreDirectorio
+ * @DESC: muestra el nombre de un directorio
+ */
+void mostrarNombreDirectorio(t_directorio *unDirectorio);
 
 /**
  * @NAME: mostrarLista
