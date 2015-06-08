@@ -113,4 +113,17 @@ void eliminarArchivoYreferencias(t_archivo *unArchivo, t_list *listaArchivos,
  */
 void eliminarArchivoDeLista(t_archivo *unArchivo, t_list *listaArchivos);
 
+/**
+ * @NAME: renombrarDirectorioConNombre
+ * @DESC: renombra un directorio con el nombre enviado por parametro
+ */
+void renombrarDirectorioConNombre(char *nombre,t_directorio *unDirectorio);
+
+/**
+ * @NAME: moverDirectorioConPadre
+ * @DESC: le cambia el padre a un directorio, lo que provoca el movimiento del mismo
+ */
+void moverDirectorioConPadre(int padre,t_directorio *unDirectorio);
+
+
 #endif /* FUNCIONESFILESYSTEM_H_ */

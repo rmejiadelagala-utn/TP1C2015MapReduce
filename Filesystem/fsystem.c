@@ -77,7 +77,7 @@ int main() {
 	list_add(listaDirectorios, directorioMedia);
 	list_add(listaDirectorios, directorioFotos);
 
-	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
+
 
 	//Muestro nodos
 	t_nodo *nodoA = nuevoNodo("192.168.0.1:80A", 10);
@@ -156,13 +156,14 @@ int main() {
 //	moverArchivoPorNombreYPadre("Archivo A", listaArchivos, listaDirectorios, 10);
 //	crearDirectorioDadoPadreYNom("Directorio Nuevo", 1,listaDirectorios);
 //	eliminarNodoDeLista(nodoA, listaNodos);
-//	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
+	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 	mostrarLista(listaArchivos, (void*) mostrarArchivo);
 	mostrarLista(listaNodos, (void*) mostrarNodo);
-	eliminarArchivoYreferencias(archivoA,listaArchivos, listaNodos);
+//	eliminarArchivoYreferencias(archivoA,listaArchivos, listaNodos);
 //	eliminarReferencias(nodoA, listaArchivos);
 //	eliminarNodoYRerencias(nodoA, listaNodos,listaArchivos);
-
+//	renombrarDirectorioConNombre("pepito",directorioHome);
+//	moverDirectorioConPadre(8,directorioHome);
 
 
 
@@ -171,7 +172,8 @@ int main() {
 //	mostrarArchivo(buscarArchPorNombre("Archivo A", listaArchivos));
 //	mostrarDirectorio(buscarDirPorNombre("home",listaDirectorios));
 //	mostrarNodo(buscarNodoPorIpPuerto("192.168.0.1:80A",listaNodos));
-	mostrarLista(listaNodos, (void*) mostrarNodo);
+	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
+//	mostrarLista(listaNodos, (void*) mostrarNodo);
 //	mostrarLista(listaArchivos, (void*) mostrarArchivo);
 
 

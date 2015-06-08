@@ -76,24 +76,24 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {
 	t_bloqueEnNodo *bloqueEnNodo;
 	t_nodo *nodoActual;
 	t_bloqueArch *bloqueArch;
-	int i; //lo pongo aca porque si lo pongo adentro del for me tira error
+	int i;
 	int j;
 	int k = 0;
 	int *aux;
 	int posicionEnNodo;
 	t_list *copiasDeBloque;
 	t_list *copiasDeBloqueAUX;
-	t_list *nodosOrdenados = list_create(); //Esto se hace para poder trabajar multihilo sino varios hilos me tocan el puntero de referencia de la lista de nodos y sonaste
+	t_list *nodosOrdenados = list_create();
 	//fin de variables auxs
 
 	list_add_all(nodosOrdenados, nodos);//Agrega todos los elementos de la segunda lista en la primera
-	list_sort(nodosOrdenados, (void*) ordenarPorMenorUso);//falta definir ordenarPorMenorUso()
+	list_sort(nodosOrdenados, (void*) ordenarPorMenorUso);
 
 	for (i = 0; i < list_size(bloquesEnArch); i++) {
-		//Creo que el primer campo del for no es necesario ya que *nodosOrdenas es algo interno de esta funcion, y *nodos No se toca
+
 		copiasDeBloque = list_create();
 
-		for (j = 0; j < 2; j++) {
+		for (j = 0; j < 3; j++) {
 			nodoActual = list_get(nodosOrdenados, k);
 			if (queue_is_empty(nodoActual->bloquesLiberados)) {
 				posicionEnNodo = nodoActual->cantidadBloquesOcupados + 1;
@@ -109,7 +109,7 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {
 			if (list_size(nodosOrdenados) == k) {
 				k = 0;
 			}
-			bloqueArch = (list_get(bloquesEnArch, i + 1));
+			bloqueArch = (list_get(bloquesEnArch, i ));//i+1??
 			//cargarCopiasABloqueDeArch(bloqueArch,copiasDeBloque);
 			copiasDeBloqueAUX = bloqueArch->copiasDeBloque;
 			list_add_all(copiasDeBloqueAUX, copiasDeBloque);
@@ -276,6 +276,21 @@ void crearDirectorioDadoPadreYNom(char *nombre, int padre, //probada
 	}
 }
 
+void renombrarDirectorioConNombre(char *nombre,t_directorio *unDirectorio) {//probada
+	free(unDirectorio->nombre);
+	unDirectorio->nombre = malloc(strlen(nombre)+1);
+	strcpy(unDirectorio->nombre,nombre);
+}
+void moverDirectorioConPadre(int padre,t_directorio *unDirectorio) {//probada
+	unDirectorio->padre = padre;
+}
+
+void eliminarUnDirectorio(t_directorio unDirectorio) {
+
+}
+
+
+
 //Este se podría hacer dado nombre, pero preferí así porque el índice es único.
 //Si no, se reutiliza esta función para hacerla por nombre, ruta o lo que sea.
 void eliminarDirectorioDadoElIndice(int indice, t_list *listaDirectorio) {
@@ -345,6 +360,8 @@ void eliminarDirectorioDadoElIndice(int indice, t_list *listaDirectorio) {
  }
  }
  */
+
+
 /******************************************/
 /********* PRIVATE FUNCTIONS **************/
 /******************************************/
