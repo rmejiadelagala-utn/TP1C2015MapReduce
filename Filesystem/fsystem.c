@@ -71,9 +71,9 @@ int main() {
 
 
 	//Muestro nodos
-	t_nodo *nodoA = nuevoNodo("192.168.0.1:80A", 10);
-	t_nodo *nodoB = nuevoNodo("192.168.0.2:127B", 20);
-	t_nodo *nodoC = nuevoNodo("192.168.0.3.243C", 60);
+	t_nodo *nodoA = nuevoNodo("127.0.0.1:80A", 10);
+	t_nodo *nodoB = nuevoNodo("127.0.0.1:127B", 20);
+	t_nodo *nodoC = nuevoNodo("127.0.0.1:243C", 60);
 
 	nodoA->cantidadBloquesOcupados = 4;
 	int *a=malloc(sizeof(int));
@@ -90,25 +90,25 @@ int main() {
 
 //muestro archivos
 
-	t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo("192.168.0.1:80A", 11);
-	t_bloqueEnNodo *copiaBloqueA1C2 = nuevoBloqueEnNodo("192.168.0.2:127B", 12);
-	t_bloqueEnNodo *copiaBloqueA1C3 = nuevoBloqueEnNodo("192.168.0.3.243C", 13);
+	t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo("127.0.0.1:80A", 11);
+	t_bloqueEnNodo *copiaBloqueA1C2 = nuevoBloqueEnNodo("127.0.0.1:127B", 12);
+	t_bloqueEnNodo *copiaBloqueA1C3 = nuevoBloqueEnNodo("127.0.0.1:243C", 13);
 	t_list *copiasBloqueA1 = list_create();
 	list_add(copiasBloqueA1, copiaBloqueA1C1);
 	list_add(copiasBloqueA1, copiaBloqueA1C2);
 	list_add(copiasBloqueA1, copiaBloqueA1C3);
 
-	t_bloqueEnNodo *copiaBloqueA2C1 = nuevoBloqueEnNodo("192.168.0.1:80A", 21);
-	t_bloqueEnNodo *copiaBloqueA2C2 = nuevoBloqueEnNodo("192.168.0.2:127B", 22);
-	t_bloqueEnNodo *copiaBloqueA2C3 = nuevoBloqueEnNodo("192.168.0.3.243C", 23);
+	t_bloqueEnNodo *copiaBloqueA2C1 = nuevoBloqueEnNodo("127.0.0.1:80A", 21);
+	t_bloqueEnNodo *copiaBloqueA2C2 = nuevoBloqueEnNodo("127.0.0.1:127B", 22);
+	t_bloqueEnNodo *copiaBloqueA2C3 = nuevoBloqueEnNodo("127.0.0.1:243C", 23);
 	t_list *copiasBloqueA2 = list_create();
 	list_add(copiasBloqueA2, copiaBloqueA2C1);
 	list_add(copiasBloqueA2, copiaBloqueA2C2);
 	list_add(copiasBloqueA2, copiaBloqueA2C3);
 
-	t_bloqueEnNodo *copiaBloqueA3C1 = nuevoBloqueEnNodo("192.168.0.1:80A", 31);
-	t_bloqueEnNodo *copiaBloqueA3C2 = nuevoBloqueEnNodo("192.168.0.2:127B", 32);
-	t_bloqueEnNodo *copiaBloqueA3C3 = nuevoBloqueEnNodo("192.168.0.3.243C", 33);
+	t_bloqueEnNodo *copiaBloqueA3C1 = nuevoBloqueEnNodo("127.0.0.1:80A", 31);
+	t_bloqueEnNodo *copiaBloqueA3C2 = nuevoBloqueEnNodo("127.0.0.1:127B", 32);
+	t_bloqueEnNodo *copiaBloqueA3C3 = nuevoBloqueEnNodo("127.0.0.1:243C", 33);
 	t_list *copiasBloqueA3 = list_create();
 	list_add(copiasBloqueA3, copiaBloqueA3C1);
 	list_add(copiasBloqueA3, copiaBloqueA3C2);
@@ -128,7 +128,7 @@ int main() {
 	list_add(bloquesDeArchivoA, bloqueArchivoA2);
 	list_add(bloquesDeArchivoA, bloqueArchivoA3);
 
-	t_bloqueEnNodo *copiaBloqueB1C1 = nuevoBloqueEnNodo("192.168.0.1:80A", 41);
+	t_bloqueEnNodo *copiaBloqueB1C1 = nuevoBloqueEnNodo("127.0.0.1:80A", 41);
 	t_list *copiasBloqueB1 = list_create();
 	list_add(copiasBloqueB1, copiaBloqueB1C1);
 	t_bloqueArch *bloqueArchivoB1 = nuevoBloqueArchivo(copiasBloqueB1);
@@ -136,11 +136,14 @@ int main() {
 	list_add(bloquesDeArchivoB, bloqueArchivoB1);
 
 
-	 t_archivo *archivoA = nuevoArchivo("Archivo A", 3, 3000, bloquesDeArchivoA,1);
-	t_archivo *archivoB = nuevoArchivo("Archivo B", 3, 3000, bloquesDeArchivoB,1);
+	t_archivo *archivoA = nuevoArchivo("ArchivoA", 3, 3000, bloquesDeArchivoA,1);
+	t_archivo *archivoB = nuevoArchivo("ArchivoB", 3, 3000, bloquesDeArchivoB,1);
+
 
 	list_add(listaArchivos, archivoA);
 	list_add(listaArchivos, archivoB);
+
+
 //	formatear(&listaNodos, &listaArchivos, &listaDirectorios);
 //	renombrarArchivoPorNombre("Archivo A","Archivo con nombre cambiado",listaArchivos);
 //	moverArchivoPorNombreYPadre("Archivo A", listaArchivos, listaDirectorios, 10);
@@ -291,8 +294,9 @@ void *interaccionFSNodo(void* sock_ptr) {
 	int sock_desc = *(int*) sock_ptr;
 	char infoDeNodo[BUFFERSIZE];
 	int read_size;
-
-	list_add(listaNodo, sock_desc);
+	t_nodo *nodo = list_get(listaNodos,1);
+	nodo->socket=sock_desc;
+	list_replace_and_destroy_element(listaNodos,1,nodo,(void*) liberarNodo);
 	//Receive a reply from the server
 	read_size = recv((int) sock_desc, infoDeNodo, 5000, 0);
 

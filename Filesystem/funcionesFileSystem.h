@@ -130,7 +130,7 @@ void renombrarDirectorioConNombre(char *nombre,t_directorio *unDirectorio);
  * @DESC: le cambia el padre a un directorio, lo que provoca el movimiento del mismo
  */
 void moverDirectorioConPadre(int padre,t_directorio *unDirectorio);
-
+int obtenerArchivo(char *nombreArchivo, char* path, int directorioActual);
 
 //135 lugar de trabajo de juanchi
 

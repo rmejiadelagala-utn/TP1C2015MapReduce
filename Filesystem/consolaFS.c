@@ -48,7 +48,7 @@ int consola(void* unListaNodo) {
 
 
 		//Cuando recibo el comando lo separo en comando-parametros (1 por ahora)
-		comandoSeparado = string_split(comando, " ");
+		comandoSeparado = string_split(comando," ");
 
 		//Una vez que lo separe reviso si la primera parte de las separaciones comandoSeparado[0]
 		//se corresponde con alguno de los comandos validos para asignar a entrada
@@ -99,7 +99,7 @@ int consola(void* unListaNodo) {
 			break;
 		case COPIAR_A_FS:
 			if(comprobarParametros(1,comandoSeparado)==1)
-			copiarAFS(comandoSeparado[1],listaNodo);
+			copiarAFS(comandoSeparado[1]);
 			break;
 		case SOLICITAR_MD5:
 			if(comprobarParametros(1,comandoSeparado)==1)
@@ -263,16 +263,9 @@ void copiarAMDFS(char *archivo) {
 	printf("Copia el archivo %s al MDFS\n", archivo);
 }
 
-void copiarAFS(char *archivo, t_list *unaListaNodo) {
+void copiarAFS(char *archivo) {
 
-	//obtenerArchivo(archivo, "path");
-	int i=0;
-	int pedirBloques (){
-		send(list_get(unaListaNodo,i),"Nodo, dame tu bloque\n",strlen("Nodo, dame tu bloque\n"),0);
-		i++;
-		return i;
-	}
-	list_iterate(unaListaNodo,pedirBloques);
+	obtenerArchivo(archivo, "sarasa", directorioActual->index);
 
 	printf("Copia el archivo %s al FileSystem\n", archivo);
 }

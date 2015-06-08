@@ -32,7 +32,6 @@ static bool ordenarPorMenorUso(t_nodo *data, t_nodo *dataSiguiente);
 static int buscarPosicionEnListaDadoUnArchivo(t_list *lista, t_archivo *archivo);
 static bool existeEseIndiceComoPadre(t_list *listaDirectorios, int padre);
 static int indiceNuevo(t_list *listaDirectorio);
-static int obtenerArchivo(char *nombreArchivo, char* path, int directorioActual);
 static char* nodoIpPuerto(t_nodo *unNodo);
 static char* dirNombre(t_directorio *unDir);
 static char* archNombre(t_archivo *unArch);
@@ -457,7 +456,7 @@ static bool existeEseIndiceComoPadre(t_list *listaDirectorios, int padre) {
 
 	return list_any_satisfy(listaDirectorios, (bool*) existePadre);
 }
-static int obtenerArchivo(char *nombreArchivo, char* path, int directorioActual) {
+int obtenerArchivo(char *nombreArchivo, char* path, int directorioActual) {
 	t_archivo *archivoEncontrado;
 	int nombreCoincide(t_archivo *unArchivo) {
 		return (unArchivo->padre == directorioActual)
@@ -482,6 +481,7 @@ static int obtenerArchivo(char *nombreArchivo, char* path, int directorioActual)
 			return unNodo->ipPuerto == bloque->ipPuerto;
 		}
 		t_nodo *nodoEncontrado = list_find(listaNodo, (void*) ipPuertoCoincide);
+		send(nodoEncontrado->socket,"Te encontre",strlen("te encontre"),0);
 		//HAY QUE CREAR EL CAMPO SOCKET EN NODO
 		/*int socket_desc = nodoEncontrado.socket;
 		 send(socket_desc,1,sizeOf(1),0);
