@@ -12,12 +12,12 @@ void leerComando(char *command, int maximoLargo);
 void freeSeparaciones(char ** separaciones);
 void formatearMDFS();
 void eliminarArchivo(char *archivo);
-void renombrarArchivo(char *archivo);
-void moverArchivo(char *archivo);
-void crearDirectorio(char *directorio);
+void renombrarArchivo(char *archivo, char *nuevoNombre);
+void moverArchivo(char *archivo, char* padre);
+void crearDirectorio(char *nomDirectorio, char* padre);
 void eliminarDirectorio(char *directorio);
-void renombrarDirectorio(char *directorio);
-void moverDirectorio(char *directorio);
+void renombrarDirectorio(char *directorio, char* nuevoNombre);
+void moverDirectorio(char *directorio, char* padre);
 void copiarAMDFS(char *archivo);
 void copiarAFS(char *archivo, t_list*);
 void solicitarMD5(char *archivo);
@@ -31,8 +31,12 @@ void cd(char *nombreDirectorio);
 void ls();
 
 //Auxiliares
+void validarDirectorioYEjecutar(char* unArch,void (*funcion)(void*));
+void validarArchivoYEjecutar(char* unArch,void (*funcion)(void*));
+int comprobarParametros(int cantParametros, char** parametros);
 t_list *directoriosVisiblesDesdeActual(void);
 t_list *archivosVisiblesDesdeActual(void);
+int string_to_int(char* string);
 //
 
 enum entrada {
