@@ -20,8 +20,18 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <commons/config.h>
+#include "consolaFS.h"
+#include"estructurasFileSystem.h"
+#include<commons/collections/list.h>
+#include"funcionesFileSystem.h"
+#include "CUnit/Basic.h"
+#include <unistd.h>
 
 t_config* config;
+
+t_list *listaArchivos;
+t_list *listaNodos;
+t_list *listaDirectorios;
 
 
 #endif /* FSYSTEM_H_ */

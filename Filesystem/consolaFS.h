@@ -27,6 +27,8 @@ void copiarBloque(char* bloque);
 void levantarNodo(char *nodo);
 void eliminarNodo(char *nodo);
 void help();
+void cd(char *nombreDirectorio);
+void ls();
 
 enum entrada {
 	FORMATEAR,
@@ -47,6 +49,8 @@ enum entrada {
 	ELIMINAR_NODO,
 	HELP,
 	SALIR,
+	CD,
+	LS,
 	COMANDO_INVALIDO,
 	FALTA_PARAMETRO
 };

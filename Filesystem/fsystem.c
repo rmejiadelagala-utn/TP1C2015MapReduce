@@ -6,12 +6,7 @@
  */
 
 #include "fsystem.h"
-#include "consolaFS.h"
-#include"estructurasFileSystem.h"
-#include<commons/collections/list.h>
-#include"funcionesFileSystem.h"
-#include "CUnit/Basic.h"
-#include <unistd.h>
+
 
 
 int inicializar() {
@@ -61,15 +56,14 @@ void agregar_tests() {
 //interaccionFSNodo es la funcion que va a ejecutar cada hilo que esta en conexion con los nodos
 void *interaccionFSNodo(void*);
 
-
 int main() {
-	t_list *listaArchivos = list_create();
-	t_list *listaNodos = list_create();
-	t_list *listaDirectorios = list_create();
+	listaArchivos = list_create();
+	listaNodos = list_create();
+	listaDirectorios = list_create();
 	//probando funcion de mostrar listas
 
-	t_directorio *directorioHome = nuevoDirectorio(1, "home", 0);
-	t_directorio *directorioMedia = nuevoDirectorio(2, "media", 0);
+	t_directorio *directorioHome = nuevoDirectorio(3, "home", 1);
+	t_directorio *directorioMedia = nuevoDirectorio(2, "media", 1);
 	t_directorio *directorioFotos = nuevoDirectorio(10, "fotos", 2);
 
 	list_add(listaDirectorios, directorioHome);
@@ -143,8 +137,8 @@ int main() {
 	t_list *bloquesDeArchivoB = list_create();
 	list_add(bloquesDeArchivoB, bloqueArchivoB1);
 
-	 t_archivo *archivoA = nuevoArchivo("Archivo A", 1, 3000, bloquesDeArchivoA,1);
-	t_archivo *archivoB = nuevoArchivo("Archivo B", 1, 3000, bloquesDeArchivoB,1);
+	 t_archivo *archivoA = nuevoArchivo("Archivo A", 3, 3000, bloquesDeArchivoA,1);
+	t_archivo *archivoB = nuevoArchivo("Archivo B", 3, 3000, bloquesDeArchivoB,1);
 
 
 	list_add(listaArchivos, archivoA);
@@ -172,7 +166,7 @@ int main() {
 
 
 	//fin de prueba de funciond de mostrar listas
-	/*	system("clear");
+	 system("clear");
 
 	 char* path = "ConfigFS.cfg";
 
@@ -191,11 +185,10 @@ int main() {
 	 perror("could not create thread");
 	 return 1;
 	 }
-	 //POR ALGUN MOTIVO ESTO NO ANDA:
-	 //int puerto = config_get_int_value(config, "PUERTO_FS");
 
 
-	 crearServerMultiHilo(8888,interaccionFSNodo);
+
+	 crearServerMultiHilo(config_get_int_value(config, "PUERTO_FS"),interaccionFSNodo);
 
 	 //Probando el agregar test
 
@@ -291,7 +284,6 @@ void *interaccionFSNodo(void* sock_ptr) {
 	while (read_size > 0) {
 		printf("%s \n", infoDeNodo);
 		memset(infoDeNodo, 0, sizeof(infoDeNodo));
-		send(list_get(listaNodo,4),"Nodo, dame tu bloque\n",strlen("Nodo, dame tu bloque\n"),0);
 		//Limpia el buffer de los mensajes que le manda ese nodo
 		read_size = recv((int)sock_desc, infoDeNodo, 5000, 0);
 	}
