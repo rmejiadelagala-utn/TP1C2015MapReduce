@@ -12,7 +12,10 @@
 #include"funcionesFileSystem.h"
 #include "CUnit/Basic.h"
 #include <unistd.h>
-
+//var globales
+t_list *listaArchivos;
+t_list *listaNodos;
+t_list *listaDirectorios;
 int inicializar() {
 	directorioUser = malloc(sizeof(t_directorio));
 
@@ -61,9 +64,9 @@ void agregar_tests() {
 void *interaccionFSNodo(void*);
 
 int main() {
-	t_list *listaArchivos = list_create();
-	t_list *listaNodos = list_create();
-	t_list *listaDirectorios = list_create();
+	listaArchivos = list_create();
+	listaNodos = list_create();
+	listaDirectorios = list_create();
 	//probando funcion de mostrar listas
 
 	t_directorio *directorioHome = nuevoDirectorio(1, "home", 0);
@@ -82,6 +85,9 @@ int main() {
 	t_nodo *nodoC = nuevoNodo("192.168.0.3.243C", 60);
 
 	nodoA->cantidadBloquesOcupados = 4;
+	int *a=malloc(sizeof(int));
+	*a=33;
+	queue_push(nodoA->bloquesLiberados,a);
 	nodoC->cantidadBloquesOcupados = 3;
 	nodoB->cantidadBloquesOcupados = 3;
 
@@ -153,16 +159,21 @@ int main() {
 //	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 	mostrarLista(listaArchivos, (void*) mostrarArchivo);
 	mostrarLista(listaNodos, (void*) mostrarNodo);
-
+	eliminarArchivoYreferencias(archivoA,listaArchivos, listaNodos);
 //	eliminarReferencias(nodoA, listaArchivos);
 //	eliminarNodoYRerencias(nodoA, listaNodos,listaArchivos);
+
+
+
+
+
 
 //	mostrarArchivo(buscarArchPorNombre("Archivo A", listaArchivos));
 //	mostrarDirectorio(buscarDirPorNombre("home",listaDirectorios));
 //	mostrarNodo(buscarNodoPorIpPuerto("192.168.0.1:80A",listaNodos));
-
+	mostrarLista(listaNodos, (void*) mostrarNodo);
 //	mostrarLista(listaArchivos, (void*) mostrarArchivo);
-//	mostrarLista(listaNodos, (void*) mostrarNodo);
+
 
 	//fin de prueba de funciond de mostrar listas
 	/*	system("clear");

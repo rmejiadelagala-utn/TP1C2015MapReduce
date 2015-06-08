@@ -13,7 +13,7 @@
 //estructura Archivo
 
 typedef struct {
-	char *ipPuerto; //quizas conviene en un futuro que
+	char *ipPuerto;
 	int numeroDeBloqueEnNodo;
 
 } t_bloqueEnNodo;
@@ -184,4 +184,5 @@ t_list *listaNodo;
 t_list *listaDirectorio;
 t_directorio *directorioUser;
 t_archivo *listaArchivo;
+
 #endif /* ESTRUCTURASFILESYSTEM_H_ */

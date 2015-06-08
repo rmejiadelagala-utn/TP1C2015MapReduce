@@ -15,12 +15,6 @@
 void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos);
 
 /*
- * @NAME: eliminarArchivoPorNombre
- * @DESC: recibe una lista de archivos y un nombre de un archivo, elimina al archivo de la lista devuelve el data eliminado o NULL si no lo encuentra
- */
-void *eliminarArchivoPorNombre(char nombreBuscado[255], t_list *listaArchivos);
-
-/*
  * @NAME: formatear
  * @DESC: recibe la lista de archivos, nodos y directorios, y las vacía
  */
@@ -105,5 +99,18 @@ t_directorio *buscarDirPorNombre(char *nombre, t_list *listaDirectorios);
  * @DESC: busca un archivo por nombre en una lista de archivos
  */
 t_archivo *buscarArchPorNombre(char *nombre, t_list *listaArchivos);
+
+/**
+ * @NAME: eliminarArchivoYreferencias
+ * @DESC: elimina un archivo sacandolo de la lista y ademas en el nodo correspondiente elimina la copia que estaba y guarda en la cola de liberados el espacio liberado
+ */
+void eliminarArchivoYreferencias(t_archivo *unArchivo, t_list *listaArchivos,
+		t_list *listaNodos);
+
+/**
+ * @NAME: eliminarArchivoDeLista
+ * @DESC: elimina un archivo sacandolo de la lista
+ */
+void eliminarArchivoDeLista(t_archivo *unArchivo, t_list *listaArchivos);
 
 #endif /* FUNCIONESFILESYSTEM_H_ */
