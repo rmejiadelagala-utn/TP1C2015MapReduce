@@ -75,13 +75,13 @@ int main() {
 	t_nodo *nodoB = nuevoNodo("127.0.0.1:127B", 20);
 	t_nodo *nodoC = nuevoNodo("127.0.0.1:243C", 60);
 
-	nodoA->cantidadBloquesOcupados = 4;
+	nodoA->cantidadBloquesOcupados = 1;
 	int *a=malloc(sizeof(int));
-	*a=33;
-	queue_push(nodoA->bloquesLiberados,a);
+	*a=1;
+	queue_push(nodoA->bloquesLiberados,a);/*
 	nodoC->cantidadBloquesOcupados = 3;
 	nodoB->cantidadBloquesOcupados = 3;
-
+*/
 	list_add(listaNodos, nodoA);
 	list_add(listaNodos, nodoB);
 	list_add(listaNodos, nodoC);
@@ -161,32 +161,33 @@ int main() {
 
 
 //160 lugar de trabajo de juanchi
-
-
-
-
-
-
-
-
-
-//
-
-
-
-
+//	formatear(&listaNodos, &listaArchivos, &listaDirectorios);
+	t_list *copiasbloques1 = list_create();
+	t_list * copiasbloques2 = list_create();
+	t_list * copiasbloques3 = list_create();
+	t_bloqueArch *bloquearch1 = nuevoBloqueArchivo(copiasbloques1);
+	t_bloqueArch *bloquearch2 = nuevoBloqueArchivo(copiasbloques2);
+	t_bloqueArch *bloquearch3 = nuevoBloqueArchivo(copiasbloques3);
+	t_list *bloquesDeArchivo  = list_create();
+list_add(bloquesDeArchivo,bloquearch1);
+list_add(bloquesDeArchivo,bloquearch2);
+list_add(bloquesDeArchivo,bloquearch3);
+	distribuirBloquesEnNodos(bloquesDeArchivo,listaNodos);
+	mostrarLista(listaNodos, (void*) mostrarNodo);
+	mostrarLista(bloquesDeArchivo, (void*) mostrarBloqueArch);
+	list_destroy_and_destroy_elements(bloquesDeArchivo,(void*)liberarBloqueArch);
 //175 fin	lugar de trabajo de juanchi
 
 //	mostrarArchivo(buscarArchPorNombre("Archivo A", listaArchivos));
 //	mostrarDirectorio(buscarDirPorNombre("home",listaDirectorios));
 //	mostrarNodo(buscarNodoPorIpPuerto("192.168.0.1:80A",listaNodos));
-	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
+//	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 //	mostrarLista(listaNodos, (void*) mostrarNodo);
 //	mostrarLista(listaArchivos, (void*) mostrarArchivo);
 
 
 	//fin de prueba de funciond de mostrar listas
-	 system("clear");
+/*	 system("clear");
 
 	 char* path = "ConfigFS.cfg";
 
@@ -208,7 +209,7 @@ int main() {
 
 
 
-	 crearServerMultiHilo(config_get_int_value(config, "PUERTO_FS"),interaccionFSNodo);
+	 crearServerMultiHilo(config_get_int_value(config, "PUERTO_FS"),interaccionFSNodo);*/
 
 	 //Probando el agregar test
 
