@@ -117,7 +117,27 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {
 
 	}
 }
+//120 lugar de trabajo de juanchi
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//140 fin de lugar de trabajo de juanchi
 //Funciones de busqueda
 t_nodo *buscarNodoPorIpPuerto(char *ipPuerto, t_list *listaNodos) {	//probada
 	t_nodo *nodo = buscarEnListaPorStrKey(listaNodos, ipPuerto,
