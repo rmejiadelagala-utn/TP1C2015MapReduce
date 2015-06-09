@@ -59,11 +59,12 @@ int main() {
 	listaNodos = list_create();
 	listaDirectorios = list_create();
 	//probando funcion de mostrar listas
-
+	t_directorio *directorioRoot = nuevoDirectorio(1, "Root", 0);
 	t_directorio *directorioHome = nuevoDirectorio(3, "home", 1);
 	t_directorio *directorioMedia = nuevoDirectorio(2, "media", 1);
 	t_directorio *directorioFotos = nuevoDirectorio(10, "fotos", 2);
 
+	list_add(listaDirectorios, directorioRoot);
 	list_add(listaDirectorios, directorioHome);
 	list_add(listaDirectorios, directorioMedia);
 	list_add(listaDirectorios, directorioFotos);
@@ -136,7 +137,7 @@ int main() {
 	list_add(bloquesDeArchivoB, bloqueArchivoB1);
 
 
-	t_archivo *archivoA = nuevoArchivo("ArchivoA", 3, 3000, bloquesDeArchivoA,1);
+	t_archivo *archivoA = nuevoArchivo("ArchivoA", 2, 3000, bloquesDeArchivoA,1);
 	t_archivo *archivoB = nuevoArchivo("ArchivoB", 3, 3000, bloquesDeArchivoB,1);
 
 
@@ -178,10 +179,37 @@ list_add(bloquesDeArchivo,bloquearch3);
 	list_destroy_and_destroy_elements(bloquesDeArchivo,(void*)liberarBloqueArch);
 //176 fin	lugar de trabajo de juanchi*/
 //177 lugar de trabajo de juanchi
+/*
+ * 	       |->|home|--------->(ArchivoB)
+ * 		   |
+ *  |root|-|  			|--->(ArchivoA)
+ * 		   |			|
+ * 		   |->|Media|---|--->|fotos|
+ *
+ */
+/*
+	printf("dirVacio False %d\n",dirVacio(directorioHome));
+	printf("dirVacio False %d\n",dirVacio(directorioMedia));
+	printf("dirVacio True %d\n",dirVacio(directorioFotos));
 
+	printf("dirConSoloArch True %d\n",dirConSoloArch(directorioHome));
+	printf("dirConSoloArch False %d\n",dirConSoloArch(directorioMedia));
+	printf("dirConSoloArch False %d\n",dirConSoloArch(directorioFotos));
 
+	printf("dirConSubdir es false %d\n",dirConSubdir(directorioFotos));
+	printf("dirConSubdir es false %d\n",dirConSubdir(directorioHome));
+	printf("dirConSubdir es true %d\n",dirConSubdir(directorioMedia));
+	*/
 
+//	eliminarDirectorioYContenido(directorioRoot);
 
+	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
+	mostrarLista(listaArchivos, (void*) mostrarArchivo);
+/*
+mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
+	mostrarLista(listaArchivos, (void*) mostrarArchivo);
+	mostrarLista(listaNodos, (void*) mostrarNodo);
+*/
 
 
 

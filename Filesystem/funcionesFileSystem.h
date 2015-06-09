@@ -133,10 +133,10 @@ void moverDirectorioConPadre(int padre,t_directorio *unDirectorio);
 int obtenerArchivo(char *nombreArchivo, char* path, int directorioActual);
 
 /**
- * @NAME: eliminarDirRecursivamente
+ * @NAME: eliminarDirectorioYContenido
  * @DESC: elimina un Directorio eliminando todo su contenido
  */
-void eliminarDirRecursivamente(t_directorio *directorioAEliminar);
+void eliminarDirectorioYContenido(t_directorio *directorioAEliminar);
 
 /**
  * @NAME: buscarDirPorIndex
@@ -179,6 +179,12 @@ int dirConSubdir(t_directorio *unDirectorio);
  * @DESC: pregunta al directorio si esta vacio, sin archivos y sin directorios
  */
 int dirVacio(t_directorio *unDirectorio) ;
+
+/**
+ * @NAME: dirConSoloArch
+ * @DESC: si el directorio solo contiene archivos en su interior
+ */
+int dirConSoloArch(t_directorio *unDirectorio);
 
 /**
  * @NAME: eliminarDirectorioVacio

@@ -118,35 +118,43 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {//Probada :
 	list_destroy(nodosOrdenados);
 }
 //116 lugar de trabajo de juanchi
-
-void eliminarDirRecursivamente(t_directorio *directorioAEliminar) {
+//si tiene varios archivos en un dir los elimina bien
+//si es dir vacio lo elimina bien
+//si hay un subdir FIXME
+void eliminarDirectorioYContenido(t_directorio *directorioAEliminar) {
 	t_directorio *unDirectorio = directorioAEliminar;
-	if (dirVacio(unDirectorio) && unDirectorio != directorioAEliminar) {
-		t_directorio *dirPadre = buscarDirPorIndex(unDirectorio->padre);
-		eliminarDirectorioVacio(unDirectorio);
-		eliminarDirRecursivamente(dirPadre);
-	} else if (dirConSoloArch(unDirectorio)) {
-		eliminarSubArchivoDeDir(unDirectorio);
-		eliminarDirRecursivamente(unDirectorio);
-	} else if (dirConSubdir(unDirectorio)) {//el dir tiene subDir entonces entra a los subdirs
-		t_directorio *subDir = dameUnSubdir(unDirectorio);
-		eliminarDirRecursivamente(subDir);
-	} else {	//esta vacio y es el directorio a Eliminar
-		eliminarDirectorioVacio(directorioAEliminar);//en este caso directorioAEliminar y unDirectorio son iguales y esta vacio
-		printf("Se elimino todo el directorio con su contenido");
+
+	void eliminarDirRecursivamente(t_directorio *unDirectorio) {
+
+		if (dirVacio(unDirectorio) && unDirectorio != directorioAEliminar) {
+			t_directorio *dirPadre = buscarDirPorIndex(unDirectorio->padre);
+			eliminarDirectorioVacio(unDirectorio);
+			eliminarDirRecursivamente(dirPadre);
+		} else if (dirConSoloArch(unDirectorio)) {
+			eliminarSubArchivoDeDir(unDirectorio);
+			eliminarDirRecursivamente(unDirectorio);
+		} else if (dirConSubdir(unDirectorio)) {//el dir tiene subDir entonces entra a los subdirs
+			t_directorio *subDir = dameUnSubdir(unDirectorio);
+			eliminarDirRecursivamente(subDir);
+		} else {	//esta vacio y es el directorio a Eliminar
+			eliminarDirectorioVacio(directorioAEliminar);//en este caso directorioAEliminar y unDirectorio son iguales y esta vacio
+			printf("Se elimino todo el directorio con su contenido");
+		}
+
 	}
+	eliminarDirRecursivamente(unDirectorio);
 }
 //funciones auxiliares de eliminar recursivamente
-void eliminarSubArchivoDeDir(t_directorio *unDirectorio){
+void eliminarSubArchivoDeDir(t_directorio *unDirectorio) {
 	t_archivo *subArchivo = buscarArchPorPadre(unDirectorio->index);
-	eliminarArchivoYreferencias(subArchivo,listaArchivos,listaNodos);
+	eliminarArchivoYreferencias(subArchivo, listaArchivos, listaNodos);
 }
 
 void eliminarDirectorioVacio(t_directorio *directorioAEliminar) {
 	int directorioConIndiceBuscado(t_directorio *directorio) {
 		return directorioAEliminar->index == directorio->index;
 	}
-	list_remove_and_destroy_by_condition(listaDirectorios,(void*) directorioConIndiceBuscado,(void*)liberarNodo);
+	list_remove_and_destroy_by_condition(listaDirectorios,(void*) directorioConIndiceBuscado,(void*)liberarDirectorio);
 }
 int dirConSoloArch(t_directorio *unDirectorio) {
 	return dameUnSubArch(unDirectorio)!=NULL && dameUnSubdir(unDirectorio) == NULL ;
