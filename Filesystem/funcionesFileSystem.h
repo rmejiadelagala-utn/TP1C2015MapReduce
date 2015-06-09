@@ -132,25 +132,66 @@ void renombrarDirectorioConNombre(char *nombre,t_directorio *unDirectorio);
 void moverDirectorioConPadre(int padre,t_directorio *unDirectorio);
 int obtenerArchivo(char *nombreArchivo, char* path, int directorioActual);
 
-//135 lugar de trabajo de juanchi
+/**
+ * @NAME: eliminarDirRecursivamente
+ * @DESC: elimina un Directorio eliminando todo su contenido
+ */
+void eliminarDirRecursivamente(t_directorio *directorioAEliminar);
 
-
+/**
+ * @NAME: buscarDirPorIndex
+ * @DESC: busca un directorio por indice
+ */
 t_directorio *buscarDirPorIndex(int index);
+
+/**
+ * @NAME: buscarDirPorPadre
+ * @DESC: busca un directorio que tenga el padre enviado por parametro
+ */
 t_directorio *buscarDirPorPadre(int padre);
-t_directorio *dameUnSubdir(t_directorio *unDirectorio);
-int dirConSubdir(t_directorio *unDirectorio);
-int dirVacio(t_directorio *unDirectorio) ;
+
+/**
+ * @NAME: buscarArchPorPadre
+ * @DESC: busca un archivo por el padre
+ */
 t_archivo *buscarArchPorPadre(int padre);
+
+/**
+ * @NAME: dameUnSubdir
+ * @DESC: devuelve un subdirectorio del directorio enviado por parametro o NULL si no existe
+ */
+t_directorio *dameUnSubdir(t_directorio *unDirectorio);
+
+/**
+ * @NAME: dameUnSubArch
+ * @DESC:devuelve un archivo perteneciente del directorio enviado por parametro o NULL si no existe
+ */
 t_archivo *dameUnSubArch(t_directorio *unDirectorio);
+
+/**
+ * @NAME: dirConSubdir
+ * @DESC: pregunta al directorio si tiene subdirectorios
+ */
+int dirConSubdir(t_directorio *unDirectorio);
+
+/**
+ * @NAME: dirVacio
+ * @DESC: pregunta al directorio si esta vacio, sin archivos y sin directorios
+ */
+int dirVacio(t_directorio *unDirectorio) ;
+
+/**
+ * @NAME: eliminarDirectorioVacio
+ * @DESC: elimina un directorio vacio, sacandolo de la lista de directorios y destruyendolo
+ */
 void eliminarDirectorioVacio(t_directorio *directorioAEliminar);
+
+/**
+ * @NAME: eliminarSubArchivoDeDir
+ * @DESC: elimina un archivo perteneciente al directorio enviado por parametro, y al eliminar el archivo se encarga de eliminar por referencias
+ */
 void eliminarSubArchivoDeDir(t_directorio *unDirectorio);
 
 
-
-
-
-
-
-//148 fin de lugar de trabajo de juanchi
 
 #endif /* FUNCIONESFILESYSTEM_H_ */

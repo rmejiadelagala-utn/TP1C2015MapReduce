@@ -136,7 +136,7 @@ void eliminarDirRecursivamente(t_directorio *directorioAEliminar) {
 		printf("Se elimino todo el directorio con su contenido");
 	}
 }
-
+//funciones auxiliares de eliminar recursivamente
 void eliminarSubArchivoDeDir(t_directorio *unDirectorio){
 	t_archivo *subArchivo = buscarArchPorPadre(unDirectorio->index);
 	eliminarArchivoYreferencias(subArchivo,listaArchivos,listaNodos);
@@ -163,7 +163,7 @@ t_directorio *dameUnSubdir(t_directorio *unDirectorio){
 t_archivo *dameUnSubArch(t_directorio *unDirectorio){
 	return buscarArchPorPadre(unDirectorio->index);
 }
-//140 fin de lugar de trabajo de juanchi
+//fin de funciones auxiliares de eliminar recursivamente
 //Funciones de busqueda
 t_nodo *buscarNodoPorIpPuerto(char *ipPuerto, t_list *listaNodos) {	//probada
 	t_nodo *nodo = buscarEnListaPorStrKey(listaNodos, ipPuerto,
@@ -195,7 +195,7 @@ t_archivo *buscarArchPorPadre(int padre) {
 			(int*) archPadre);
 	return arch != NULL ? arch : NULL;
 }
-
+//Fin de funciones de busqueda
 t_directorio *encontrarDirectorioHijo(t_list *listaDirectorios,t_directorio *directorioPadre){
 	return list_find(listaDirectorios,({ bool esPadre(t_directorio* unDir)
 					{return esHijo(directorioPadre,unDir);}esPadre;}));
