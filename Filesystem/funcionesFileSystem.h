@@ -135,9 +135,15 @@ int obtenerArchivo(char *nombreArchivo, char* path, int directorioActual);
 //135 lugar de trabajo de juanchi
 
 
-
-
-
+t_directorio *buscarDirPorIndex(int index);
+t_directorio *buscarDirPorPadre(int padre);
+t_directorio *dameUnSubdir(t_directorio *unDirectorio);
+int dirConSubdir(t_directorio *unDirectorio);
+int dirVacio(t_directorio *unDirectorio) ;
+t_archivo *buscarArchPorPadre(int padre);
+t_archivo *dameUnSubArch(t_directorio *unDirectorio);
+void eliminarDirectorioVacio(t_directorio *directorioAEliminar);
+void eliminarSubArchivoDeDir(t_directorio *unDirectorio);
 
 
 

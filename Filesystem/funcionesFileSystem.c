@@ -37,9 +37,14 @@ static char* dirNombre(t_directorio *unDir);
 static char* archNombre(t_archivo *unArch);
 static void *buscarEnListaPorStrKey(t_list *lista, char *key,
 		char *keyGetter(void*));
+static void *buscarEnListaPorIntKey(t_list *lista, int key,
+		int *keyGetter(void*));
 static void recorrerCopiasDeUnArch(t_archivo *unArchivo,
 		void (*accionACopia)(t_bloqueEnNodo*));
 static void disminuirNodo(t_bloqueEnNodo *copia);
+static int dirPadre(t_directorio *unDir);
+static int dirIndex(t_directorio *unDir);
+static int archPadre(t_archivo *unArch);
 //
 /*
  t_list* divideArchivoEnBloques(char* pathArch){
@@ -114,28 +119,50 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {//Probada :
 }
 //116 lugar de trabajo de juanchi
 
+void eliminarDirRecursivamente(t_directorio *directorioAEliminar) {
+	t_directorio *unDirectorio = directorioAEliminar;
+	if (dirVacio(unDirectorio) && unDirectorio != directorioAEliminar) {
+		t_directorio *dirPadre = buscarDirPorIndex(unDirectorio->padre);
+		eliminarDirectorioVacio(unDirectorio);
+		eliminarDirRecursivamente(dirPadre);
+	} else if (dirConSoloArch(unDirectorio)) {
+		eliminarSubArchivoDeDir(unDirectorio);
+		eliminarDirRecursivamente(unDirectorio);
+	} else if (dirConSubdir(unDirectorio)) {//el dir tiene subDir entonces entra a los subdirs
+		t_directorio *subDir = dameUnSubdir(unDirectorio);
+		eliminarDirRecursivamente(subDir);
+	} else {	//esta vacio y es el directorio a Eliminar
+		eliminarDirectorioVacio(directorioAEliminar);//en este caso directorioAEliminar y unDirectorio son iguales y esta vacio
+		printf("Se elimino todo el directorio con su contenido");
+	}
+}
 
+void eliminarSubArchivoDeDir(t_directorio *unDirectorio){
+	t_archivo *subArchivo = buscarArchPorPadre(unDirectorio->index);
+	eliminarArchivoYreferencias(subArchivo,listaArchivos,listaNodos);
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void eliminarDirectorioVacio(t_directorio *directorioAEliminar) {
+	int directorioConIndiceBuscado(t_directorio *directorio) {
+		return directorioAEliminar->index == directorio->index;
+	}
+	list_remove_and_destroy_by_condition(listaDirectorios,(void*) directorioConIndiceBuscado,(void*)liberarNodo);
+}
+int dirConSoloArch(t_directorio *unDirectorio) {
+	return dameUnSubArch(unDirectorio)!=NULL && dameUnSubdir(unDirectorio) == NULL ;
+}
+int dirVacio(t_directorio *unDirectorio) {
+	return dameUnSubArch(unDirectorio)==NULL && dameUnSubdir(unDirectorio) == NULL;
+}
+int dirConSubdir(t_directorio *unDirectorio){
+	return dameUnSubdir(unDirectorio) != NULL;
+}
+t_directorio *dameUnSubdir(t_directorio *unDirectorio){
+	return buscarDirPorPadre(unDirectorio->index);
+}
+t_archivo *dameUnSubArch(t_directorio *unDirectorio){
+	return buscarArchPorPadre(unDirectorio->index);
+}
 //140 fin de lugar de trabajo de juanchi
 //Funciones de busqueda
 t_nodo *buscarNodoPorIpPuerto(char *ipPuerto, t_list *listaNodos) {	//probada
@@ -148,9 +175,24 @@ t_directorio *buscarDirPorNombre(char *nombre, t_list *listaDirectorios) {//prob
 			(char*) dirNombre);
 	return dir != NULL ? dir : NULL;
 }
+t_directorio *buscarDirPorIndex(int index) {
+	t_archivo *dir = buscarEnListaPorIntKey(listaDirectorios, index,
+			(int*) dirIndex);
+	return dir != NULL ? dir : NULL;
+}
+t_directorio *buscarDirPorPadre(int padre) {
+	t_archivo *dir = buscarEnListaPorIntKey(listaDirectorios, padre,
+			(int*) dirPadre);
+	return dir != NULL ? dir : NULL;
+}
 t_archivo *buscarArchPorNombre(char *nombre, t_list *listaArchivos) {//probada
 	t_archivo *arch = buscarEnListaPorStrKey(listaArchivos, nombre,
 			(char*) archNombre);
+	return arch != NULL ? arch : NULL;
+}
+t_archivo *buscarArchPorPadre(int padre) {
+	t_archivo *arch = buscarEnListaPorIntKey(listaArchivos, padre,
+			(int*) archPadre);
 	return arch != NULL ? arch : NULL;
 }
 
@@ -403,11 +445,28 @@ static void *buscarEnListaPorStrKey(t_list *lista, char *key,
 
 	return list_find(lista, (bool*) _comparacion);
 }
+static void *buscarEnListaPorIntKey(t_list *lista, int key,
+		int *keyGetter(void*)) {
+	bool _comparacion(void* data) {
+		return keyGetter(data) == key;
+	}
+
+	return list_find(lista, (bool*) _comparacion);
+}
 static char* nodoIpPuerto(t_nodo *unNodo) {
 	return unNodo->ipPuerto;
 }
 static char* dirNombre(t_directorio *unDir) {
 	return unDir->nombre;
+}
+static int dirPadre(t_directorio *unDir) {
+	return unDir->padre;
+}
+static int dirIndex(t_directorio *unDir) {
+	return unDir->index;
+}
+static int archPadre(t_archivo *unArch) {
+	return unArch->padre;
 }
 static char* archNombre(t_archivo *unArch) {
 	return unArch->nombre;
