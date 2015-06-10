@@ -26,12 +26,14 @@
 #include"funcionesFileSystem.h"
 #include "CUnit/Basic.h"
 #include <unistd.h>
+#include <semaphore.h>
 
 t_config* config;
 
 t_list *listaArchivos;
 t_list *listaNodos;
 t_list *listaDirectorios;
-
+sem_t *semaforo;
+FILE *archivoReconstruido;
 
 #endif /* FSYSTEM_H_ */

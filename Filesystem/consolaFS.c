@@ -260,11 +260,14 @@ void moverDirectorio(char *directorio, char* padreString) {
 	}
 }
 void copiarAMDFS(char *archivo) {
+
 	printf("Copia el archivo %s al MDFS\n", archivo);
 }
 
 void copiarAFS(char *archivo) {
-
+	sem_init(semaforo,0,0);
+	archivoReconstruido = malloc(3000);
+	archivoReconstruido = fopen("archivoReconstruido","w");
 	obtenerArchivo(archivo, "sarasa", directorioActual->index);
 
 	printf("Copia el archivo %s al FileSystem\n", archivo);

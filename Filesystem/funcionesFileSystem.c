@@ -503,6 +503,7 @@ int obtenerArchivo(char *nombreArchivo, char* path, int directorioActual) {
 		}
 		t_nodo *nodoEncontrado = list_find(listaNodo, (void*) ipPuertoCoincide);
 		send(nodoEncontrado->socket,"Te encontre",strlen("te encontre"),0);
+		sem_wait(semaforo);
 		//HAY QUE CREAR EL CAMPO SOCKET EN NODO
 		/*int socket_desc = nodoEncontrado.socket;
 		 send(socket_desc,1,sizeOf(1),0);

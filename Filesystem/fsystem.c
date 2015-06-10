@@ -234,7 +234,7 @@ mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 
 
 	//fin de prueba de funciond de mostrar listas
-/*	 system("clear");
+	 system("clear");
 
 	 char* path = "ConfigFS.cfg";
 
@@ -256,7 +256,7 @@ mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 
 
 
-	 crearServerMultiHilo(config_get_int_value(config, "PUERTO_FS"),interaccionFSNodo);*/
+	 crearServerMultiHilo(config_get_int_value(config, "PUERTO_FS"),interaccionFSNodo);
 
 	 //Probando el agregar test
 
@@ -346,13 +346,23 @@ void *interaccionFSNodo(void* sock_ptr) {
 	nodo->socket=sock_desc;
 	list_replace_and_destroy_element(listaNodos,1,nodo,(void*) liberarNodo);
 	//Receive a reply from the server
-	read_size = recv((int) sock_desc, infoDeNodo, 5000, 0);
+	read_size = recv((int) sock_desc, infoDeNodo, 100, 0);
 
 	while (read_size > 0) {
 		printf("%s \n", infoDeNodo);
 		memset(infoDeNodo, 0, sizeof(infoDeNodo));
 		//Limpia el buffer de los mensajes que le manda ese nodo
-		read_size = recv((int) sock_desc, infoDeNodo, 5000, 0);
+		if(infoDeNodo[0]==0){
+		recv((int) sock_desc, infoDeNodo, 1, 0);
+		int tamanio = infoDeNodo[0]-'0';
+		recv((int) sock_desc, infoDeNodo, tamanio, 0);
+		char** texto = string_duplicate(infoDeNodo);
+		write(archivoReconstruido,texto,tamanio);
+		sem_post(semaforo);
+		}
+		else{
+			recv((int) sock_desc, infoDeNodo, 1, 0);
+		}
 	}
 	if (read_size == 0) {
 		printf("Nodo desconectado.\n");
