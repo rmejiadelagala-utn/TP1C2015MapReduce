@@ -8,7 +8,7 @@
 #include "interfaces.h"
 
 //Ruta donde se encuentra el archivo de configuración
-char* ARCHIVO_CONFIG = "/home/utnso/ConfigNodo.txt";
+char* ARCHIVO_CONFIG = "/home/utnso/tp-2015-1c-socketes-planificados/ArchivoVarios/ConfigNodo.txt";
 
 int main() {
 
@@ -16,20 +16,8 @@ int main() {
 
 	t_config_nodo* arch_config;
 
-    arch_config= malloc(sizeof(t_config_nodo));
+    	arch_config= malloc(sizeof(t_config_nodo));
 	arch_config = leerArchivoConfig(ARCHIVO_CONFIG);
-
-/*	DATOS = mapeo_disco("/home/utnso/midata2.bin");
-	memset(DATOS + obtenerDirBloque(1),0, BLKSIZE );
-
-	DATOS_A = mapeo_archivo("/home/utnso/Testeo.txt");
-	memcpy(DATOS, DATOS_A + obtenerDirBloque(1), BLKSIZE);
-
-
-	for(i=0; i<20; i++) {
-		printf("%c", DATOS[i]);
-	}
-	printf("\n");*/
 
 	int sockfs;
 	pthread_t hiloFS;
@@ -37,7 +25,6 @@ int main() {
 	pthread_t hiloNodos;
 	t_hilofs paramHiloFS;
 
-	//sockfs = 1;
 	sockfs = crearCliente(arch_config->IP_FS,arch_config->PUERTO_FS);
 
 	paramHiloFS.IP_NODO = arch_config->IP_NODO;
@@ -49,9 +36,9 @@ int main() {
 	pthread_create(&hiloJobs, NULL, (void*)conexionJobs, (void*) &arch_config->PUERTO_NODO);
 	pthread_create(&hiloNodos, NULL, (void*)conexionNodos, (void*) &arch_config->PUERTO_NODO);
 
-    pthread_join(hiloFS,NULL);
-    pthread_join(hiloJobs,NULL);
-    pthread_join(hiloNodos,NULL);
+	pthread_join(hiloFS,NULL);
+	pthread_join(hiloJobs,NULL);
+	pthread_join(hiloNodos,NULL);
 
 	//Probando un mensaje mandado del nodo al FS
 	//send(sockfs,ip,1000 ,0);
