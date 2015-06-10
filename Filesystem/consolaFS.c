@@ -292,11 +292,21 @@ void copiarBloque(char *bloque) {
 }
 
 void levantarNodo(char *nodo) {
+
 	printf("Agrega el nodo %s\n", nodo);
 }
 
 void eliminarNodo(char *nodo) {
-	printf("Borra el nodo %s\n", nodo);
+	if(!strcmp(nodo,"VerNodos")){//XXX PARA TESTEAR
+		mostrarLista(listaNodos, (void*)mostrarNodo);
+	}
+	else{
+		void eliminarNod(t_nodo *unNodo){
+			eliminarNodoYReferencias(unNodo,listaNodos,listaArchivos);
+			printf("Se elimino nodo de ip %s\n.",nodo);
+		}
+		validarNodoYEjecutar(nodo,(void*)eliminarNod);
+	}
 }
 
 void help() {
@@ -413,6 +423,11 @@ void validarDirectorioYEjecutar(char* unDirectorio, void (*funcion)(void*)){
 	else printf("Directorio no encontrado.\n");
 }
 
+void validarNodoYEjecutar(char* unNodo, void (*funcion)(void*)){
+	t_nodo *nodoObjetivo = buscarNodoPorIpPuerto(unNodo,listaNodos);
+	if(nodoObjetivo!=NULL) funcion(nodoObjetivo);
+	else printf("Nodo no encontrado.\n");
+}
 int string_to_int(char* string){
 		int i; int j=0;
 		for (i=0;i<(strlen(string));i++){

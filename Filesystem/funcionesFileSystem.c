@@ -238,7 +238,7 @@ bool esNodoNuevo(t_nodo *nodoABuscar, t_list *listaNodos) {	//probada
 }
 //elimina el nodo y los bloques de copia que cada archivo contaba en ese nodo
 
-void eliminarNodoYRerencias(t_nodo *nodoAEliminar, t_list *listaNodos, //probada
+void eliminarNodoYReferencias(t_nodo *nodoAEliminar, t_list *listaNodos, //probada
 		t_list *archivos) {
 	eliminarReferencias(nodoAEliminar, archivos);
 	eliminarNodoDeLista(nodoAEliminar, listaNodos);

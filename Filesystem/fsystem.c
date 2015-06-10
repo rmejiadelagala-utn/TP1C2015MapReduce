@@ -73,7 +73,7 @@ int main() {
 
 	//Muestro nodos
 	t_nodo *nodoA = nuevoNodo("127.0.0.1:80A", 10);
-	t_nodo *nodoB = nuevoNodo("127.0.0.1:127B", 20);
+	t_nodo *nodoB = nuevoNodo("127.0.0.1:12B", 20);
 	t_nodo *nodoC = nuevoNodo("127.0.0.1:243C", 60);
 
 	nodoA->cantidadBloquesOcupados = 1;
@@ -92,7 +92,7 @@ int main() {
 //muestro archivos
 
 	t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo("127.0.0.1:80A", 11);
-	t_bloqueEnNodo *copiaBloqueA1C2 = nuevoBloqueEnNodo("127.0.0.1:127B", 12);
+	t_bloqueEnNodo *copiaBloqueA1C2 = nuevoBloqueEnNodo("127.0.0.1:12B", 12);
 	t_bloqueEnNodo *copiaBloqueA1C3 = nuevoBloqueEnNodo("127.0.0.1:243C", 13);
 	t_list *copiasBloqueA1 = list_create();
 	list_add(copiasBloqueA1, copiaBloqueA1C1);
@@ -100,7 +100,7 @@ int main() {
 	list_add(copiasBloqueA1, copiaBloqueA1C3);
 
 	t_bloqueEnNodo *copiaBloqueA2C1 = nuevoBloqueEnNodo("127.0.0.1:80A", 21);
-	t_bloqueEnNodo *copiaBloqueA2C2 = nuevoBloqueEnNodo("127.0.0.1:127B", 22);
+	t_bloqueEnNodo *copiaBloqueA2C2 = nuevoBloqueEnNodo("127.0.0.1:12B", 22);
 	t_bloqueEnNodo *copiaBloqueA2C3 = nuevoBloqueEnNodo("127.0.0.1:243C", 23);
 	t_list *copiasBloqueA2 = list_create();
 	list_add(copiasBloqueA2, copiaBloqueA2C1);
@@ -108,7 +108,7 @@ int main() {
 	list_add(copiasBloqueA2, copiaBloqueA2C3);
 
 	t_bloqueEnNodo *copiaBloqueA3C1 = nuevoBloqueEnNodo("127.0.0.1:80A", 31);
-	t_bloqueEnNodo *copiaBloqueA3C2 = nuevoBloqueEnNodo("127.0.0.1:127B", 32);
+	t_bloqueEnNodo *copiaBloqueA3C2 = nuevoBloqueEnNodo("127.0.0.1:12B", 32);
 	t_bloqueEnNodo *copiaBloqueA3C3 = nuevoBloqueEnNodo("127.0.0.1:243C", 33);
 	t_list *copiasBloqueA3 = list_create();
 	list_add(copiasBloqueA3, copiaBloqueA3C1);
@@ -155,7 +155,7 @@ int main() {
 	mostrarLista(listaNodos, (void*) mostrarNodo);
 //	eliminarArchivoYreferencias(archivoA,listaArchivos, listaNodos);
 //	eliminarReferencias(nodoA, listaArchivos);
-//	eliminarNodoYRerencias(nodoA, listaNodos,listaArchivos);
+//	eliminarNodoYReferencias(nodoB, listaNodos,listaArchivos);
 //	renombrarDirectorioConNombre("pepito",directorioHome);
 //	moverDirectorioConPadre(8,directorioHome);
 

@@ -65,7 +65,7 @@ void activarNodoReconectado(t_nodo *nodoABuscar, t_list *listaNodos);
  * @NAME: eliminarNodoYRerencias
  * @DESC: elimina nodo de la lista nodos y las referencias de las copias en los archivos si es que pertenecen a ese nodo
  */
-void eliminarNodoYRerencias(t_nodo *nodoAEliminar, t_list *listaNodos,
+void eliminarNodoYReferencias(t_nodo *nodoAEliminar, t_list *listaNodos,
 		t_list *archivos);
 
 /*
