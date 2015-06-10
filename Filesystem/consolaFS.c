@@ -78,8 +78,8 @@ int consola(void* unListaNodo) {
 			moverArchivo(comandoSeparado[1],comandoSeparado[2]);
 			break;
 		case CREAR_DIRECTORIO:
-			if(comprobarParametros(2,comandoSeparado)==1)
-			crearDirectorio(comandoSeparado[1],comandoSeparado[2]);
+			if(comprobarParametros(1,comandoSeparado)==1)
+			crearDirectorio(comandoSeparado[1]);
 			break;
 		case ELIMINAR_DIRECTORIO:
 			if(comprobarParametros(1,comandoSeparado)==1)
@@ -219,11 +219,9 @@ void moverArchivo(char *archivo, char* padreString) {
 	}
 }
 
-void crearDirectorio(char *nomDirectorio, char* padreString) {
-	int padre = string_to_int(padreString);
-	if (padre!=(-1)){
-		crearDirectorioDadoPadreYNom(nomDirectorio, directorioActual->padre, listaDirectorios);
-	}
+void crearDirectorio(char *nomDirectorio) {
+
+		crearDirectorioDadoPadreYNom(nomDirectorio, directorioActual->index, listaDirectorios);
 
 }
 
@@ -250,10 +248,15 @@ void renombrarDirectorio(char *directorio, char* nuevoNombre) {
 void moverDirectorio(char *directorio, char* padreString) {
 
 	int padre = string_to_int(padreString);
-	if (padreString!=(-1)){
+	if (padre!=(-1)){
 
 		void moverDir(t_directorio *unDirectorio){
+			if(unDirectorio->index==padre){
+				printf("No se puede mover un Directorio adentro de si mismo\n");
+			}
+			else{
 				moverDirectorioConPadre(padre,unDirectorio);
+			}
 		}
 		validarDirectorioYEjecutar(directorio,(void*) moverDir);
 
@@ -326,7 +329,9 @@ void ls(){
 
 	list_destroy(directoriosVisibles);
 	list_destroy(archivosVisibles);
-
+	if(dirVacio(directorioActual)){
+		printf("Directorio vacio\n");
+	}
 }
 
 void cd(char* nombreDirectorio){

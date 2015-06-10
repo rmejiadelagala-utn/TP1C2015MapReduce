@@ -234,7 +234,7 @@ mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 
 
 	//fin de prueba de funciond de mostrar listas
-/*	 system("clear");
+	 system("clear");
 
 	 char* path = "ConfigFS.cfg";
 
@@ -256,7 +256,7 @@ mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 
 
 
-	 crearServerMultiHilo(config_get_int_value(config, "PUERTO_FS"),interaccionFSNodo);*/
+	 crearServerMultiHilo(config_get_int_value(config, "PUERTO_FS"),interaccionFSNodo);
 
 	 //Probando el agregar test
 

@@ -129,6 +129,7 @@ void mostrarArchivo(t_archivo *unArchivo) {
 }
 
 void mostrarNombreArchivo(t_archivo *unArchivo){
+	printf("Archivo:\t");
 	printf("%s\n",unArchivo->nombre);
 }
 
@@ -147,6 +148,7 @@ void mostrarDirectorio(t_directorio *unDirectorio) {
 }
 
 void mostrarNombreDirectorio(t_directorio *unDirectorio){
+	printf("%d\t\t",unDirectorio->index);
 	printf("%s\n",unDirectorio->nombre);
 }
 

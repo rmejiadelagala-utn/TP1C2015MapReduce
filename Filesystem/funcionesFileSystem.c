@@ -130,7 +130,7 @@ void eliminarDirectorioYContenido(t_directorio *directorioAEliminar) { //probada
 			eliminarDirRecursivamente(subDir);
 		} else {	//esta vacio y es el directorio a Eliminar
 			eliminarDirectorioVacio(directorioAEliminar);//en este caso directorioAEliminar y unDirectorio son iguales y esta vacio
-			printf("Se elimino todo el directorio con su contenido");
+			printf("Se elimino todo el directorio con su contenido\n");
 		}
 
 	}
@@ -294,12 +294,13 @@ void renombrarArchivoPorNombre(char *nombreBuscado, char *nuevoNombre, //probada
 	t_archivo *archivoAModificar = list_find(listaArchivos,
 			(void*) archivoConNombreBuscado);
 	if (!archivoAModificar) {
-		printf("el archivo %s no se encuentra en el sistema", nombreBuscado);
+		printf("el archivo %s no se encuentra en el sistema\n", nombreBuscado);
 	} else {
 		//genero un archivo nuevo, que va a ser el anterior con un nuevo nombre
 		free(archivoAModificar->nombre);
 		archivoAModificar->nombre = malloc(strlen(nuevoNombre) + 1);
 		strcpy(archivoAModificar->nombre, nuevoNombre);
+		printf("el archivo %s fue renombrado a %s\n", nombreBuscado, nuevoNombre);
 	}
 }
 
@@ -325,9 +326,10 @@ void moverArchivoPorNombreYPadre(char *nombreBuscado, t_list *listaArchivos, //p
 				(void*) archivoConNombreBuscado);
 
 		if (!archivoAModificarPadre) {
-			printf("el archivo %s no se encuentra en el sistema",
+			printf("el archivo %s no se encuentra en el sistema\n",
 					nombreBuscado);
 		} else {
+			printf("el archivo %s fue movido al directorio con indice %d\n",nombreBuscado, padre);
 			archivoAModificarPadre->padre = padre;
 		}
 	}
@@ -335,11 +337,12 @@ void moverArchivoPorNombreYPadre(char *nombreBuscado, t_list *listaArchivos, //p
 
 void crearDirectorioDadoPadreYNom(char *nombre, int padre, //probada
 		t_list *listaDirectorio) {
-
+int i;
 //Verifico que no se pase de los 1024 directorios permitidos
 	if (list_size(listaDirectorio) > 1024) {
 		printf("No se pueden cargar mas de 1024\n");
-	} else {
+	}
+	else {
 		//genero el nuevo directorio con sus datos, y le pongo el indice del ultimo + 1
 		t_directorio *directorioNuevo = nuevoDirectorio(
 				indiceNuevo(listaDirectorio), nombre, padre);
@@ -352,9 +355,15 @@ void renombrarDirectorioConNombre(char *nombre,t_directorio *unDirectorio) {//pr
 	free(unDirectorio->nombre);
 	unDirectorio->nombre = malloc(strlen(nombre)+1);
 	strcpy(unDirectorio->nombre,nombre);
+	printf("Directorio fue renombrado correctamente\n");
 }
-void moverDirectorioConPadre(int padre,t_directorio *unDirectorio) {//probada
-	unDirectorio->padre = padre;
+void moverDirectorioConPadre(int padre, t_directorio *unDirectorio) { //probada
+	if (!buscarDirPorIndex(padre)) {
+		printf("No existe el indice a donde se desea mover\n");
+	} else {
+		unDirectorio->padre = padre;
+		printf("El directorio fue movido correctamente\n");
+	}
 }
 
 /*
@@ -446,6 +455,15 @@ static int buscarPosicionEnListaDadoUnArchivo(t_list *listaArchivos,
 }
 
 static int indiceNuevo(t_list *listaDirectorio) {
+	int i;
+	for(i=2;i<=1024 && buscarDirPorIndex(i);i++);
+	return i;
+
+
+
+
+
+	/*
 	int nuevoIndice = -1;
 
 	int i = 0;
@@ -464,7 +482,7 @@ static int indiceNuevo(t_list *listaDirectorio) {
 		nuevoIndice = listaDirectorio->elements_count + 1;
 	}
 
-	return nuevoIndice;
+	return nuevoIndice;*/
 }
 
 static bool existeEseIndiceComoPadre(t_list *listaDirectorios, int padre) {
