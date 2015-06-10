@@ -268,11 +268,10 @@ void copiarAMDFS(char *archivo) {
 }
 
 void copiarAFS(char *archivo) {
-	sem_init(semaforo,0,0);
-	archivoReconstruido = malloc(3000);
+	sem_init(&semaforo,0,0);
 	archivoReconstruido = fopen("archivoReconstruido","w");
 	obtenerArchivo(archivo, "sarasa", directorioActual->index);
-
+	fclose(archivoReconstruido);
 	printf("Copia el archivo %s al FileSystem\n", archivo);
 }
 

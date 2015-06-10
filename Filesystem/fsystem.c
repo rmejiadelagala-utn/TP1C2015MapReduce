@@ -342,9 +342,8 @@ void *interaccionFSNodo(void* sock_ptr) {
 	int sock_desc = *(int*) sock_ptr;
 	char infoDeNodo[BUFFERSIZE];
 	int read_size;
-	t_nodo *nodo = list_get(listaNodos,1);
+	t_nodo *nodo = list_get(listaNodos,0);
 	nodo->socket=sock_desc;
-	list_replace_and_destroy_element(listaNodos,1,nodo,(void*) liberarNodo);
 	//Receive a reply from the server
 	read_size = recv((int) sock_desc, infoDeNodo, 100, 0);
 
@@ -356,9 +355,11 @@ void *interaccionFSNodo(void* sock_ptr) {
 		recv((int) sock_desc, infoDeNodo, 1, 0);
 		int tamanio = infoDeNodo[0]-'0';
 		recv((int) sock_desc, infoDeNodo, tamanio, 0);
-		char** texto = string_duplicate(infoDeNodo);
-		write(archivoReconstruido,texto,tamanio);
-		sem_post(semaforo);
+	//	char* texto = malloc(strlen(infoDeNodo)+1);
+	//	strcpy(texto,infoDeNodo);
+		write(fileno(archivoReconstruido),infoDeNodo,tamanio);
+		sem_post(&semaforo);
+		recv((int) sock_desc, infoDeNodo, 1, 0);
 		}
 		else{
 			recv((int) sock_desc, infoDeNodo, 1, 0);

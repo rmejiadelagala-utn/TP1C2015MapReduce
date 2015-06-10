@@ -33,7 +33,7 @@ t_config* config;
 t_list *listaArchivos;
 t_list *listaNodos;
 t_list *listaDirectorios;
-sem_t *semaforo;
+sem_t semaforo;
 FILE *archivoReconstruido;
 
 #endif /* FSYSTEM_H_ */

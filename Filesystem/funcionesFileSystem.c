@@ -499,10 +499,9 @@ int obtenerArchivo(char *nombreArchivo, char* path, int directorioActual) {
 	t_archivo *archivoEncontrado;
 	int nombreCoincide(t_archivo *unArchivo) {
 		return (unArchivo->padre == directorioActual)
-				&& (unArchivo->nombre == nombreArchivo);
+				&& (!strcmp(unArchivo->nombre,nombreArchivo));
 	}
-	if ((archivoEncontrado = list_find(listaArchivo, (void *) nombreCoincide))
-			== NULL) {
+	if ((archivoEncontrado = list_find(listaArchivos, (void *) nombreCoincide))== NULL) {
 		puts("Archivo no encontrado.");
 		return 0;
 	}
@@ -517,11 +516,11 @@ int obtenerArchivo(char *nombreArchivo, char* path, int directorioActual) {
 		t_bloqueEnNodo *bloque = list_find(bloqueDeArchivo->copiasDeBloque,
 				(void*) noEsNull);
 		int ipPuertoCoincide(t_nodo *unNodo) {
-			return unNodo->ipPuerto == bloque->ipPuerto;
+			return !strcmp(unNodo->ipPuerto, bloque->ipPuerto);
 		}
-		t_nodo *nodoEncontrado = list_find(listaNodo, (void*) ipPuertoCoincide);
+		t_nodo *nodoEncontrado = list_find(listaNodos, (void*) ipPuertoCoincide);
 		send(nodoEncontrado->socket,"Te encontre",strlen("te encontre"),0);
-		sem_wait(semaforo);
+		sem_wait(&semaforo);
 		//HAY QUE CREAR EL CAMPO SOCKET EN NODO
 		/*int socket_desc = nodoEncontrado.socket;
 		 send(socket_desc,1,sizeOf(1),0);
