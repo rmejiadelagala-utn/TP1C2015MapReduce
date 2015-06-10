@@ -345,30 +345,31 @@ void *interaccionFSNodo(void* sock_ptr) {
 	t_nodo *nodo = list_get(listaNodos,0);
 	nodo->socket=sock_desc;
 	//Receive a reply from the server
-	read_size = recv((int) sock_desc, infoDeNodo, 100, 0);
 
+	read_size = recv((int) sock_desc, infoDeNodo, 100, 0);
 	while (read_size > 0) {
 		printf("%s \n", infoDeNodo);
-		memset(infoDeNodo, 0, sizeof(infoDeNodo));
 		//Limpia el buffer de los mensajes que le manda ese nodo
-		if(infoDeNodo[0]==0){
+		if(infoDeNodo[0]=='0'){
+		printf("Leyo el 0.\n");
 		recv((int) sock_desc, infoDeNodo, 1, 0);
 		int tamanio = infoDeNodo[0]-'0';
+		printf("Leyo el tamanio:%d.\n",tamanio);
 		recv((int) sock_desc, infoDeNodo, tamanio, 0);
+		printf("Leyo el mensaje.\n");
 	//	char* texto = malloc(strlen(infoDeNodo)+1);
 	//	strcpy(texto,infoDeNodo);
 		write(fileno(archivoReconstruido),infoDeNodo,tamanio);
+		printf("Escribio el mensaje.\n");
+		write(fileno(archivoReconstruido),'\0',1);
 		sem_post(&semaforo);
-		recv((int) sock_desc, infoDeNodo, 1, 0);
 		}
-		else{
-			recv((int) sock_desc, infoDeNodo, 1, 0);
-		}
+		read_size= recv((int) sock_desc, infoDeNodo, 1, 0);
 	}
 	if (read_size == 0) {
 		printf("Nodo desconectado.\n");
 	}
-	if (read_size < 0) {
+	if (read_size<0) {
 		printf("Error.");
 	}
 	close(sock_desc);
