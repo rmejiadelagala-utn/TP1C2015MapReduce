@@ -12,6 +12,6 @@
 
 void* conexionFS(void*);
 void* conexionJobs(void*);
-void* conexionNodos(void*);
+//void* conexionNodos(void*);
 
 #endif /* INTERFACES_H_ */

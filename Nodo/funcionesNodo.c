@@ -127,4 +127,32 @@ char* obtenerNombreArchivo(char* ruta){
 	return file_name;
 }
 
+char* getFileContent(char* nombreFile, char * ruta_archivo){
+
+	char* path;
+	char* fileMaped;
+	int fd_a;
+
+	struct stat buff;
+	path=strdup("");
+
+	strcpy(path,ruta_archivo);
+	strcat(path,"/");
+	strcat(path,nombreFile);
+
+	fd_a = open(path,O_RDWR);
+	stat(path, &buff);
+
+	fileMaped=mmap(NULL,buff.st_size,PROT_READ|PROT_WRITE,MAP_FILE|MAP_SHARED,fd_a,0);
+
+		if (fileMaped==MAP_FAILED){
+			perror("mmap");
+			printf("Falló el mapeo para el archivo solicitado\n");
+			exit(-1);
+		}
+	close(fd_a); //Cierro el archivo
+
+	return fileMaped;
+}
+
 

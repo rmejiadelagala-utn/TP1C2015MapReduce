@@ -11,7 +11,8 @@
 #include <stdio.h>
 #include <commons/config.h>
 #include <commons/string.h>
-#include <socketes/servidor.h>
+#include "socketes/servidor.h"
+#include "socketes/servidorMultihilo.h"
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -45,6 +46,8 @@ typedef struct {
 	char* ARCH_BIN;
 	char* IP_NODO;
 	uint16_t PUERTO_NODO;
+	char* NODO_NEW;
+	char* DIR_TEMP;
 }t_hilofs;
 
 #endif /* NODO_H_ */

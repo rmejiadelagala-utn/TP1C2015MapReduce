@@ -19,5 +19,6 @@ uint32_t obtenerDirBloque(uint32_t);
 uint32_t obtener_tamanio_disco(char*);
 int obtener_cant_elem_array(char **);
 char* obtenerNombreArchivo(char*);
+char* getFileContent(char*, char *);
 
 #endif /* FUNCIONESNODO_H_ */
