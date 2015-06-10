@@ -230,7 +230,7 @@ void crearDirectorio(char *nomDirectorio, char* padreString) {
 void eliminarDirectorio(char *directorio) {
 
 	void eliminarDir(t_directorio *unDirectorio){
-		eliminarDirectorioDadoElIndice(unDirectorio->index, listaDirectorios);
+		eliminarDirectorioYContenido(unDirectorio);
 	}
 
 	validarDirectorioYEjecutar(directorio,eliminarDir);

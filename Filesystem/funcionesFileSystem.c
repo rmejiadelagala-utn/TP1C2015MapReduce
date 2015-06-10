@@ -23,11 +23,6 @@ t_list *listaArchivos;
 t_list *listaNodos;
 t_list *listaDirectorios;
 
-typedef struct {
-	char nombre[255];
-	bool (*mismoNombreArch)(void*);
-} t_closureCondicion;
-
 static bool ordenarPorMenorUso(t_nodo *data, t_nodo *dataSiguiente);
 static int buscarPosicionEnListaDadoUnArchivo(t_list *lista, t_archivo *archivo);
 static bool existeEseIndiceComoPadre(t_list *listaDirectorios, int padre);
@@ -117,11 +112,8 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {//Probada :
 	}
 	list_destroy(nodosOrdenados);
 }
-//116 lugar de trabajo de juanchi
-//si tiene varios archivos en un dir los elimina bien
-//si es dir vacio lo elimina bien
-//si hay un subdir FIXME
-void eliminarDirectorioYContenido(t_directorio *directorioAEliminar) {
+
+void eliminarDirectorioYContenido(t_directorio *directorioAEliminar) { //probada
 	t_directorio *unDirectorio = directorioAEliminar;
 
 	void eliminarDirRecursivamente(t_directorio *unDirectorio) {
@@ -144,7 +136,7 @@ void eliminarDirectorioYContenido(t_directorio *directorioAEliminar) {
 	}
 	eliminarDirRecursivamente(unDirectorio);
 }
-//funciones auxiliares de eliminar recursivamente
+//funciones auxiliares de eliminar recursivamente, todas probadas
 void eliminarSubArchivoDeDir(t_directorio *unDirectorio) {
 	t_archivo *subArchivo = buscarArchPorPadre(unDirectorio->index);
 	eliminarArchivoYreferencias(subArchivo, listaArchivos, listaNodos);
@@ -183,12 +175,12 @@ t_directorio *buscarDirPorNombre(char *nombre, t_list *listaDirectorios) {//prob
 			(char*) dirNombre);
 	return dir != NULL ? dir : NULL;
 }
-t_directorio *buscarDirPorIndex(int index) {
+t_directorio *buscarDirPorIndex(int index) { //probada
 	t_archivo *dir = buscarEnListaPorIntKey(listaDirectorios, index,
 			(int*) dirIndex);
 	return dir != NULL ? dir : NULL;
 }
-t_directorio *buscarDirPorPadre(int padre) {
+t_directorio *buscarDirPorPadre(int padre) { //probada
 	t_archivo *dir = buscarEnListaPorIntKey(listaDirectorios, padre,
 			(int*) dirPadre);
 	return dir != NULL ? dir : NULL;
@@ -198,7 +190,7 @@ t_archivo *buscarArchPorNombre(char *nombre, t_list *listaArchivos) {//probada
 			(char*) archNombre);
 	return arch != NULL ? arch : NULL;
 }
-t_archivo *buscarArchPorPadre(int padre) {
+t_archivo *buscarArchPorPadre(int padre) { //probada
 	t_archivo *arch = buscarEnListaPorIntKey(listaArchivos, padre,
 			(int*) archPadre);
 	return arch != NULL ? arch : NULL;
@@ -236,6 +228,7 @@ void activarNodoReconectado(t_nodo *nodoABuscar, t_list *listaNodos) {//probada
 	}
 
 }
+//XXX creo que no hace falta esta función porque el nodo cuando se conecta indíca si es nuevo o no
 bool esNodoNuevo(t_nodo *nodoABuscar, t_list *listaNodos) {	//probada
 	bool mismosNodos(t_nodo *nodoDeLista) {
 		return (!strcmp(nodoABuscar->ipPuerto, nodoDeLista->ipPuerto));
@@ -244,6 +237,15 @@ bool esNodoNuevo(t_nodo *nodoABuscar, t_list *listaNodos) {	//probada
 	return !list_any_satisfy(listaNodos, (bool*) mismosNodos);
 }
 //elimina el nodo y los bloques de copia que cada archivo contaba en ese nodo
+
+void eliminarNodoYRerencias(t_nodo *nodoAEliminar, t_list *listaNodos, //probada
+		t_list *archivos) {
+	eliminarReferencias(nodoAEliminar, archivos);
+	eliminarNodoDeLista(nodoAEliminar, listaNodos);
+
+}
+
+
 void eliminarNodoDeLista(t_nodo *nodoAEliminar, t_list *listaNodos) {//probada
 	bool mismosNodos(t_nodo *nodoDeLista) {
 		return (!strcmp(nodoAEliminar->ipPuerto, nodoDeLista->ipPuerto));
@@ -268,12 +270,6 @@ void eliminarReferencias(t_nodo *nodoAEliminar, t_list *archivos) { //probada
 	}
 
 	list_iterate(archivos, (void*) _list_elements1);
-}
-void eliminarNodoYRerencias(t_nodo *nodoAEliminar, t_list *listaNodos, //probada
-		t_list *archivos) {
-	eliminarReferencias(nodoAEliminar, archivos);
-	eliminarNodoDeLista(nodoAEliminar, listaNodos);
-
 }
 
 void formatear(t_list **listaNodos, t_list **listaArchivos,	//probada
@@ -312,6 +308,7 @@ void renombrarArchivoPorNombre(char *nombreBuscado, char *nuevoNombre, //probada
 //ruta a la que quiere moverse. Esta ruta sería una cadena de nombre de
 //directorio separados por /. Eso me daría el padre del directorio al que quiero
 //moverme.
+//Respuesta a ramiro: Meeeh, esto lo puede hacer el adapter
 void moverArchivoPorNombreYPadre(char *nombreBuscado, t_list *listaArchivos, //probada
 		t_list *listaDirectorios, int padre) {
 
@@ -360,32 +357,6 @@ void moverDirectorioConPadre(int padre,t_directorio *unDirectorio) {//probada
 	unDirectorio->padre = padre;
 }
 
-void eliminarUnDirectorio(t_directorio unDirectorio) {
-
-}
-
-
-
-//Este se podría hacer dado nombre, pero preferí así porque el índice es único.
-//Si no, se reutiliza esta función para hacerla por nombre, ruta o lo que sea.
-void eliminarDirectorioDadoElIndice(int indice, t_list *listaDirectorio) {
-
-	int directorioConIndiceBuscado(t_directorio *directorio) {
-		return indice == directorio->index;
-	}
-
-	if (list_remove_by_condition(listaDirectorio,
-			(void*) directorioConIndiceBuscado) == NULL) {
-		//tira error de que no lo encontró en la lista.
-	}
-
-//Me faltó considerar que además del directorio borrado, debe borrar a
-//los hijos del mismo, ya que no tienen un padre. Y así sucesivamente.
-
-//borrarDescendientesDe(indice, listaDirectorio);
-
-}
-
 /*
  void enviarBloques(t_nodo *nodosOrdenados,t_info info){
  //ACA SE ENVIA LA INFORMACION DEL BLOQUE
@@ -416,26 +387,6 @@ void eliminarDirectorioDadoElIndice(int indice, t_list *listaDirectorio) {
  return fileSystem;
  }
  */
-/*
- void renombrarArchivo(char *nomArchivo, char *nuevoNombreArchivo,
- t_fileSystem fileSystem) {
- //Debo buscar el archivo de nombre nomArchivo y reemplazarlo por el
- //nuevo nombre
- int posicionEnListaArchivos = buscarArchivoPorNombre(nomArchivo,
- fileSystem.archivo);
-
- //Creo un nuevo archivo, igual al anterior pero con el nombre nuevo
- t_archivo nuevoArchivo = fileSystem.archivo[posicionEnListaArchivos];
- nuevoArchivo.nombre = nuevoNombreArchivo;
-
- if (posicionEnListaArchivos == -1) {
- //No encontró ese archivo, debería devolver un mensaje de error
- } else {
- list_replace(fileSystem.archivo, posicionEnListaArchivos, nuevoArchivo);
- }
- }
- */
-
 
 /******************************************/
 /********* PRIVATE FUNCTIONS **************/
@@ -480,6 +431,7 @@ static char* archNombre(t_archivo *unArch) {
 	return unArch->nombre;
 }
 
+//XXX posible eliminacion
 static int buscarPosicionEnListaDadoUnArchivo(t_list *listaArchivos,
 		t_archivo *archivo) {
 	int posDondeReemplazar = -1;
@@ -523,6 +475,8 @@ static bool existeEseIndiceComoPadre(t_list *listaDirectorios, int padre) {
 
 	return list_any_satisfy(listaDirectorios, (bool*) existePadre);
 }
+
+//XXX posible eliminacion
 int obtenerArchivo(char *nombreArchivo, char* path, int directorioActual) {
 	t_archivo *archivoEncontrado;
 	int nombreCoincide(t_archivo *unArchivo) {
@@ -562,6 +516,7 @@ int obtenerArchivo(char *nombreArchivo, char* path, int directorioActual) {
 	list_iterate(archivoEncontrado->bloquesDeArch, (void *) obtenerBloque);
 
 }
+
 static void recorrerCopiasDeUnArch(t_archivo *unArchivo,
 		void (*accionACopia)(t_bloqueEnNodo*)) {
 	void _recorrerCopias(t_bloqueArch *bloqueArchivo) {
