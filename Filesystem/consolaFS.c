@@ -296,7 +296,12 @@ void copiarBloque(char *bloque) {
 }
 
 void levantarNodo(char *nodo) {
-
+/*
+ * Levantar nodo se supone que es un nodo nuevo porque si no la consola no interviene
+ * en la reconexion pero tampoco entiendo que hace levantar nodo en la consola, porque
+ * en teoría el nodo se conectaba con el FS y ahí lo levantaba, osea no sé para que
+ * estaría esta funcion si el nodo lo levanta el FS cuando el nodo se conecta
+*/
 	printf("Agrega el nodo %s\n", nodo);
 }
 

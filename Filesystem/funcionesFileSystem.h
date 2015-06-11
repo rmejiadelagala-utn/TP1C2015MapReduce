@@ -198,6 +198,16 @@ void eliminarDirectorioVacio(t_directorio *directorioAEliminar);
  */
 void eliminarSubArchivoDeDir(t_directorio *unDirectorio);
 
+/**
+ * @NAME: archivoEstaActivo
+ * @DESC: hace la logica para ver que un archivo tenga al menos una copia de cada bloque de archivo
+ */
+void archivoEstaActivoPorLogica(t_archivo *unArchivo);
 
+/**
+ * @NAME: archivoActivoPorFlag
+ * @DESC: consulta el flag activo de un archivo
+ */
+int archivoActivoPorFlag(t_archivo *unArchivo);
 
 #endif /* FUNCIONESFILESYSTEM_H_ */
