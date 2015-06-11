@@ -405,6 +405,22 @@ void moverDirectorioConPadre(int padre, t_directorio *unDirectorio) { //probada
  return fileSystem;
  }
  */
+void archivoEstaActivoPorLogica(t_archivo *unArchivo) {
+	bool* _tieneAlMenosUnaCopia(t_bloqueArch *unBloqueArch) {
+		return list_is_empty(unBloqueArch->copiasDeBloque);
+	}
+
+	if (list_all_satisfy(unArchivo->bloquesDeArch,
+			(bool*) _tieneAlMenosUnaCopia)) {
+		unArchivo->estado = 1;
+	} else {
+		unArchivo->estado = 0;
+	}
+}
+
+int archivoActivoPorFlag(t_archivo *unArchivo) {
+	return unArchivo->estado;
+}
 
 /******************************************/
 /********* PRIVATE FUNCTIONS **************/
