@@ -22,21 +22,21 @@ t_config_nodo* leerArchivoConfig(char *path_config){
 		exit(-1);
 	}
 
-	configNodo->IP_FS     = config_get_string_value(config, "IP_FS");
+	configNodo->IP_FS     = strdup(config_get_string_value(config, "IP_FS"));
 	configNodo->PUERTO_FS = config_get_int_value(config, "PUERTO_FS");
-	configNodo->ARCH_BIN  = config_get_string_value(config, "ARCHIVO_BIN");
-	configNodo->DIR_TEMP  = config_get_string_value(config, "DIR_TEMP");
-	configNodo->NODO_NEW  = config_get_string_value(config, "NODO_NUEVO");
-	configNodo->IP_NODO   = config_get_string_value(config, "IP_NODO");
+	configNodo->ARCH_BIN  = strdup(config_get_string_value(config, "ARCHIVO_BIN"));
+	configNodo->DIR_TEMP  = strdup(config_get_string_value(config, "DIR_TEMP"));
+	configNodo->NODO_NEW  = strdup(config_get_string_value(config, "NODO_NUEVO"));
+	configNodo->IP_NODO   = strdup(config_get_string_value(config, "IP_NODO"));
 	configNodo->PUERTO_NODO = config_get_int_value(config, "PUERTO_NODO");
 
-/*	printf("Conectando a IP: %s\n", config_get_string_value(config, "IP_FS"));
+	printf("Conectando a IP: %s\n", config_get_string_value(config, "IP_FS"));
 	printf("Puerto: %d\n", config_get_int_value(config, "PUERTO_FS"));
 	printf("Archivo_bin: %s\n", config_get_string_value(config, "ARCHIVO_BIN"));
 	printf("Directorio Temporal: %s\n", config_get_string_value(config, "DIR_TEMP"));
 	printf("Nodo Nuevo: %s\n", config_get_string_value(config, "NODO_NUEVO"));
 	printf("IP Nodo: %s\n", config_get_string_value(config, "IP_NODO"));
-	printf("Puerto Nodo: %d\n", config_get_int_value(config, "PUERTO_NODO"));*/
+	printf("Puerto Nodo: %d\n", config_get_int_value(config, "PUERTO_NODO"));
 
 	/* Una vez que se levantaron los datos del archivo de configuracion
 	   puedo destruir la estructura config. */

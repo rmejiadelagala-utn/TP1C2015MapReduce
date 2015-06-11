@@ -47,7 +47,7 @@ int crearCliente(char *ip, uint16_t port) {
 	dest.sin_port = htons(port);
 	dest.sin_addr.s_addr = inet_addr(ip);
 
-	if (connect(sock, (struct sockaddr*) &dest, sizeof(dest)) != 0) {
+	if (connect(sock, (struct sockaddr*) &dest, sizeof(dest)) == (-1)) {
 		perror("connect");
 		exit(1);
 	}

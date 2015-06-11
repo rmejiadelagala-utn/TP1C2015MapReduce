@@ -351,8 +351,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 	nodo->socket=sock_desc;
 	//Receive a reply from the server
 
-	read_size = recv((int) sock_desc, infoDeNodo, 100, 0);
-	while (read_size > 0) {
+	while ((read_size = recv((int) sock_desc, infoDeNodo, 1, 0)) > 0) {
 
 		//Limpia el buffer de los mensajes que le manda ese nodo
 		if(infoDeNodo[0]=='0'){
@@ -369,7 +368,6 @@ void *interaccionFSNodo(void* sock_ptr) {
 		write(fileno(archivoReconstruido),'\0',1);
 		sem_post(&semaforo);
 		}
-		read_size= recv((int) sock_desc, infoDeNodo, 1, 0);
 	}
 	if (read_size == 0) {
 		printf("Nodo desconectado.\n");

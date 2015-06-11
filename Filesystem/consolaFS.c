@@ -231,7 +231,7 @@ void eliminarDirectorio(char *directorio) {
 		eliminarDirectorioYContenido(unDirectorio);
 	}
 
-	validarDirectorioYEjecutar(directorio,eliminarDir);
+	validarDirectorioYEjecutar(directorio,(void*)eliminarDir);
 
 }
 
