@@ -8,6 +8,7 @@
 #include "fsystem.h"
 
 int inicializar() {
+	cantidadDeNodos=0;
 	directorioUser = malloc(sizeof(t_directorio));
 
 	directorioUser->index = 1;
@@ -91,27 +92,27 @@ int main() {
 
 //muestro archivos
 
-	t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo("127.0.0.1:80A", 11);
-	t_bloqueEnNodo *copiaBloqueA1C2 = nuevoBloqueEnNodo("127.0.0.1:12B", 12);
+	//t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo("127.0.0.1:80A", 11);
+	//t_bloqueEnNodo *copiaBloqueA1C2 = nuevoBloqueEnNodo("127.0.0.1:12B", 12);
 	t_bloqueEnNodo *copiaBloqueA1C3 = nuevoBloqueEnNodo("127.0.0.1:243C", 13);
 	t_list *copiasBloqueA1 = list_create();
-	list_add(copiasBloqueA1, copiaBloqueA1C1);
-	list_add(copiasBloqueA1, copiaBloqueA1C2);
+	//list_add(copiasBloqueA1, copiaBloqueA1C1);
+	//list_add(copiasBloqueA1, copiaBloqueA1C2);
 	list_add(copiasBloqueA1, copiaBloqueA1C3);
 
 	t_bloqueEnNodo *copiaBloqueA2C1 = nuevoBloqueEnNodo("127.0.0.1:80A", 21);
-	t_bloqueEnNodo *copiaBloqueA2C2 = nuevoBloqueEnNodo("127.0.0.1:12B", 22);
-	t_bloqueEnNodo *copiaBloqueA2C3 = nuevoBloqueEnNodo("127.0.0.1:243C", 23);
+	//t_bloqueEnNodo *copiaBloqueA2C2 = nuevoBloqueEnNodo("127.0.0.1:12B", 22);
+	//t_bloqueEnNodo *copiaBloqueA2C3 = nuevoBloqueEnNodo("127.0.0.1:243C", 23);
 	t_list *copiasBloqueA2 = list_create();
 	list_add(copiasBloqueA2, copiaBloqueA2C1);
-	list_add(copiasBloqueA2, copiaBloqueA2C2);
-	list_add(copiasBloqueA2, copiaBloqueA2C3);
+	//list_add(copiasBloqueA2, copiaBloqueA2C2);
+	//list_add(copiasBloqueA2, copiaBloqueA2C3);
 
-	t_bloqueEnNodo *copiaBloqueA3C1 = nuevoBloqueEnNodo("127.0.0.1:80A", 31);
+	//t_bloqueEnNodo *copiaBloqueA3C1 = nuevoBloqueEnNodo("127.0.0.1:80A", 31);
 	t_bloqueEnNodo *copiaBloqueA3C2 = nuevoBloqueEnNodo("127.0.0.1:12B", 32);
 	t_bloqueEnNodo *copiaBloqueA3C3 = nuevoBloqueEnNodo("127.0.0.1:243C", 33);
 	t_list *copiasBloqueA3 = list_create();
-	list_add(copiasBloqueA3, copiaBloqueA3C1);
+	//list_add(copiasBloqueA3, copiaBloqueA3C1);
 	list_add(copiasBloqueA3, copiaBloqueA3C2);
 	list_add(copiasBloqueA3, copiaBloqueA3C3);
 
@@ -234,7 +235,7 @@ mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 //	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 //	mostrarLista(listaNodos, (void*) mostrarNodo);
 //	mostrarLista(listaArchivos, (void*) mostrarArchivo);
-/*
+
 
 	//fin de prueba de funciond de mostrar listas
 	 system("clear");
@@ -260,7 +261,7 @@ mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 
 
 	 crearServerMultiHilo(config_get_int_value(config, "PUERTO_FS"),interaccionFSNodo);
-*/
+
 	 //Probando el agregar test
 
 	 /*CU_initialize_registry();
@@ -345,25 +346,26 @@ void *interaccionFSNodo(void* sock_ptr) {
 	int sock_desc = *(int*) sock_ptr;
 	char infoDeNodo[BUFFERSIZE];
 	int read_size;
-	t_nodo *nodo = list_get(listaNodos,0);
+	t_nodo *nodo = list_get(listaNodos,cantidadDeNodos);
+	cantidadDeNodos++;
 	nodo->socket=sock_desc;
 	//Receive a reply from the server
 
 	read_size = recv((int) sock_desc, infoDeNodo, 100, 0);
 	while (read_size > 0) {
-		printf("%s \n", infoDeNodo);
+
 		//Limpia el buffer de los mensajes que le manda ese nodo
 		if(infoDeNodo[0]=='0'){
-		printf("Leyo el 0.\n");
+
 		recv((int) sock_desc, infoDeNodo, 1, 0);
 		int tamanio = infoDeNodo[0]-'0';
-		printf("Leyo el tamanio:%d.\n",tamanio);
+
 		recv((int) sock_desc, infoDeNodo, tamanio, 0);
-		printf("Leyo el mensaje.\n");
+
 	//	char* texto = malloc(strlen(infoDeNodo)+1);
 	//	strcpy(texto,infoDeNodo);
 		write(fileno(archivoReconstruido),infoDeNodo,tamanio);
-		printf("Escribio el mensaje.\n");
+
 		write(fileno(archivoReconstruido),'\0',1);
 		sem_post(&semaforo);
 		}

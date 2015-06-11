@@ -504,18 +504,9 @@ static bool existeEseIndiceComoPadre(t_list *listaDirectorios, int padre) {
 }
 
 //XXX posible eliminacion
-int obtenerArchivo(char *nombreArchivo, char* path, int directorioActual) {
-	t_archivo *archivoEncontrado;
-	int nombreCoincide(t_archivo *unArchivo) {
-		return (unArchivo->padre == directorioActual)
-				&& (!strcmp(unArchivo->nombre,nombreArchivo));
-	}
-	if ((archivoEncontrado = list_find(listaArchivos, (void *) nombreCoincide))== NULL) {
-		puts("Archivo no encontrado.");
-		return 0;
-	}
-	if (!archivoEncontrado->estado) {
-		puts("Archivo no está disponible.");
+int obtenerArchivo(t_archivo *archivo) {
+	if (!(archivo->estado)) {
+		printf("Archivo no está disponible.");
 		return 0;
 	}
 	int noEsNull(void* unBloque) {
@@ -524,12 +515,12 @@ int obtenerArchivo(char *nombreArchivo, char* path, int directorioActual) {
 	int obtenerBloque(t_bloqueArch *bloqueDeArchivo) {
 		t_bloqueEnNodo *bloque = list_find(bloqueDeArchivo->copiasDeBloque,
 				(void*) noEsNull);
-		int ipPuertoCoincide(t_nodo *unNodo) {
+	int ipPuertoCoincide(t_nodo *unNodo) {
 			return !strcmp(unNodo->ipPuerto, bloque->ipPuerto);
 		}
-		t_nodo *nodoEncontrado = list_find(listaNodos, (void*) ipPuertoCoincide);
-		send(nodoEncontrado->socket,"Te encontre",strlen("te encontre"),0);
-		sem_wait(&semaforo);
+	t_nodo *nodoEncontrado = list_find(listaNodos, (void*) ipPuertoCoincide);
+	send(nodoEncontrado->socket,"Te encontre",strlen("te encontre"),0);
+	sem_wait(&semaforo);
 		//HAY QUE CREAR EL CAMPO SOCKET EN NODO
 		/*int socket_desc = nodoEncontrado.socket;
 		 send(socket_desc,1,sizeOf(1),0);
@@ -540,7 +531,7 @@ int obtenerArchivo(char *nombreArchivo, char* path, int directorioActual) {
 		 puts(*data);*/
 		//FALTA ESCRIBIR EN ARCHIVO EN VEZ DE MOSTRAR POR PANTALLA
 	}
-	list_iterate(archivoEncontrado->bloquesDeArch, (void *) obtenerBloque);
+	list_iterate(archivo->bloquesDeArch, (void *) obtenerBloque);
 
 }
 

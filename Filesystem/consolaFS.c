@@ -268,11 +268,15 @@ void copiarAMDFS(char *archivo) {
 }
 
 void copiarAFS(char *archivo) {
+	void copiarArchAFS(t_archivo *unArchivo){
 	sem_init(&semaforo,0,0);
-	archivoReconstruido = fopen("archivoReconstruido","w");
-	obtenerArchivo(archivo, "sarasa", directorioActual->index);
+	archivoReconstruido = fopen("../archivoReconstruido","w");
+	obtenerArchivo(unArchivo);
 	fclose(archivoReconstruido);
 	printf("Copia el archivo %s al FileSystem\n", archivo);
+	}
+	validarArchivoYEjecutar(archivo, (void*)copiarArchAFS);
+
 }
 
 void solicitarMD5(char *archivo) {

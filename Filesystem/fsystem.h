@@ -35,5 +35,6 @@ t_list *listaNodos;
 t_list *listaDirectorios;
 sem_t semaforo;
 FILE *archivoReconstruido;
+int cantidadDeNodos;
 
 #endif /* FSYSTEM_H_ */
