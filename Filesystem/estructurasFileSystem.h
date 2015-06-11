@@ -46,6 +46,29 @@ typedef struct {
 	int socket;
 } t_nodo;
 
+
+//estructura informacion de archivo a enviar a MaRTA
+
+typedef t_list t_listBloquesDeArchivo;
+
+ t_listBloquesDeArchivo* listaBloquesArch; //lista de bloques de archivo con sus copias
+
+ typedef t_list t_listCopiasEnNodo;
+
+ t_listCopiasEnNodo* sublistaCopiasEnNodo;
+
+ /*                  _________________________________      ___________________________________
+listaBloquesArch -->|bloque_arch | sublista    | SGTE |     |bloque_arch | sublista    | SGTE |
+                    |            |copiasEnNodos|   *--|---->|            |copiasEnNodos|  *---|--->
+                    |____________|_____________|______|     |____________|_____________|______|
+
+                               _______________________       _______________________
+    sublistaCopiasEnNodos --> | Nodo-Bloque    | SGTE |     | Nodo-Bloque    | SGTE |
+                              |(t_bloqueEnNodo)|   *--|---->|(t_bloqueEnNodo)|  *---|---->
+                              |________________|______|     |________________|______|
+*/
+
+
 //estructura tabla de directorios
 typedef struct {
 	int index;
