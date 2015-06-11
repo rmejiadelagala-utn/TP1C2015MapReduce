@@ -42,6 +42,9 @@ static int dirIndex(t_directorio *unDir);
 static int archPadre(t_archivo *unArch);
 //
 /*
+void darFormatoAlArchivo(char* path) {
+
+}
  t_list* divideArchivoEnBloques(char* pathArch){
 
  int fd_a = -1, i;
@@ -261,8 +264,14 @@ void eliminarReferencias(t_nodo *nodoAEliminar, t_list *archivos) { //probada
 	}
 
 	void _list_elements2(t_bloqueArch *bloqueDeArch) {
-		list_remove_and_destroy_by_condition(bloqueDeArch->copiasDeBloque,
-				(bool*) copiaEstaEnNodo, (void*) liberarBloqueEnNodo);
+		if (list_is_empty(bloqueDeArch->copiasDeBloque)){
+			//hacerNada
+		}
+		else{
+			list_remove_and_destroy_by_condition(bloqueDeArch->copiasDeBloque,
+							(bool*) copiaEstaEnNodo, (void*) liberarBloqueEnNodo);
+		}
+
 	}
 
 	void _list_elements1(t_archivo *unArchivo) {

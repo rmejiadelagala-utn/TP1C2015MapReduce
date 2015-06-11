@@ -202,8 +202,11 @@ list_add(bloquesDeArchivo,bloquearch3);
 	*/
 
 //	eliminarDirectorioYContenido(directorioRoot);
+//	eliminarNodoYReferencias(nodoC, listaNodos,listaArchivos);
 
-	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
+//	printf("False %d\n",strcmp(copiaBloqueB1C1->ipPuerto,nodoA->ipPuerto)==0);
+	printf("Despues de la accion\n\n\n");
+	mostrarLista(listaNodos, (void*) mostrarNodo);
 	mostrarLista(listaArchivos, (void*) mostrarArchivo);
 /*
 mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
@@ -231,7 +234,7 @@ mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 //	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 //	mostrarLista(listaNodos, (void*) mostrarNodo);
 //	mostrarLista(listaArchivos, (void*) mostrarArchivo);
-
+/*
 
 	//fin de prueba de funciond de mostrar listas
 	 system("clear");
@@ -257,7 +260,7 @@ mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 
 
 	 crearServerMultiHilo(config_get_int_value(config, "PUERTO_FS"),interaccionFSNodo);
-
+*/
 	 //Probando el agregar test
 
 	 /*CU_initialize_registry();
