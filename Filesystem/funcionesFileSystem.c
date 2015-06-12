@@ -634,7 +634,7 @@ static bool existeEseIndiceComoPadre(t_list *listaDirectorios, int padre) {
 int obtenerArchivo(t_archivo *archivo) {
 	if (!(archivo->estado)) {
 		printf("Archivo no está disponible.");
-		return 0;
+		return -1;
 	}
 	int noEsNull(void* unBloque) {
 		return unBloque != NULL;
@@ -645,10 +645,16 @@ int obtenerArchivo(t_archivo *archivo) {
 		int ipPuertoCoincide(t_nodo *unNodo) {
 			return !strcmp(unNodo->ipPuerto, bloque->ipPuerto);
 		}
-		t_nodo *nodoEncontrado = list_find(listaNodos,
-				(void*) ipPuertoCoincide);
-		send(nodoEncontrado->socket, "Te encontre", strlen("te encontre"), 0);
-		sem_wait(&semaforo);
+	t_nodo *nodoEncontrado = list_find(listaNodos, (void*) ipPuertoCoincide);
+	if(!nodoEncontrado) return -1;
+	t_mensaje *mensaje = malloc(sizeof(t_mensaje));
+	mensaje->id=104;
+	mensaje->tipo='5';
+	mensaje->info = string_duplicate(string_itoa(bloque->numeroDeBloqueEnNodo));
+	t_stream *stream = empaquetar_mensaje(mensaje);
+	int result = send(nodoEncontrado->socket,stream,stream,0);
+	if (result<0) return result;
+	sem_wait(&semaforo);
 		//HAY QUE CREAR EL CAMPO SOCKET EN NODO
 		/*int socket_desc = nodoEncontrado.socket;
 		 send(socket_desc,1,sizeOf(1),0);

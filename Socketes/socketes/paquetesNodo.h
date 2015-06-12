@@ -16,8 +16,6 @@
 #define GET_FILE_       106 // Recibo del FS el nombre del archivo solicitado
 #define GET_FILE_OK     107 // Envio el contenido del archivo solicitado por el FS
 
-#include "nodo.h"
-
 typedef struct{
 	int  id;
 	char tipo; //N: Nodo; M: Marta; F: Filesystem; J: Job
