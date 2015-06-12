@@ -210,4 +210,12 @@ void archivoEstaActivoPorLogica(t_archivo *unArchivo);
  */
 int archivoActivoPorFlag(t_archivo *unArchivo);
 
+/**
+ * @NAME: nodoElegido
+ * @DESC: setea nodo elegido por algoritmo distribucion, o devuele -1 de error
+ */
+int nodoElegido(t_list *nodosOrdenados, t_nodo **nodoActual);
+int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
+		t_list** listaDeBolques) ;
+
 #endif /* FUNCIONESFILESYSTEM_H_ */

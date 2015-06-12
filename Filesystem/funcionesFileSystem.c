@@ -40,12 +40,14 @@ static void disminuirNodo(t_bloqueEnNodo *copia);
 static int dirPadre(t_directorio *unDir);
 static int dirIndex(t_directorio *unDir);
 static int archPadre(t_archivo *unArch);
-static void lista_remove_and_destroy_by_condition(t_list *self, bool(*condition)(void*), void(*element_destroyer)(void*));
+static void lista_remove_and_destroy_by_condition(t_list *self,
+bool (*condition)(void*), void (*element_destroyer)(void*));
+static bool tieneLugar(t_nodo *unNodo);
 //
 /*
-void darFormatoAlArchivo(char* path) {
+ void darFormatoAlArchivo(char* path) {
 
-}
+ }
  t_list* divideArchivoEnBloques(char* pathArch){
 
  int fd_a = -1, i;
@@ -74,6 +76,106 @@ void darFormatoAlArchivo(char* path) {
  return bloquesArchivo;
  }
  */
+
+int BLOCK_SIZE = 20 * 1024 * 1024;
+int CANT_COPIAS = 3;
+
+int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
+		t_list** listaDeBolques) {
+
+	struct t_nodo* nodo_disp;
+	int i, fin = 0, index_set;
+	int comienzoDeBloque = 0, finDeBloque;
+	t_list* list_used = list_create();
+	t_bloqueArch *bloqueDeArchivo;
+	struct t_copia_bloq* copy_block;
+	t_list *nodosOrdenados = list_create();
+	t_nodo *nodoActual;
+	int posicionEnNodo;
+	int *aux;
+	t_bloqueEnNodo *bloqueEnNodo;
+	int ultimoIndiceDelData = string_length(data) - 1;
+
+	*cantidadBolquesEnviados = 0;
+
+	while (!fin) {
+		bloqueDeArchivo = malloc(sizeof(t_bloqueArch));
+		bloqueDeArchivo->copiasDeBloque = list_create();
+		finDeBloque = comienzoDeBloque + BLOCK_SIZE;
+
+		if (finDeBloque > ultimoIndiceDelData) {
+			finDeBloque = ultimoIndiceDelData;
+			fin = 1;
+		}	//Sale si ya no hay bloques
+
+		while (data[finDeBloque] != '\n')
+			finDeBloque--;
+		//Acá tengo el final del bloque dado, y también donde empieza
+
+		//ordenar lista nodo por cantidad de bloques usados-->sale nodosOrdenados
+		list_add_all(nodosOrdenados, listaNodos);//Agrega todos los elementos de la segunda lista en la primera
+		list_sort(nodosOrdenados, (void*) ordenarPorMenorUso);
+
+		//Acá distribuye las copias dado el algoritmo de dstribucion
+		for (i = 0; i < CANT_COPIAS; i++) {
+			//--Mandar este bloque al nodo que corresponda--
+
+			//nodoActual = nodoElegdoYConLugar(nodosOrdenados);
+			if (nodoElegido(nodosOrdenados, &nodoActual) != -1) {
+				//salio bien el elegir nodo, estando en nodoActual
+
+				//cargarEnListaArchivoElNodo(nodoElegido);
+				if (queue_is_empty(nodoActual->bloquesLiberados)) {
+					posicionEnNodo = nodoActual->cantidadBloquesOcupados + 1;
+				} else {
+					aux = queue_pop(nodoActual->bloquesLiberados);
+					posicionEnNodo = *aux;
+					free(aux);
+				}
+				nodoActual->cantidadBloquesOcupados++;
+				bloqueEnNodo = nuevoBloqueEnNodo(nodoActual->ipPuerto,
+						posicionEnNodo);
+
+				//enviarBloqueDeDatosA(nodoElegido, incicio y fin de bloque);
+
+				//termino de agregar a la lista de archivos, la info nueva del bloque
+				list_add(bloqueDeArchivo->copiasDeBloque, bloqueEnNodo);//algo malo puede pasar
+
+			} else {
+				printf("No hay nodos disponibles\n");
+				return -1;
+			}
+
+		}
+		//cambiar el bloque start al siguiente y agrega el Bloque a la lista de bloques
+		list_add(*listaDeBolques, bloqueDeArchivo);
+		(*cantidadBolquesEnviados)++;
+		comienzoDeBloque = finDeBloque + 1;
+	}
+	return 1;
+}
+
+int nodoElegido(t_list *nodosOrdenados, t_nodo **nodoActual) {
+	int k = 0;
+	int z = 0;
+
+	nodoActual = list_get(nodosOrdenados, k);
+
+	z = k;
+	while (!tieneLugar(*nodoActual)) {
+		k++;
+		if (z == k) {
+			return -1;
+		}
+		if (list_size(nodosOrdenados) == k) {
+			k = 0;
+		}
+		*nodoActual = list_get(nodosOrdenados, k);
+	}
+
+	return 0;
+}
+
 void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {//Probada :D
 	//variables auxiliares para la funcion
 	t_bloqueEnNodo *bloqueEnNodo;
@@ -109,7 +211,7 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {//Probada :
 			if (list_size(nodosOrdenados) == k) {
 				k = 0;
 			}
-			bloqueArch = (list_get(bloquesEnArch, i ));
+			bloqueArch = (list_get(bloquesEnArch, i));
 			copiasDeBloqueAUX = bloqueArch->copiasDeBloque;
 			list_add(copiasDeBloqueAUX, bloqueEnNodo);
 		}
@@ -129,7 +231,7 @@ void eliminarDirectorioYContenido(t_directorio *directorioAEliminar) { //probada
 		} else if (dirConSoloArch(unDirectorio)) {
 			eliminarSubArchivoDeDir(unDirectorio);
 			eliminarDirRecursivamente(unDirectorio);
-		} else if (dirConSubdir(unDirectorio)) {//el dir tiene subDir entonces entra a los subdirs
+		} else if (dirConSubdir(unDirectorio)) { //el dir tiene subDir entonces entra a los subdirs
 			t_directorio *subDir = dameUnSubdir(unDirectorio);
 			eliminarDirRecursivamente(subDir);
 		} else {	//esta vacio y es el directorio a Eliminar
@@ -150,21 +252,24 @@ void eliminarDirectorioVacio(t_directorio *directorioAEliminar) {
 	int directorioConIndiceBuscado(t_directorio *directorio) {
 		return directorioAEliminar->index == directorio->index;
 	}
-	list_remove_and_destroy_by_condition(listaDirectorios,(void*) directorioConIndiceBuscado,(void*)liberarDirectorio);
+	list_remove_and_destroy_by_condition(listaDirectorios,
+			(void*) directorioConIndiceBuscado, (void*) liberarDirectorio);
 }
 int dirConSoloArch(t_directorio *unDirectorio) {
-	return dameUnSubArch(unDirectorio)!=NULL && dameUnSubdir(unDirectorio) == NULL ;
+	return dameUnSubArch(unDirectorio) != NULL
+			&& dameUnSubdir(unDirectorio) == NULL;
 }
 int dirVacio(t_directorio *unDirectorio) {
-	return dameUnSubArch(unDirectorio)==NULL && dameUnSubdir(unDirectorio) == NULL;
+	return dameUnSubArch(unDirectorio) == NULL
+			&& dameUnSubdir(unDirectorio) == NULL;
 }
-int dirConSubdir(t_directorio *unDirectorio){
+int dirConSubdir(t_directorio *unDirectorio) {
 	return dameUnSubdir(unDirectorio) != NULL;
 }
-t_directorio *dameUnSubdir(t_directorio *unDirectorio){
+t_directorio *dameUnSubdir(t_directorio *unDirectorio) {
 	return buscarDirPorPadre(unDirectorio->index);
 }
-t_archivo *dameUnSubArch(t_directorio *unDirectorio){
+t_archivo *dameUnSubArch(t_directorio *unDirectorio) {
 	return buscarArchPorPadre(unDirectorio->index);
 }
 //fin de funciones auxiliares de eliminar recursivamente
@@ -189,7 +294,7 @@ t_directorio *buscarDirPorPadre(int padre) { //probada
 			(int*) dirPadre);
 	return dir != NULL ? dir : NULL;
 }
-t_archivo *buscarArchPorNombre(char *nombre, t_list *listaArchivos) {//probada
+t_archivo *buscarArchPorNombre(char *nombre, t_list *listaArchivos) { //probada
 	t_archivo *arch = buscarEnListaPorStrKey(listaArchivos, nombre,
 			(char*) archNombre);
 	return arch != NULL ? arch : NULL;
@@ -200,26 +305,26 @@ t_archivo *buscarArchPorPadre(int padre) { //probada
 	return arch != NULL ? arch : NULL;
 }
 //Fin de funciones de busqueda
-t_directorio *encontrarDirectorioHijo(t_list *listaDirectorios,t_directorio *directorioPadre){
-	return list_find(listaDirectorios,({ bool esPadre(t_directorio* unDir)
-					{return esHijo(directorioPadre,unDir);}esPadre;}));
+t_directorio *encontrarDirectorioHijo(t_list *listaDirectorios,
+		t_directorio *directorioPadre) {
+	return list_find(listaDirectorios, ( {bool esPadre(t_directorio* unDir)
+				{	return esHijo(directorioPadre,unDir);}esPadre;}));
 }
 
-
-void eliminarArchivoYreferencias(t_archivo *unArchivo, t_list *listaArchivos,//probada
+void eliminarArchivoYreferencias(t_archivo *unArchivo, t_list *listaArchivos, //probada
 		t_list *listaNodos) {
 	recorrerCopiasDeUnArch(unArchivo, (void*) disminuirNodo);
 	eliminarArchivoDeLista(unArchivo, listaArchivos);
 
 }
-void eliminarArchivoDeLista(t_archivo *unArchivo, t_list *listaArchivos) {//probada
+void eliminarArchivoDeLista(t_archivo *unArchivo, t_list *listaArchivos) { //probada
 	bool archivoConNombreBuscado(t_archivo *archivoDeLista) {
 		return (strcmp(archivoDeLista->nombre, unArchivo->nombre) == 0);
 	}
 	return list_remove_and_destroy_by_condition(listaArchivos,
 			(bool*) archivoConNombreBuscado, (void*) liberarArchivo);
 }
-void activarNodoReconectado(t_nodo *nodoABuscar, t_list *listaNodos) {//probada
+void activarNodoReconectado(t_nodo *nodoABuscar, t_list *listaNodos) { //probada
 	int i;
 	t_nodo *nodoActual;
 	for (i = 0; i < list_size(listaNodos); i++) {
@@ -249,8 +354,7 @@ void eliminarNodoYReferencias(t_nodo *nodoAEliminar, t_list *listaNodos, //proba
 
 }
 
-
-void eliminarNodoDeLista(t_nodo *nodoAEliminar, t_list *listaNodos) {//probada
+void eliminarNodoDeLista(t_nodo *nodoAEliminar, t_list *listaNodos) { //probada
 	bool mismosNodos(t_nodo *nodoDeLista) {
 		return (!strcmp(nodoAEliminar->ipPuerto, nodoDeLista->ipPuerto));
 	}
@@ -265,12 +369,11 @@ void eliminarReferencias(t_nodo *nodoAEliminar, t_list *archivos) { //probada
 	}
 
 	void _list_elements2(t_bloqueArch *bloqueDeArch) {
-		if (list_is_empty(bloqueDeArch->copiasDeBloque)){
+		if (list_is_empty(bloqueDeArch->copiasDeBloque)) {
 			//hacerNada
-		}
-		else{
-			lista_remove_and_destroy_by_condition(bloqueDeArch->copiasDeBloque,//cambiado a funcion lista... para que no explote
-							(bool*) copiaEstaEnNodo, (void*) liberarBloqueEnNodo);
+		} else {
+			lista_remove_and_destroy_by_condition(bloqueDeArch->copiasDeBloque, //cambiado a funcion lista... para que no explote
+					(bool*) copiaEstaEnNodo, (void*) liberarBloqueEnNodo);
 		}
 
 	}
@@ -310,7 +413,8 @@ void renombrarArchivoPorNombre(char *nombreBuscado, char *nuevoNombre, //probada
 		free(archivoAModificar->nombre);
 		archivoAModificar->nombre = malloc(strlen(nuevoNombre) + 1);
 		strcpy(archivoAModificar->nombre, nuevoNombre);
-		printf("el archivo %s fue renombrado a %s\n", nombreBuscado, nuevoNombre);
+		printf("el archivo %s fue renombrado a %s\n", nombreBuscado,
+				nuevoNombre);
 	}
 }
 
@@ -339,7 +443,8 @@ void moverArchivoPorNombreYPadre(char *nombreBuscado, t_list *listaArchivos, //p
 			printf("el archivo %s no se encuentra en el sistema\n",
 					nombreBuscado);
 		} else {
-			printf("el archivo %s fue movido al directorio con indice %d\n",nombreBuscado, padre);
+			printf("el archivo %s fue movido al directorio con indice %d\n",
+					nombreBuscado, padre);
 			archivoAModificarPadre->padre = padre;
 		}
 	}
@@ -347,12 +452,11 @@ void moverArchivoPorNombreYPadre(char *nombreBuscado, t_list *listaArchivos, //p
 
 void crearDirectorioDadoPadreYNom(char *nombre, int padre, //probada
 		t_list *listaDirectorio) {
-int i;
+	int i;
 //Verifico que no se pase de los 1024 directorios permitidos
 	if (list_size(listaDirectorio) > 1024) {
 		printf("No se pueden cargar mas de 1024\n");
-	}
-	else {
+	} else {
 		//genero el nuevo directorio con sus datos, y le pongo el indice del ultimo + 1
 		t_directorio *directorioNuevo = nuevoDirectorio(
 				indiceNuevo(listaDirectorio), nombre, padre);
@@ -361,10 +465,10 @@ int i;
 	}
 }
 
-void renombrarDirectorioConNombre(char *nombre,t_directorio *unDirectorio) {//probada
+void renombrarDirectorioConNombre(char *nombre, t_directorio *unDirectorio) { //probada
 	free(unDirectorio->nombre);
-	unDirectorio->nombre = malloc(strlen(nombre)+1);
-	strcpy(unDirectorio->nombre,nombre);
+	unDirectorio->nombre = malloc(strlen(nombre) + 1);
+	strcpy(unDirectorio->nombre, nombre);
 	printf("Directorio fue renombrado correctamente\n");
 }
 void moverDirectorioConPadre(int padre, t_directorio *unDirectorio) { //probada
@@ -423,14 +527,14 @@ int archivoActivoPorFlag(t_archivo *unArchivo) {
 	return unArchivo->estado;
 }
 
-
-
 /******************************************/
 /********* PRIVATE FUNCTIONS **************/
 /******************************************/
-static void lista_remove_and_destroy_by_condition(t_list *self, bool(*condition)(void*), void(*element_destroyer)(void*)) {
+static void lista_remove_and_destroy_by_condition(t_list *self,
+bool (*condition)(void*), void (*element_destroyer)(void*)) {
 	void* data = list_remove_by_condition(self, condition);
-	if (data)element_destroyer(data);
+	if (data)
+		element_destroyer(data);
 }
 static bool ordenarPorMenorUso(t_nodo *data, t_nodo *dataSiguiente) {
 	return dataSiguiente->cantidadBloquesOcupados
@@ -487,33 +591,30 @@ static int buscarPosicionEnListaDadoUnArchivo(t_list *listaArchivos,
 
 static int indiceNuevo(t_list *listaDirectorio) {
 	int i;
-	for(i=2;i<=1024 && buscarDirPorIndex(i);i++);
+	for (i = 2; i <= 1024 && buscarDirPorIndex(i); i++)
+		;
 	return i;
 
-
-
-
-
 	/*
-	int nuevoIndice = -1;
+	 int nuevoIndice = -1;
 
-	int i = 0;
-	for (i = 0; i < listaDirectorio->elements_count; i++) {
-		t_directorio *dirAuxiliar;
+	 int i = 0;
+	 for (i = 0; i < listaDirectorio->elements_count; i++) {
+	 t_directorio *dirAuxiliar;
 
-		dirAuxiliar = list_get(listaDirectorio, i);
-		if (dirAuxiliar->index != (i + 1)) {
-			nuevoIndice = i + 1;
+	 dirAuxiliar = list_get(listaDirectorio, i);
+	 if (dirAuxiliar->index != (i + 1)) {
+	 nuevoIndice = i + 1;
 
-			i = listaDirectorio->elements_count;		//Para salir a lo rambo
-		}
-	}
+	 i = listaDirectorio->elements_count;		//Para salir a lo rambo
+	 }
+	 }
 
-	if (nuevoIndice == -1) {
-		nuevoIndice = listaDirectorio->elements_count + 1;
-	}
+	 if (nuevoIndice == -1) {
+	 nuevoIndice = listaDirectorio->elements_count + 1;
+	 }
 
-	return nuevoIndice;*/
+	 return nuevoIndice;*/
 }
 
 static bool existeEseIndiceComoPadre(t_list *listaDirectorios, int padre) {
@@ -537,12 +638,13 @@ int obtenerArchivo(t_archivo *archivo) {
 	int obtenerBloque(t_bloqueArch *bloqueDeArchivo) {
 		t_bloqueEnNodo *bloque = list_find(bloqueDeArchivo->copiasDeBloque,
 				(void*) noEsNull);
-	int ipPuertoCoincide(t_nodo *unNodo) {
+		int ipPuertoCoincide(t_nodo *unNodo) {
 			return !strcmp(unNodo->ipPuerto, bloque->ipPuerto);
 		}
-	t_nodo *nodoEncontrado = list_find(listaNodos, (void*) ipPuertoCoincide);
-	send(nodoEncontrado->socket,"Te encontre",strlen("te encontre"),0);
-	sem_wait(&semaforo);
+		t_nodo *nodoEncontrado = list_find(listaNodos,
+				(void*) ipPuertoCoincide);
+		send(nodoEncontrado->socket, "Te encontre", strlen("te encontre"), 0);
+		sem_wait(&semaforo);
 		//HAY QUE CREAR EL CAMPO SOCKET EN NODO
 		/*int socket_desc = nodoEncontrado.socket;
 		 send(socket_desc,1,sizeOf(1),0);
@@ -571,4 +673,8 @@ static void disminuirNodo(t_bloqueEnNodo *copia) {
 	int *numero = malloc(sizeof(int));
 	*numero = copia->numeroDeBloqueEnNodo;
 	queue_push(nodo->bloquesLiberados, numero);
+}
+
+static bool tieneLugar(t_nodo *unNodo) {
+	return unNodo->tamanio / BLOCK_SIZE >= unNodo->cantidadBloquesOcupados;
 }

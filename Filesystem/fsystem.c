@@ -6,9 +6,12 @@
  */
 
 #include "fsystem.h"
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
 
 int inicializar() {
-	cantidadDeNodos=0;
+	cantidadDeNodos = 0;
 	directorioUser = malloc(sizeof(t_directorio));
 
 	directorioUser->index = 1;
@@ -70,20 +73,18 @@ int main() {
 	list_add(listaDirectorios, directorioMedia);
 	list_add(listaDirectorios, directorioFotos);
 
-
-
 	//Muestro nodos
 	t_nodo *nodoA = nuevoNodo("127.0.0.1:80A", 10);
 	t_nodo *nodoB = nuevoNodo("127.0.0.1:12B", 20);
 	t_nodo *nodoC = nuevoNodo("127.0.0.1:243C", 60);
 
 	nodoA->cantidadBloquesOcupados = 1;
-	int *a=malloc(sizeof(int));
-	*a=1;
-	queue_push(nodoA->bloquesLiberados,a);/*
-	nodoC->cantidadBloquesOcupados = 3;
-	nodoB->cantidadBloquesOcupados = 3;
-*/
+	int *a = malloc(sizeof(int));
+	*a = 1;
+	queue_push(nodoA->bloquesLiberados, a);/*
+	 nodoC->cantidadBloquesOcupados = 3;
+	 nodoB->cantidadBloquesOcupados = 3;
+	 */
 	list_add(listaNodos, nodoA);
 	list_add(listaNodos, nodoB);
 	list_add(listaNodos, nodoC);
@@ -92,8 +93,8 @@ int main() {
 
 //muestro archivos
 
-	//t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo("127.0.0.1:80A", 11);
-	//t_bloqueEnNodo *copiaBloqueA1C2 = nuevoBloqueEnNodo("127.0.0.1:12B", 12);
+//t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo("127.0.0.1:80A", 11);
+//t_bloqueEnNodo *copiaBloqueA1C2 = nuevoBloqueEnNodo("127.0.0.1:12B", 12);
 	t_bloqueEnNodo *copiaBloqueA1C3 = nuevoBloqueEnNodo("127.0.0.1:243C", 13);
 	t_list *copiasBloqueA1 = list_create();
 	//list_add(copiasBloqueA1, copiaBloqueA1C1);
@@ -137,14 +138,13 @@ int main() {
 	t_list *bloquesDeArchivoB = list_create();
 	list_add(bloquesDeArchivoB, bloqueArchivoB1);
 
-
-	t_archivo *archivoA = nuevoArchivo("ArchivoA", 2, 3000, bloquesDeArchivoA,1);
-	t_archivo *archivoB = nuevoArchivo("ArchivoB", 3, 3000, bloquesDeArchivoB,1);
-
+	t_archivo *archivoA = nuevoArchivo("ArchivoA", 2, 3000, bloquesDeArchivoA,
+			1);
+	t_archivo *archivoB = nuevoArchivo("ArchivoB", 3, 3000, bloquesDeArchivoB,
+			1);
 
 	list_add(listaArchivos, archivoA);
 	list_add(listaArchivos, archivoB);
-
 
 //	formatear(&listaNodos, &listaArchivos, &listaDirectorios);
 //	renombrarArchivoPorNombre("Archivo A","Archivo con nombre cambiado",listaArchivos);
@@ -160,85 +160,71 @@ int main() {
 //	renombrarDirectorioConNombre("pepito",directorioHome);
 //	moverDirectorioConPadre(8,directorioHome);
 
-
-
 //160 lugar de trabajo de juanchi
-/*
-	t_list *copiasbloques1 = list_create();
-	t_list * copiasbloques2 = list_create();
-	t_list * copiasbloques3 = list_create();
-	t_bloqueArch *bloquearch1 = nuevoBloqueArchivo(copiasbloques1);
-	t_bloqueArch *bloquearch2 = nuevoBloqueArchivo(copiasbloques2);
-	t_bloqueArch *bloquearch3 = nuevoBloqueArchivo(copiasbloques3);
-	t_list *bloquesDeArchivo  = list_create();
-list_add(bloquesDeArchivo,bloquearch1);
-list_add(bloquesDeArchivo,bloquearch2);
-list_add(bloquesDeArchivo,bloquearch3);
-	distribuirBloquesEnNodos(bloquesDeArchivo,listaNodos);
-	mostrarLista(listaNodos, (void*) mostrarNodo);
-	mostrarLista(bloquesDeArchivo, (void*) mostrarBloqueArch);
-	list_destroy_and_destroy_elements(bloquesDeArchivo,(void*)liberarBloqueArch);
-//176 fin	lugar de trabajo de juanchi*/
+	/*
+	 t_list *copiasbloques1 = list_create();
+	 t_list * copiasbloques2 = list_create();
+	 t_list * copiasbloques3 = list_create();
+	 t_bloqueArch *bloquearch1 = nuevoBloqueArchivo(copiasbloques1);
+	 t_bloqueArch *bloquearch2 = nuevoBloqueArchivo(copiasbloques2);
+	 t_bloqueArch *bloquearch3 = nuevoBloqueArchivo(copiasbloques3);
+	 t_list *bloquesDeArchivo  = list_create();
+	 list_add(bloquesDeArchivo,bloquearch1);
+	 list_add(bloquesDeArchivo,bloquearch2);
+	 list_add(bloquesDeArchivo,bloquearch3);
+	 distribuirBloquesEnNodos(bloquesDeArchivo,listaNodos);
+	 mostrarLista(listaNodos, (void*) mostrarNodo);
+	 mostrarLista(bloquesDeArchivo, (void*) mostrarBloqueArch);
+	 list_destroy_and_destroy_elements(bloquesDeArchivo,(void*)liberarBloqueArch);
+	 //176 fin	lugar de trabajo de juanchi*/
 //177 lugar de trabajo de juanchi
-/*
- * 	       |->|home|--------->(ArchivoB)
- * 		   |
- *  |root|-|  			|--->(ArchivoA)
- * 		   |			|
- * 		   |->|Media|---|--->|fotos|
- *
- */
-/*
-	printf("dirVacio False %d\n",dirVacio(directorioHome));
-	printf("dirVacio False %d\n",dirVacio(directorioMedia));
-	printf("dirVacio True %d\n",dirVacio(directorioFotos));
+	/*
+	 * 	       |->|home|--------->(ArchivoB)
+	 * 		   |
+	 *  |root|-|  			|--->(ArchivoA)
+	 * 		   |			|
+	 * 		   |->|Media|---|--->|fotos|
+	 *
+	 */
+	/*
+	 printf("dirVacio False %d\n",dirVacio(directorioHome));
+	 printf("dirVacio False %d\n",dirVacio(directorioMedia));
+	 printf("dirVacio True %d\n",dirVacio(directorioFotos));
 
-	printf("dirConSoloArch True %d\n",dirConSoloArch(directorioHome));
-	printf("dirConSoloArch False %d\n",dirConSoloArch(directorioMedia));
-	printf("dirConSoloArch False %d\n",dirConSoloArch(directorioFotos));
+	 printf("dirConSoloArch True %d\n",dirConSoloArch(directorioHome));
+	 printf("dirConSoloArch False %d\n",dirConSoloArch(directorioMedia));
+	 printf("dirConSoloArch False %d\n",dirConSoloArch(directorioFotos));
 
-	printf("dirConSubdir es false %d\n",dirConSubdir(directorioFotos));
-	printf("dirConSubdir es false %d\n",dirConSubdir(directorioHome));
-	printf("dirConSubdir es true %d\n",dirConSubdir(directorioMedia));
-	*/
+	 printf("dirConSubdir es false %d\n",dirConSubdir(directorioFotos));
+	 printf("dirConSubdir es false %d\n",dirConSubdir(directorioHome));
+	 printf("dirConSubdir es true %d\n",dirConSubdir(directorioMedia));
+	 */
 
 //	eliminarDirectorioYContenido(directorioRoot);
 //	eliminarNodoYReferencias(nodoC, listaNodos,listaArchivos);
-
 //	printf("False %d\n",strcmp(copiaBloqueB1C1->ipPuerto,nodoA->ipPuerto)==0);
 	printf("Despues de la accion\n\n\n");
 	mostrarLista(listaNodos, (void*) mostrarNodo);
 	mostrarLista(listaArchivos, (void*) mostrarArchivo);
-/*
-mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
-	mostrarLista(listaArchivos, (void*) mostrarArchivo);
-	mostrarLista(listaNodos, (void*) mostrarNodo);
-*/
-
-
-
-
-
-
-
-
-
-
-
-
+	/*
+	 mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
+	 mostrarLista(listaArchivos, (void*) mostrarArchivo);
+	 mostrarLista(listaNodos, (void*) mostrarNodo);
+	 */
 
 	//195 fin	lugar de trabajo de juanchi
-
 //	mostrarArchivo(buscarArchPorNombre("Archivo A", listaArchivos));
 //	mostrarDirectorio(buscarDirPorNombre("home",listaDirectorios));
 //	mostrarNodo(buscarNodoPorIpPuerto("192.168.0.1:80A",listaNodos));
 //	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 //	mostrarLista(listaNodos, (void*) mostrarNodo);
 //	mostrarLista(listaArchivos, (void*) mostrarArchivo);
-
-
 	//fin de prueba de funciond de mostrar listas
-	 system("clear");
+	levantarArchivoAMemoriaYDistribuirANodos(
+			"/home/utnso/Proyectos/tp-2015-1c-socketes-planificados/Filesystem/archivoBasura.dat",
+			"/home/utnso/Proyectos/tp-2015-1c-socketes-planificados/Filesystem/archivoDestino.dat");
+
+	/*system("clear");
 
 	 char* path = "ConfigFS.cfg";
 
@@ -249,7 +235,6 @@ mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 	 //fd_set master;
 	 //fd_set read_fds;
 
-
 	 listaNodo = list_create();
 
 	 pthread_t consola_hilo;
@@ -258,13 +243,11 @@ mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 	 return 1;
 	 }
 
-
-
-	 crearServerMultiHilo(config_get_int_value(config, "PUERTO_FS"),interaccionFSNodo);
-
-	 //Probando el agregar test
-
-	 /*CU_initialize_registry();
+	 crearServerMultiHilo(config_get_int_value(config, "PUERTO_FS"),
+	 interaccionFSNodo);
+	 */
+	//Probando el agregar test
+	/*CU_initialize_registry();
 
 	 agregar_tests();
 
@@ -342,15 +325,65 @@ mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 	return 0;
 }
 
+void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* pathDeMDFS) {
+	int local_fd;
+	int envioNodoCorrectamente = 1;
+	int cantidadBolquesEnviados = 0;
+	struct stat file_stat;
+	char *data;
+	t_list* listaDeBloques = list_create();
+
+	if (pathLocal != NULL && pathDeMDFS != NULL) {
+		if ((local_fd = open(pathLocal, O_RDONLY)) != -1) {
+
+			fstat(local_fd, &file_stat);
+			data = mmap((caddr_t) 0, file_stat.st_size, PROT_READ, MAP_SHARED,
+					local_fd, 0);
+			if (data == (caddr_t) (-1)) {
+				perror("mmap");
+				exit(1);
+
+			}
+			printf("\nLevanto a memoria el archivo (está en char* data)\n");
+
+			//TODO: Acá se pone a mandar bloques de arch a nodos y demás
+			envioNodoCorrectamente = mandarBloquesANodos(data, &cantidadBolquesEnviados,
+					&listaDeBloques);
+
+			if (close(local_fd) == -1)
+				perror("close");
+
+			if (envioNodoCorrectamente != -1) {	//si se mando correctamente
+				//agregar a la lista de archivos global el archivo nuevo,
+				//con su correspondiente listaDeBloques, nombre, padre, tamanio,
+				//y estado. (Esto es a las estructuras lógicas)
+				printf("Envio correctamente\n");
+
+			}
+			else {
+				printf("error al enviar a nodos\n");
+			}
+			//TODO: Acá se actualiza la lista de archivos del FS para incluir al nuevo archivo
+
+		} else {
+			printf("Error al abrir el archivo\n");
+		}
+	} else {
+		printf("upload: falta un operando\n");
+	}
+}
+
+
 void *interaccionFSNodo(void* sock_ptr) {
 	fflush(stdout);
 	int sock_desc = *(int*) sock_ptr;
 	char infoDeNodo[BUFFERSIZE];
-	int read_size; int i=0;
-	t_nodo *nodo = list_get(listaNodos,cantidadDeNodos);
+	int read_size;
+	int i = 0;
+	t_nodo *nodo = list_get(listaNodos, cantidadDeNodos);
 	cantidadDeNodos++;
-	nodo->socket=sock_desc;
-	//Receive a reply from the server
+	nodo->socket = sock_desc;
+//Receive a reply from the server
 	int tamanio;
 
 	while ((read_size = recv((int) sock_desc, &tamanio, sizeof(int), 0)) > 0) {
@@ -360,37 +393,40 @@ void *interaccionFSNodo(void* sock_ptr) {
 		//printf("%s",mensaje);
 		//fflush(stdout);
 		/*
-		//Limpia el buffer de los mensajes que le manda ese nodo
-		if(infoDeNodo[0]=='0'){
+		 //Limpia el buffer de los mensajes que le manda ese nodo
+		 if(infoDeNodo[0]=='0'){
 
-		recv((int) sock_desc, infoDeNodo, 1, 0);
-		int tamanio = infoDeNodo[0]-'0';
+		 recv((int) sock_desc, infoDeNodo, 1, 0);
+		 int tamanio = infoDeNodo[0]-'0';
 
-		recv((int) sock_desc, infoDeNodo, tamanio, 0);
+		 recv((int) sock_desc, infoDeNodo, tamanio, 0);
 
-	//	char* texto = malloc(strlen(infoDeNodo)+1);
-	//	strcpy(texto,infoDeNodo);
-		write(fileno(archivoReconstruido),infoDeNodo,tamanio);
+		 //	char* texto = malloc(strlen(infoDeNodo)+1);
+		 //	strcpy(texto,infoDeNodo);
+		 write(fileno(archivoReconstruido),infoDeNodo,tamanio);
 
-		write(fileno(archivoReconstruido),'\0',1);
-		sem_post(&semaforo);
-		}
+		 write(fileno(archivoReconstruido),'\0',1);
+		 sem_post(&semaforo);
+		 }
 
-		if(infoDeNodo[0]=='d'){
-			printf("%s",infoDeNodo);
-			recv((int) sock_desc, infoDeNodo, 15, 0);
-			printf("%s",infoDeNodo);
-			fflush(stdout);
+		 if(infoDeNodo[0]=='d'){
+		 printf("%s",infoDeNodo);
+		 recv((int) sock_desc, infoDeNodo, 15, 0);
+		 printf("%s",infoDeNodo);
+		 fflush(stdout);
 
-		}*/
-		char** mensajePartido = string_split(mensaje,":");
-		printf("El nodo de ip %s, puerto %s se ha conectado. Tiene %d bloques y %s es nuevo.", mensajePartido[0],mensajePartido[1],atoi(mensajePartido[2]),mensajePartido[3]);
+		 }*/
+		char** mensajePartido = string_split(mensaje, ":");
+		printf(
+				"El nodo de ip %s, puerto %s se ha conectado. Tiene %d bloques y %s es nuevo.",
+				mensajePartido[0], mensajePartido[1], atoi(mensajePartido[2]),
+				mensajePartido[3]);
 		fflush(stdout);
 	}
 	if (read_size == 0) {
 		printf("Nodo desconectado.\n");
 	}
-	if (read_size<0) {
+	if (read_size < 0) {
 		printf("Error.");
 	}
 	close(sock_desc);
