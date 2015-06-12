@@ -8,7 +8,7 @@
 #include "interfaces.h"
 
 //Ruta donde se encuentra el archivo de configuración
-char* ARCHIVO_CONFIG = "/home/utnso/tp-2015-1c-socketes-planificados/ArchivoVarios/ConfigNodo.txt";
+char* ARCHIVO_CONFIG = "../ArchivosVarios/ConfigNodo.txt";
 
 int main() {
 
