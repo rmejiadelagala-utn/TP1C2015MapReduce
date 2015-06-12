@@ -541,7 +541,12 @@ int obtenerArchivo(t_archivo *archivo) {
 			return !strcmp(unNodo->ipPuerto, bloque->ipPuerto);
 		}
 	t_nodo *nodoEncontrado = list_find(listaNodos, (void*) ipPuertoCoincide);
-	send(nodoEncontrado->socket,"Te encontre",strlen("te encontre"),0);
+	t_mensaje *mensaje = malloc(sizeof(t_mensaje));
+	mensaje->id=104;
+	mensaje->tipo='5';
+	mensaje->info = string_duplicate(string_itoa(bloque->numeroDeBloqueEnNodo));
+	t_stream *stream = empaquetar_mensaje(mensaje);
+	send(nodoEncontrado->socket,stream,stream,0);
 	sem_wait(&semaforo);
 		//HAY QUE CREAR EL CAMPO SOCKET EN NODO
 		/*int socket_desc = nodoEncontrado.socket;

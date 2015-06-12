@@ -5,7 +5,8 @@
  *      Author: utnso
  */
 #include "interfaces.h"
-#include "paquetesNodo.h"
+
+#include <socketes/paquetesNodo.h>
 
 void* conexionFS(void* arg){
 
@@ -43,8 +44,14 @@ void* conexionFS(void* arg){
 
 	t_stream *stream = empaquetar_mensaje(mensaje_nodo);
 
+	char* size = malloc(sizeof(int));
+	memcpy(size,&stream->length,4);
+
+	send(ptr->socket, size, sizeof(int),0);
+
 	if (enviar_mensaje(ptr->socket, stream->data, stream->length) > 0)
 		printf("Enviando mensaje a Filesystem\n");
+
 
 	t_mensaje* mensaje_fs = malloc(sizeof(t_mensaje));
 	uint32_t nrobloque;

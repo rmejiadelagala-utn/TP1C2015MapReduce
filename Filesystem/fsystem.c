@@ -345,48 +345,64 @@ mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 void *interaccionFSNodo(void* sock_ptr) {
 	fflush(stdout);
 	int sock_desc = *(int*) sock_ptr;
-	char infoDeNodo[BUFFERSIZE];
-	int read_size; int i=0;
-	t_nodo *nodo = list_get(listaNodos,cantidadDeNodos);
-	cantidadDeNodos++;
-	nodo->socket=sock_desc;
+	int read_size;
 	//Receive a reply from the server
 	int tamanio;
 
 	while ((read_size = recv((int) sock_desc, &tamanio, sizeof(int), 0)) > 0) {
-		char* mensaje = malloc(tamanio);
-		recv((int) sock_desc, mensaje, 1, 0);
-		recv((int) sock_desc, mensaje, tamanio, 0);
-		//printf("%s",mensaje);
-		//fflush(stdout);
-		/*
-		//Limpia el buffer de los mensajes que le manda ese nodo
-		if(infoDeNodo[0]=='0'){
+		int id;
+		char tipo;
+		char* mensaje;
+		mensaje=malloc(tamanio);
+		recv((int) sock_desc, &id, sizeof(int), 0);
+		switch (id){
+		case 100:
+			recv((int) sock_desc, &tipo, sizeof(char), 0);
+			recv((int) sock_desc, mensaje, tamanio-sizeof(int)-sizeof(char), 0);
 
-		recv((int) sock_desc, infoDeNodo, 1, 0);
-		int tamanio = infoDeNodo[0]-'0';
+			printf("El tamanio es:%d.\nId: %d.\nTipo: %c. Mensaje: %s\n",tamanio,id,tipo,mensaje);
 
-		recv((int) sock_desc, infoDeNodo, tamanio, 0);
+			char** mensajePartido = string_split(mensaje,":");
+			printf("El nodo de ip %s, puerto %s se ha conectado. Tiene %d bloques y %s es nuevo.", mensajePartido[0],mensajePartido[1],atoi(mensajePartido[2]),mensajePartido[3]);
 
-	//	char* texto = malloc(strlen(infoDeNodo)+1);
-	//	strcpy(texto,infoDeNodo);
-		write(fileno(archivoReconstruido),infoDeNodo,tamanio);
-
-		write(fileno(archivoReconstruido),'\0',1);
-		sem_post(&semaforo);
-		}
-
-		if(infoDeNodo[0]=='d'){
-			printf("%s",infoDeNodo);
-			recv((int) sock_desc, infoDeNodo, 15, 0);
-			printf("%s",infoDeNodo);
+			char* ipPuerto = strcat(strcat(mensajePartido[0],":"),mensajePartido[1]);
+			t_nodo* nodo = nuevoNodo(ipPuerto,50);
+			nodo->socket=sock_desc;
+			list_add(listaNodos,nodo);
+			//printf("%s",mensaje);
 			fflush(stdout);
 
-		}*/
-		char** mensajePartido = string_split(mensaje,":");
-		printf("El nodo de ip %s, puerto %s se ha conectado. Tiene %d bloques y %s es nuevo.", mensajePartido[0],mensajePartido[1],atoi(mensajePartido[2]),mensajePartido[3]);
-		fflush(stdout);
+			/*PARA PROBAR
+			t_bloqueEnNodo *copiaBloquePrueba = nuevoBloqueEnNodo("127.0.0.1:5000", 3);
+			t_list *copiasBloquePrueba = list_create();
+			list_add(copiasBloquePrueba, copiaBloquePrueba);
+			t_bloqueArch *bloqueArchivoPrueba = nuevoBloqueArchivo(copiasBloquePrueba);
+			t_list * bloquesDeArchivoPrueba = list_create();
+			list_add(bloquesDeArchivoPrueba, bloqueArchivoPrueba);
+			t_archivo *archivoPrueba = nuevoArchivo("ArchivoPrueba", 1, 3000, bloquesDeArchivoPrueba,1);
+			list_add(listaArchivos, archivoPrueba);*/
+
+
+
+			break;
+		case 0:
+			recv((int) sock_desc, &tipo, 1, 0);
+			recv((int) sock_desc, &tamanio, 4, 0);
+			recv((int) sock_desc, mensaje, tamanio, 0);
+
+			//	char* texto = malloc(strlen(infoDeNodo)+1);
+			//	strcpy(texto,infoDeNodo);
+			write(fileno(archivoReconstruido),mensaje,tamanio);
+
+			write(fileno(archivoReconstruido),'\0',1);
+			sem_post(&semaforo);
+			fflush(stdout);
+
+		}
+
+
 	}
+
 	if (read_size == 0) {
 		printf("Nodo desconectado.\n");
 	}
