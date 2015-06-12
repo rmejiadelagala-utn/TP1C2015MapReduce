@@ -224,7 +224,7 @@ int main() {
 			"/home/utnso/Proyectos/tp-2015-1c-socketes-planificados/Filesystem/archivoBasura.dat",
 			"/home/utnso/Proyectos/tp-2015-1c-socketes-planificados/Filesystem/archivoDestino.dat");
 
-	/*system("clear");
+	 system("clear");
 
 	 char* path = "ConfigFS.cfg";
 
@@ -245,7 +245,7 @@ int main() {
 
 	 crearServerMultiHilo(config_get_int_value(config, "PUERTO_FS"),
 	 interaccionFSNodo);
-	 */
+
 	//Probando el agregar test
 	/*CU_initialize_registry();
 

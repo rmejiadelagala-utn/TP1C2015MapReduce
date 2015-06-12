@@ -271,10 +271,14 @@ void copiarAFS(char *archivo) {
 	void copiarArchAFS(t_archivo *unArchivo){
 	sem_init(&semaforo,0,0);
 	archivoReconstruido = fopen("../archivoReconstruido","w");
-	obtenerArchivo(unArchivo);
+	int resultado = obtenerArchivo(unArchivo);
 	fclose(archivoReconstruido);
-	printf("Copia el archivo %s al FileSystem\n", archivo);
+	if (resultado<=0) {
+		remove("../archivoReconstruido");
+		printf("Error al copiar el archivo al Filesystem.\n");
 	}
+	else printf("Copia el archivo %s al FileSystem\n", archivo);
+}
 	validarArchivoYEjecutar(archivo, (void*)copiarArchAFS);
 
 }
