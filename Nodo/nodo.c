@@ -11,7 +11,6 @@
 char* ARCHIVO_CONFIG = "../ArchivosVarios/ConfigNodo.txt";
 
 int main() {
-
 	printf("***************HOLA SOY UN PROCESO NODO\n****************");
 
 	t_config_nodo* arch_config;

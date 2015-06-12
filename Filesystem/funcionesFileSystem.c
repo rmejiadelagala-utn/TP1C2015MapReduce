@@ -40,6 +40,7 @@ static void disminuirNodo(t_bloqueEnNodo *copia);
 static int dirPadre(t_directorio *unDir);
 static int dirIndex(t_directorio *unDir);
 static int archPadre(t_archivo *unArch);
+static void lista_remove_and_destroy_by_condition(t_list *self, bool(*condition)(void*), void(*element_destroyer)(void*));
 //
 /*
 void darFormatoAlArchivo(char* path) {
@@ -268,7 +269,7 @@ void eliminarReferencias(t_nodo *nodoAEliminar, t_list *archivos) { //probada
 			//hacerNada
 		}
 		else{
-			list_remove_and_destroy_by_condition(bloqueDeArch->copiasDeBloque,
+			lista_remove_and_destroy_by_condition(bloqueDeArch->copiasDeBloque,//cambiado a funcion lista... para que no explote
 							(bool*) copiaEstaEnNodo, (void*) liberarBloqueEnNodo);
 		}
 
@@ -422,10 +423,15 @@ int archivoActivoPorFlag(t_archivo *unArchivo) {
 	return unArchivo->estado;
 }
 
+
+
 /******************************************/
 /********* PRIVATE FUNCTIONS **************/
 /******************************************/
-
+static void lista_remove_and_destroy_by_condition(t_list *self, bool(*condition)(void*), void(*element_destroyer)(void*)) {
+	void* data = list_remove_by_condition(self, condition);
+	if (data)element_destroyer(data);
+}
 static bool ordenarPorMenorUso(t_nodo *data, t_nodo *dataSiguiente) {
 	return dataSiguiente->cantidadBloquesOcupados
 			< data->cantidadBloquesOcupados;
