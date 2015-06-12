@@ -83,8 +83,8 @@ int main() {
 	 *a = 1;
 	 queue_push(nodoA->bloquesLiberados, a);*/
 	nodoA->cantidadBloquesOcupados = 0;
-	nodoC->cantidadBloquesOcupados = 0;
-	nodoB->cantidadBloquesOcupados = 0;
+	nodoB->cantidadBloquesOcupados = 3;
+	nodoC->cantidadBloquesOcupados = 2;
 
 	list_add(listaNodos, nodoA);
 	list_add(listaNodos, nodoB);
@@ -226,7 +226,7 @@ int main() {
 //	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 	mostrarLista(listaNodos, (void*) mostrarNodo);
 	mostrarLista(listaArchivos, (void*) mostrarArchivo);
-	system("clear");
+/*	system("clear");
 
 	 char* path = "ConfigFS.cfg";
 
@@ -247,7 +247,7 @@ int main() {
 
 	 crearServerMultiHilo(config_get_int_value(config, "PUERTO_FS"),
 	 interaccionFSNodo);
-
+*/
 	 //Probando el agregar test
 	 /*CU_initialize_registry();
 
@@ -350,7 +350,7 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal,
 			}
 			printf("\nLevanto a memoria el archivo (está en char* data)\n");
 
-			//TODO: Acá se pone a mandar bloques de arch a nodos y demás
+			//Acá se pone a mandar bloques de arch a nodos y demás
 			envioNodoCorrectamente = mandarBloquesANodos(data,
 					&cantidadBolquesEnviados, &listaDeBloques);
 
@@ -371,7 +371,7 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal,
 			} else {
 				printf("error al enviar a nodos\n");
 			}
-			//TODO: Acá se actualiza la lista de archivos del FS para incluir al nuevo archivo
+
 
 		} else {
 			printf("Error al abrir el archivo\n");

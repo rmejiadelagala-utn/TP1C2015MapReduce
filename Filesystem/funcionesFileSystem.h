@@ -214,7 +214,7 @@ int archivoActivoPorFlag(t_archivo *unArchivo);
  * @NAME: nodoElegido
  * @DESC: setea nodo elegido por algoritmo distribucion, o devuele -1 de error
  */
-int nodoElegido(t_list *nodosOrdenados, t_nodo **nodoActual);
+int nodoElegido(t_list *nodosOrdenados, t_nodo **nodoActual, int *posicion);
 int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
 		t_list** listaDeBolques) ;
 
