@@ -25,6 +25,7 @@ void* conexionFS(void* arg){
 
 	mensaje_nodo->id = CONEXION_FS;
 	mensaje_nodo->tipo = 'N';
+	mensaje_nodo->info = string_new();
 
 	//Formato de Mensaje-> IP:PUERTO:CANTBLOQUES:NUEVO
 	string_append(&mensaje_nodo->info, ptr->IP_NODO);

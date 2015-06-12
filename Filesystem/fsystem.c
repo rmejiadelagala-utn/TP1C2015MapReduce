@@ -343,6 +343,8 @@ mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 }
 
 void *interaccionFSNodo(void* sock_ptr) {
+	printf("no me mates nodo D:");
+	fflush(stdout);
 	int sock_desc = *(int*) sock_ptr;
 	char infoDeNodo[BUFFERSIZE];
 	int read_size;
