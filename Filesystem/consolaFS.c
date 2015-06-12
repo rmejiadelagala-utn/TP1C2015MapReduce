@@ -269,22 +269,25 @@ void copiarAMDFS(char *archivo) {
 
 void copiarAFS(char *archivo) {
 	void copiarArchAFS(t_archivo *unArchivo){
-	sem_init(&semaforo,0,0);
-	archivoReconstruido = fopen("../archivoReconstruido","w");
-	int resultado = obtenerArchivo(unArchivo);
-	fclose(archivoReconstruido);
-	if (resultado<=0) {
-		remove("../archivoReconstruido");
-		printf("Error al copiar el archivo al Filesystem.\n");
-	}
-	else printf("Copia el archivo %s al FileSystem\n", archivo);
+		int resultado = descargarArchivo(unArchivo);
+		if(resultado>0) printf("El archivo fue copiado al FileSystem local\.n");
+		else printf("Error al copiar el archivo al FileSystem local.\n");
 }
 	validarArchivoYEjecutar(archivo, (void*)copiarArchAFS);
 
 }
 
 void solicitarMD5(char *archivo) {
-	printf("Obtiene el solicitarMD5 de %s\n", archivo);
+	void pedirMD5(t_archivo *unArchivo){
+		int resultado = descargarArchivo(unArchivo);
+		if(resultado>0) {
+			printf("El hash solicitado es:\.n");
+			system("md5sum ../archivoReconstruido");
+			remove("../archivoReconstruido");
+		}
+		else	printf("Error al copiar el archivo al FileSystem local.\n");
+}
+	validarArchivoYEjecutar(archivo, (void*)pedirMD5);
 }
 
 void verBloque(char *bloque) {
@@ -451,4 +454,18 @@ int string_to_int(char* string){
 			}
 		}
 		return j;
+}
+int descargarArchivo(t_archivo *unArchivo){
+		sem_init(&semaforo,0,0);
+			archivoReconstruido = fopen("../archivoReconstruido","w");
+			int resultado = obtenerArchivo(unArchivo);
+			fclose(archivoReconstruido);
+			if (resultado<=0) {
+				remove("../archivoReconstruido");
+				return 0;
+		}
+				else {
+
+				return 1;
+		}
 }
