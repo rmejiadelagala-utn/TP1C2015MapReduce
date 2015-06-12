@@ -38,4 +38,5 @@ sem_t semaforo;
 FILE *archivoReconstruido;
 int cantidadDeNodos;
 
+void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* pathDeMDFS);
 #endif /* FSYSTEM_H_ */
