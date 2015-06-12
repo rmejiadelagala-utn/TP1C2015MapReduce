@@ -222,7 +222,7 @@ int main() {
 //	mostrarLista(listaArchivos, (void*) mostrarArchivo);
 	//fin de prueba de funciond de mostrar listas
 	levantarArchivoAMemoriaYDistribuirANodos(
-			"/home/utnso/Proyectos/tp-2015-1c-socketes-planificados/Filesystem/archivoBasura.dat","nuevoArchivo", 1);
+			"../archivoBasura.dat","nuevoArchivo", 1);
 //	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 	mostrarLista(listaNodos, (void*) mostrarNodo);
 	mostrarLista(listaArchivos, (void*) mostrarArchivo);
