@@ -77,14 +77,15 @@ int main() {
 	t_nodo *nodoA = nuevoNodo("127.0.0.1:80A", 10);
 	t_nodo *nodoB = nuevoNodo("127.0.0.1:12B", 20);
 	t_nodo *nodoC = nuevoNodo("127.0.0.1:243C", 60);
+	/*
+	 nodoA->cantidadBloquesOcupados = 1;
+	 int *a = malloc(sizeof(int));
+	 *a = 1;
+	 queue_push(nodoA->bloquesLiberados, a);*/
+	nodoA->cantidadBloquesOcupados = 0;
+	nodoC->cantidadBloquesOcupados = 0;
+	nodoB->cantidadBloquesOcupados = 0;
 
-	nodoA->cantidadBloquesOcupados = 1;
-	int *a = malloc(sizeof(int));
-	*a = 1;
-	queue_push(nodoA->bloquesLiberados, a);/*
-	 nodoC->cantidadBloquesOcupados = 3;
-	 nodoB->cantidadBloquesOcupados = 3;
-	 */
 	list_add(listaNodos, nodoA);
 	list_add(listaNodos, nodoB);
 	list_add(listaNodos, nodoC);
@@ -93,27 +94,27 @@ int main() {
 
 //muestro archivos
 
-//t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo("127.0.0.1:80A", 11);
-//t_bloqueEnNodo *copiaBloqueA1C2 = nuevoBloqueEnNodo("127.0.0.1:12B", 12);
+	t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo("127.0.0.1:80A", 11);
+	t_bloqueEnNodo *copiaBloqueA1C2 = nuevoBloqueEnNodo("127.0.0.1:12B", 12);
 	t_bloqueEnNodo *copiaBloqueA1C3 = nuevoBloqueEnNodo("127.0.0.1:243C", 13);
 	t_list *copiasBloqueA1 = list_create();
-	//list_add(copiasBloqueA1, copiaBloqueA1C1);
-	//list_add(copiasBloqueA1, copiaBloqueA1C2);
+	list_add(copiasBloqueA1, copiaBloqueA1C1);
+	list_add(copiasBloqueA1, copiaBloqueA1C2);
 	list_add(copiasBloqueA1, copiaBloqueA1C3);
 
 	t_bloqueEnNodo *copiaBloqueA2C1 = nuevoBloqueEnNodo("127.0.0.1:80A", 21);
-	//t_bloqueEnNodo *copiaBloqueA2C2 = nuevoBloqueEnNodo("127.0.0.1:12B", 22);
-	//t_bloqueEnNodo *copiaBloqueA2C3 = nuevoBloqueEnNodo("127.0.0.1:243C", 23);
+	t_bloqueEnNodo *copiaBloqueA2C2 = nuevoBloqueEnNodo("127.0.0.1:12B", 22);
+	t_bloqueEnNodo *copiaBloqueA2C3 = nuevoBloqueEnNodo("127.0.0.1:243C", 23);
 	t_list *copiasBloqueA2 = list_create();
 	list_add(copiasBloqueA2, copiaBloqueA2C1);
-	//list_add(copiasBloqueA2, copiaBloqueA2C2);
-	//list_add(copiasBloqueA2, copiaBloqueA2C3);
+	list_add(copiasBloqueA2, copiaBloqueA2C2);
+	list_add(copiasBloqueA2, copiaBloqueA2C3);
 
-	//t_bloqueEnNodo *copiaBloqueA3C1 = nuevoBloqueEnNodo("127.0.0.1:80A", 31);
+	t_bloqueEnNodo *copiaBloqueA3C1 = nuevoBloqueEnNodo("127.0.0.1:80A", 31);
 	t_bloqueEnNodo *copiaBloqueA3C2 = nuevoBloqueEnNodo("127.0.0.1:12B", 32);
 	t_bloqueEnNodo *copiaBloqueA3C3 = nuevoBloqueEnNodo("127.0.0.1:243C", 33);
 	t_list *copiasBloqueA3 = list_create();
-	//list_add(copiasBloqueA3, copiaBloqueA3C1);
+	list_add(copiasBloqueA3, copiaBloqueA3C1);
 	list_add(copiasBloqueA3, copiaBloqueA3C2);
 	list_add(copiasBloqueA3, copiaBloqueA3C3);
 
@@ -222,8 +223,10 @@ int main() {
 	//fin de prueba de funciond de mostrar listas
 	levantarArchivoAMemoriaYDistribuirANodos(
 			"/home/utnso/Proyectos/tp-2015-1c-socketes-planificados/Filesystem/archivoBasura.dat",
-			"/home/utnso/Proyectos/tp-2015-1c-socketes-planificados/Filesystem/archivoDestino.dat");
-
+			"nuevoArchivo", 1);
+//	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
+	mostrarLista(listaNodos, (void*) mostrarNodo);
+	mostrarLista(listaArchivos, (void*) mostrarArchivo);
 	/*system("clear");
 
 	 char* path = "ConfigFS.cfg";
@@ -325,15 +328,17 @@ int main() {
 	return 0;
 }
 
-void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* pathDeMDFS) {
+void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal,
+		char* nombreArchivo, int padre) {
 	int local_fd;
 	int envioNodoCorrectamente = 1;
 	int cantidadBolquesEnviados = 0;
 	struct stat file_stat;
 	char *data;
 	t_list* listaDeBloques = list_create();
+	t_archivo *archivoNuevo;
 
-	if (pathLocal != NULL && pathDeMDFS != NULL) {
+	if (pathLocal != NULL) {
 		if ((local_fd = open(pathLocal, O_RDONLY)) != -1) {
 
 			fstat(local_fd, &file_stat);
@@ -347,8 +352,8 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* pathDeMDFS)
 			printf("\nLevanto a memoria el archivo (está en char* data)\n");
 
 			//TODO: Acá se pone a mandar bloques de arch a nodos y demás
-			envioNodoCorrectamente = mandarBloquesANodos(data, &cantidadBolquesEnviados,
-					&listaDeBloques);
+			envioNodoCorrectamente = mandarBloquesANodos(data,
+					&cantidadBolquesEnviados, &listaDeBloques);
 
 			if (close(local_fd) == -1)
 				perror("close");
@@ -357,10 +362,14 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* pathDeMDFS)
 				//agregar a la lista de archivos global el archivo nuevo,
 				//con su correspondiente listaDeBloques, nombre, padre, tamanio,
 				//y estado. (Esto es a las estructuras lógicas)
-				printf("Envio correctamente\n");
 
-			}
-			else {
+				archivoNuevo = nuevoArchivo(nombreArchivo, padre,
+						string_length(data), listaDeBloques, 1);
+
+				list_add(listaArchivos, archivoNuevo);
+
+				printf("Envio correctamente y agrego a lista global\n");
+			} else {
 				printf("error al enviar a nodos\n");
 			}
 			//TODO: Acá se actualiza la lista de archivos del FS para incluir al nuevo archivo
@@ -372,7 +381,6 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* pathDeMDFS)
 		printf("upload: falta un operando\n");
 	}
 }
-
 
 void *interaccionFSNodo(void* sock_ptr) {
 	fflush(stdout);

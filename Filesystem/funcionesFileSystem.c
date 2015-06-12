@@ -83,18 +83,15 @@ int CANT_COPIAS = 3;
 int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
 		t_list** listaDeBolques) {
 
-	struct t_nodo* nodo_disp;
-	int i, fin = 0, index_set;
+	int i, fin = 0;
 	int comienzoDeBloque = 0, finDeBloque;
-	t_list* list_used = list_create();
 	t_bloqueArch *bloqueDeArchivo;
-	struct t_copia_bloq* copy_block;
 	t_list *nodosOrdenados = list_create();
 	t_nodo *nodoActual;
 	int posicionEnNodo;
 	int *aux;
 	t_bloqueEnNodo *bloqueEnNodo;
-	int ultimoIndiceDelData = string_length(data) - 1;
+	int ultimoIndiceDelData = string_length(data) - 1;//Juanchi dice que -1 no va
 
 	*cantidadBolquesEnviados = 0;
 
@@ -104,12 +101,15 @@ int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
 		finDeBloque = comienzoDeBloque + BLOCK_SIZE;
 
 		if (finDeBloque > ultimoIndiceDelData) {
+			printf("sale\n");
 			finDeBloque = ultimoIndiceDelData;
 			fin = 1;
 		}	//Sale si ya no hay bloques
-
-		while (data[finDeBloque] != '\n')
+		printf("esta en while\n");
+		while (data[finDeBloque] != '\n'){
+			printf("esta buscando los barra n\n");
 			finDeBloque--;
+		}
 		//Acá tengo el final del bloque dado, y también donde empieza
 
 		//ordenar lista nodo por cantidad de bloques usados-->sale nodosOrdenados
@@ -140,7 +140,7 @@ int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
 
 				//termino de agregar a la lista de archivos, la info nueva del bloque
 				list_add(bloqueDeArchivo->copiasDeBloque, bloqueEnNodo);//algo malo puede pasar
-
+				printf("agrego un bloque\n");
 			} else {
 				printf("No hay nodos disponibles\n");
 				return -1;
@@ -151,6 +151,7 @@ int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
 		list_add(*listaDeBolques, bloqueDeArchivo);
 		(*cantidadBolquesEnviados)++;
 		comienzoDeBloque = finDeBloque + 1;
+		printf("agrego el bloque a la lista de bloques\n");
 	}
 	return 1;
 }
@@ -158,19 +159,22 @@ int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
 int nodoElegido(t_list *nodosOrdenados, t_nodo **nodoActual) {
 	int k = 0;
 	int z = 0;
+	int fin = 0;
 
-	nodoActual = list_get(nodosOrdenados, k);
+	*nodoActual = list_get(nodosOrdenados, k);
 
 	z = k;
-	while (!tieneLugar(*nodoActual)) {
+	while (!tieneLugar(*nodoActual) && fin != 0) {
 		k++;
 		if (z == k) {
+			fin = 1;
 			return -1;
 		}
 		if (list_size(nodosOrdenados) == k) {
 			k = 0;
 		}
 		*nodoActual = list_get(nodosOrdenados, k);
+		printf("%d ---- %d\n", k, z);
 	}
 
 	return 0;
