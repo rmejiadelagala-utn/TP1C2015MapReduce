@@ -152,6 +152,7 @@ int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
 		(*cantidadBolquesEnviados)++;
 		comienzoDeBloque = finDeBloque + 1;
 		printf("agrego el bloque a la lista de bloques\n");
+		list_destroy(nodosOrdenados);
 	}
 	return 1;
 }
