@@ -97,6 +97,7 @@ void liberarArchivo(t_archivo *unArchivo) {
 	free(unArchivo);
 }
 
+
 void liberarNodo(t_nodo *unNodo) {
 	queue_destroy_and_destroy_elements(unNodo->bloquesLiberados, (void*) free);
 	free(unNodo->ipPuerto);
