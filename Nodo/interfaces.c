@@ -14,7 +14,7 @@ void* conexionFS(void* arg){
 	t_hilofs* ptr;
 	ptr = (t_hilofs*) arg;
 
-	printf("Nodo Conectado al Filesystem");
+	printf("Nodo Conectado al Filesystem\n");
 
 	tam_disco = obtener_tamanio_disco(ptr->ARCH_BIN);
 	int cant_bloques = tam_disco / BLKSIZE;

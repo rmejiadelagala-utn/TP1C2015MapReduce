@@ -343,18 +343,23 @@ mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 }
 
 void *interaccionFSNodo(void* sock_ptr) {
-	printf("no me mates nodo D:");
 	fflush(stdout);
 	int sock_desc = *(int*) sock_ptr;
 	char infoDeNodo[BUFFERSIZE];
-	int read_size;
+	int read_size; int i=0;
 	t_nodo *nodo = list_get(listaNodos,cantidadDeNodos);
 	cantidadDeNodos++;
 	nodo->socket=sock_desc;
 	//Receive a reply from the server
+	int tamanio;
 
-	while ((read_size = recv((int) sock_desc, infoDeNodo, 1, 0)) > 0) {
-
+	while ((read_size = recv((int) sock_desc, &tamanio, sizeof(int), 0)) > 0) {
+		char* mensaje = malloc(tamanio);
+		recv((int) sock_desc, mensaje, 1, 0);
+		recv((int) sock_desc, mensaje, tamanio, 0);
+		//printf("%s",mensaje);
+		//fflush(stdout);
+		/*
 		//Limpia el buffer de los mensajes que le manda ese nodo
 		if(infoDeNodo[0]=='0'){
 
@@ -370,6 +375,17 @@ void *interaccionFSNodo(void* sock_ptr) {
 		write(fileno(archivoReconstruido),'\0',1);
 		sem_post(&semaforo);
 		}
+
+		if(infoDeNodo[0]=='d'){
+			printf("%s",infoDeNodo);
+			recv((int) sock_desc, infoDeNodo, 15, 0);
+			printf("%s",infoDeNodo);
+			fflush(stdout);
+
+		}*/
+		char** mensajePartido = string_split(mensaje,":");
+		printf("El nodo de ip %s, puerto %s se ha conectado. Tiene %d bloques y %s es nuevo.", mensajePartido[0],mensajePartido[1],atoi(mensajePartido[2]),mensajePartido[3]);
+		fflush(stdout);
 	}
 	if (read_size == 0) {
 		printf("Nodo desconectado.\n");
