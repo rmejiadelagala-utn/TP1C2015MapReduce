@@ -83,8 +83,8 @@ int main() {
 	 *a = 1;
 	 queue_push(nodoA->bloquesLiberados, a);*/
 	nodoA->cantidadBloquesOcupados = 0;
-	nodoC->cantidadBloquesOcupados = 0;
-	nodoB->cantidadBloquesOcupados = 0;
+	nodoB->cantidadBloquesOcupados = 3;
+	nodoC->cantidadBloquesOcupados = 2;
 
 	list_add(listaNodos, nodoA);
 	list_add(listaNodos, nodoB);
@@ -222,11 +222,11 @@ int main() {
 //	mostrarLista(listaArchivos, (void*) mostrarArchivo);
 	//fin de prueba de funciond de mostrar listas
 	levantarArchivoAMemoriaYDistribuirANodos(
-			"/home/utnso/Proyectos/tp-2015-1c-socketes-planificados/Filesystem/archivoBasura.dat","nuevoArchivo", 1);
+			"../archivoBasura.dat","nuevoArchivo", 1);
 //	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 	mostrarLista(listaNodos, (void*) mostrarNodo);
 	mostrarLista(listaArchivos, (void*) mostrarArchivo);
-	system("clear");
+/*	system("clear");
 
 	 char* path = "ConfigFS.cfg";
 
@@ -247,9 +247,9 @@ int main() {
 
 	 crearServerMultiHilo(config_get_int_value(config, "PUERTO_FS"),
 	 interaccionFSNodo);
-
-	//Probando el agregar test
-	/*CU_initialize_registry();
+*/
+	 //Probando el agregar test
+	 /*CU_initialize_registry();
 
 	 agregar_tests();
 
@@ -350,7 +350,7 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal,
 			}
 			printf("\nLevanto a memoria el archivo (está en char* data)\n");
 
-			//TODO: Acá se pone a mandar bloques de arch a nodos y demás
+			//Acá se pone a mandar bloques de arch a nodos y demás
 			envioNodoCorrectamente = mandarBloquesANodos(data,
 					&cantidadBolquesEnviados, &listaDeBloques);
 
@@ -371,7 +371,7 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal,
 			} else {
 				printf("error al enviar a nodos\n");
 			}
-			//TODO: Acá se actualiza la lista de archivos del FS para incluir al nuevo archivo
+
 
 		} else {
 			printf("Error al abrir el archivo\n");
@@ -392,24 +392,31 @@ void *interaccionFSNodo(void* sock_ptr) {
 		int id;
 		char tipo;
 		char* mensaje;
-		mensaje=malloc(tamanio);
+		mensaje = malloc(tamanio);
 		recv((int) sock_desc, &id, sizeof(int), 0);
-		switch (id){
+		switch (id) {
 		case 100:
 			recv((int) sock_desc, &tipo, sizeof(char), 0);
-			recv((int) sock_desc, mensaje, tamanio-sizeof(int)-sizeof(char), 0);
+			recv((int) sock_desc, mensaje, tamanio - sizeof(int) - sizeof(char),
+					0);
 
-			printf("El tamanio es:%d.\nId: %d.\nTipo: %c. Mensaje: %s\n",tamanio,id,tipo,mensaje);
+			printf("El tamanio es:%d.\nId: %d.\nTipo: %c. Mensaje: %s\n",
+					tamanio, id, tipo, mensaje);
 
-			char** mensajePartido = string_split(mensaje,":");
-			printf("El nodo de ip %s, puerto %s se ha conectado. Tiene %d bloques y %s es nuevo.", mensajePartido[0],mensajePartido[1],atoi(mensajePartido[2]),mensajePartido[3]);
+			char** mensajePartido = string_split(mensaje, ":");
+			printf(
+					"El nodo de ip %s, puerto %s se ha conectado. Tiene %d bloques y %s es nuevo.",
+					mensajePartido[0], mensajePartido[1],
+					atoi(mensajePartido[2]), mensajePartido[3]);
 
-			char* ipPuerto = strcat(strcat(mensajePartido[0],":"),mensajePartido[1]);
-			t_nodo* nodo = nuevoNodo(ipPuerto,50);
-			nodo->socket=sock_desc;
-			list_add(listaNodos,nodo);
+			char* ipPuerto = strcat(strcat(mensajePartido[0], ":"),
+					mensajePartido[1]);
+			t_nodo* nodo = nuevoNodo(ipPuerto, 50);
+			nodo->socket = sock_desc;
+			list_add(listaNodos, nodo);
 			//printf("%s",mensaje);
 			fflush(stdout);
+
 
 			//PARA PROBAR
 
@@ -423,7 +430,6 @@ void *interaccionFSNodo(void* sock_ptr) {
 			list_add(listaArchivos, archivoPrueba);
 
 
-
 			break;
 		case 0:
 			recv((int) sock_desc, &tipo, 1, 0);
@@ -432,9 +438,9 @@ void *interaccionFSNodo(void* sock_ptr) {
 
 			//	char* texto = malloc(strlen(infoDeNodo)+1);
 			//	strcpy(texto,infoDeNodo);
-			write(fileno(archivoReconstruido),mensaje,tamanio);
+			write(fileno(archivoReconstruido), mensaje, tamanio);
 
-			write(fileno(archivoReconstruido),'\0',1);
+			write(fileno(archivoReconstruido), '\0', 1);
 			sem_post(&semaforo);
 			fflush(stdout);
 

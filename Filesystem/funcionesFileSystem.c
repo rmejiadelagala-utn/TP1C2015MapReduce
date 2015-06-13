@@ -115,13 +115,13 @@ int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
 		//ordenar lista nodo por cantidad de bloques usados-->sale nodosOrdenados
 		list_add_all(nodosOrdenados, listaNodos);//Agrega todos los elementos de la segunda lista en la primera
 		list_sort(nodosOrdenados, (void*) ordenarPorMenorUso);
-
+		int k = 0;
 		//Acá distribuye las copias dado el algoritmo de dstribucion
 		for (i = 0; i < CANT_COPIAS; i++) {
 			//--Mandar este bloque al nodo que corresponda--
 
 			//nodoActual = nodoElegdoYConLugar(nodosOrdenados);
-			if (nodoElegido(nodosOrdenados, &nodoActual) != -1) {
+			if (nodoElegido(nodosOrdenados, &nodoActual,&k) != -1) {
 				//salio bien el elegir nodo, estando en nodoActual
 
 				//cargarEnListaArchivoElNodo(nodoElegido);
@@ -136,7 +136,7 @@ int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
 				bloqueEnNodo = nuevoBloqueEnNodo(nodoActual->ipPuerto,
 						posicionEnNodo);
 
-				//enviarBloqueDeDatosA(nodoElegido, incicio y fin de bloque);
+				//TODO enviarBloqueDeDatosA(nodoElegido, incicio y fin de bloque);
 
 				//termino de agregar a la lista de archivos, la info nueva del bloque
 				list_add(bloqueDeArchivo->copiasDeBloque, bloqueEnNodo);//algo malo puede pasar
@@ -145,38 +145,37 @@ int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
 				printf("No hay nodos disponibles\n");
 				return -1;
 			}
-
+			k++;
 		}
 		//cambiar el bloque start al siguiente y agrega el Bloque a la lista de bloques
 		list_add(*listaDeBolques, bloqueDeArchivo);
 		(*cantidadBolquesEnviados)++;
 		comienzoDeBloque = finDeBloque + 1;
 		printf("agrego el bloque a la lista de bloques\n");
+		list_destroy(nodosOrdenados);
 	}
 	return 1;
 }
 
-int nodoElegido(t_list *nodosOrdenados, t_nodo **nodoActual) {
-	int k = 0;
-	int z = 0;
+int nodoElegido(t_list *nodosOrdenados, t_nodo **nodoActual, int *posicion) {
+	int z = *posicion;
 	int fin = 0;
 
-	*nodoActual = list_get(nodosOrdenados, k);
+	*nodoActual = list_get(nodosOrdenados, *posicion);
 
-	z = k;
 	while (!tieneLugar(*nodoActual) && fin != 0) {
-		k++;
-		if (z == k) {
+		*posicion = *posicion + 1;//con el ++ se quejaba eclipse
+		if (z == *posicion) {
 			fin = 1;
 			return -1;
 		}
-		if (list_size(nodosOrdenados) == k) {
-			k = 0;
+		if (list_size(nodosOrdenados) == *posicion) {
+			*posicion = 1;
 		}
-		*nodoActual = list_get(nodosOrdenados, k);
-		printf("%d ---- %d\n", k, z);
+		*nodoActual = list_get(nodosOrdenados, *posicion);
+		printf("%d ---- %d\n", *posicion, z);
 	}
-
+	printf("%d\t",*posicion);
 	return 0;
 }
 
@@ -542,7 +541,7 @@ bool (*condition)(void*), void (*element_destroyer)(void*)) {
 }
 static bool ordenarPorMenorUso(t_nodo *data, t_nodo *dataSiguiente) {
 	return dataSiguiente->cantidadBloquesOcupados
-			< data->cantidadBloquesOcupados;
+			> data->cantidadBloquesOcupados;
 }
 static void *buscarEnListaPorStrKey(t_list *lista, char *key,
 		char *keyGetter(void*)) {
