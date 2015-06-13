@@ -77,10 +77,17 @@ static bool tieneLugar(t_nodo *unNodo);
  }
  */
 
-int BLOCK_SIZE = 25;//0 * 1024 * 1024;
+int BLOCK_SIZE = 20 * 1024 * 1024;//Probar con menos
 int CANT_COPIAS = 3;
+/*
+ * //FIXME a la hora de tener un archivo mayor a 20MB o que el BLOCK_SIZE sea menor estalla
+ * hay 2 motivos para que estalle, uno no encontro un barra n en el bloque por lo que debería devolver error
+ * e imprimir por pantalla que el archivo esta mal formateado. Y el otro es cuando de verdad esta buscando /n
+ * y hay un /n tambien tira segment fault. Por lo cual es importante arreglarlo
+ */
 
 int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
+
 		t_list** listaDeBloques) {
 
 	int i, fin = 0;
