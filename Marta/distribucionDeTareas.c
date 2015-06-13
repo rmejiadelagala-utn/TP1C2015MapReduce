@@ -5,7 +5,7 @@
  *      Author: utnso
  */
 
-
-void distribuirTareas(t_list listaJobsAPlanificar, t_list infoDeFS){
-
+/*
+void distribuirTareas(t_list *listaJobsAPlanificar, t_list *infoDeFS){
 }
+*/

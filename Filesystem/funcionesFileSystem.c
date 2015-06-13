@@ -77,7 +77,7 @@ static bool tieneLugar(t_nodo *unNodo);
  }
  */
 
-int BLOCK_SIZE = 20 * 1024 * 1024;//Probar con menos
+int BLOCK_SIZE =2* 1024 * 1024;//Probar con menos
 int CANT_COPIAS = 3;
 /*
  * //FIXME a la hora de tener un archivo mayor a 20MB o que el BLOCK_SIZE sea menor estalla
@@ -93,7 +93,7 @@ int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
 	int i, fin = 0;
 	int comienzoDeBloque = 0, finDeBloque;
 	t_bloqueArch *bloqueDeArchivo;
-	t_list *nodosOrdenados = list_create();
+//	t_list *nodosOrdenados = list_create();
 	t_nodo *nodoActual;
 	int posicionEnNodo;
 	int *aux;
@@ -119,6 +119,7 @@ int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
 		//Acá tengo el final del bloque dado, y también donde empieza
 
 		//ordenar lista nodo por cantidad de bloques usados-->sale nodosOrdenados
+		t_list *nodosOrdenados = list_create();
 		list_add_all(nodosOrdenados, listaNodos);//Agrega todos los elementos de la segunda lista en la primera
 		list_sort(nodosOrdenados, (void*) ordenarPorMenorUso);
 		int k = 0;

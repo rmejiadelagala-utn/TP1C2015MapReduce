@@ -391,7 +391,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 
 		switch (mensaje->id) {
 		case NODO_NUEVO_SE_CONECTA:
-			printf("Tengo un nodo con esta data loca: %s",mensaje->info);
+			//printf("Tengo un nodo con esta data loca: %s",mensaje->info);
 			fflush(stdout);
 			list_add(listaNodos,string_to_nodo(mensaje->info,socket));
 			//printf("%s",mensaje);
@@ -399,7 +399,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 
 			//PARA PROBAR
 
-			t_bloqueEnNodo *copiaBloquePrueba0 = nuevoBloqueEnNodo("127.0.0.1:5000", 0);
+			/*t_bloqueEnNodo *copiaBloquePrueba0 = nuevoBloqueEnNodo("127.0.0.1:5000", 0);
 			t_bloqueEnNodo *copiaBloquePrueba1 = nuevoBloqueEnNodo("127.0.0.1:5000", 1);
 			t_bloqueEnNodo *copiaBloquePrueba2 = nuevoBloqueEnNodo("127.0.0.1:5000", 2);
 			t_bloqueEnNodo *copiaBloquePrueba3 = nuevoBloqueEnNodo("127.0.0.1:5000", 3);
@@ -444,7 +444,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 			list_add(listaArchivos, archivoPrueba);
 
 			mostrarLista(bloquesDeArchivoPrueba,(void*)mostrarBloqueArch);
-
+*/
 
 			break;
 		case GET_BLOQUE_DE_NODO:
@@ -455,7 +455,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 	}
 
 	if (bytesRecibidos == 0) {
-		printf("Nodo desconectado.\n");
+		//printf("Nodo desconectado.\n");
 	}
 	if (bytesRecibidos < 0) {
 		printf("Error.");

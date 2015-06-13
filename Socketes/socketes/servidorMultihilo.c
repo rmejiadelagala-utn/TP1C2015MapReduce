@@ -13,7 +13,7 @@ int crearServerMultiHilo(uint16_t puerto, void* funcion_hilo)
     {
         printf("Could not create socket");
     }
-    puts("Socket created");
+    //puts("Socket created");
 
     setsockopt(socket_desc, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
 
@@ -28,16 +28,16 @@ int crearServerMultiHilo(uint16_t puerto, void* funcion_hilo)
         perror("bind failed. Error");
         return 1;
     }
-    puts("bind done");
+    //puts("bind done");
 
     listen(socket_desc , 3);
 
 
-    puts("Waiting for incoming connections...");
+    //puts("Waiting for incoming connections...");
     c = sizeof(struct sockaddr_in);
     while( (client_sock = accept(socket_desc, (struct sockaddr *)&client, (socklen_t*)&c)) )
     {
-        puts("Connection accepted");
+        //puts("Connection accepted");
 
         pthread_t hilo;
         new_sock = malloc(sizeof(int));
@@ -49,7 +49,7 @@ int crearServerMultiHilo(uint16_t puerto, void* funcion_hilo)
                         return 1;
                     }
 
-        puts("Nodo conectado");
+        //puts("Nodo conectado");
 
 
     }
