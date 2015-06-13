@@ -263,8 +263,9 @@ void moverDirectorio(char *directorio, char* padreString) {
 	}
 }
 void copiarAMDFS(char *archivo) {
+	levantarArchivoAMemoriaYDistribuirANodos("../archivoBasura.dat", archivo, directorioActual->index);
 
-	printf("Copia el archivo %s al MDFS\n", archivo);
+	printf("Ehhh \n", archivo);
 }
 
 void copiarAFS(char *archivo) {

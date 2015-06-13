@@ -77,7 +77,7 @@ static bool tieneLugar(t_nodo *unNodo);
  }
  */
 
-int BLOCK_SIZE =2* 1024 * 1024;//Probar con menos
+int BLOCK_SIZE = 50; //2* 1024 * 1024;//Probar con menos
 int CANT_COPIAS = 3;
 /*
  * //FIXME a la hora de tener un archivo mayor a 20MB o que el BLOCK_SIZE sea menor estalla
@@ -142,11 +142,32 @@ int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
 				nodoActual->cantidadBloquesOcupados++;
 				bloqueEnNodo = nuevoBloqueEnNodo(nodoActual->ipPuerto,
 						posicionEnNodo);
+				int tamanio = finDeBloque - comienzoDeBloque;
+				t_mensaje* mensaje = malloc(sizeof(t_mensaje));
+				mensaje->id=101;
+				mensaje->tipo='F'; //XXX
+				//NROBLOQUE:DATOS
+
+				mensaje->info=malloc(tamanio+sizeof(int));
+				printf("El numero de bloque que voy a mandar es %d\n",bloqueEnNodo->numeroDeBloqueEnNodo);
+
+				char* nroBloque =strdup(string_itoa(bloqueEnNodo->numeroDeBloqueEnNodo));
+				printf("El string numero de bloque pesa %d",strlen(nroBloque));
+				memcpy(mensaje->info, nroBloque,1); //Es 4, probar con numeros grandes despues
+				printf("El numero de bloque mandado es %d\n",bloqueEnNodo->numeroDeBloqueEnNodo);
+				printf("El string del bloque mandado es %s\n",nroBloque);
+				memcpy(mensaje->info+1,data+sizeof(int),tamanio);
+				t_stream *stream = empaquetar_mensaje(mensaje);
+				send(nodoActual->socket, &stream->length, sizeof(int),0);
+				if (enviar_mensaje(nodoActual->socket, stream->data, stream->length) > 0)
+										printf("Enviando mensaje a Nodo\n");
 /*
  * nodo: nodoActual
  * socket: nodoActual->socket
  * info: eee masomenos, buscala en memoria
  */
+
+
 
 				//TODO enviarBloqueDeDatosA(nodoElegido, incicio y fin de bloque);
 

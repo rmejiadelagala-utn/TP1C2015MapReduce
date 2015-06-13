@@ -52,22 +52,41 @@ void* conexionFS(void* arg){
 
 	t_mensaje* mensaje_fs = malloc(sizeof(t_mensaje));
 	uint32_t nrobloque;
+	int bytesLeidos;
 
-	while ((recibir_mensaje(ptr->socket, &mensaje_fs)) > 0) {
+	while ((bytesLeidos=recibir_mensaje(ptr->socket, &mensaje_fs)) > 0) {
 
 		switch (mensaje_fs->id){
 		  case SET_BLOQUE:
 			  printf("Recibiendo mensaje SET_BLOQUE del Filesystem\n");
-			  char ** data_fs = string_split(mensaje_fs->info, ":");
-			  nrobloque = atoi(data_fs[0]);
 
-			  memset(DATOS + obtenerDirBloque(nrobloque),'\0', BLKSIZE );
-			  memcpy(DATOS + obtenerDirBloque(nrobloque), data_fs[1], BLKSIZE);
+			  printf("Lei %d bytes\n",bytesLeidos);
+			  int tamanioDatos_fs = bytesLeidos-sizeof(int)-sizeof(char);
+			  char * datosRecibidos_fs;// = malloc(tamanioDatos_fs);
+			  datosRecibidos_fs=strdup(mensaje_fs->info);
+			  char* nroBloqueString=malloc(1);
+			  memcpy(nroBloqueString,mensaje_fs->info,1);
+			  printf("El string que recibi es: %s\n",nroBloqueString);
+			  nrobloque=atoi(nroBloqueString);
+
+			  printf("El numero de bloque es: %d\n",nrobloque);
+			  //datosRecibidos_fs++;
+			  printf("Recibi esto: %s\n",datosRecibidos_fs);
+			  printf("El tamaño recibido fue: %d\n",tamanioDatos_fs-1 );
+
+			  //DATOS=malloc(tamanioDatos_fs-1);
+			  printf("%d\n",obtenerDirBloque(nrobloque));
+			  //memset(DATOS + obtenerDirBloque(nrobloque),'\0', BLKSIZE );
+			  memcpy(DATOS + obtenerDirBloque(nrobloque), datosRecibidos_fs, tamanioDatos_fs-1);
+
+			  printf("El bin.data va a tener: %s\n",DATOS);
+			  printf("Y pesa: %d\n",strlen(DATOS));
 
 			  free(mensaje_nodo->info);
 			  free(mensaje_nodo);
 			  free(stream);
-
+			  munmap(DATOS,sizeof(DATOS));
+			  mensaje_nodo=malloc(sizeof(t_mensaje));
 			  mensaje_nodo->id = SET_BLOQUE_OK;
 			  mensaje_nodo->tipo = 'N';
 			  mensaje_nodo->info = string_new();
@@ -76,7 +95,8 @@ void* conexionFS(void* arg){
 			  if (enviar_mensaje(ptr->socket, stream->data, stream->length) > 0)
 			  		printf("Enviando mensaje SET_BLOQUE_OK a Filesystem\n");
 
-			  munmap(DATOS,sizeof(DATOS));// Para que deje grabado la info en Data.bin
+			  // Para que deje grabado la info en Data.bin
+			  printf("imprimi al archivo");
 
 		  break;
 

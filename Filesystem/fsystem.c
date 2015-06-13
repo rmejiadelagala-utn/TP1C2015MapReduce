@@ -63,7 +63,14 @@ int main() {
 	listaNodos = list_create();
 	listaDirectorios = list_create();
 	//probando funcion de mostrar listas
-	t_directorio *directorioRoot = nuevoDirectorio(1, "Root", 0);
+
+
+
+
+
+
+
+	/*t_directorio *directorioRoot = nuevoDirectorio(1, "Root", 0);
 	t_directorio *directorioHome = nuevoDirectorio(3, "home", 1);
 	t_directorio *directorioMedia = nuevoDirectorio(2, "media", 1);
 	t_directorio *directorioFotos = nuevoDirectorio(10, "fotos", 2);
@@ -76,25 +83,53 @@ int main() {
 	//Muestro nodos
 	t_nodo *nodoA = nuevoNodo("127.0.0.1:80A", 10);
 	t_nodo *nodoB = nuevoNodo("127.0.0.1:12B", 20);
-	t_nodo *nodoC = nuevoNodo("127.0.0.1:243C", 60);
+	t_nodo *nodoC = nuevoNodo("127.0.0.1:243C", 60);*/
+
+
+
+
+
+
+
 	/*
 	 nodoA->cantidadBloquesOcupados = 1;
 	 int *a = malloc(sizeof(int));
 	 *a = 1;
 	 queue_push(nodoA->bloquesLiberados, a);*/
-	nodoA->cantidadBloquesOcupados = 0;
+
+
+
+
+
+
+
+	/*nodoA->cantidadBloquesOcupados = 0;
 	nodoB->cantidadBloquesOcupados = 3;
 	nodoC->cantidadBloquesOcupados = 2;
 
 	list_add(listaNodos, nodoA);
 	list_add(listaNodos, nodoB);
-	list_add(listaNodos, nodoC);
+	list_add(listaNodos, nodoC);*/
+
+
+
+
+
+
+
+
 
 //	mostrarLista(listaNodos, (void*) mostrarNodo);
 
 //muestro archivos
 
-	t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo("127.0.0.1:80A", 11);
+
+
+
+
+
+
+	/*t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo("127.0.0.1:80A", 11);
 	t_bloqueEnNodo *copiaBloqueA1C2 = nuevoBloqueEnNodo("127.0.0.1:12B", 12);
 	t_bloqueEnNodo *copiaBloqueA1C3 = nuevoBloqueEnNodo("127.0.0.1:243C", 13);
 	t_list *copiasBloqueA1 = list_create();
@@ -160,6 +195,14 @@ int main() {
 //	eliminarNodoYReferencias(nodoB, listaNodos,listaArchivos);
 //	renombrarDirectorioConNombre("pepito",directorioHome);
 //	moverDirectorioConPadre(8,directorioHome);
+*/
+
+
+
+
+
+
+
 
 //160 lugar de trabajo de juanchi
 	/*
@@ -221,8 +264,8 @@ int main() {
 //	mostrarLista(listaNodos, (void*) mostrarNodo);
 //	mostrarLista(listaArchivos, (void*) mostrarArchivo);
 	//fin de prueba de funciond de mostrar listas
-	levantarArchivoAMemoriaYDistribuirANodos(
-			"../archivoBasura.dat","nuevoArchivo", 1);
+	//levantarArchivoAMemoriaYDistribuirANodos(
+	//		"../archivoBasura.dat","nuevoArchivo", 1);
 //	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 	mostrarLista(listaNodos, (void*) mostrarNodo);
 	mostrarLista(listaArchivos, (void*) mostrarArchivo);
