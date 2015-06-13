@@ -1,0 +1,2 @@
+Para crear un archivo de 1 GB sin importar su contenido pueden usar el comando truncate en la 
+consola: truncate -s 1G midata.bin
