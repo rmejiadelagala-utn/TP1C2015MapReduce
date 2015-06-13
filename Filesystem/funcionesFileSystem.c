@@ -649,13 +649,15 @@ int obtenerArchivo(t_archivo *archivo) {
 	t_mensaje *mensaje = malloc(sizeof(t_mensaje));
 	mensaje->id=104;
 	mensaje->tipo='5';
-	mensaje->info = string_duplicate(string_itoa(bloque->numeroDeBloqueEnNodo));
+	mensaje->info = strdup(string_itoa(bloque->numeroDeBloqueEnNodo));
 	t_stream *stream = empaquetar_mensaje(mensaje);
-	int result = send(nodoEncontrado->socket,stream->length,stream,0);
-	if (result<0) return result;
-	result = send(nodoEncontrado->socket,stream->data,stream,0);
-	if (result<0) return result;
+	int result;
+	result=send(nodoEncontrado->socket,&stream->length,sizeof(int),0);
+	if (result<=0) return result;
+	send(nodoEncontrado->socket,stream->data,stream->length,0);
+	if (result<=0) return result;
 	sem_wait(&semaforo);
+
 		//HAY QUE CREAR EL CAMPO SOCKET EN NODO
 		/*int socket_desc = nodoEncontrado.socket;
 		 send(socket_desc,1,sizeOf(1),0);
@@ -667,7 +669,7 @@ int obtenerArchivo(t_archivo *archivo) {
 		//FALTA ESCRIBIR EN ARCHIVO EN VEZ DE MOSTRAR POR PANTALLA
 	}
 	list_iterate(archivo->bloquesDeArch, (void *) obtenerBloque);
-
+	return 1;
 }
 
 static void recorrerCopiasDeUnArch(t_archivo *unArchivo,

@@ -44,10 +44,7 @@ void* conexionFS(void* arg){
 
 	t_stream *stream = empaquetar_mensaje(mensaje_nodo);
 
-	char* size = malloc(sizeof(int));
-	memcpy(size,&stream->length,4);
-
-	send(ptr->socket, size, sizeof(int),0);
+	send(ptr->socket, &stream->length, sizeof(int),0);
 
 	if (enviar_mensaje(ptr->socket, stream->data, stream->length) > 0)
 		printf("Enviando mensaje a Filesystem\n");
@@ -56,7 +53,7 @@ void* conexionFS(void* arg){
 	t_mensaje* mensaje_fs = malloc(sizeof(t_mensaje));
 	uint32_t nrobloque;
 
-	while ((recibir_mensaje(ptr->socket, mensaje_fs)) > 0) {
+	while ((recibir_mensaje(ptr->socket, &mensaje_fs)) > 0) {
 
 		switch (mensaje_fs->id){
 		  case SET_BLOQUE:
@@ -85,9 +82,8 @@ void* conexionFS(void* arg){
 
 		  case GET_BLOQUE:
 			  printf("Recibiendo mensaje GET_BLOQUE del Filesystem\n");
-			  char * datos_fs = string_new();
+			  char * datos_fs = strdup(mensaje_fs->info);
 
-			  strcpy(datos_fs, mensaje_fs->info);
 			  nrobloque = atoi(datos_fs);
 
 			  DATOS = string_new();
@@ -96,15 +92,22 @@ void* conexionFS(void* arg){
 			  free(mensaje_nodo->info);
 			  free(mensaje_nodo);
 			  free(stream);
+			  free(stream->data);
 
+			  stream=malloc(sizeof(t_stream));
+			  mensaje_nodo=malloc(sizeof(t_mensaje));
 			  mensaje_nodo->id = GET_BLOQUE_OK;
 			  mensaje_nodo->tipo = 'N';
 
+			  mensaje_nodo->info=malloc(BLKSIZE);
 			  memcpy(mensaje_nodo->info,DATOS + obtenerDirBloque(nrobloque), BLKSIZE);
 			  stream = empaquetar_mensaje(mensaje_nodo);
 
+			  printf("Voy a mandar el bloque %d\n",nrobloque);
+			  send(ptr->socket, &stream->length, sizeof(int),0);
+
 			  if (enviar_mensaje(ptr->socket, stream->data, stream->length) > 0)
-			  		printf("Enviando mensaje GET_BLOQUE_OK a Filesystem\n");
+				printf("Enviando mensaje a Filesystem\n");
 
 	      break;
 

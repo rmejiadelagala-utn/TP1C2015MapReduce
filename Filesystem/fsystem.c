@@ -399,25 +399,58 @@ void *interaccionFSNodo(void* sock_ptr) {
 
 			//PARA PROBAR
 
-			t_bloqueEnNodo *copiaBloquePrueba = nuevoBloqueEnNodo("127.0.0.1:5000", 3);
-			t_list *copiasBloquePrueba = list_create();
-			list_add(copiasBloquePrueba, copiaBloquePrueba);
-			t_bloqueArch *bloqueArchivoPrueba = nuevoBloqueArchivo(copiasBloquePrueba);
+			t_bloqueEnNodo *copiaBloquePrueba0 = nuevoBloqueEnNodo("127.0.0.1:5000", 0);
+			t_bloqueEnNodo *copiaBloquePrueba1 = nuevoBloqueEnNodo("127.0.0.1:5000", 1);
+			t_bloqueEnNodo *copiaBloquePrueba2 = nuevoBloqueEnNodo("127.0.0.1:5000", 2);
+			t_bloqueEnNodo *copiaBloquePrueba3 = nuevoBloqueEnNodo("127.0.0.1:5000", 3);
+			t_bloqueEnNodo *copiaBloquePrueba4 = nuevoBloqueEnNodo("127.0.0.1:5000", 4);
+			t_bloqueEnNodo *copiaBloquePrueba5 = nuevoBloqueEnNodo("127.0.0.1:5000", 5);
+			t_bloqueEnNodo *copiaBloquePrueba6 = nuevoBloqueEnNodo("127.0.0.1:5000", 6);
+			t_bloqueEnNodo *copiaBloquePrueba7 = nuevoBloqueEnNodo("127.0.0.1:5000", 7);
+			t_list *copiasBloquePrueba0 = list_create();
+			t_list *copiasBloquePrueba1 = list_create();
+			t_list *copiasBloquePrueba2 = list_create();
+			t_list *copiasBloquePrueba3 = list_create();
+			t_list *copiasBloquePrueba4 = list_create();
+			t_list *copiasBloquePrueba5 = list_create();
+			t_list *copiasBloquePrueba6 = list_create();
+			t_list *copiasBloquePrueba7 = list_create();
+			list_add(copiasBloquePrueba0, copiaBloquePrueba0);
+			list_add(copiasBloquePrueba1, copiaBloquePrueba1);
+			list_add(copiasBloquePrueba2, copiaBloquePrueba2);
+			list_add(copiasBloquePrueba3, copiaBloquePrueba3);
+			list_add(copiasBloquePrueba4, copiaBloquePrueba4);
+			list_add(copiasBloquePrueba5, copiaBloquePrueba5);
+			list_add(copiasBloquePrueba6, copiaBloquePrueba6);
+			list_add(copiasBloquePrueba7, copiaBloquePrueba7);
+			t_bloqueArch *bloqueArchivoPrueba0 = nuevoBloqueArchivo(copiasBloquePrueba0);
+			t_bloqueArch *bloqueArchivoPrueba1 = nuevoBloqueArchivo(copiasBloquePrueba1);
+			t_bloqueArch *bloqueArchivoPrueba2 = nuevoBloqueArchivo(copiasBloquePrueba2);
+			t_bloqueArch *bloqueArchivoPrueba3 = nuevoBloqueArchivo(copiasBloquePrueba3);
+			t_bloqueArch *bloqueArchivoPrueba4 = nuevoBloqueArchivo(copiasBloquePrueba4);
+			t_bloqueArch *bloqueArchivoPrueba5 = nuevoBloqueArchivo(copiasBloquePrueba5);
+			t_bloqueArch *bloqueArchivoPrueba6 = nuevoBloqueArchivo(copiasBloquePrueba6);
+			t_bloqueArch *bloqueArchivoPrueba7 = nuevoBloqueArchivo(copiasBloquePrueba7);
 			t_list * bloquesDeArchivoPrueba = list_create();
-			list_add(bloquesDeArchivoPrueba, bloqueArchivoPrueba);
+			list_add(bloquesDeArchivoPrueba, bloqueArchivoPrueba0);
+			list_add(bloquesDeArchivoPrueba, bloqueArchivoPrueba1);
+			list_add(bloquesDeArchivoPrueba, bloqueArchivoPrueba2);
+			list_add(bloquesDeArchivoPrueba, bloqueArchivoPrueba3);
+			list_add(bloquesDeArchivoPrueba, bloqueArchivoPrueba4);
+			list_add(bloquesDeArchivoPrueba, bloqueArchivoPrueba5);
+			list_add(bloquesDeArchivoPrueba, bloqueArchivoPrueba6);
+			list_add(bloquesDeArchivoPrueba, bloqueArchivoPrueba7);
 			t_archivo *archivoPrueba = nuevoArchivo("ArchivoPrueba", 1, 3000, bloquesDeArchivoPrueba,1);
 			list_add(listaArchivos, archivoPrueba);
+
+			mostrarLista(bloquesDeArchivoPrueba,(void*)mostrarBloqueArch);
 
 
 			break;
 		case GET_BLOQUE_DE_NODO:
-
-			//	char* texto = malloc(strlen(infoDeNodo)+1);
-			//	strcpy(texto,infoDeNodo);
-			write(fileno(archivoReconstruido), mensaje->info, strlen(mensaje->info));
+			write(fileno(archivoReconstruido), mensaje->info, strlen(mensaje->info)-1);
 			sem_post(&semaforo);
 			fflush(stdout);
-
 		}
 	}
 

@@ -270,7 +270,7 @@ void copiarAMDFS(char *archivo) {
 void copiarAFS(char *archivo) {
 	void copiarArchAFS(t_archivo *unArchivo){
 		int resultado = descargarArchivo(unArchivo);
-		if(resultado>0) printf("El archivo fue copiado al FileSystem local\.n");
+		if(resultado>0) printf("El archivo fue copiado al FileSystem local.\n");
 		else printf("Error al copiar el archivo al FileSystem local.\n");
 }
 	validarArchivoYEjecutar(archivo, (void*)copiarArchAFS);
@@ -281,8 +281,8 @@ void solicitarMD5(char *archivo) {
 	void pedirMD5(t_archivo *unArchivo){
 		int resultado = descargarArchivo(unArchivo);
 		if(resultado>0) {
-			printf("El hash solicitado es:\.n");
-			system("md5sum ../archivoReconstruido");
+			printf("El hash solicitado es:.\n");
+			system("md5sum  ../archivoReconstruido");
 			remove("../archivoReconstruido");
 		}
 		else	printf("Error al copiar el archivo al FileSystem local.\n");
