@@ -35,7 +35,7 @@ t_mensaje * desempaquetar_mensaje(t_stream *stream) {
 	int offset = 0;
 	int tmp_size = 0;
 
-	memcpy(&mensaje->id, stream->data, tmp_size = sizeof(char));
+	memcpy(&mensaje->id, stream->data, tmp_size = sizeof(int));
 	offset = tmp_size;
 
 	memcpy(&mensaje->tipo, stream->data + offset, tmp_size = sizeof(char));
@@ -58,13 +58,13 @@ int enviar_mensaje(int unSocket, char* data, int length){
 	return nbytes;
 }
 
-int recibir_mensaje (int unSocket, t_mensaje * mensaje){
+int recibir_mensaje (int unSocket, t_mensaje ** mensaje){
 
 	int nbytes;
 	t_stream *stream = malloc(sizeof(t_stream));
 
 
-	if ((nbytes= recv(unSocket, &(stream->length), sizeof(int), 0)) < 0)
+	if ((nbytes= recv(unSocket, &stream->length, sizeof(int), 0)) < 0)
 		perror("Error en la recepcion");
 
 	stream->data=malloc(stream->length);
@@ -72,7 +72,7 @@ int recibir_mensaje (int unSocket, t_mensaje * mensaje){
 	if ((nbytes= recv(unSocket, stream->data, stream->length, 0)) < 0)
 			perror("Error en la recepcion");
 
-	mensaje = desempaquetar_mensaje(stream);
+	*mensaje = desempaquetar_mensaje(stream);
 
 	return nbytes;
 }

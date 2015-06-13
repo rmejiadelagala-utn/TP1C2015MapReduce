@@ -30,6 +30,6 @@ typedef struct stream {
 t_stream * empaquetar_mensaje(t_mensaje *);
 t_mensaje * desempaquetar_mensaje(t_stream *);
 int enviar_mensaje(int, char*, int);
-int recibir_mensaje (int, t_mensaje *);
+int recibir_mensaje (int, t_mensaje **);
 
 #endif /* PAQUETESNODO_H_ */

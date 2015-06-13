@@ -226,7 +226,7 @@ int main() {
 //	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 	mostrarLista(listaNodos, (void*) mostrarNodo);
 	mostrarLista(listaArchivos, (void*) mostrarArchivo);
-/*	system("clear");
+	system("clear");
 
 	 char* path = "ConfigFS.cfg";
 
@@ -247,7 +247,7 @@ int main() {
 
 	 crearServerMultiHilo(config_get_int_value(config, "PUERTO_FS"),
 	 interaccionFSNodo);
-*/
+
 	 //Probando el agregar test
 	 /*CU_initialize_registry();
 
@@ -382,41 +382,20 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal,
 }
 
 void *interaccionFSNodo(void* sock_ptr) {
-	fflush(stdout);
-	int sock_desc = *(int*) sock_ptr;
-	int read_size;
-	//Receive a reply from the server
-	int tamanio;
+	int socket = *(int*) sock_ptr;
+	t_mensaje* mensaje=malloc(sizeof(t_mensaje));
+	int bytesRecibidos;
 
-	while ((read_size = recv((int) sock_desc, &tamanio, sizeof(int), 0)) > 0) {
-		int id;
-		char tipo;
-		char* mensaje;
-		mensaje = malloc(tamanio);
-		recv((int) sock_desc, &id, sizeof(int), 0);
-		switch (id) {
-		case 100:
-			recv((int) sock_desc, &tipo, sizeof(char), 0);
-			recv((int) sock_desc, mensaje, tamanio - sizeof(int) - sizeof(char),
-					0);
+	while ((bytesRecibidos=recibir_mensaje(socket,&mensaje))>0) {
 
-			printf("El tamanio es:%d.\nId: %d.\nTipo: %c. Mensaje: %s\n",
-					tamanio, id, tipo, mensaje);
 
-			char** mensajePartido = string_split(mensaje, ":");
-			printf(
-					"El nodo de ip %s, puerto %s se ha conectado. Tiene %d bloques y %s es nuevo.",
-					mensajePartido[0], mensajePartido[1],
-					atoi(mensajePartido[2]), mensajePartido[3]);
-
-			char* ipPuerto = strcat(strcat(mensajePartido[0], ":"),
-					mensajePartido[1]);
-			t_nodo* nodo = nuevoNodo(ipPuerto, 50);
-			nodo->socket = sock_desc;
-			list_add(listaNodos, nodo);
+		switch (mensaje->id) {
+		case NODO_NUEVO_SE_CONECTA:
+			printf("Tengo un nodo con esta data loca: %s",mensaje->info);
+			fflush(stdout);
+			list_add(listaNodos,string_to_nodo(mensaje->info,socket));
 			//printf("%s",mensaje);
 			fflush(stdout);
-
 
 			//PARA PROBAR
 
@@ -431,29 +410,24 @@ void *interaccionFSNodo(void* sock_ptr) {
 
 
 			break;
-		case 0:
-			recv((int) sock_desc, &tipo, 1, 0);
-			recv((int) sock_desc, &tamanio, 4, 0);
-			recv((int) sock_desc, mensaje, tamanio, 0);
+		case GET_BLOQUE_DE_NODO:
 
 			//	char* texto = malloc(strlen(infoDeNodo)+1);
 			//	strcpy(texto,infoDeNodo);
-			write(fileno(archivoReconstruido), mensaje, tamanio);
-
-			write(fileno(archivoReconstruido), '\0', 1);
+			write(fileno(archivoReconstruido), mensaje->info, strlen(mensaje->info));
 			sem_post(&semaforo);
 			fflush(stdout);
 
 		}
 	}
 
-	if (read_size == 0) {
+	if (bytesRecibidos == 0) {
 		printf("Nodo desconectado.\n");
 	}
-	if (read_size < 0) {
+	if (bytesRecibidos < 0) {
 		printf("Error.");
 	}
-	close(sock_desc);
+	close(socket);
 	return 0;
 }
 
