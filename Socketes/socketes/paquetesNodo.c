@@ -61,16 +61,18 @@ int enviar_mensaje(int unSocket, char* data, int length){
 int recibir_mensaje (int unSocket, t_mensaje * mensaje){
 
 	int nbytes;
-	char * buff = malloc(sizeof(buff));;
+	t_stream *stream = malloc(sizeof(t_stream));
 
-	if ((nbytes= recv(unSocket, buff, sizeof(buff), 0)) < 0)
+
+	if ((nbytes= recv(unSocket, &(stream->length), sizeof(int), 0)) < 0)
 		perror("Error en la recepcion");
 
-	t_stream *stream_rta = malloc(sizeof(t_stream));
-	stream_rta->data = buff;
-	stream_rta->length = nbytes;
+	stream->data=malloc(stream->length);
 
-	mensaje = desempaquetar_mensaje(stream_rta);
+	if ((nbytes= recv(unSocket, stream->data, stream->length, 0)) < 0)
+			perror("Error en la recepcion");
+
+	mensaje = desempaquetar_mensaje(stream);
 
 	return nbytes;
 }

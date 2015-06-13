@@ -411,7 +411,8 @@ void *interaccionFSNodo(void* sock_ptr) {
 			//printf("%s",mensaje);
 			fflush(stdout);
 
-			/*PARA PROBAR
+			//PARA PROBAR
+
 			t_bloqueEnNodo *copiaBloquePrueba = nuevoBloqueEnNodo("127.0.0.1:5000", 3);
 			t_list *copiasBloquePrueba = list_create();
 			list_add(copiasBloquePrueba, copiaBloquePrueba);
@@ -419,7 +420,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 			t_list * bloquesDeArchivoPrueba = list_create();
 			list_add(bloquesDeArchivoPrueba, bloqueArchivoPrueba);
 			t_archivo *archivoPrueba = nuevoArchivo("ArchivoPrueba", 1, 3000, bloquesDeArchivoPrueba,1);
-			list_add(listaArchivos, archivoPrueba);*/
+			list_add(listaArchivos, archivoPrueba);
 
 
 

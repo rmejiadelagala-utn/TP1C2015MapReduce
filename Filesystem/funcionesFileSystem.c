@@ -652,7 +652,9 @@ int obtenerArchivo(t_archivo *archivo) {
 	mensaje->tipo='5';
 	mensaje->info = string_duplicate(string_itoa(bloque->numeroDeBloqueEnNodo));
 	t_stream *stream = empaquetar_mensaje(mensaje);
-	int result = send(nodoEncontrado->socket,stream,stream,0);
+	int result = send(nodoEncontrado->socket,stream->length,stream,0);
+	if (result<0) return result;
+	int result = send(nodoEncontrado->socket,stream->data,stream,0);
 	if (result<0) return result;
 	sem_wait(&semaforo);
 		//HAY QUE CREAR EL CAMPO SOCKET EN NODO
