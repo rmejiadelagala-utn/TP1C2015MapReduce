@@ -8,6 +8,15 @@
 #ifndef FSYSTEM_H_
 #define FSYSTEM_H_
 
+//PROTOCOLOS QUE ESPERA EL FILESYSTEM
+enum protocolo {
+	NODO_NUEVO_SE_CONECTA=100,
+	GET_BLOQUE_DE_NODO=42
+};
+
+//PROTOCOLOS QUE ESPERA EL FILESYSTEM
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <socketes/servidor.h>

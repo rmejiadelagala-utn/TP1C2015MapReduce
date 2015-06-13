@@ -61,6 +61,20 @@ void activarNodo(t_nodo *unNodo) {
 void desactivarNodo(t_nodo *unNodo) {
 	unNodo->activo = 0;
 }
+
+t_nodo* string_to_nodo(char* infoDeNodo,int socket){
+			char** mensajePartido = string_split(infoDeNodo, ":");
+			printf(
+					"El nodo de ip %s, puerto %s se ha conectado. Tiene %d bloques y %s es nuevo.",
+					mensajePartido[0], mensajePartido[1],
+					atoi(mensajePartido[2]), mensajePartido[3]);
+
+			char* ipPuerto = strcat(strcat(mensajePartido[0], ":"),
+					mensajePartido[1]);
+			t_nodo* nodo = nuevoNodo(ipPuerto, 50);
+			nodo->socket = socket;
+			return nodo;
+}
 //funciones para la estructura tabla de directorios
 
 t_directorio *nuevoDirectorio(int index, char *nombre, int padre) {

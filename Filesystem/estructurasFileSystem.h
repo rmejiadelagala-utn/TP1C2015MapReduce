@@ -123,6 +123,12 @@ void activarNodo(t_nodo *unNodo);
  */
 void desactivarNodo(t_nodo *unNodo);
 
+/**
+ * @NAME: desactivarNodo
+ * @DESC: dado un string y un socket, devuelve un nodo
+ */
+t_nodo* string_to_nodo(char* infoDeNodo,int socket);
+
 //funciones para la estructura tabla de directorios
 /**
  * @NAME: nuevoDirectorio
