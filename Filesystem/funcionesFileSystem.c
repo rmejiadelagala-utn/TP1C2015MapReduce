@@ -77,11 +77,18 @@ static bool tieneLugar(t_nodo *unNodo);
  }
  */
 
-int BLOCK_SIZE = 20 * 1024 * 1024;
+int BLOCK_SIZE = 20 * 1024 * 1024;//Probar con menos
 int CANT_COPIAS = 3;
+/*
+ * //FIXME a la hora de tener un archivo mayor a 20MB o que el BLOCK_SIZE sea menor estalla
+ * hay 2 motivos para que estalle, uno no encontro un barra n en el bloque por lo que debería devolver error
+ * e imprimir por pantalla que el archivo esta mal formateado. Y el otro es cuando de verdad esta buscando /n
+ * y hay un /n tambien tira segment fault. Por lo cual es importante arreglarlo
+ */
 
 int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
-		t_list** listaDeBolques) {
+
+		t_list** listaDeBloques) {
 
 	int i, fin = 0;
 	int comienzoDeBloque = 0, finDeBloque;
@@ -101,13 +108,12 @@ int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
 		finDeBloque = comienzoDeBloque + BLOCK_SIZE;
 
 		if (finDeBloque > ultimoIndiceDelData) {
-			printf("sale\n");
+
 			finDeBloque = ultimoIndiceDelData;
 			fin = 1;
 		}	//Sale si ya no hay bloques
-		printf("esta en while\n");
+
 		while (data[finDeBloque] != '\n'){
-			printf("esta buscando los barra n\n");
 			finDeBloque--;
 		}
 		//Acá tengo el final del bloque dado, y también donde empieza
@@ -135,6 +141,11 @@ int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
 				nodoActual->cantidadBloquesOcupados++;
 				bloqueEnNodo = nuevoBloqueEnNodo(nodoActual->ipPuerto,
 						posicionEnNodo);
+/*
+ * nodo: nodoActual
+ * socket: nodoActual->socket
+ * info: eee masomenos, buscala en memoria
+ */
 
 				//TODO enviarBloqueDeDatosA(nodoElegido, incicio y fin de bloque);
 
@@ -148,7 +159,7 @@ int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
 			k++;
 		}
 		//cambiar el bloque start al siguiente y agrega el Bloque a la lista de bloques
-		list_add(*listaDeBolques, bloqueDeArchivo);
+		list_add(*listaDeBloques, bloqueDeArchivo);
 		(*cantidadBolquesEnviados)++;
 		comienzoDeBloque = finDeBloque + 1;
 		printf("agrego el bloque a la lista de bloques\n");
