@@ -8,6 +8,7 @@
 #ifndef PAQUETESNODO_H_
 #define PAQUETESNODO_H_
 
+#include "servidor.h"
 #define	CONEXION_FS     100 // Envio IP, Puerto y Cantidad de bloques total del Nodo al FS
 #define	SET_BLOQUE      101 // Recibo del FS el bloque y datos a Grabar en el data.bin
 #define	SET_BLOQUE_OK   103 // Envio OK de la escritura del bloque
