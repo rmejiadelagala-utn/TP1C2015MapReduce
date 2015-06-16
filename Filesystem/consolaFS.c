@@ -327,26 +327,48 @@ void eliminarNodo(char *nodo) {
 }
 
 void help() {
-	printf("Comandos Validos\n");
-	printf("formatearMDFS		Formatea el MDFS\n");
-	printf("eliminarArchivo archivo		Borra el archivo 'archivo'\n");
-	printf("renombarArchivo archivo		Renombra el archivo 'archivo'\n");
-	printf("moverArchivo archivo		Mueve el archivo 'archivo'\n");
-	printf(
-			"crearDirectorio directorio		Crea un directorio llamado 'directorio'\n");
-	printf("eliminarDirectorio directorio		Borra el directorio 'directorio'\n");
-	printf(
-			"renombrarDirectorio directorio		Renombra el directorio 'directorio'\n");
-	printf("moverDirectorio directorio		Mueve el directorio 'directorio'\n");
-	printf("copiarAMDFS archivo		Copia el archivo file al MDFS\n");
-	printf("copiarAFS archivo		Copia el archivo file al File System\n");
-	printf("solicitarMD5 archivo		Obtiene el MD5 de 'archivo'\n");
-	printf("verBloque bloque		Muestra el bloque 'bloque'\n");
-	printf("eliminarBloque bloque	Borra el bloque 'bloque'\n");
-	printf("copiarBloque bloque		Copia el bloque 'bloque'\n");
-	printf("levantarNodo nodo		Agrega el nodo 'nodo'\n");
-	printf("eliminarNodo nodo		Borra el nodo 'nodo'\n");
-	printf("salir		Cierra la consola del MDFS\n\n");
+	//printf("Comandos Validos\n");
+	//printf("formatearMDFS		Formatea el MDFS\n");
+	//printf("eliminarArchivo archivo		Borra el archivo 'archivo'\n");
+	//printf("renombarArchivo archivo		Renombra el archivo 'archivo'\n");
+	//printf("moverArchivo archivo		Mueve el archivo 'archivo'\n");
+	//printf(
+			//"crearDirectorio directorio		Crea un directorio llamado 'directorio'\n");
+	//printf("eliminarDirectorio directorio		Borra el directorio 'directorio'\n");
+	//printf(
+			//"renombrarDirectorio directorio		Renombra el directorio 'directorio'\n");
+	//printf("moverDirectorio directorio		Mueve el directorio 'directorio'\n");
+	//printf("copiarAMDFS archivo		Copia el archivo file al MDFS\n");
+	//printf("copiarAFS archivo		Copia el archivo file al File System\n");
+	//printf("solicitarMD5 archivo		Obtiene el MD5 de 'archivo'\n");
+	//printf("verBloque bloque		Muestra el bloque 'bloque'\n");
+	//printf("eliminarBloque bloque	Borra el bloque 'bloque'\n");
+	//printf("copiarBloque bloque		Copia el bloque 'bloque'\n");
+	//printf("levantarNodo nodo		Agrega el nodo 'nodo'\n");
+	//printf("eliminarNodo nodo		Borra el nodo 'nodo'\n");
+	//printf("salir		Cierra la consola del MDFS\n\n");
+	
+	 printf("===========================================================================\n");
+	 printf("* Comandos Validos:                                                        \n");
+	 printf("===========================================================================\n");
+	 printf("* formatearMDFS                  |->(Formatea el MDFS)                     \n");
+	 printf("* eliminarArchivo archivo        |->(Borra el archivo 'archivo')           \n");
+	 printf("* renombarArchivo archivo        |->(Renombra el archivo 'archivo')        \n");
+	 printf("* moverArchivo archivo           |->(Mueve el archivo 'archivo')           \n");
+	 printf("* crearDirectorio directorio     |->(Crea un directorio 'directorio'       \n");
+	 printf("* eliminarDirectorio directorio  |->(Borra el directorio 'directorio')     \n");
+	 printf("* renombrarDirectorio directorio |->(Renombra el directorio 'directorio')	\n");
+	 printf("* moverDirectorio directorio     |->(Mueve el directorio 'directorio')     \n");
+	 printf("* copiarAMDFS archivo            |->(Copia el archivo file al MDFS)        \n");
+	 printf("* copiarAFS archivo              |->(Copia el archivo file al File System) \n");
+	 printf("* solicitarMD5 archivo           |->(Obtiene el MD5 de 'archivo')          \n");
+	 printf("* verBloque bloque               |->(Muestra el bloque 'bloque')           \n");
+	 printf("* eliminarBloque bloque          |->(Borra el bloque 'bloque')             \n");
+	 printf("* copiarBloque bloque            |->(Copia el bloque 'bloque')             \n");
+	 printf("* levantarNodo nodo              |->(Agrega el nodo 'nodo')                \n");
+	 printf("* eliminarNodo nodo              |->(Borra el nodo 'nodo')                 \n");
+	 printf("* Salir                          |->(Cierra la consola del MDFS)           \n");
+	 printf("===========================================================================\n");
 }
 
 void ls(){
