@@ -415,6 +415,7 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal,
 				printf("error al enviar a nodos\n");
 			}
 
+			munmap(data, file_stat.st_size);
 
 		} else {
 			printf("Error al abrir el archivo\n");
