@@ -37,7 +37,7 @@ typedef struct {
 	uint16_t PUERTO_FS;
 	char* ARCH_BIN;
 	char* DIR_TEMP;
-	char* NODO_NEW;
+	char NODO_NEW;
 	char* IP_NODO;
 	uint16_t PUERTO_NODO;
 } t_config_nodo;
@@ -46,7 +46,7 @@ typedef struct {
 	char* ARCH_BIN;
 	char* IP_NODO;
 	uint16_t PUERTO_NODO;
-	char* NODO_NEW;
+	char NODO_NEW;
 	char* DIR_TEMP;
 }t_hilofs;
 
