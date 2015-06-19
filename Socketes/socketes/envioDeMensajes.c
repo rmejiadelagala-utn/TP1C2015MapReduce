@@ -3,11 +3,39 @@
 //sendall y recvall aseguran que se mande/reciba toda la informacion
 
 int sendall(int socket, void *mensaje, size_t tamanio){
-	return send(socket, mensaje, tamanio, 0);
+
+	    int total = 0;        // how many bytes we've sent
+	    int bytesleft = tamanio; // how many we have left to send
+	    int bytesSent;
+
+	    while(total < tamanio) {
+	        bytesSent = send(socket, mensaje+total, bytesleft, 0);
+	        if (bytesSent == -1) { break; }
+	        total += bytesSent;
+	        bytesleft -= bytesSent;
+	    }
+
+	    tamanio = total; // return number actually sent here
+
+	    return bytesSent==-1?-1:0; // return -1 on failure, 0 on success
+
 }
 
 int recvall(int socket, void *mensaje, size_t tamanio){
-	return recv(socket, mensaje, tamanio, 0);
+	 	 	 int total = 0;        // how many bytes we've received
+		    int bytesleft = tamanio; // how many we have left to receive
+		    int bytesRead;
+
+		    while(total < tamanio) {
+		        bytesRead = recv(socket, mensaje+total, bytesleft, 0);
+		        if (bytesRead == -1) { break; }
+		        total += bytesRead;
+		        bytesleft -= bytesRead;
+		    }
+
+		    tamanio = total; // return number actually received here
+
+		    return bytesRead==-1?-1:0; // return -1 on failure, 0 on success
 }
 
 //PROTOCOLOS
@@ -100,6 +128,9 @@ int enviarBuffer(t_buffer* buffer, int socket){
 	}
 //Nodo
 	//De FileSystem
-	int setBloqueDeFileSystem(int socket,char* dataBin){
-
+	int setBloqueDeFileSystem(int socket, int* nroBloque, char* dataBin, int block_size){
+		int tamanio;
+		recvall(socket,nroBloque,4);
+		recvall(socket,&tamanio,4);
+		return recvall(socket,dataBin+(block_size*nroBloque),tamanio);
 	}
