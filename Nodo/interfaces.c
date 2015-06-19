@@ -23,7 +23,7 @@ void* conexionFS(void* arg){
 	DATOS = mapeo_disco(ptr->ARCH_BIN);
 
 	t_nodoParaFS* nodo = malloc(sizeof(t_nodoParaFS));
-	nodo->IP_NODO = strdup(ptr->IP_NODO);
+	nodo->IP_NODO = inet_addr (ptr->IP_NODO);
 	nodo->PUERTO_NODO = ptr->PUERTO_NODO;
 	nodo->NODO_NEW = (ptr->NODO_NEW == 's' || ptr->NODO_NEW == 'S');
 
