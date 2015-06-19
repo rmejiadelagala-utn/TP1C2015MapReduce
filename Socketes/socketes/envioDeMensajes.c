@@ -28,18 +28,35 @@ void bufferAgregarInt(t_buffer* buffer, int unInt){
 	memcpy(buffer->data + tamanioAnterior,&unInt,sizeof(int));
 }
 
+void bufferAgregarChar(t_buffer* buffer, char unChar){
+	int tamanioAnterior=buffer->tamanio;
+	buffer->tamanio+=sizeof(char);
+	buffer = realloc(buffer->data,buffer->tamanio);
+	memcpy(buffer->data + tamanioAnterior,&unChar,sizeof(char));
+}
+
 void bufferAgregarString(t_buffer* buffer,char* unString){
-	int tamanioAnterior=buffer->tamanio+1;
-	int largoString = strlen(unString);
+	int tamanioAnterior=buffer->tamanio;
+	int largoString = strlen(unString)+1;
 	buffer->tamanio+= largoString;
 	buffer = realloc(buffer->data,buffer->tamanio);
 	memcpy(buffer->data + tamanioAnterior,unString,largoString);
 }
 
+
+
 //Enviar buffer
 
 int enviarBuffer(t_buffer* buffer, int socket){
-	return sendall(socket,buffer->data,buffer->tamanio);
+	int tamanioMensaje = buffer->tamanio + sizeof(buffer->tamanio);
+	int offset = 0;
+	void* mensajeAEnviar = malloc(tamanioMensaje);
+	memcpy(mensajeAEnviar+offset,buffer->tamanio,sizeof(buffer->tamanio));
+	offset+=sizeof(buffer->tamanio);
+	memcpy(mensajeAEnviar+offset,buffer->data,buffer->tamanio);
+	int resultado= sendall(socket,mensajeAEnviar,tamanioMensaje);
+	liberarBuffer(buffer);
+	return resultado;
 }
 
 int enviarBufferConProtocolo(t_buffer* buffer, int socket, int protocolo){
@@ -49,12 +66,24 @@ int enviarBufferConProtocolo(t_buffer* buffer, int socket, int protocolo){
 
 //Serializar mensajes
 
-//Nodo-Salida
+//Nodo
 	//A FileSystem
-	int presentarseAlFileSystem(t_nodoParaFS* infoNodo){
-		t_buffer* buffer = crearBuffer();
+	int presentarseAlFileSystem(t_nodoParaFS* infoNodo, int socket){
+		int tamanioAEnviar = sizeof(t_nodoParaFS) + 4;
+		void* buffer = malloc(tamanioAEnviar);
+		int protocolo = CONEXION_NODO_A_FS;
+		memcpy(buffer,&protocolo,4);
+		memcpy(buffer+4,infoNodo,sizeof(t_nodoParaFS));
+		return sendall(socket, buffer, tamanioAEnviar);
+	}
 
-		infoNodo->IP_NODO;
-		infoNodo->NODO_NEW;
-		infoNodo->PUERTO_NODO;
+
+//Deserializar mensajes
+
+//FileSystem
+	//De Nodo
+	t_nodoParaFS* conocerAlNodo(int socket){
+		t_nodoParaFS* unNodo;
+		recvall(socket, unNodo, sizeof(t_nodoParaFS));
+		return unNodo;
 	}
