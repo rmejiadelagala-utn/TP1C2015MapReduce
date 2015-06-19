@@ -44,7 +44,7 @@ void bufferAgregarChar(t_buffer* buffer, char unChar){
 void bufferAgregarString(t_buffer* buffer,char* unString){
 	int tamanioAnterior=buffer->tamanio;
 	int largoString = strlen(unString)+1;
-	bufferAgregarInt(largoString);
+	bufferAgregarInt(buffer, largoString);
 	buffer->tamanio+= largoString;
 	buffer = realloc(buffer->data,buffer->tamanio);
 	memcpy(buffer->data + tamanioAnterior,unString,largoString);
