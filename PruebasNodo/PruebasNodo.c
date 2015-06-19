@@ -50,7 +50,7 @@ int main(void) {
 
 	if( arch_mapeado == MAP_FAILED){
 
-		printf("Error al iniciar el mapeo de disco");
+		printf("Error al iniciar el mapeo de Archivo");
 		close(fd);
 		exit(1);
 	}
