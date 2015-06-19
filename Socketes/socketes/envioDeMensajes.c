@@ -21,6 +21,12 @@ t_buffer* crearBuffer(){
 	return buffer;
 }
 
+t_buffer* crearBufferConProtocolo(int protocolo){
+	t_buffer* buffer = crearBuffer();
+	bufferAgregarInt(buffer,protocolo);
+	return buffer;
+}
+
 void bufferAgregarInt(t_buffer* buffer, int unInt){
 	int tamanioAnterior=buffer->tamanio;
 	buffer->tamanio+=sizeof(int);
@@ -38,6 +44,7 @@ void bufferAgregarChar(t_buffer* buffer, char unChar){
 void bufferAgregarString(t_buffer* buffer,char* unString){
 	int tamanioAnterior=buffer->tamanio;
 	int largoString = strlen(unString)+1;
+	bufferAgregarInt(largoString);
 	buffer->tamanio+= largoString;
 	buffer = realloc(buffer->data,buffer->tamanio);
 	memcpy(buffer->data + tamanioAnterior,unString,largoString);
@@ -59,11 +66,6 @@ int enviarBuffer(t_buffer* buffer, int socket){
 	return resultado;
 }
 
-int enviarBufferConProtocolo(t_buffer* buffer, int socket, int protocolo){
-	bufferAgregarInt(buffer,protocolo);
-	return enviarBuffer(buffer, socket);
-}
-
 //Serializar mensajes
 
 //Nodo
@@ -77,6 +79,15 @@ int enviarBufferConProtocolo(t_buffer* buffer, int socket, int protocolo){
 		return sendall(socket, buffer, tamanioAEnviar);
 	}
 
+//FileSystem
+	//A Nodo
+	int enviarBloqueANodo(int socket, int numeroDeBloque, char* dataBloque){
+		t_buffer* buffer = crearBufferConProtocolo(SET_BLOQUE);
+		bufferAgregarInt(buffer,numeroDeBloque);
+		bufferAgregarString(buffer,dataBloque);
+		enviarBuffer(buffer,socket);
+	}
+
 
 //Deserializar mensajes
 
@@ -86,4 +97,9 @@ int enviarBufferConProtocolo(t_buffer* buffer, int socket, int protocolo){
 		t_nodoParaFS* unNodo;
 		recvall(socket, unNodo, sizeof(t_nodoParaFS));
 		return unNodo;
+	}
+//Nodo
+	//De FileSystem
+	int setBloqueDeFileSystem(int socket,char* dataBin){
+
 	}

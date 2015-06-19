@@ -41,7 +41,6 @@ void* conexionFS(void* arg){
 		switch (mensaje_fs->id){
 		  case SET_BLOQUE:
 			  printf("Recibiendo mensaje SET_BLOQUE del Filesystem\n");
-
 			  printf("Lei %d bytes\n",bytesLeidos);
 			  int tamanioDatos_fs = bytesLeidos-sizeof(int)-sizeof(char);
 			  char * datosRecibidos_fs;// = malloc(tamanioDatos_fs);

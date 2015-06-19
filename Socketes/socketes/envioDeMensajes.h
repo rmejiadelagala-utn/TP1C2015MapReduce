@@ -16,7 +16,7 @@ typedef struct {
 
 //Estructuras del Nodo
 typedef struct {
-	int IP_NODO;
+	in_addr_t IP_NODO;
 	uint16_t PUERTO_NODO;
 	char NODO_NEW;
 	int CANT_BLOQUES;
@@ -32,7 +32,7 @@ int recvall(int socket, void *mensaje, size_t tamanio);
 //PROTOCOLOS
 
 enum protocolos {
-	CONEXION_NODO_A_FS
+	CONEXION_NODO_A_FS,SET_BLOQUE
 };
 
 //Primitivas
