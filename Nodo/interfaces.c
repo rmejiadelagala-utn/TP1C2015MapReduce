@@ -5,7 +5,7 @@
  *      Author: utnso
  */
 #include "interfaces.h"
-
+#include "nodo.h"
 #include <socketes/paquetesNodo.h>
 
 void* conexionFS(void* arg){
