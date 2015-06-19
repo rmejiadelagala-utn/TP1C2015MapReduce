@@ -8,9 +8,11 @@
 #ifndef NODO_H_
 #define NODO_H_
 
+
 #include <stdio.h>
 #include <commons/config.h>
 #include <commons/string.h>
+#include <socketes/envioDeMensajes.h>
 #include "socketes/servidor.h"
 #include "socketes/servidorMultihilo.h"
 #include <stdlib.h>
@@ -40,7 +42,6 @@ typedef struct {
 	char* IP_NODO;
 	uint16_t PUERTO_NODO;
 } t_config_nodo;
-
 typedef struct {
 	 int socket;
 	char* ARCH_BIN;
@@ -49,5 +50,10 @@ typedef struct {
 	char* NODO_NEW;
 	char* DIR_TEMP;
 }t_hilofs;
+
+
+
+
+
 
 #endif /* NODO_H_ */

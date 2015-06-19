@@ -22,33 +22,14 @@ void* conexionFS(void* arg){
 
 	DATOS = mapeo_disco(ptr->ARCH_BIN);
 
-	t_mensaje* mensaje_nodo = malloc(sizeof(t_mensaje));
+	t_nodoParaFS* nodo = malloc(sizeof(t_nodoParaFS));
+	nodo->IP_NODO = strdup(ptr->IP_NODO);
+	nodo->PUERTO_NODO = ptr->PUERTO_NODO;
+	nodo->NODO_NEW = (ptr->NODO_NEW == 's' || ptr->NODO_NEW == 'S');
 
-	mensaje_nodo->id = CONEXION_FS;
-	mensaje_nodo->tipo = 'N';
-	mensaje_nodo->info = string_new();
+	//nodo->CANT_BLOQUES = cant_bloques;
 
 	//Formato de Mensaje-> IP:PUERTO:CANTBLOQUES:NUEVO
-	string_append(&mensaje_nodo->info, ptr->IP_NODO);
-	string_append(&mensaje_nodo->info, ":");
-	string_append(&mensaje_nodo->info, string_itoa(ptr->PUERTO_NODO));
-	string_append(&mensaje_nodo->info, ":");
-	string_append(&mensaje_nodo->info, string_itoa(cant_bloques));
-	string_append(&mensaje_nodo->info, ":");
-	string_append(&mensaje_nodo->info, ptr->NODO_NEW);
-
-/*	strcpy(mensaje->info, ptr->IP_NODO);
-	strcat(mensaje->info, ":");
-	strcat(mensaje->info, string_itoa(ptr->PUERTO_NODO));
-	strcat(mensaje->info, string_itoa(cant_bloques));*/
-
-	t_stream *stream = empaquetar_mensaje(mensaje_nodo);
-
-	send(ptr->socket, &stream->length, sizeof(int),0);
-
-	if (enviar_mensaje(ptr->socket, stream->data, stream->length) > 0)
-		printf("Enviando mensaje a Filesystem\n");
-
 
 	t_mensaje* mensaje_fs = malloc(sizeof(t_mensaje));
 	uint32_t nrobloque;
