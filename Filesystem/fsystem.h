@@ -37,6 +37,7 @@ enum protocolo {
 #include "CUnit/Basic.h"
 #include <unistd.h>
 #include <semaphore.h>
+#include "interaccionMarta.h"
 
 t_config* config;
 

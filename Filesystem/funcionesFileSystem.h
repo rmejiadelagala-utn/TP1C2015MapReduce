@@ -98,7 +98,7 @@ t_directorio *buscarDirPorNombre(char *nombre, t_list *listaDirectorios);
  * @NAME: buscarArchPorNombre
  * @DESC: busca un archivo por nombre en una lista de archivos
  */
-t_archivo *buscarArchPorNombre(char *nombre);
+t_archivo *buscarArchPorNombre(char *nombre,t_list* listaArchivos);
 
 /**
  * @NAME: encontrarDirectorioHijo
