@@ -106,6 +106,11 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		memcpy(buffer+4,infoNodo,sizeof(t_nodoParaFS));
 		return sendall(socket, buffer, tamanioAEnviar);
 	}
+	int enviarBloqueAFileSystem(int socket, char* dataBin){
+		t_buffer* buffer = crearBufferConProtocolo(GET_BLOQUE);
+		bufferAgregarString(buffer,dataBin,strlen(dataBin)+1);
+		return enviarBuffer(buffer,socket);
+	}
 
 //FileSystem
 	//A Nodo
@@ -113,9 +118,16 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		t_buffer* buffer = crearBufferConProtocolo(SET_BLOQUE);
 		bufferAgregarInt(buffer,numeroDeBloque);
 		bufferAgregarString(buffer,dataBloque+comienzoBloque,tamanio);
-		enviarBuffer(buffer,socket);
-		return 1;
+		int resultado = enviarBuffer(buffer,socket);
+		return resultado;
 	}
+	int pedirBloqueANodo(int socket, int numeroDeBloque){
+		t_buffer* buffer = crearBufferConProtocolo(GET_BLOQUE);
+		bufferAgregarInt(buffer,numeroDeBloque);
+		int resultado = enviarBuffer(buffer,socket);
+		return resultado;
+	}
+
 
 
 //Deserializar mensajes
@@ -127,6 +139,16 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		recvall(socket, unNodo, sizeof(t_nodoParaFS));
 		return unNodo;
 	}
+	int recibirBloqueDeNodo(int socket, void** buffer){
+		int tamanio;
+		recvall(socket,&tamanio,4);
+		printf("el tamaño es %d\n",tamanio);
+		buffer = malloc(tamanio);
+		int resultado = recvall(socket,buffer,tamanio);
+		printf("el buffer tiene %s\n y es de tamanio %d",buffer,strlen(buffer));
+		fflush(stdout);
+		return resultado;
+	}
 //Nodo
 	//De FileSystem
 	int setBloqueDeFileSystem(int socket, char* dataBin, int block_size){
@@ -135,10 +157,17 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		recvall(socket,&nroBloque,4);
 		recvall(socket,&tamanio,4);
 		int resultado = recvall(socket,dataBin+(block_size*nroBloque),tamanio);
+		int nulo=0;
+		memcpy(dataBin+(block_size*nroBloque)+1,&nulo,1);
 		return resultado;
 	}
 	int respuestaSetBloque(int socket, int resultado){
 		t_buffer* buffer = crearBufferConProtocolo(RTA_SET_BLOQUE);
 		bufferAgregarInt(buffer,resultado);
 		return enviarBuffer(buffer,socket);
+	}
+	int getBloqueParaFileSystem(int socket,char* dataBin){
+		int nroBloque;
+		recvall(socket,&nroBloque,4);
+		return enviarBloqueAFileSystem(socket, dataBin);
 	}

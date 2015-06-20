@@ -30,7 +30,7 @@ void* conexionFS(void* arg){
 	infoNodo->CANT_BLOQUES = cant_bloques;
 
 	presentarseAlFileSystem(infoNodo, socket);
-
+	system("clear");
 
 	uint32_t nrobloque;
 	int protocolo;
@@ -46,27 +46,11 @@ void* conexionFS(void* arg){
 			  respuestaSetBloque(socket,resultado);
 			  break;
 
-		  //case GET_BLOQUE:
-			  /*printf("Recibiendo mensaje GET_BLOQUE del Filesystem\n");
-			  char * datos_fs = strdup(mensaje_fs->info);
+		 case GET_BLOQUE:
 
-			  nrobloque = atoi(datos_fs);
+			  resultado = getBloqueParaFileSystem(socket,DATOS);/*
 
-			  DATOS = string_new();
-			  DATOS = mapeo_disco(ptr->ARCH_BIN);
-
-			  free(mensaje_nodo->info);
-			  free(mensaje_nodo);
-			  free(stream);
-			  free(stream->data);
-
-			  stream=malloc(sizeof(t_stream));
-			  mensaje_nodo=malloc(sizeof(t_mensaje));
-			  mensaje_nodo->id = GET_BLOQUE_OK;
-			  mensaje_nodo->tipo = 'N';
-
-			  mensaje_nodo->info=malloc(BLKSIZE);
-			  memcpy(mensaje_nodo->info,DATOS + obtenerDirBloque(nrobloque), BLKSIZE);
+			    memcpy(mensaje_nodo->info,DATOS + obtenerDirBloque(nrobloque), BLKSIZE);
 			  stream = empaquetar_mensaje(mensaje_nodo);
 
 			  printf("Voy a mandar el bloque %d\n",nrobloque);

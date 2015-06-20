@@ -445,6 +445,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 	t_nodoParaFS* infoNodo;
 	t_nodo* nodo;
 	int respuestaSetBloque;
+	void* buffer;
 	while ( (recibido=recvall(socket,&protocolo,4))>0) {
 		switch (protocolo) {
 		case CONEXION_NODO_A_FS:
@@ -461,12 +462,12 @@ void *interaccionFSNodo(void* sock_ptr) {
 			printf("Hubo un problema al escribir el archivo.");
 			if(respuestaSetBloque<=0)printf("Hubo un problema al escribir el archivo.");
 			break;
-
-		//case GET_BLOQUE:
-			/* TODO
-			write(fileno(archivoReconstruido), mensaje->info, strlen(mensaje->info)-1);
+		case GET_BLOQUE:
+			recibirBloqueDeNodo(socket,&buffer);
+			printf("En el buffer hay %s y tiene de tamanio: %d",(void*)buffer,strlen((void*)buffer));
+			//write(fileno(archivoReconstruido), buffer, strlen( buffer)-1);
+			free(buffer);
 			sem_post(&semaforo);
-			fflush(stdout);*/
 		}
 	}
 

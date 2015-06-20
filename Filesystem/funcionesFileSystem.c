@@ -672,8 +672,7 @@ int obtenerArchivo(t_archivo *archivo) {
 		}
 	t_nodo *nodoEncontrado = list_find(listaNodos, (void*) ipPuertoCoincide);
 	if(!nodoEncontrado) return -1;
-
-
+	pedirBloqueANodo(nodoEncontrado->socket,bloque->numeroDeBloqueEnNodo);
 	sem_wait(&semaforo);
 
 		//HAY QUE CREAR EL CAMPO SOCKET EN NODO

@@ -39,7 +39,13 @@ enum protocolos {
 
 t_buffer* crearBuffer();
 
+t_buffer* crearBufferConProtocolo(int protocolo);
+
+void liberarBuffer(t_buffer* buffer);
+
 void bufferAgregarInt(t_buffer* buffer, int unInt);
+
+void bufferAgregarChar(t_buffer* buffer, char unChar);
 
 void bufferAgregarString(t_buffer* buffer,char* unString, int tamanio);
 
@@ -47,12 +53,33 @@ void bufferAgregarString(t_buffer* buffer,char* unString, int tamanio);
 
 int enviarBuffer(t_buffer* buffer, int socket);
 
-int enviarBufferConProtocolo(t_buffer* buffer, int socket, int protocolo);
-
 //Serializar mensajes
 
-//Nodo-Salida
+//Nodo
 	//A FileSystem
 	int presentarseAlFileSystem(t_nodoParaFS* infoNodo, int socket);
 
+	int enviarBloqueAFileSystem(int socket, char* dataBin);
+
+//FileSystem
+	//A Nodo
+
+	int enviarBloqueANodo(int socket, int numeroDeBloque, char* dataBloque,int comienzoBloque, int tamanio);
+
+	int pedirBloqueANodo(int socket, int numeroDeBloque);
+//Deserializar mensajes
+
+//FileSystem
+	//De Nodo
+	t_nodoParaFS* conocerAlNodo(int socket);
+
+	int recibirBloqueDeNodo(int socket, void** buffer);
+
+//Nodo
+	//De FileSystem
+	int setBloqueDeFileSystem(int socket, char* dataBin, int block_size);
+
+	int respuestaSetBloque(int socket, int resultado);
+
+	getBloqueParaFileSystem(int socket,char* dataBin);
 #endif
