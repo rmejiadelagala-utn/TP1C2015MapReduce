@@ -39,6 +39,8 @@ enum protocolo {
 #include <unistd.h>
 #include <semaphore.h>
 #include <commons/string.h>
+#include "interaccionMarta.h"
+
 
 t_config* config;
 

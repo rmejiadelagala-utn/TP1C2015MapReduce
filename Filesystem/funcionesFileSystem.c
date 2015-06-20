@@ -316,7 +316,14 @@ t_directorio *buscarDirPorPadre(int padre) { //probada
 			(int*) dirPadre);
 	return dir != NULL ? dir : NULL;
 }
-t_archivo *buscarArchPorNombre(char *nombre, t_list *listaArchivos) { //probada
+t_archivo *buscarArchPorPadreYNombre(int padre,char *nombre) {
+	bool _mismoNombreYPadre(t_archivo *unArchivo){
+		return (unArchivo->padre == padre) && (strcmp(unArchivo->nombre,nombre)== 0);
+	}
+	return list_find(listaArchivos, (bool*) _mismoNombreYPadre);
+
+}
+t_archivo *buscarArchPorNombre(char *nombre,t_list* listaArchivos) { //probada
 	t_archivo *arch = buscarEnListaPorStrKey(listaArchivos, nombre,
 			(char*) archNombre);
 	return arch != NULL ? arch : NULL;

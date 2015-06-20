@@ -62,7 +62,7 @@ int main() {
 	listaArchivos = list_create();
 	listaNodos = list_create();
 	listaDirectorios = list_create();
-	//probando funcion de mostrar listas
+	/*//probando funcion de mostrar listas
 
 
 
@@ -70,7 +70,7 @@ int main() {
 
 
 
-	/*t_directorio *directorioRoot = nuevoDirectorio(1, "Root", 0);
+	t_directorio *directorioRoot = nuevoDirectorio(1, "Root", 0);
 	t_directorio *directorioHome = nuevoDirectorio(3, "home", 1);
 	t_directorio *directorioMedia = nuevoDirectorio(2, "media", 1);
 	t_directorio *directorioFotos = nuevoDirectorio(10, "fotos", 2);
@@ -83,7 +83,7 @@ int main() {
 	//Muestro nodos
 	t_nodo *nodoA = nuevoNodo("127.0.0.1:80A", 10);
 	t_nodo *nodoB = nuevoNodo("127.0.0.1:12B", 20);
-	t_nodo *nodoC = nuevoNodo("127.0.0.1:243C", 60);*/
+	t_nodo *nodoC = nuevoNodo("127.0.0.1:243C", 60);
 
 
 
@@ -95,7 +95,7 @@ int main() {
 	 nodoA->cantidadBloquesOcupados = 1;
 	 int *a = malloc(sizeof(int));
 	 *a = 1;
-	 queue_push(nodoA->bloquesLiberados, a);*/
+	 queue_push(nodoA->bloquesLiberados, a);
 
 
 
@@ -103,13 +103,13 @@ int main() {
 
 
 
-	/*nodoA->cantidadBloquesOcupados = 0;
+	nodoA->cantidadBloquesOcupados = 0;
 	nodoB->cantidadBloquesOcupados = 3;
 	nodoC->cantidadBloquesOcupados = 2;
 
 	list_add(listaNodos, nodoA);
 	list_add(listaNodos, nodoB);
-	list_add(listaNodos, nodoC);*/
+	list_add(listaNodos, nodoC);
 
 
 
@@ -129,7 +129,7 @@ int main() {
 
 
 
-	/*t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo("127.0.0.1:80A", 11);
+	t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo("127.0.0.1:80A", 11);
 	t_bloqueEnNodo *copiaBloqueA1C2 = nuevoBloqueEnNodo("127.0.0.1:12B", 12);
 	t_bloqueEnNodo *copiaBloqueA1C3 = nuevoBloqueEnNodo("127.0.0.1:243C", 13);
 	t_list *copiasBloqueA1 = list_create();
@@ -195,7 +195,6 @@ int main() {
 //	eliminarNodoYReferencias(nodoB, listaNodos,listaArchivos);
 //	renombrarDirectorioConNombre("pepito",directorioHome);
 //	moverDirectorioConPadre(8,directorioHome);
-*/
 
 
 
@@ -223,7 +222,7 @@ int main() {
 	 //176 fin	lugar de trabajo de juanchi*/
 //177 lugar de trabajo de juanchi
 	/*
-	 * 	       |->|home|--------->(ArchivoB)
+	 * 	 encontrarCopias(char* nombre,int directorioIndex, int numeroDeBloqueEnArchivo, t_list **copias)      |->|home|--------->(ArchivoB)
 	 * 		   |
 	 *  |root|-|  			|--->(ArchivoA)
 	 * 		   |			|
@@ -242,7 +241,7 @@ int main() {
 	 printf("dirConSubdir es false %d\n",dirConSubdir(directorioFotos));
 	 printf("dirConSubdir es false %d\n",dirConSubdir(directorioHome));
 	 printf("dirConSubdir es true %d\n",dirConSubdir(directorioMedia));
-	 */
+
 
 //	eliminarDirectorioYContenido(directorioRoot);
 //	eliminarNodoYReferencias(nodoC, listaNodos,listaArchivos);
@@ -250,6 +249,19 @@ int main() {
 	printf("Despues de la accion\n\n\n");
 	mostrarLista(listaNodos, (void*) mostrarNodo);
 	mostrarLista(listaArchivos, (void*) mostrarArchivo);
+	t_list *copias = list_create();
+
+	int malIndex = encontrarCopias("ArchivoA",19947, 1, &copias);
+	int malBloqueArch = encontrarCopias("ArchivoA",2, 19947, &copias);
+	int malNombre = encontrarCopias("asdd",2,1 , &copias);
+	int bien = encontrarCopias("ArchivoA",2, 1, &copias);
+	printf("bien %d\n",bien);
+	mostrarLista(copias,(void*) mostrarBloqueEnNodo);
+	printf("bien %d\n",bien);
+	printf("malIndex %d\n",malIndex);
+	printf("malBloqueArch %d\n",malBloqueArch);
+	printf("malNombre %d\n",malNombre);
+	//free(copias);
 	/*
 	 mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 	 mostrarLista(listaArchivos, (void*) mostrarArchivo);
@@ -267,8 +279,8 @@ int main() {
 	//levantarArchivoAMemoriaYDistribuirANodos(
 	//		"../archivoBasura.dat","nuevoArchivo", 1);
 //	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
-	mostrarLista(listaNodos, (void*) mostrarNodo);
-	mostrarLista(listaArchivos, (void*) mostrarArchivo);
+//	mostrarLista(listaNodos, (void*) mostrarNodo);
+//	mostrarLista(listaArchivos, (void*) mostrarArchivo);
 	system("clear");
 
 	 char* path = "ConfigFS.cfg";
@@ -366,7 +378,7 @@ int main() {
 	list_destroy_and_destroy_elements(listaNodos, (void*) liberarNodo);
 	list_destroy_and_destroy_elements(listaDirectorios,
 			(void*) liberarDirectorio);
-
+	//free(copias);
 	return 0;
 }
 

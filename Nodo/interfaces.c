@@ -44,9 +44,7 @@ void* conexionFS(void* arg){
 			  resultado = setBloqueDeFileSystem(socket, DATOS, BLKSIZE);//Si devuelve 0 es porque recibio todo
 			  msync(ptr->ARCH_BIN,BLKSIZE,0);
 			  respuestaSetBloque(socket,resultado);
-			  printf("Recibi el bloque");
-			  fflush(stdout);
-		  break;
+			  break;
 
 		  //case GET_BLOQUE:
 			  /*printf("Recibiendo mensaje GET_BLOQUE del Filesystem\n");

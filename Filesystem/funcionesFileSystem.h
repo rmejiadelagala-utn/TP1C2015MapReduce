@@ -98,7 +98,7 @@ t_directorio *buscarDirPorNombre(char *nombre, t_list *listaDirectorios);
  * @NAME: buscarArchPorNombre
  * @DESC: busca un archivo por nombre en una lista de archivos
  */
-t_archivo *buscarArchPorNombre(char *nombre, t_list *listaArchivos);
+t_archivo *buscarArchPorNombre(char *nombre,t_list* listaArchivos);
 
 /**
  * @NAME: encontrarDirectorioHijo
@@ -215,7 +215,18 @@ int archivoActivoPorFlag(t_archivo *unArchivo);
  * @DESC: setea nodo elegido por algoritmo distribucion, o devuele -1 de error
  */
 int nodoElegido(t_list *nodosOrdenados, t_nodo **nodoActual, int *posicion);
+
+/**
+ * @NAME: mandarBloquesANodos
+ * @DESC: manda bloques a los nodos
+ */
 int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
 		t_list** listaDeBolques) ;
+
+/**
+ * @NAME: buscarArchPorPadreYNombre
+ * @DESC: busca un archivo con padre y nombre
+ */
+t_archivo *buscarArchPorPadreYNombre(int padre,char *nombre);
 
 #endif /* FUNCIONESFILESYSTEM_H_ */
