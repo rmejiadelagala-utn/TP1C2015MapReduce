@@ -26,7 +26,7 @@ t_config_nodo* leerArchivoConfig(char *path_config){
 	configNodo->PUERTO_FS = config_get_int_value(config, "PUERTO_FS");
 	configNodo->ARCH_BIN  = strdup(config_get_string_value(config, "ARCHIVO_BIN"));
 	configNodo->DIR_TEMP  = strdup(config_get_string_value(config, "DIR_TEMP"));
-	configNodo->NODO_NEW  = strdup(config_get_string_value(config, "NODO_NUEVO"));
+	configNodo->NODO_NEW  = (config_get_string_value(config, "NODO_NUEVO"))[0];
 	configNodo->IP_NODO   = strdup(config_get_string_value(config, "IP_NODO"));
 	configNodo->PUERTO_NODO = config_get_int_value(config, "PUERTO_NODO");
 
@@ -34,7 +34,7 @@ t_config_nodo* leerArchivoConfig(char *path_config){
 	printf("Puerto: %d\n", config_get_int_value(config, "PUERTO_FS"));
 	printf("Archivo_bin: %s\n", config_get_string_value(config, "ARCHIVO_BIN"));
 	printf("Directorio Temporal: %s\n", config_get_string_value(config, "DIR_TEMP"));
-	printf("Nodo Nuevo: %s\n", config_get_string_value(config, "NODO_NUEVO"));
+	printf("Nodo Nuevo: %c\n", (config_get_string_value(config, "NODO_NUEVO"))[0]);
 	printf("IP Nodo: %s\n", config_get_string_value(config, "IP_NODO"));
 	printf("Puerto Nodo: %d\n", config_get_int_value(config, "PUERTO_NODO"));
 

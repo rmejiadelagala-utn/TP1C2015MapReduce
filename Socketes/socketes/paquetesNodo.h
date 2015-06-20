@@ -9,13 +9,6 @@
 #define PAQUETESNODO_H_
 
 #include "servidor.h"
-#define	CONEXION_FS     100 // Envio IP, Puerto y Cantidad de bloques total del Nodo al FS
-#define	SET_BLOQUE      101 // Recibo del FS el bloque y datos a Grabar en el data.bin
-#define	SET_BLOQUE_OK   103 // Envio OK de la escritura del bloque
-#define GET_BLOQUE      104 // Recibo del FS el nro de Bloque
-#define GET_BLOQUE_OK   105 // Envio el contenido del bloque solicitado por el FS
-#define GET_FILE_       106 // Recibo del FS el nombre del archivo solicitado
-#define GET_FILE_OK     107 // Envio el contenido del archivo solicitado por el FS
 
 typedef struct{
 	int  id;

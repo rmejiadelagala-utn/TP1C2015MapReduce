@@ -29,13 +29,14 @@ int recvall(int socket, void *mensaje, size_t tamanio){
 		    while(total < tamanio) {
 		        bytesRead = recv(socket, mensaje+total, bytesleft, 0);
 		        if (bytesRead == -1) { break; }
+		        if (bytesRead == 0) {break;}
 		        total += bytesRead;
 		        bytesleft -= bytesRead;
 		    }
 
 		    tamanio = total; // return number actually received here
 
-		    return bytesRead==-1?-1:0; // return -1 on failure, 0 on success
+		    return bytesRead; // return -1 on failure, 0 on node disconnection
 }
 
 //PROTOCOLOS
@@ -55,27 +56,32 @@ t_buffer* crearBufferConProtocolo(int protocolo){
 	return buffer;
 }
 
+void liberarBuffer(t_buffer* buffer){
+	free(buffer->data);
+	free(buffer);
+}
+
 void bufferAgregarInt(t_buffer* buffer, int unInt){
 	int tamanioAnterior=buffer->tamanio;
 	buffer->tamanio+=sizeof(int);
-	buffer = realloc(buffer->data,buffer->tamanio);
+	buffer->data = realloc(buffer->data,buffer->tamanio);
 	memcpy(buffer->data + tamanioAnterior,&unInt,sizeof(int));
 }
 
 void bufferAgregarChar(t_buffer* buffer, char unChar){
 	int tamanioAnterior=buffer->tamanio;
 	buffer->tamanio+=sizeof(char);
-	buffer = realloc(buffer->data,buffer->tamanio);
+	buffer->data = realloc(buffer->data,buffer->tamanio);
 	memcpy(buffer->data + tamanioAnterior,&unChar,sizeof(char));
 }
 
-void bufferAgregarString(t_buffer* buffer,char* unString){
+void bufferAgregarString(t_buffer* buffer,char* unString, int tamanio){
+	int largoString = tamanio;
+	bufferAgregarInt(buffer,largoString);
 	int tamanioAnterior=buffer->tamanio;
-	int largoString = strlen(unString)+1;
-	bufferAgregarInt(largoString);
 	buffer->tamanio+= largoString;
-	buffer = realloc(buffer->data,buffer->tamanio);
-	memcpy(buffer->data + tamanioAnterior,unString,largoString);
+	buffer->data = realloc(buffer->data,buffer->tamanio);
+	memcpy((buffer->data + tamanioAnterior),unString,largoString);
 }
 
 
@@ -83,13 +89,7 @@ void bufferAgregarString(t_buffer* buffer,char* unString){
 //Enviar buffer
 
 int enviarBuffer(t_buffer* buffer, int socket){
-	int tamanioMensaje = buffer->tamanio + sizeof(buffer->tamanio);
-	int offset = 0;
-	void* mensajeAEnviar = malloc(tamanioMensaje);
-	memcpy(mensajeAEnviar+offset,buffer->tamanio,sizeof(buffer->tamanio));
-	offset+=sizeof(buffer->tamanio);
-	memcpy(mensajeAEnviar+offset,buffer->data,buffer->tamanio);
-	int resultado= sendall(socket,mensajeAEnviar,tamanioMensaje);
+	int resultado= sendall(socket,buffer->data,buffer->tamanio);
 	liberarBuffer(buffer);
 	return resultado;
 }
@@ -109,11 +109,12 @@ int enviarBuffer(t_buffer* buffer, int socket){
 
 //FileSystem
 	//A Nodo
-	int enviarBloqueANodo(int socket, int numeroDeBloque, char* dataBloque){
+	int enviarBloqueANodo(int socket, int numeroDeBloque, char* dataBloque,int comienzoBloque, int tamanio){
 		t_buffer* buffer = crearBufferConProtocolo(SET_BLOQUE);
 		bufferAgregarInt(buffer,numeroDeBloque);
-		bufferAgregarString(buffer,dataBloque);
+		bufferAgregarString(buffer,dataBloque+comienzoBloque,tamanio);
 		enviarBuffer(buffer,socket);
+		return 1;
 	}
 
 
@@ -122,15 +123,22 @@ int enviarBuffer(t_buffer* buffer, int socket){
 //FileSystem
 	//De Nodo
 	t_nodoParaFS* conocerAlNodo(int socket){
-		t_nodoParaFS* unNodo;
+		t_nodoParaFS* unNodo = malloc(sizeof(t_nodoParaFS));
 		recvall(socket, unNodo, sizeof(t_nodoParaFS));
 		return unNodo;
 	}
 //Nodo
 	//De FileSystem
-	int setBloqueDeFileSystem(int socket, int* nroBloque, char* dataBin, int block_size){
+	int setBloqueDeFileSystem(int socket, char* dataBin, int block_size){
 		int tamanio;
-		recvall(socket,nroBloque,4);
+		int nroBloque;
+		recvall(socket,&nroBloque,4);
 		recvall(socket,&tamanio,4);
-		return recvall(socket,dataBin+(block_size*nroBloque),tamanio);
+		int resultado = recvall(socket,dataBin+(block_size*nroBloque),tamanio);
+		return resultado;
+	}
+	int respuestaSetBloque(int socket, int resultado){
+		t_buffer* buffer = crearBufferConProtocolo(RTA_SET_BLOQUE);
+		bufferAgregarInt(buffer,resultado);
+		return enviarBuffer(buffer,socket);
 	}

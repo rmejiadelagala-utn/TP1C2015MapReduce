@@ -9,6 +9,7 @@
 #define INTERFACES_H_
 
 #include "funcionesNodo.h"
+#include <socketes/envioDeMensajes.h>
 
 void* conexionFS(void*);
 void* conexionJobs(void*);

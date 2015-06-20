@@ -427,81 +427,41 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal,
 
 void *interaccionFSNodo(void* sock_ptr) {
 	int socket = *(int*) sock_ptr;
-	t_mensaje* mensaje=malloc(sizeof(t_mensaje));
-	int bytesRecibidos;
-
-	while ((bytesRecibidos=recibir_mensaje(socket,&mensaje))>0) {
-
-
-		switch (mensaje->id) {
-		case NODO_NUEVO_SE_CONECTA:
-			//printf("Tengo un nodo con esta data loca: %s",mensaje->info);
-			fflush(stdout);
-			list_add(listaNodos,string_to_nodo(mensaje->info,socket));
-			//printf("%s",mensaje);
-			fflush(stdout);
-
-			//PARA PROBAR
-
-			/*t_bloqueEnNodo *copiaBloquePrueba0 = nuevoBloqueEnNodo("127.0.0.1:5000", 0);
-			t_bloqueEnNodo *copiaBloquePrueba1 = nuevoBloqueEnNodo("127.0.0.1:5000", 1);
-			t_bloqueEnNodo *copiaBloquePrueba2 = nuevoBloqueEnNodo("127.0.0.1:5000", 2);
-			t_bloqueEnNodo *copiaBloquePrueba3 = nuevoBloqueEnNodo("127.0.0.1:5000", 3);
-			t_bloqueEnNodo *copiaBloquePrueba4 = nuevoBloqueEnNodo("127.0.0.1:5000", 4);
-			t_bloqueEnNodo *copiaBloquePrueba5 = nuevoBloqueEnNodo("127.0.0.1:5000", 5);
-			t_bloqueEnNodo *copiaBloquePrueba6 = nuevoBloqueEnNodo("127.0.0.1:5000", 6);
-			t_bloqueEnNodo *copiaBloquePrueba7 = nuevoBloqueEnNodo("127.0.0.1:5000", 7);
-			t_list *copiasBloquePrueba0 = list_create();
-			t_list *copiasBloquePrueba1 = list_create();
-			t_list *copiasBloquePrueba2 = list_create();
-			t_list *copiasBloquePrueba3 = list_create();
-			t_list *copiasBloquePrueba4 = list_create();
-			t_list *copiasBloquePrueba5 = list_create();
-			t_list *copiasBloquePrueba6 = list_create();
-			t_list *copiasBloquePrueba7 = list_create();
-			list_add(copiasBloquePrueba0, copiaBloquePrueba0);
-			list_add(copiasBloquePrueba1, copiaBloquePrueba1);
-			list_add(copiasBloquePrueba2, copiaBloquePrueba2);
-			list_add(copiasBloquePrueba3, copiaBloquePrueba3);
-			list_add(copiasBloquePrueba4, copiaBloquePrueba4);
-			list_add(copiasBloquePrueba5, copiaBloquePrueba5);
-			list_add(copiasBloquePrueba6, copiaBloquePrueba6);
-			list_add(copiasBloquePrueba7, copiaBloquePrueba7);
-			t_bloqueArch *bloqueArchivoPrueba0 = nuevoBloqueArchivo(copiasBloquePrueba0);
-			t_bloqueArch *bloqueArchivoPrueba1 = nuevoBloqueArchivo(copiasBloquePrueba1);
-			t_bloqueArch *bloqueArchivoPrueba2 = nuevoBloqueArchivo(copiasBloquePrueba2);
-			t_bloqueArch *bloqueArchivoPrueba3 = nuevoBloqueArchivo(copiasBloquePrueba3);
-			t_bloqueArch *bloqueArchivoPrueba4 = nuevoBloqueArchivo(copiasBloquePrueba4);
-			t_bloqueArch *bloqueArchivoPrueba5 = nuevoBloqueArchivo(copiasBloquePrueba5);
-			t_bloqueArch *bloqueArchivoPrueba6 = nuevoBloqueArchivo(copiasBloquePrueba6);
-			t_bloqueArch *bloqueArchivoPrueba7 = nuevoBloqueArchivo(copiasBloquePrueba7);
-			t_list * bloquesDeArchivoPrueba = list_create();
-			list_add(bloquesDeArchivoPrueba, bloqueArchivoPrueba0);
-			list_add(bloquesDeArchivoPrueba, bloqueArchivoPrueba1);
-			list_add(bloquesDeArchivoPrueba, bloqueArchivoPrueba2);
-			list_add(bloquesDeArchivoPrueba, bloqueArchivoPrueba3);
-			list_add(bloquesDeArchivoPrueba, bloqueArchivoPrueba4);
-			list_add(bloquesDeArchivoPrueba, bloqueArchivoPrueba5);
-			list_add(bloquesDeArchivoPrueba, bloqueArchivoPrueba6);
-			list_add(bloquesDeArchivoPrueba, bloqueArchivoPrueba7);
-			t_archivo *archivoPrueba = nuevoArchivo("ArchivoPrueba", 1, 3000, bloquesDeArchivoPrueba,1);
-			list_add(listaArchivos, archivoPrueba);
-
-			mostrarLista(bloquesDeArchivoPrueba,(void*)mostrarBloqueArch);
-*/
-
+	int protocolo;
+	int recibido;
+	char* ipPuerto;
+	t_nodoParaFS* infoNodo;
+	t_nodo* nodo;
+	int respuestaSetBloque;
+	while ( (recibido=recvall(socket,&protocolo,4))>0) {
+		switch (protocolo) {
+		case CONEXION_NODO_A_FS:
+			infoNodo = conocerAlNodo(socket);
+			ipPuerto = strdup(strcat(strcat(inet_ntoa(infoNodo->IP_NODO),":"),string_itoa(infoNodo->PUERTO_NODO)));
+			nodo = nuevoNodo(ipPuerto,(infoNodo->CANT_BLOQUES)*50);
+			nodo->socket = socket;
+			list_add(listaNodos,nodo);
+			mostrarLista(listaNodos,mostrarNodo);
+			free(infoNodo);
 			break;
-		case GET_BLOQUE_DE_NODO:
+		case RTA_SET_BLOQUE:
+			if(recvall(socket,&respuestaSetBloque,4)<=0)
+			printf("Hubo un problema al escribir el archivo.");
+			if(respuestaSetBloque<=0)printf("Hubo un problema al escribir el archivo.");
+			break;
+
+		//case GET_BLOQUE:
+			/* TODO
 			write(fileno(archivoReconstruido), mensaje->info, strlen(mensaje->info)-1);
 			sem_post(&semaforo);
-			fflush(stdout);
+			fflush(stdout);*/
 		}
 	}
 
-	if (bytesRecibidos == 0) {
-		//printf("Nodo desconectado.\n");
+	if (recibido == 0) {
+		printf("Nodo desconectado.\n");
 	}
-	if (bytesRecibidos < 0) {
+	if (recibido < 0) {
 		printf("Error.");
 	}
 	close(socket);

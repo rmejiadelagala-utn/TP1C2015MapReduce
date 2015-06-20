@@ -16,7 +16,7 @@ typedef struct {
 
 //Estructuras del Nodo
 typedef struct {
-	in_addr_t IP_NODO;
+	struct in_addr IP_NODO;
 	uint16_t PUERTO_NODO;
 	char NODO_NEW;
 	int CANT_BLOQUES;
@@ -32,7 +32,7 @@ int recvall(int socket, void *mensaje, size_t tamanio);
 //PROTOCOLOS
 
 enum protocolos {
-	CONEXION_NODO_A_FS,SET_BLOQUE
+	CONEXION_NODO_A_FS,SET_BLOQUE, GET_BLOQUE, RTA_SET_BLOQUE
 };
 
 //Primitivas
@@ -41,7 +41,7 @@ t_buffer* crearBuffer();
 
 void bufferAgregarInt(t_buffer* buffer, int unInt);
 
-void bufferAgregarString(t_buffer* buffer,char* unString);
+void bufferAgregarString(t_buffer* buffer,char* unString, int tamanio);
 
 //Enviar buffer
 

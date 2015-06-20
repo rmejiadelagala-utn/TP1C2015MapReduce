@@ -22,6 +22,7 @@ enum protocolo {
 #include <socketes/servidor.h>
 #include <socketes/estructuras.h>
 #include <socketes/servidorMultihilo.h>
+#include <socketes/envioDeMensajes.h>
 #include <socketes/paquetesNodo.h>
 #include <commons/log.h>
 #include <sys/socket.h>
@@ -31,12 +32,13 @@ enum protocolo {
 #include <string.h>
 #include <commons/config.h>
 #include "consolaFS.h"
-#include"estructurasFileSystem.h"
-#include<commons/collections/list.h>
-#include"funcionesFileSystem.h"
+#include "estructurasFileSystem.h"
+#include <commons/collections/list.h>
+#include "funcionesFileSystem.h"
 #include "CUnit/Basic.h"
 #include <unistd.h>
 #include <semaphore.h>
+#include <commons/string.h>
 
 t_config* config;
 

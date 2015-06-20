@@ -8,13 +8,14 @@
 
 #include <socketes/paquetesNodo.h>
 
+
 void* conexionFS(void* arg){
 
     char *DATOS;
 	uint32_t tam_disco;
 	t_hilofs* ptr;
 	ptr = (t_hilofs*) arg;
-
+	int socket = ptr->socket;
 	printf("Nodo Conectado al Filesystem\n");
 
 	tam_disco = obtener_tamanio_disco(ptr->ARCH_BIN);
@@ -22,86 +23,31 @@ void* conexionFS(void* arg){
 
 	DATOS = mapeo_disco(ptr->ARCH_BIN);
 
-	t_mensaje* mensaje_nodo = malloc(sizeof(t_mensaje));
+	t_nodoParaFS* infoNodo = malloc(sizeof(t_nodoParaFS));
+	infoNodo->IP_NODO.s_addr = inet_addr (ptr->IP_NODO);
+	infoNodo->PUERTO_NODO = ptr->PUERTO_NODO;
+	infoNodo->NODO_NEW = (ptr->NODO_NEW == 's' || ptr->NODO_NEW == 'S');
+	infoNodo->CANT_BLOQUES = cant_bloques;
 
-	mensaje_nodo->id = CONEXION_FS;
-	mensaje_nodo->tipo = 'N';
-	mensaje_nodo->info = string_new();
-
-	//Formato de Mensaje-> IP:PUERTO:CANTBLOQUES:NUEVO
-	string_append(&mensaje_nodo->info, ptr->IP_NODO);
-	string_append(&mensaje_nodo->info, ":");
-	string_append(&mensaje_nodo->info, string_itoa(ptr->PUERTO_NODO));
-	string_append(&mensaje_nodo->info, ":");
-	string_append(&mensaje_nodo->info, string_itoa(cant_bloques));
-	string_append(&mensaje_nodo->info, ":");
-	string_append(&mensaje_nodo->info, ptr->NODO_NEW);
-
-/*	strcpy(mensaje->info, ptr->IP_NODO);
-	strcat(mensaje->info, ":");
-	strcat(mensaje->info, string_itoa(ptr->PUERTO_NODO));
-	strcat(mensaje->info, string_itoa(cant_bloques));*/
-
-	t_stream *stream = empaquetar_mensaje(mensaje_nodo);
-
-	send(ptr->socket, &stream->length, sizeof(int),0);
-
-	if (enviar_mensaje(ptr->socket, stream->data, stream->length) > 0)
-		printf("Enviando mensaje a Filesystem\n");
+	presentarseAlFileSystem(infoNodo, socket);
 
 
-	t_mensaje* mensaje_fs = malloc(sizeof(t_mensaje));
 	uint32_t nrobloque;
-	int bytesLeidos;
+	int protocolo;
+	int recibido;
+	int resultado;
 
-	while ((bytesLeidos=recibir_mensaje(ptr->socket, &mensaje_fs)) > 0) {
-
-		switch (mensaje_fs->id){
+	while ((recibido=recvall(ptr->socket,&protocolo,4))>0) {
+		fflush(stdout);
+		switch (protocolo){
 		  case SET_BLOQUE:
-			  printf("Recibiendo mensaje SET_BLOQUE del Filesystem\n");
-
-			  printf("Lei %d bytes\n",bytesLeidos);
-			  int tamanioDatos_fs = bytesLeidos-sizeof(int)-sizeof(char);
-			  char * datosRecibidos_fs;// = malloc(tamanioDatos_fs);
-			  datosRecibidos_fs=strdup(mensaje_fs->info);
-			  char* nroBloqueString=malloc(1);
-			  memcpy(nroBloqueString,mensaje_fs->info,1);
-			  printf("El string que recibi es: %s\n",nroBloqueString);
-			  nrobloque=atoi(nroBloqueString);
-
-			  printf("El numero de bloque es: %d\n",nrobloque);
-			  //datosRecibidos_fs++;
-			  printf("Recibi esto: %s\n",datosRecibidos_fs);
-			  printf("El tamaño recibido fue: %d\n",tamanioDatos_fs-1 );
-
-			  //DATOS=malloc(tamanioDatos_fs-1);
-			  printf("%d\n",obtenerDirBloque(nrobloque));
-			  //memset(DATOS + obtenerDirBloque(nrobloque),'\0', BLKSIZE );
-			  memcpy(DATOS + obtenerDirBloque(nrobloque), datosRecibidos_fs, tamanioDatos_fs-1);
-
-			  printf("El bin.data va a tener: %s\n",DATOS);
-			  printf("Y pesa: %d\n",strlen(DATOS));
-
-			  free(mensaje_nodo->info);
-			  free(mensaje_nodo);
-			  free(stream);
-			  munmap(DATOS,sizeof(DATOS));
-			  mensaje_nodo=malloc(sizeof(t_mensaje));
-			  mensaje_nodo->id = SET_BLOQUE_OK;
-			  mensaje_nodo->tipo = 'N';
-			  mensaje_nodo->info = string_new();
-
-			  stream = empaquetar_mensaje(mensaje_nodo);
-			  if (enviar_mensaje(ptr->socket, stream->data, stream->length) > 0)
-			  		printf("Enviando mensaje SET_BLOQUE_OK a Filesystem\n");
-
-			  // Para que deje grabado la info en Data.bin
-			  printf("imprimi al archivo");
-
+			  resultado = setBloqueDeFileSystem(socket, DATOS, BLKSIZE);//Si devuelve 0 es porque recibio todo
+			  msync(ptr->ARCH_BIN,BLKSIZE,0);
+			  respuestaSetBloque(socket,resultado);
 		  break;
 
-		  case GET_BLOQUE:
-			  printf("Recibiendo mensaje GET_BLOQUE del Filesystem\n");
+		  //case GET_BLOQUE:
+			  /*printf("Recibiendo mensaje GET_BLOQUE del Filesystem\n");
 			  char * datos_fs = strdup(mensaje_fs->info);
 
 			  nrobloque = atoi(datos_fs);
@@ -150,7 +96,7 @@ void* conexionFS(void* arg){
 			  if (enviar_mensaje(ptr->socket, stream->data, stream->length) > 0)
 				  printf("Enviando mensaje GET_FILE_OK a Filesystem\n");
 
-		  break;
+		  break;*/
 
 		}
 
