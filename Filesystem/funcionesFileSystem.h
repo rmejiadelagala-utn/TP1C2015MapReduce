@@ -229,4 +229,10 @@ int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
  */
 t_archivo *buscarArchPorPadreYNombre(int padre,char *nombre);
 
+/**
+ * @NAME: separarIpPuerto
+ * @DESC: separa un ipPuerto enviado por parametro en una ip retornada y un puerto modificado
+ */
+char* separarIpPuerto(char* ipPuerto,int * puerto);
+
 #endif /* FUNCIONESFILESYSTEM_H_ */

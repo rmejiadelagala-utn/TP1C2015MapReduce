@@ -22,7 +22,6 @@ typedef struct {
 	int CANT_BLOQUES;
 }__attribute__ ((__packed__)) t_nodoParaFS;
 
-
 //sendall y recvall aseguran que se mande/reciba toda la informacion
 
 int sendall(int socket, void *mensaje, size_t tamanio);
