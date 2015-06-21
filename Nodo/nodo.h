@@ -30,7 +30,7 @@
 #include <sys/stat.h>
 
 //#define BLKSIZE 1024*1024*20
-#define BLKSIZE 50 //Ejemplo para probar el data.bin
+#define BLKSIZE 150 //Ejemplo para probar el data.bin
 
 typedef struct {
 	char* IP_FS;

@@ -35,20 +35,22 @@ void* conexionFS(void* arg){
 	uint32_t nrobloque;
 	int protocolo;
 	int recibido;
+	int nroBloqueRecibido;
 	int resultado;
 
 	while ((recibido=recvall(ptr->socket,&protocolo,4))>0) {
 		fflush(stdout);
 		switch (protocolo){
 		  case SET_BLOQUE:
-			  resultado = setBloqueDeFileSystem(socket, DATOS, BLKSIZE);//Si devuelve 0 es porque recibio todo
-			  msync(ptr->ARCH_BIN,BLKSIZE,0);
-			  respuestaSetBloque(socket,resultado);
+			  nroBloqueRecibido = setBloqueDeFileSystem(socket, DATOS, BLKSIZE);//Si devuelve 0 es porque recibio todo
+			  msync(ptr->ARCH_BIN,strlen(DATOS),MS_SYNC);
+			  respuestaSetBloque(socket,nroBloqueRecibido);
+			  printf("Almacené la informacion en el bloque numero %d correctamente.\n",nroBloqueRecibido);
 			  break;
 
 		 case GET_BLOQUE:
 
-			  resultado = getBloqueParaFileSystem(socket,DATOS);/*
+			  resultado = getBloqueParaFileSystem(socket,DATOS,BLKSIZE);/*
 
 			    memcpy(mensaje_nodo->info,DATOS + obtenerDirBloque(nrobloque), BLKSIZE);
 			  stream = empaquetar_mensaje(mensaje_nodo);

@@ -403,7 +403,6 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal,
 				exit(1);
 
 			}
-			printf("\nLevanto a memoria el archivo (está en char* data)\n");
 
 			//Acá se pone a mandar bloques de arch a nodos y demás
 			envioNodoCorrectamente = mandarBloquesANodos(data,
@@ -422,7 +421,7 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal,
 
 				list_add(listaArchivos, archivoNuevo);
 
-				printf("Envio correctamente y agrego a lista global\n");
+				printf("El archivo %s fue copiado correctamente.\n", nombreArchivo);
 			} else {
 				printf("error al enviar a nodos\n");
 			}
@@ -454,7 +453,6 @@ void *interaccionFSNodo(void* sock_ptr) {
 			nodo = nuevoNodo(ipPuerto,(infoNodo->CANT_BLOQUES)*50);
 			nodo->socket = socket;
 			list_add(listaNodos,nodo);
-			mostrarLista(listaNodos,mostrarNodo);
 			free(infoNodo);
 			break;
 		case RTA_SET_BLOQUE:
@@ -463,9 +461,8 @@ void *interaccionFSNodo(void* sock_ptr) {
 			if(respuestaSetBloque<=0)printf("Hubo un problema al escribir el archivo.");
 			break;
 		case GET_BLOQUE:
-			recibirBloqueDeNodo(socket,&buffer);
-			printf("En el buffer hay %s y tiene de tamanio: %d",(void*)buffer,strlen((void*)buffer));
-			//write(fileno(archivoReconstruido), buffer, strlen( buffer)-1);
+			recibirBloqueDeNodo(socket,(void*)&buffer);
+			write(fileno(archivoReconstruido), buffer, strlen(buffer));
 			free(buffer);
 			sem_post(&semaforo);
 		}

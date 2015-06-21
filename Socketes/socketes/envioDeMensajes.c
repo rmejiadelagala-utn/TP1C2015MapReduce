@@ -139,15 +139,13 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		recvall(socket, unNodo, sizeof(t_nodoParaFS));
 		return unNodo;
 	}
-	int recibirBloqueDeNodo(int socket, void** buffer){
+	int recibirBloqueDeNodo(int socket, void* buffer){
 		int tamanio;
 		recvall(socket,&tamanio,4);
-		printf("el tamaño es %d\n",tamanio);
-		buffer = malloc(tamanio);
-		int resultado = recvall(socket,buffer,tamanio);
-		printf("el buffer tiene %s\n y es de tamanio %d",buffer,strlen(buffer));
-		fflush(stdout);
+		*(char**)buffer = malloc(tamanio+2);
+		int resultado = recvall(socket,*(char**)buffer,tamanio);
 		return resultado;
+
 	}
 //Nodo
 	//De FileSystem
@@ -156,18 +154,19 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		int nroBloque;
 		recvall(socket,&nroBloque,4);
 		recvall(socket,&tamanio,4);
-		int resultado = recvall(socket,dataBin+(block_size*nroBloque),tamanio);
-		int nulo=0;
-		memcpy(dataBin+(block_size*nroBloque)+1,&nulo,1);
-		return resultado;
+		recvall(socket,dataBin+(block_size*nroBloque),tamanio);
+		memset(dataBin+(block_size*nroBloque)+tamanio,'\n',1);
+		memset(dataBin+(block_size*nroBloque)+tamanio+1,'\0',1);
+		return nroBloque;
 	}
 	int respuestaSetBloque(int socket, int resultado){
+
 		t_buffer* buffer = crearBufferConProtocolo(RTA_SET_BLOQUE);
 		bufferAgregarInt(buffer,resultado);
 		return enviarBuffer(buffer,socket);
 	}
-	int getBloqueParaFileSystem(int socket,char* dataBin){
+	int getBloqueParaFileSystem(int socket,char* dataBin, int block_size){
 		int nroBloque;
 		recvall(socket,&nroBloque,4);
-		return enviarBloqueAFileSystem(socket, dataBin);
+		return enviarBloqueAFileSystem(socket, dataBin+(nroBloque*block_size));
 	}

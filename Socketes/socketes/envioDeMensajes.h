@@ -73,7 +73,7 @@ int enviarBuffer(t_buffer* buffer, int socket);
 	//De Nodo
 	t_nodoParaFS* conocerAlNodo(int socket);
 
-	int recibirBloqueDeNodo(int socket, void** buffer);
+	int recibirBloqueDeNodo(int socket, void* buffer);
 
 //Nodo
 	//De FileSystem
@@ -81,5 +81,5 @@ int enviarBuffer(t_buffer* buffer, int socket);
 
 	int respuestaSetBloque(int socket, int resultado);
 
-	getBloqueParaFileSystem(int socket,char* dataBin);
+	getBloqueParaFileSystem(int socket,char* dataBin, int block_size);
 #endif

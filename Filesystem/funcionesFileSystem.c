@@ -77,7 +77,7 @@ static bool tieneLugar(t_nodo *unNodo);
  }
  */
 
-int BLOCK_SIZE = 50; //2* 1024 * 1024;//Probar con menos
+int BLOCK_SIZE = 150; //2* 1024 * 1024;//Probar con menos
 int CANT_COPIAS = 3;
 /*
  * //FIXME a la hora de tener un archivo mayor a 20MB o que el BLOCK_SIZE sea menor estalla
@@ -98,11 +98,14 @@ int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
 	int posicionEnNodo;
 	int *aux;
 	t_bloqueEnNodo *bloqueEnNodo;
-	int ultimoIndiceDelData = string_length(data) - 1;//Juanchi dice que -1 no va
+	int ultimoIndiceDelData = string_length(data)-1;//Juanchi dice que -1 no va
 
 	*cantidadBolquesEnviados = 0;
-
+	int cant=0;
 	while (!fin) {
+
+
+		cant++;
 		bloqueDeArchivo = malloc(sizeof(t_bloqueArch));
 		bloqueDeArchivo->copiasDeBloque = list_create();
 		finDeBloque = comienzoDeBloque + BLOCK_SIZE;
@@ -117,6 +120,7 @@ int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
 		while (data[finDeBloque] != '\n'){
 			finDeBloque--;
 		}
+
 		//Acá tengo el final del bloque dado, y también donde empieza
 
 		//ordenar lista nodo por cantidad de bloques usados-->sale nodosOrdenados
@@ -192,9 +196,9 @@ int nodoElegido(t_list *nodosOrdenados, t_nodo **nodoActual, int *posicion) {
 			*posicion = 1;
 		}
 		*nodoActual = list_get(nodosOrdenados, *posicion);
-		printf("%d ---- %d\n", *posicion, z);
+
 	}
-	printf("%d\t",*posicion);
+
 	return 0;
 }
 

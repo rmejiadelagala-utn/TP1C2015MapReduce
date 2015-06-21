@@ -18,7 +18,7 @@ void crearDirectorio(char *nomDirectorio);
 void eliminarDirectorio(char *directorio);
 void renombrarDirectorio(char *directorio, char* nuevoNombre);
 void moverDirectorio(char *directorio, char* padre);
-void copiarAMDFS(char *archivo);
+void copiarAMDFS(char *archivo, char *archivoACopiar);
 void copiarAFS(char *archivo);
 void solicitarMD5(char *archivo);
 void verBloque(char *bloque);

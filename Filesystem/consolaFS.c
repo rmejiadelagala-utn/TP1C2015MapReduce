@@ -94,8 +94,8 @@ int consola(void* unListaNodo) {
 			moverDirectorio(comandoSeparado[1],comandoSeparado[2]);
 			break;
 		case COPIAR_A_MDFS:
-			if(comprobarParametros(1,comandoSeparado)==1)
-			copiarAMDFS(comandoSeparado[1]);
+			if(comprobarParametros(2,comandoSeparado)==1)
+			copiarAMDFS(comandoSeparado[1],comandoSeparado[2]);
 			break;
 		case COPIAR_A_FS:
 			if(comprobarParametros(1,comandoSeparado)==1)
@@ -262,8 +262,10 @@ void moverDirectorio(char *directorio, char* padreString) {
 
 	}
 }
-void copiarAMDFS(char *archivo) {
-	levantarArchivoAMemoriaYDistribuirANodos("../archivoBasura.dat", archivo, directorioActual->index);
+void copiarAMDFS(char *archivoDestino, char *archivoACopiar) {
+	char* path = strdup("../Archivos/");
+	string_append(&path,archivoACopiar);
+	levantarArchivoAMemoriaYDistribuirANodos(path, archivoDestino, directorioActual->index);
 }
 
 void copiarAFS(char *archivo) {
