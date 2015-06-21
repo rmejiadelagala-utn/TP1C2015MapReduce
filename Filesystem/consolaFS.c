@@ -315,6 +315,33 @@ void eliminarNodo(char *nodo) {
 	if(!strcmp(nodo,"VerNodos")){//XXX PARA TESTEAR
 		mostrarLista(listaNodos, (void*)mostrarNodo);
 	}
+	else if(!strcmp(nodo,"responderAMarta")){//XXX PARA TESTEAR
+
+		  char str [80];//asquerosamente hecho para probar que funciona
+		  char *nombreArchivo = malloc (80);
+		  int padre, numeroDeBloqueEnArchivo;
+		  t_list *copias = list_create();
+		  int resultado;
+		  printf ("Ingrese nombre del archivo a eliminar: ");
+		  scanf ("%79s",str);
+		  printf ("Ingrese el padre de dicho archivo: ");
+		  scanf ("%d",&padre);
+		  printf ("Ingrese el numero De Bloque En Archivo que desea obtener : ");
+		  scanf ("%d",&numeroDeBloqueEnArchivo);
+		  strcpy(nombreArchivo,str);
+		  resultado = encontrarCopias(nombreArchivo,padre, numeroDeBloqueEnArchivo,&copias);
+		  if(resultado == -1){
+			  printf("El nombre del archivo o el padre están erroneos\n");
+		  }
+		  else if(resultado == -2){
+			  printf("El bloque de archivo pedido no existe\n");
+		  }
+		  else{
+			  //TODO respuesta
+		  }
+
+
+	}
 	else{
 		void eliminarNod(t_nodo *unNodo){
 			eliminarNodoYReferencias(unNodo,listaNodos,listaArchivos);
