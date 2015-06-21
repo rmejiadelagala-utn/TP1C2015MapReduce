@@ -55,4 +55,60 @@ typedef struct {
 	int estado;
 } t_infoNodo;
 
+/////////////Nuevas estructuras de Marta que surgen del algorit. de distribuir y manda mensajes////////////
+//////////// Estructuras de MaRTA Para envio de mesajes y demás /////////////////////////
+typedef struct {
+	int idJob;
+	int combiner;
+	char* pathDeResultado;
+	char** pathsDeArchivos;
+} t_InfoJob;
+
+typedef struct {
+	int idArchivo;
+	int cantidadDeBloques;
+} t_InfoArchivo;
+
+typedef struct {
+	uint32_t id_map;
+	uint32_t id_nodo;
+	uint32_t ip_nodo;
+	uint32_t puerto_nodo;
+	uint32_t block;
+	char* temp_file_name;
+} t_DestinoMap;
+
+typedef struct {
+	t_InfoArchivo* file;
+	uint32_t block;
+	t_DestinoMap* map_dest;
+} t_MapPendiente;
+
+typedef struct {
+	uint32_t prot;
+	uint32_t id_map;
+} t_ResultadoMap;
+
+typedef struct {
+	uint32_t id_temp;
+	char* path;
+	uint32_t id_nodo;
+	uint32_t id_file_origin;
+	uint32_t block_origin;
+} t_MapTemporal; //Revisar bien esta
+
+///Esto va en envioDeMensajes me parece///
+
+typedef struct {
+	uint32_t id_nodo;
+	uint32_t ip_nodo;
+	uint32_t puerto_nodo;
+	uint32_t block;
+} t_CopiaDeBloque;
+
+typedef struct {
+	uint32_t id_nodo;
+	uint32_t cantidadOperacionesEnCurso;
+} t_CargaNodo;
+
 #endif /* ESTRUCTURASMARTA_H_ */
