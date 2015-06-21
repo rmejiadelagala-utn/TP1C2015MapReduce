@@ -6,6 +6,7 @@
 #include <commons/collections/list.h>
 #include <commons/string.h>
 #include <string.h>
+#include <socketes/envioDeMensajes.h>
 
 int consola();
 void leerComando(char *command, int maximoLargo);

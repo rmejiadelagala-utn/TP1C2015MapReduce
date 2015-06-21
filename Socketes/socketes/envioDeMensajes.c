@@ -1,4 +1,19 @@
 #include "envioDeMensajes.h"
+#include <commons/config.h>
+#include <commons/string.h>
+#include <commons/collections/list.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <stdint.h>
+#include <ifaddrs.h>
+#include <string.h>
 
 //sendall y recvall aseguran que se mande/reciba toda la informacion
 
@@ -84,6 +99,43 @@ void bufferAgregarString(t_buffer* buffer,char* unString, int tamanio){
 	memcpy((buffer->data + tamanioAnterior),unString,largoString);
 }
 
+void buffer_add_string(t_buffer* self, char *string_to_add) {
+	uint32_t size_string = strlen(string_to_add) + 1;
+	bufferAgregarInt(self,size_string);
+
+	off_t offset_to_write = self->tamanio;
+
+	self->tamanio += size_string;
+	self->data = realloc(self->data, self->tamanio);
+
+	memcpy((self->data + offset_to_write), string_to_add, size_string);
+}
+
+int recibirIntEnOrden(int socket, uint32_t *numero) {
+	int resultado;
+
+	if ((resultado = recv(socket, numero, sizeof(uint32_t), 0)) == -1) {
+		//mostrar_error(-1, "Error recieving");
+		return -1;
+	}
+	*numero = ntohl(*numero);
+
+	return resultado;
+}
+
+uint32_t recibirProtocoloEnOrden(int socket) {
+	uint32_t prot;
+
+	int resultado = recibirIntEnOrden(socket,&prot);
+
+	if (resultado == 0)
+		return DISCONNECTED;
+
+	if (resultado == -1)
+		return -1;
+
+	return prot;
+}
 
 
 //Enviar buffer

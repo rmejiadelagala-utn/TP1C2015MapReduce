@@ -317,6 +317,57 @@ void eliminarNodo(char *nodo) {
 	if(!strcmp(nodo,"VerNodos")){//XXX PARA TESTEAR
 		mostrarLista(listaNodos, (void*)mostrarNodo);
 	}
+	else if(!strcmp(nodo,"responderAMarta")){//XXX PARA TESTEAR
+
+		  char str [80];//asquerosamente hecho para probar que funciona
+		  char *nombreArchivo = malloc (80);
+		  int padre, numeroDeBloqueEnArchivo;
+		  t_list *copias = list_create();
+		  int resultado;
+		  printf ("Ingrese nombre del archivo a eliminar: ");
+		  scanf ("%79s",str);
+		  printf ("Ingrese el padre de dicho archivo: ");
+		  scanf ("%d",&padre);
+		  printf ("Ingrese el numero De Bloque En Archivo que desea obtener : ");
+		  scanf ("%d",&numeroDeBloqueEnArchivo);
+		  strcpy(nombreArchivo,str);
+		  resultado = encontrarCopias(nombreArchivo,padre, numeroDeBloqueEnArchivo,&copias);
+		  if(resultado == -1){
+			  printf("El nombre del archivo o el padre están erroneos\n");
+		  }
+		  else if(resultado == -2){
+			  printf("El bloque de archivo pedido no existe\n");
+		  }
+		  else if(copias == NULL){
+					  printf("No existen copias de ese bloque de archivo\n");
+				  }
+		  else{
+			  int cantCopias = list_size(copias);
+			  int i;
+			  int puerto;
+			  t_bloqueEnNodo copia;
+			  int tamanioCopia = sizeof(uint32_t) + sizeof(uint16_t) + sizeof(uint16_t);
+			  void *buffer = malloc(cantCopias * sizeof(tamanioCopia));
+
+			  for(i = 0 ; i< cantCopias; i++){
+				  copia = list_get(copias,i);
+				  char* ip = separarIpPuerto(copia->ipPuerto, &puerto);
+
+				  memcpy(buffer + i* sizeof(tamanioCopia), &(inet_addr (ip)), sizeof(uint32_t));
+				  memcpy(buffer + i* sizeof(tamanioCopia) + sizeof(uint32_t), &(puerto), sizeof(uint16_t));
+				  memcpy(buffer + i* sizeof(tamanioCopia) + sizeof(uint32_t) + sizeof(uint16_t) , &(copia->numeroDeBloqueEnNodo ), sizeof(uint16_t));
+
+
+			  }
+
+			  //faltaria otro send mas arriba diciendole cuantas copias les voy a mandar
+			  //martaSocket debería estar en algun lado definido
+			  //send(martaSocket, buffer, cantCopias * tamanioCopia, 0);
+
+		  }
+
+
+	}
 	else{
 		void eliminarNod(t_nodo *unNodo){
 			eliminarNodoYReferencias(unNodo,listaNodos,listaArchivos);

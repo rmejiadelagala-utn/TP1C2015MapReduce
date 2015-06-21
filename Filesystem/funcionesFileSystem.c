@@ -512,6 +512,12 @@ void moverDirectorioConPadre(int padre, t_directorio *unDirectorio) { //probada
 		printf("El directorio fue movido correctamente\n");
 	}
 }
+char* separarIpPuerto(char* ipPuerto,int * puerto){
+	char** substrings = string_split(ipPuerto, ":" );
+	char *ip = malloc(strlen(substrings[0]));
+	*puerto = atoi(substrings[1]);
+	return ip;
+}
 
 /*
  void enviarBloques(t_nodo *nodosOrdenados,t_info info){
