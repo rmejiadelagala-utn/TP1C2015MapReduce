@@ -231,3 +231,10 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		recvall(socket,&nroBloque,4);
 		return enviarBloqueAFileSystem(socket, dataBin+(nroBloque*block_size));
 	}
+//Marta
+	//De Filesystem
+	t_registro_id_ipPuerto* recibirRegistroNodo(int socket){
+		t_registro_id_ipPuerto* unRegistro = malloc(sizeof(t_registro_id_ipPuerto));
+		recvall(socket, unRegistro, sizeof(t_registro_id_ipPuerto));
+		return unRegistro;
+	}
