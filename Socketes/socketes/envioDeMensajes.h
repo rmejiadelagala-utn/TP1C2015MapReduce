@@ -20,7 +20,14 @@ typedef struct {
 	uint16_t PUERTO_NODO;
 	char NODO_NEW;
 	int CANT_BLOQUES;
+	int ID;
 }__attribute__ ((__packed__)) t_nodoParaFS;
+
+typedef struct {
+	int id;
+	uint16_t puerto;
+	struct in_addr ip;
+}__attribute__ ((__packed__)) t_registro_id_ipPuerto;
 
 //sendall y recvall aseguran que se mande/reciba toda la informacion
 
@@ -32,7 +39,7 @@ int recvall(int socket, void *mensaje, size_t tamanio);
 
 enum protocolos {
 	CONEXION_NODO_A_FS,SET_BLOQUE, GET_BLOQUE, RTA_SET_BLOQUE, DISCONNECTED,
-	MAP_OK, NODO_NOT_FOUND, ORDER_MAP
+	MAP_OK, NODO_NOT_FOUND, ORDER_MAP, MARTA_ACTUALIZA_EL_REGISTRO
 };
 
 //Primitivas
@@ -73,6 +80,9 @@ int enviarBuffer(t_buffer* buffer, int socket);
 	int enviarBloqueANodo(int socket, int numeroDeBloque, char* dataBloque,int comienzoBloque, int tamanio);
 
 	int pedirBloqueANodo(int socket, int numeroDeBloque);
+
+	//A marta
+	int actualizarIdIpPuertoEnMarta(int socket, t_registro_id_ipPuerto* unRegistro);
 //Deserializar mensajes
 
 //FileSystem

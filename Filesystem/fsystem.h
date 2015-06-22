@@ -17,6 +17,11 @@ enum protocolo {
 //PROTOCOLOS QUE ESPERA EL FILESYSTEM
 
 
+
+
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <socketes/servidor.h>
@@ -47,9 +52,11 @@ t_config* config;
 t_list *listaArchivos;
 t_list *listaNodos;
 t_list *listaDirectorios;
+t_list *listaRegistrosIDIP;
 sem_t semaforo;
 FILE *archivoReconstruido;
-int cantidadDeNodos;
+int socketDeMarta;
+
 
 void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* nombreArchivo, int padre);
 #endif /* FSYSTEM_H_ */

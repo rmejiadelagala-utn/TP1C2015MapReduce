@@ -34,6 +34,7 @@ int main() {
 	paramHiloFS.ARCH_BIN = arch_config->ARCH_BIN;
 	paramHiloFS.NODO_NEW = arch_config->NODO_NEW;
 	paramHiloFS.DIR_TEMP = arch_config->DIR_TEMP;
+	paramHiloFS.ID = arch_config->ID;
 
 	pthread_create(&hiloFS, NULL, (void*)conexionFS, (void*) &paramHiloFS);
 //	pthread_create(&hiloJobs, NULL, (void*)conexionJobs, (void*) &arch_config->PUERTO_NODO);

@@ -28,6 +28,7 @@ void* conexionFS(void* arg){
 	infoNodo->PUERTO_NODO = ptr->PUERTO_NODO;
 	infoNodo->NODO_NEW = (ptr->NODO_NEW == 's' || ptr->NODO_NEW == 'S');
 	infoNodo->CANT_BLOQUES = cant_bloques;
+	infoNodo->ID = ptr->ID;
 
 	presentarseAlFileSystem(infoNodo, socket);
 	system("clear");

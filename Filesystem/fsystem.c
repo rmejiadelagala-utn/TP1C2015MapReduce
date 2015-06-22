@@ -6,10 +6,9 @@
  */
 
 #include "fsystem.h"
-#include <fcntl.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
 
+
+/*XXX POSIBLE ELIMINACION
 int inicializar() {
 	cantidadDeNodos = 0;
 	directorioUser = malloc(sizeof(t_directorio));
@@ -53,7 +52,7 @@ void agregar_tests() {
 	CU_add_test(pSuite,
 			"test crear directorio nuevo y ver que tiene el indice correcto",
 			test_crear_directorio_nuevo_y_verificar_su_indice);
-}
+}*/
 
 //interaccionFSNodo es la funcion que va a ejecutar cada hilo que esta en conexion con los nodos
 void *interaccionFSNodo(void*);
@@ -62,6 +61,7 @@ int main() {
 	listaArchivos = list_create();
 	listaNodos = list_create();
 	listaDirectorios = list_create();
+	listaRegistrosIDIP = list_create();
 	/*//probando funcion de mostrar listas
 
 
@@ -440,21 +440,39 @@ void *interaccionFSNodo(void* sock_ptr) {
 	int socket = *(int*) sock_ptr;
 	int protocolo;
 	int recibido;
-	char* ipPuerto;
+	int id;
 	t_nodoParaFS* infoNodo;
 	t_nodo* nodo;
 	int respuestaSetBloque;
 	void* buffer;
+	t_registro_id_ipPuerto* unRegistro=malloc(sizeof(t_registro_id_ipPuerto));
 	while ( (recibido=recvall(socket,&protocolo,4))>0) {
 		switch (protocolo) {
 		case CONEXION_NODO_A_FS:
 			infoNodo = conocerAlNodo(socket);
-			ipPuerto = strdup(strcat(strcat(inet_ntoa(infoNodo->IP_NODO),":"),string_itoa(infoNodo->PUERTO_NODO)));
-			if((nodo=buscarNodoPorIpPuerto(ipPuerto,listaNodos)) == NULL){
-			nodo = nuevoNodo(ipPuerto,(infoNodo->CANT_BLOQUES)*50);
+			//ipPuerto = strdup(strcat(strcat(inet_ntoa(infoNodo->IP_NODO),":"),string_itoa(infoNodo->PUERTO_NODO)));
+			id=infoNodo->ID;
+			if(infoNodo->NODO_NEW){ //Nodo es nuevo
+			nodo = nuevoNodo(id,(infoNodo->CANT_BLOQUES)*50);
 			list_add(listaNodos,nodo);
+			unRegistro->id=id;
+			unRegistro->ip=infoNodo->IP_NODO;
+			unRegistro->puerto=infoNodo->PUERTO_NODO;
+
 			}
+			else{ //Nodo no nuevo
+				unRegistro= buscarRegistroPorId(id);
+				if((nodo=buscarNodoPorId(id,listaNodos)) == NULL){ //No tenia su ID
+					printf("Error, no se conocía a este nodo.");
+					}
+				else if(!verificarRegistro(unRegistro,infoNodo->IP_NODO,infoNodo->PUERTO_NODO)){//Cambió su IP o Puerto
+					actualizarRegistro(unRegistro,infoNodo->IP_NODO,infoNodo->PUERTO_NODO);
+				}
+				else;//No cambió su IP ni puerto, entonces no se hace nada
+			}
+
 			nodo->socket=socket;
+			printf("El socket conectado es %d\n",socket);
 			free(infoNodo);
 			break;
 		case RTA_SET_BLOQUE:
@@ -476,6 +494,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 	if (recibido < 0) {
 		printf("Error.");
 	}
+	free(unRegistro);
 	close(socket);
 	return 0;
 }

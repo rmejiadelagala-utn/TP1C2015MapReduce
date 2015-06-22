@@ -9,11 +9,13 @@
 //estructura FileSytem
 #include<commons/collections/list.h>
 #include<commons/collections/queue.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 //estructura Archivo
 
 typedef struct {
-	char *ipPuerto;
+	int id;
 	int numeroDeBloqueEnNodo;
 
 } t_bloqueEnNodo;
@@ -38,14 +40,13 @@ typedef struct {
 //estructura nodo
 
 typedef struct {
-	char *ipPuerto;
 	float tamanio;
 	int cantidadBloquesOcupados;
 	t_queue *bloquesLiberados;
 	int activo; //para saber si el bloque se cayo o esta activo
 	int socket;
+	int id;
 } t_nodo;
-
 
 //estructura informacion de archivo a enviar a MaRTA
 
@@ -102,14 +103,14 @@ t_bloqueArch *nuevoBloqueArchivo(t_list *copiasDeBloques);
  * @NAME: nuevoBloqueEnNodo
  * @DESC: Inicializa un nuevo bloqueNodo
  */
-t_bloqueEnNodo *nuevoBloqueEnNodo(char *ipPuerto, int numeroDeBloqueEnNodo);
+t_bloqueEnNodo *nuevoBloqueEnNodo(int id, int numeroDeBloqueEnNodo);
 
 //funciones para la estructura nodo
 /**
  * @NAME: nuevoNodo
  * @DESC: Inicializa un nuevo nodo
  */
-t_nodo *nuevoNodo(char *ipPuerto, int tamanio);
+t_nodo *nuevoNodo(int id, int tamanio);
 
 /**
  * @NAME: activarNodo

@@ -31,22 +31,20 @@ t_bloqueArch *nuevoBloqueArchivo(t_list *copiasDeBloques) {
 	return bloqueArchivo;
 }
 
-t_bloqueEnNodo *nuevoBloqueEnNodo(char *ipPuerto, int numeroDeBloqueEnNodo) {
+t_bloqueEnNodo *nuevoBloqueEnNodo(int id, int numeroDeBloqueEnNodo) {
 	t_bloqueEnNodo *unBloqueEnNodo = malloc(sizeof(t_bloqueEnNodo)); //nueva estructura
-	unBloqueEnNodo->ipPuerto = malloc(strlen(ipPuerto) + 1);
+	unBloqueEnNodo->id = id;
 	//asignacion de valores a la estructura
-	strcpy(unBloqueEnNodo->ipPuerto, ipPuerto);
 	unBloqueEnNodo->numeroDeBloqueEnNodo = numeroDeBloqueEnNodo;
 	//devuelvo la estructura
 	return unBloqueEnNodo;
 }
 
 //funciones para la estructura nodo
-t_nodo *nuevoNodo(char *ipPuerto, int tamanio) {
+t_nodo *nuevoNodo(int id, int tamanio) {
 	t_nodo *unNodo = malloc(sizeof(t_nodo));  //nueva estructura
-	unNodo->ipPuerto = malloc(strlen(ipPuerto) + 1);
 	//asignacion de campos a la estructura
-	strcpy(unNodo->ipPuerto, ipPuerto);
+	unNodo->id = id;
 	unNodo->tamanio = tamanio;
 	unNodo->cantidadBloquesOcupados = 0; //SE SUPONE QUE SI EL NODO ES NUEVO NO TIENE BLOQUES ESCRITOS
 	unNodo->activo = 1; //SE SUPONE QUE SI EL NODO SE ESTA CONECTANDO, ENTONCES ESTA ACTIVO
@@ -88,7 +86,6 @@ int esHijo(t_directorio *dirHijo, t_directorio *dirPadre){
 
 //Funciones Para liberar
 void liberarBloqueEnNodo(t_bloqueEnNodo *bloqueEnNodo) {
-	free(bloqueEnNodo->ipPuerto);
 	free(bloqueEnNodo);
 }
 
@@ -108,7 +105,6 @@ void liberarArchivo(t_archivo *unArchivo) {
 
 void liberarNodo(t_nodo *unNodo) {
 	queue_destroy_and_destroy_elements(unNodo->bloquesLiberados, (void*) free);
-	free(unNodo->ipPuerto);
 	free(unNodo);
 }
 
@@ -120,7 +116,7 @@ void liberarDirectorio(t_directorio *unDirectorio) {
 //Funciones para mostrar estructuras por pantalla
 
 void mostrarBloqueEnNodo(t_bloqueEnNodo *bloqueEnNodo) {
-	printf("\tIpPuerto: %s\n", bloqueEnNodo->ipPuerto);
+	printf("\tId del Nodo: %d\n", bloqueEnNodo->id);
 	printf("\tNumeroDeBloqueEnNodo %d\n\n", bloqueEnNodo->numeroDeBloqueEnNodo);
 }
 
@@ -145,7 +141,7 @@ void mostrarNombreArchivo(t_archivo *unArchivo){
 void mostrarNodo(t_nodo *unNodo) {
 	printf("Activo: %d\n", unNodo->activo);
 	printf("CantidadBloquesOcupados: %d\n", unNodo->cantidadBloquesOcupados);
-	printf("IpPuerto: %s\n", unNodo->ipPuerto);
+	printf("ID: %d\n", unNodo->id);
 	printf("Tamanio: %f\n", unNodo->tamanio);
 	mostrarColaDeInt(unNodo->bloquesLiberados);
 }

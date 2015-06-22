@@ -40,6 +40,7 @@ typedef struct {
 	char NODO_NEW;
 	char* IP_NODO;
 	uint16_t PUERTO_NODO;
+	int ID;
 } t_config_nodo;
 typedef struct {
 	 int socket;
@@ -48,6 +49,7 @@ typedef struct {
 	uint16_t PUERTO_NODO;
 	char NODO_NEW;
 	char* DIR_TEMP;
+	int ID;
 }t_hilofs;
 
 

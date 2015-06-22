@@ -8,6 +8,7 @@
 #ifndef FUNCIONESFILESYSTEM_H_
 #define FUNCIONESFILESYSTEM_H_
 #include"estructurasFileSystem.h"
+#include "fsystem.h"
 /*
  * @NAME: distribuirBloquesEnNodos
  * @DESC: recibe una lista de bloques de archivo, por la cual crea 3 copias y cada una se la asigna a un nodo específico. Ademas internamente ordena la lista para lograr una mejor distribucion
@@ -49,6 +50,11 @@ void crearDirectorioDadoPadreYNom(char *nombre, int padre,
 void eliminarDirectorioDadoElIndice(int indice, t_list *listaDirectorio);
 
 /*
+ * @NAME: actualizarRegistro
+ * @DESC: actualiza el registro y le avisa a marta.
+ */
+void actualizarRegistro(t_registro_id_ipPuerto* unRegistro,struct in_addr ip,uint16_t puerto);
+/*
  * @NAME: esNodoNuevo
  * @DESC: recibe una lista de nodos y un nodo, y se fija si ese nodo esta en la lista comparando puerto e ip
  */
@@ -81,12 +87,21 @@ void eliminarReferencias(t_nodo *nodoAEliminar, t_list *archivos);
 void eliminarNodoDeLista(t_nodo *nodoAEliminar, t_list *listaNodos);
 
 //funciones de busquedas
-
 /**
- * @NAME: buscarNodoPorIpPuerto
- * @DESC: busca un nodo por ipPuerto en una lista de nodos
+ * @NAME: verificarRegistro
+ * @DESC: devuelve true si el registro guardado en la tabla de registros tiene la misma ip y puerto que el provisto
  */
-t_nodo *buscarNodoPorIpPuerto(char *ipPuerto, t_list *listaNodos);
+bool verificarRegistro(t_registro_id_ipPuerto* unRegistro, struct in_addr ip,int puerto);
+/**
+ * @NAME: buscarRegistroPorId
+ * @DESC: busca un registro por id en una lista de registro
+ */
+t_registro_id_ipPuerto* buscarRegistroPorId(int id);
+/**
+ * @NAME: buscarNodoPorId
+ * @DESC: busca un nodo por id en una lista de nodos
+ */
+t_nodo *buscarNodoPorId(int id, t_list *listaNodos);
 
 /**
  * @NAME: buscarDirPorNombre

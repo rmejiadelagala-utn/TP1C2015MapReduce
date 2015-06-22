@@ -29,6 +29,7 @@ t_config_nodo* leerArchivoConfig(char *path_config){
 	configNodo->NODO_NEW  = (config_get_string_value(config, "NODO_NUEVO"))[0];
 	configNodo->IP_NODO   = strdup(config_get_string_value(config, "IP_NODO"));
 	configNodo->PUERTO_NODO = config_get_int_value(config, "PUERTO_NODO");
+	configNodo->ID     = config_get_int_value(config, "ID");
 
 	printf("Conectando a IP: %s\n", config_get_string_value(config, "IP_FS"));
 	printf("Puerto: %d\n", config_get_int_value(config, "PUERTO_FS"));
@@ -37,6 +38,7 @@ t_config_nodo* leerArchivoConfig(char *path_config){
 	printf("Nodo Nuevo: %c\n", (config_get_string_value(config, "NODO_NUEVO"))[0]);
 	printf("IP Nodo: %s\n", config_get_string_value(config, "IP_NODO"));
 	printf("Puerto Nodo: %d\n", config_get_int_value(config, "PUERTO_NODO"));
+	printf("Hola, soy el nodo %d\n", config_get_int_value(config, "ID"));
 
 	/* Una vez que se levantaron los datos del archivo de configuracion
 	   puedo destruir la estructura config. */

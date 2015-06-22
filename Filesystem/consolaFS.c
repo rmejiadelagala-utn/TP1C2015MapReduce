@@ -514,7 +514,7 @@ void validarDirectorioYEjecutar(char* unDirectorio, void (*funcion)(void*)){
 }
 
 void validarNodoYEjecutar(char* unNodo, void (*funcion)(void*)){
-	t_nodo *nodoObjetivo = buscarNodoPorIpPuerto(unNodo,listaNodos);
+	t_nodo *nodoObjetivo = buscarNodoPorId(unNodo,listaNodos);
 	if(nodoObjetivo!=NULL) funcion(nodoObjetivo);
 	else printf("Nodo no encontrado.\n");
 }

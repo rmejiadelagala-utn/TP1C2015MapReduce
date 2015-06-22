@@ -179,6 +179,15 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		int resultado = enviarBuffer(buffer,socket);
 		return resultado;
 	}
+	//A Marta
+	int actualizarIdIpPuertoEnMarta(int socket, t_registro_id_ipPuerto* unRegistro){
+		int tamanioAEnviar = sizeof(t_registro_id_ipPuerto) + 4;
+		void* buffer = malloc(tamanioAEnviar);
+		int protocolo = MARTA_ACTUALIZA_EL_REGISTRO;
+		memcpy(buffer,&protocolo,4);
+		memcpy(buffer+4,unRegistro,sizeof(t_registro_id_ipPuerto));
+		return sendall(socket, buffer, tamanioAEnviar);
+	}
 
 
 

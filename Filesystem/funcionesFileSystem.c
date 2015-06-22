@@ -17,17 +17,16 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <stdio.h>
-#include "fsystem.h"
 #include"funcionesFileSystem.h"
 t_list *listaArchivos;
 t_list *listaNodos;
 t_list *listaDirectorios;
-
+static int registroID(t_registro_id_ipPuerto *unRegistro);
 static bool ordenarPorMenorUso(t_nodo *data, t_nodo *dataSiguiente);
 static int buscarPosicionEnListaDadoUnArchivo(t_list *lista, t_archivo *archivo);
 static bool existeEseIndiceComoPadre(t_list *listaDirectorios, int padre);
 static int indiceNuevo(t_list *listaDirectorio);
-static char* nodoIpPuerto(t_nodo *unNodo);
+static int nodoID(t_nodo *unNodo);
 static char* dirNombre(t_directorio *unDir);
 static char* archNombre(t_archivo *unArch);
 static void *buscarEnListaPorStrKey(t_list *lista, char *key,
@@ -145,23 +144,12 @@ int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
 					free(aux);
 				}
 				nodoActual->cantidadBloquesOcupados++;
-				bloqueEnNodo = nuevoBloqueEnNodo(nodoActual->ipPuerto,
+				bloqueEnNodo = nuevoBloqueEnNodo(nodoActual->id,
 										posicionEnNodo);
 				int tamanio = finDeBloque - comienzoDeBloque;
 
 
 				enviarBloqueANodo(nodoActual->socket, bloqueEnNodo->numeroDeBloqueEnNodo, data,comienzoDeBloque,tamanio);
-
-
-/*
- * nodo: nodoActual
- * socket: nodoActual->socket
- * info: eee masomenos, buscala en memoria
- */
-
-
-
-				//TODO enviarBloqueDeDatosA(nodoElegido, incicio y fin de bloque);
 
 				//termino de agregar a la lista de archivos, la info nueva del bloque
 				list_add(bloqueDeArchivo->copiasDeBloque, bloqueEnNodo);//algo malo puede pasar
@@ -231,7 +219,7 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) {//Probada :
 				free(aux);
 			}
 			nodoActual->cantidadBloquesOcupados++;
-			bloqueEnNodo = nuevoBloqueEnNodo(nodoActual->ipPuerto,
+			bloqueEnNodo = nuevoBloqueEnNodo(nodoActual->id,
 					posicionEnNodo);
 			k++;
 			if (list_size(nodosOrdenados) == k) {
@@ -300,9 +288,19 @@ t_archivo *dameUnSubArch(t_directorio *unDirectorio) {
 }
 //fin de funciones auxiliares de eliminar recursivamente
 //Funciones de busqueda
-t_nodo *buscarNodoPorIpPuerto(char *ipPuerto, t_list *listaNodos) {	//probada
-	t_nodo *nodo = buscarEnListaPorStrKey(listaNodos, ipPuerto,
-			(char*) nodoIpPuerto);
+bool verificarRegistro(t_registro_id_ipPuerto* unRegistro, struct in_addr ip,int puerto){
+	return ((unRegistro->puerto == puerto) && (unRegistro->ip.s_addr == ip.s_addr));
+}
+
+t_registro_id_ipPuerto* buscarRegistroPorId(int id){
+	t_registro_id_ipPuerto* unReg = buscarEnListaPorIntKey(listaRegistrosIDIP, id,
+			(int*) registroID);
+	return unReg != NULL ? unReg : NULL;
+}
+
+t_nodo *buscarNodoPorId(int id, t_list *listaNodos) {	//probada
+	t_nodo *nodo = buscarEnListaPorIntKey(listaNodos, id,
+			(int*) nodoID);
 	return nodo != NULL ? nodo : NULL;
 }
 t_directorio *buscarDirPorNombre(char *nombre, t_list *listaDirectorios) {//probada
@@ -337,12 +335,13 @@ t_archivo *buscarArchPorPadre(int padre) { //probada
 			(int*) archPadre);
 	return arch != NULL ? arch : NULL;
 }
-//Fin de funciones de busqueda
+
 t_directorio *encontrarDirectorioHijo(t_list *listaDirectorios,
 		t_directorio *directorioPadre) {
 	return list_find(listaDirectorios, ( {bool esPadre(t_directorio* unDir)
 				{	return esHijo(directorioPadre,unDir);}esPadre;}));
 }
+//Fin de funciones de busqueda
 
 void eliminarArchivoYreferencias(t_archivo *unArchivo, t_list *listaArchivos, //probada
 		t_list *listaNodos) {
@@ -362,7 +361,7 @@ void activarNodoReconectado(t_nodo *nodoABuscar, t_list *listaNodos) { //probada
 	t_nodo *nodoActual;
 	for (i = 0; i < list_size(listaNodos); i++) {
 		nodoActual = list_get(listaNodos, i);
-		if (!strcmp(nodoABuscar->ipPuerto, nodoActual->ipPuerto)) {
+		if (nodoABuscar->id == nodoActual->id) {
 			activarNodo(nodoActual);
 			i = list_size(listaNodos);	//corto el ciclo como un campeon
 
@@ -370,10 +369,18 @@ void activarNodoReconectado(t_nodo *nodoABuscar, t_list *listaNodos) { //probada
 	}
 
 }
+
+void actualizarRegistro(t_registro_id_ipPuerto* unRegistro,struct in_addr ip,uint16_t puerto){
+	unRegistro->ip = ip;
+	unRegistro->puerto = puerto;
+	actualizarIdIpPuertoEnMarta(socketDeMarta,unRegistro);
+	}
+
+
 //XXX creo que no hace falta esta función porque el nodo cuando se conecta indíca si es nuevo o no
 bool esNodoNuevo(t_nodo *nodoABuscar, t_list *listaNodos) {	//probada
 	bool mismosNodos(t_nodo *nodoDeLista) {
-		return (!strcmp(nodoABuscar->ipPuerto, nodoDeLista->ipPuerto));
+		return (nodoABuscar->id == nodoDeLista->id);
 	}
 
 	return !list_any_satisfy(listaNodos, (bool*) mismosNodos);
@@ -389,7 +396,7 @@ void eliminarNodoYReferencias(t_nodo *nodoAEliminar, t_list *listaNodos, //proba
 
 void eliminarNodoDeLista(t_nodo *nodoAEliminar, t_list *listaNodos) { //probada
 	bool mismosNodos(t_nodo *nodoDeLista) {
-		return (!strcmp(nodoAEliminar->ipPuerto, nodoDeLista->ipPuerto));
+		return (nodoAEliminar->id == nodoDeLista->id);
 	}
 
 	list_remove_and_destroy_by_condition(listaNodos, (bool*) mismosNodos,
@@ -398,7 +405,7 @@ void eliminarNodoDeLista(t_nodo *nodoAEliminar, t_list *listaNodos) { //probada
 void eliminarReferencias(t_nodo *nodoAEliminar, t_list *archivos) { //probada
 
 	bool copiaEstaEnNodo(t_bloqueEnNodo *copiaDeBloque) {
-		return (strcmp(nodoAEliminar->ipPuerto, copiaDeBloque->ipPuerto) == 0);
+		return (nodoAEliminar->id == copiaDeBloque->id);
 	}
 
 	void _list_elements2(t_bloqueArch *bloqueDeArch) {
@@ -595,8 +602,11 @@ static void *buscarEnListaPorIntKey(t_list *lista, int key,
 
 	return list_find(lista, (bool*) _comparacion);
 }
-static char* nodoIpPuerto(t_nodo *unNodo) {
-	return unNodo->ipPuerto;
+static int registroID(t_registro_id_ipPuerto *unRegistro) {
+	return unRegistro->id;
+}
+static int nodoID(t_nodo *unNodo) {
+	return unNodo->id;
 }
 static char* dirNombre(t_directorio *unDir) {
 	return unDir->nombre;
@@ -678,7 +688,7 @@ int obtenerArchivo(t_archivo *archivo) {
 		t_bloqueEnNodo *bloque = list_find(bloqueDeArchivo->copiasDeBloque,
 				(void*) noEsNull);
 		int ipPuertoCoincide(t_nodo *unNodo) {
-			return !strcmp(unNodo->ipPuerto, bloque->ipPuerto);
+			return (unNodo->id == bloque->id);
 		}
 	t_nodo *nodoEncontrado = list_find(listaNodos, (void*) ipPuertoCoincide);
 	if(!nodoEncontrado) return -1;
@@ -708,7 +718,7 @@ static void recorrerCopiasDeUnArch(t_archivo *unArchivo,
 }
 
 static void disminuirNodo(t_bloqueEnNodo *copia) {
-	t_nodo *nodo = buscarNodoPorIpPuerto(copia->ipPuerto, listaNodos);
+	t_nodo *nodo = buscarNodoPorId(copia->id, listaNodos);
 	nodo->cantidadBloquesOcupados = nodo->cantidadBloquesOcupados - 1;
 	int *numero = malloc(sizeof(int));
 	*numero = copia->numeroDeBloqueEnNodo;
