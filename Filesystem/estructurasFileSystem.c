@@ -115,6 +115,10 @@ void liberarDirectorio(t_directorio *unDirectorio) {
 
 //Funciones para mostrar estructuras por pantalla
 
+void mostrarRegistro(t_registro_id_ipPuerto *registro) {
+	printf("\tId del Nodo: %d\n", registro->id);
+}
+
 void mostrarBloqueEnNodo(t_bloqueEnNodo *bloqueEnNodo) {
 	printf("\tId del Nodo: %d\n", bloqueEnNodo->id);
 	printf("\tNumeroDeBloqueEnNodo %d\n\n", bloqueEnNodo->numeroDeBloqueEnNodo);

@@ -9,21 +9,21 @@
 
 t_config *config;
 
-int main(int argc, char *argv[]) {
+int main(/*int argc, char *argv[]*/) {
 
 	listaRegistrosIDIP = list_create();
-	char *c;
+	//char *c;
 	int serv; //socket servidor
 	int cliente; //socket cliente del FS
 	pthread_t thr;
 	pthread_t thr_fs;
 
-	if (argc != 2){
+	/*if (argc != 2){
 		printf("Error: Se esperaba un parametro \nUso: ./Marta config.cfg\n");
 		return 1;
 	}
-	c=argv[1];
-	config=config_create(c);
+	c=argv[1];*/
+	config=config_create("../marta.cfg");
 	serv = crearServer(config_get_int_value(config, "PORT")); //Jobs
 	cliente = crearCliente(config_get_string_value(config,"IP_FS"),config_get_int_value(config,"PUERTO_FS")); //FS
 	pthread_create(&thr, NULL, atencionJobs, (void*) &serv );

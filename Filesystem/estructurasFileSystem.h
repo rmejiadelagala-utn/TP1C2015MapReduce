@@ -11,6 +11,7 @@
 #include<commons/collections/queue.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <socketes/envioDeMensajes.h>
 
 //estructura Archivo
 
@@ -180,6 +181,11 @@ void liberarDirectorio(t_directorio *unDirectorio);
 
 //Funciones para mostrar estructuras
 
+/**
+ * @NAME: mostrarRegistro
+ * @DESC: muestra la estructura registro
+ */
+void mostrarRegistro(t_registro_id_ipPuerto *registro);
 /**
  * @NAME: mostrarBloqueEnNodo
  * @DESC: muestra la estructura bloqueEnNodo

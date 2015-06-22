@@ -21,8 +21,11 @@ static int registroID(t_registro_id_ipPuerto *unRegistro) {
 	return unRegistro->id;
 }
 
-static void *buscarEnListaPorIntKey(t_list *lista, int key, int *keyGetter(void*)) {
+static void *buscarEnListaPorIntKey(t_list *lista, int key,
+		int *keyGetter(void*)) {
 	bool _comparacion(void* data) {
 		return keyGetter(data) == key;
 	}
+
+	return list_find(lista, (bool*) _comparacion);
 }

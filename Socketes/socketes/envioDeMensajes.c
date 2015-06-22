@@ -188,7 +188,12 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		memcpy(buffer+4,unRegistro,sizeof(t_registro_id_ipPuerto));
 		return sendall(socket, buffer, tamanioAEnviar);
 	}
-
+//Marta
+	//A Filesystem
+	int presentarseMartaAlFileSystem(int socket){ //TODO posiblemente haya que agregar alguna funcionalidad mas
+			t_buffer* buffer = crearBufferConProtocolo(CONEXION_MARTA_A_FS);
+			return enviarBuffer(buffer,socket);
+		}
 
 
 //Deserializar mensajes

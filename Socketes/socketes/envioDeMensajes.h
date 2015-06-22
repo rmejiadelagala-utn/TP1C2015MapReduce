@@ -38,7 +38,7 @@ int recvall(int socket, void *mensaje, size_t tamanio);
 //PROTOCOLOS
 
 enum protocolos {
-	CONEXION_NODO_A_FS,SET_BLOQUE, GET_BLOQUE, RTA_SET_BLOQUE, DISCONNECTED,
+	CONEXION_NODO_A_FS, CONEXION_MARTA_A_FS, SET_BLOQUE, GET_BLOQUE, RTA_SET_BLOQUE, DISCONNECTED,
 	MAP_OK, NODO_NOT_FOUND, ORDER_MAP, MARTA_ACTUALIZA_EL_REGISTRO
 };
 
@@ -81,8 +81,14 @@ int enviarBuffer(t_buffer* buffer, int socket);
 
 	int pedirBloqueANodo(int socket, int numeroDeBloque);
 
-	//A marta
+	//A Marta
 	int actualizarIdIpPuertoEnMarta(int socket, t_registro_id_ipPuerto* unRegistro);
+
+//Marta
+	//A FileSystem
+
+	int presentarseMartaAlFileSystem(int socket);
+
 //Deserializar mensajes
 
 //FileSystem

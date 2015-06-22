@@ -62,6 +62,11 @@ int main() {
 	listaNodos = list_create();
 	listaDirectorios = list_create();
 	listaRegistrosIDIP = list_create();
+	t_registro_id_ipPuerto* registroVacio = malloc(registroVacio);
+	/*registroVacio->id=0;
+	registroVacio->ip.s_addr=inet_addr("0.0.0.0");
+	registroVacio->puerto=0;
+	list_add(listaRegistrosIDIP,registroVacio);*/
 	/*//probando funcion de mostrar listas
 
 
@@ -378,6 +383,7 @@ int main() {
 	list_destroy_and_destroy_elements(listaNodos, (void*) liberarNodo);
 	list_destroy_and_destroy_elements(listaDirectorios,
 			(void*) liberarDirectorio);
+	list_destroy_and_destroy_elements(listaRegistrosIDIP, (void*) free);
 	//free(copias);
 	return 0;
 }
@@ -458,22 +464,29 @@ void *interaccionFSNodo(void* sock_ptr) {
 			unRegistro->id=id;
 			unRegistro->ip=infoNodo->IP_NODO;
 			unRegistro->puerto=infoNodo->PUERTO_NODO;
-
+			list_add(listaRegistrosIDIP,unRegistro);
+			actualizarRegistro(unRegistro,infoNodo->IP_NODO,infoNodo->PUERTO_NODO);
+			mostrarLista(listaRegistrosIDIP,mostrarRegistro);
+			printf("\n\n");
 			}
 			else{ //Nodo no nuevo
 				unRegistro= buscarRegistroPorId(id);
+				printf("Es null el registro? %d",unRegistro==NULL);
+				fflush(stdout);
 				if((nodo=buscarNodoPorId(id,listaNodos)) == NULL){ //No tenia su ID
 					printf("Error, no se conocía a este nodo.");
+					fflush(stdout);
 					}
 				else if(!verificarRegistro(unRegistro,infoNodo->IP_NODO,infoNodo->PUERTO_NODO)){//Cambió su IP o Puerto
 					actualizarRegistro(unRegistro,infoNodo->IP_NODO,infoNodo->PUERTO_NODO);
 				}
-				else;//No cambió su IP ni puerto, entonces no se hace nada
+				else printf("Entre por el else.\n");
+
+				fflush(stdout);//No cambió su IP ni puerto, entonces no se hace nada
 			}
 
-			nodo->socket=socket;
-			printf("El socket conectado es %d\n",socket);
-			free(infoNodo);
+			if(nodo) nodo->socket=socket;
+			//free(infoNodo);
 			break;
 		case RTA_SET_BLOQUE:
 			if(recvall(socket,&respuestaSetBloque,4)<=0)
@@ -485,6 +498,16 @@ void *interaccionFSNodo(void* sock_ptr) {
 			write(fileno(archivoReconstruido), buffer, strlen(buffer));
 			free(buffer);
 			sem_post(&semaforo);
+			break;
+		case CONEXION_MARTA_A_FS:
+			printf("Hola Marta!\n");
+			socketDeMarta=socket;
+			void actualizarAMarta(t_registro_id_ipPuerto* unRegistro){
+				actualizarIdIpPuertoEnMarta(socketDeMarta,unRegistro);
+			}
+			list_iterate(listaRegistrosIDIP,(void*)actualizarAMarta);
+			//TODO esta bien
+			break;
 		}
 	}
 
@@ -494,7 +517,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 	if (recibido < 0) {
 		printf("Error.");
 	}
-	free(unRegistro);
+	//free(unRegistro);
 	close(socket);
 	return 0;
 }
