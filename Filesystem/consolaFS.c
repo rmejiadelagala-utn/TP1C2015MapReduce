@@ -317,7 +317,7 @@ void eliminarNodo(char *nodo) {
 	if(!strcmp(nodo,"VerNodos")){//XXX PARA TESTEAR
 		mostrarLista(listaNodos, (void*)mostrarNodo);
 	}
-	else if(!strcmp(nodo,"responderAMarta")){//XXX PARA TESTEAR
+	/*else if(!strcmp(nodo,"responderAMarta")){//XXX PARA TESTEAR
 
 		  char str [80];//asquerosamente hecho para probar que funciona
 		  char *nombreArchivo = malloc (80);
@@ -367,7 +367,7 @@ void eliminarNodo(char *nodo) {
 		  }
 
 
-	}
+	}*/
 	else{
 		void eliminarNod(t_nodo *unNodo){
 			eliminarNodoYReferencias(unNodo,listaNodos,listaArchivos);

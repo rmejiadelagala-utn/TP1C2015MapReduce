@@ -450,9 +450,11 @@ void *interaccionFSNodo(void* sock_ptr) {
 		case CONEXION_NODO_A_FS:
 			infoNodo = conocerAlNodo(socket);
 			ipPuerto = strdup(strcat(strcat(inet_ntoa(infoNodo->IP_NODO),":"),string_itoa(infoNodo->PUERTO_NODO)));
+			if((nodo=buscarNodoPorIpPuerto(ipPuerto,listaNodos)) == NULL){
 			nodo = nuevoNodo(ipPuerto,(infoNodo->CANT_BLOQUES)*50);
-			nodo->socket = socket;
 			list_add(listaNodos,nodo);
+			}
+			nodo->socket=socket;
 			free(infoNodo);
 			break;
 		case RTA_SET_BLOQUE:

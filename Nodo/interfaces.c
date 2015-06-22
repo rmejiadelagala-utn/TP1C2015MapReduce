@@ -39,13 +39,14 @@ void* conexionFS(void* arg){
 	int resultado;
 
 	while ((recibido=recvall(ptr->socket,&protocolo,4))>0) {
-		fflush(stdout);
+
 		switch (protocolo){
 		  case SET_BLOQUE:
 			  nroBloqueRecibido = setBloqueDeFileSystem(socket, DATOS, BLKSIZE);//Si devuelve 0 es porque recibio todo
 			  msync(ptr->ARCH_BIN,strlen(DATOS),MS_SYNC);
 			  respuestaSetBloque(socket,nroBloqueRecibido);
 			  printf("Almacené la informacion en el bloque numero %d correctamente.\n",nroBloqueRecibido);
+			  fflush(stdout);
 			  break;
 
 		 case GET_BLOQUE:
