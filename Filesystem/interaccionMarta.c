@@ -6,6 +6,16 @@
  */
 #include "interaccionMarta.h"
 
+/*
+ * Datos a serializar
+ __________________________________________________________________
+|cantBloques |bloque_arch | cantCopias|tamanio | dato   |nroBloque |
+|     int    |    int     |     int   |ipPuerto|ipPuerto| EnNodo   |....
+|   4bytes   |   4bytes   |   4bytes  | 4bytes |        |  4bytes  |....
+|____________|____________|___________|________|________|__________|
+
+*/
+
 
 int encontrarCopias(char* nombre,int directorioIndex, int numeroDeBloqueEnArchivo, t_list **copias){
 	t_archivo *archivo = buscarArchPorPadreYNombre(directorioIndex, nombre);
