@@ -205,11 +205,9 @@ int enviarBuffer(t_buffer* buffer, int socket){
 	//A Nodo
 	int enviarMapperANodo(int socket, char* mapper, int nroDeBloqueNodo, char* nombreArchivoTmp ){
 		t_buffer* buffer = crearBufferConProtocolo(ORDER_MAP);
-                             bufferAgregarint(buffer,strlen(mapper));
-                             bufferAgregarString(buffer,mapper,strlen(mapper)+1); 
+                bufferAgregarString(buffer,mapper,strlen(mapper)+1); 
 		bufferAgregarInt(buffer,nroDeBloqueNodo);
-                            bufferAgregarInt(buffer,strlen(nombreArchivoTmp));
-                            bufferAgregarString(buffer,nombreArchivoTmp,strlen(nombreArchivoTmp)+1);
+                bufferAgregarString(buffer,nombreArchivoTmp,strlen(nombreArchivoTmp)+1);
 		int resultado = enviarBuffer(buffer,socket);
 		return resultado;
 	}
