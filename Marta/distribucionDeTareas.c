@@ -35,40 +35,86 @@ void liberarCopiaDeBloque(t_CopiaDeBloque* self) {
 	free(self);
 }
 
+t_CopiaDeBloque* elegirMejorNodoParaMap(t_list* copiasDeBloque) {
+
+	t_CargaNodo* cargaNodo;
+	t_CargaNodo* cargaNodoOtroBloque;
+	uint32_t idNodoBloqueEvaluado;
+
+	//la lista global cargaNodos tiene idNodo y sus cargas de trabajo en curso
+	//la copiaDeBloque tiene el id del nodo donde está la copia de bloqArch necesaria
+
+	//para todas las copias, selecciono aquella que su idNodo sea el que
+	//menos carga de trabajo tenga actualmente
+
+	int encuentraNodoDeId(t_CargaNodo* cargaNodo) {
+		return cargaNodo->id_nodo == idNodoBloqueEvaluado;
+	}
+
+	bool compararNodosPorMenorCarga(t_CopiaDeBloque *unBloque,
+			t_CopiaDeBloque *bloqueSiguiente) {
+
+		idNodoBloqueEvaluado = unBloque->id_nodo;
+		cargaNodo = list_find(cargaNodos, (void *) encuentraNodoDeId);
+
+		idNodoBloqueEvaluado = bloqueSiguiente->id_nodo;
+		cargaNodoOtroBloque = list_find(cargaNodos, (void *) encuentraNodoDeId);
+
+		return cargaNodo->cantidadOperacionesEnCurso
+				< cargaNodoOtroBloque->cantidadOperacionesEnCurso;
+	}
+
+	//ordena las copiasDeBloque por los nodos que menos están trabajando
+	list_sort(copiasDeBloque, (void*) compararNodosPorMenorCarga);
+
+	//elijo la primera de las copias de la lista ordena por menor carga.
+	return list_get(copiasDeBloque, 0);
+}
+
+int buscarBloquesEnFS(t_InfoJob infoDeJob, uint32_t idArchivo,
+		uint32_t numeroDeBloque, t_list* copiasDeBloque) {
+
+	//TODO pone en copiasDeBloque la info de en qué nodos
+	//están las copias de ese bloqArch
+
+	return 1;	//1 salió bien, <= 0 no lo encontró
+}
 //planifica un map de los que tiene que hacer el job
 t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 		uint32_t numeroDeBloque, uint32_t* ultimoIDMap) {
 
-	t_CopiaDeBloque* selected_copy;
+	t_CopiaDeBloque* copiaSeleccionada;
 	t_DestinoMap* self;
 
-	t_list* block_copies = list_create();
+	t_list* copiasDeBloque = list_create();
 
-	/*
-	//TODO pone en block_copies la info de en que nodos estan las copias de ese bloqArch
-	if (buscarBloquesEnFS(infoDeJob, idArchivo, numeroDeBloque, block_copies) <= 0) {
-		//log_error(paranoid_log, "No se pudieron localizar las copias del Archivo: %i, Bloque: %i", idArchivo, block_number);
-		list_destroy_and_destroy_elements(block_copies, (void *) free_block_copy);
+	//TODO falta implementar buscarBloquesEnFS
+	if (buscarBloquesEnFS(infoDeJob, idArchivo, numeroDeBloque, copiasDeBloque)
+			<= 0) {
+		printf("No se encontraron las copias del Archivo: %i, Bloque: %i",
+				idArchivo, numeroDeBloque);
+		list_destroy_and_destroy_elements(copiasDeBloque,
+				(void *) liberarCopiaDeBloque);
 		return NULL;
-	}*/
+	}
 
-	//Selecciona la copia de bloque primera
-	 //TODO seleccionar por alguna planifición la mejor copia, y no la primera
-	selected_copy = list_get(block_copies, 0);
+	//Selecciona la copia de bloque que está en el nodo que menos trabajo tiene
+	copiaSeleccionada = elegirMejorNodoParaMap(copiasDeBloque);
 
 	self = malloc(sizeof(t_DestinoMap));
 	self->id_map = ++(*ultimoIDMap);
-	self->id_nodo = selected_copy->id_nodo;
-	self->ip_nodo = selected_copy->ip_nodo;
-	self->puerto_nodo = selected_copy->puerto_nodo;
-	self->block = selected_copy->block;
-	self->temp_file_name = string_from_format("map_%i_%i.temp", infoDeJob.idJob, self->block);
+	self->id_nodo = copiaSeleccionada->id_nodo;
+	self->ip_nodo = copiaSeleccionada->ip_nodo;
+	self->puerto_nodo = copiaSeleccionada->puerto_nodo;
+	self->block = copiaSeleccionada->block;
+	self->temp_file_name = string_from_format("map_%i_%i.temp", infoDeJob.idJob,
+			self->block);
 
-	list_destroy_and_destroy_elements(block_copies, (void *) liberarCopiaDeBloque);
+	list_destroy_and_destroy_elements(copiasDeBloque,
+			(void *) liberarCopiaDeBloque);
 
 	return self;
 }
-
 
 int ordenarMapAJob(t_DestinoMap* destinoDeMap, int socket) {
 
@@ -88,7 +134,6 @@ int ordenarMapAJob(t_DestinoMap* destinoDeMap, int socket) {
 	result = enviarBuffer(socket, map_order);
 
 	if (result < 0) {
-		//log_error(paranoid_log, "No se Pudo enviar la Orden de Map al Job");
 		printf("No se Pudo enviar la Orden de Map al Job");
 	}
 
@@ -101,29 +146,24 @@ int recibirResultadoDeMap(int sockjob, t_ResultadoMap* resultadoMap) {
 
 	switch (resultadoMap->prot) {
 	case MAP_OK:
-		//log_info(paranoid_log, "Map Realizado con Exito");
 		printf("Map realizado con exito");
 		break;
 
 	case NODO_NOT_FOUND:
-		//log_warning(paranoid_log, "No se encontró el NODO donde mapear");
 		printf("No se encontró el nodo donde mapear");
 		break;
 
 	case DISCONNECTED:
-		//log_error(paranoid_log, "Job se Desconectó de forma inesperada");
 		printf("Job se desconectó de forma inesperada");
 		return 0;
 		break;
 
 	case -1:
-		//log_error(paranoid_log, "No se pudo recibir el resultado del Map");
 		printf("No se pudo recibir el resultado del Map");
 		return -1;
 		break;
 
 	default:
-		//log_error(paranoid_log, "Protocolo Inesperado %i (MaRTA PANIC!)", result_map->prot);
 		printf("Protocolo Inesperado %i", resultadoMap->prot);
 		return -1;
 		break;
@@ -176,7 +216,8 @@ void borrarMapPendiente(t_list* mapsPendientes, uint32_t idMap,
 		return mapPendiente->map_dest->id_map == idMap;
 	}
 
-	t_MapPendiente* mapPendiente = list_find(mapsPendientes, (void *) encuentraMapPendiente);
+	t_MapPendiente* mapPendiente = list_find(mapsPendientes,
+			(void *) encuentraMapPendiente);
 	t_CargaNodo* cargaNodo;
 
 	int seEncuetraNodo(t_CargaNodo* carga_nodo) {
@@ -205,7 +246,8 @@ void borrarMapPendiente(t_list* mapsPendientes, uint32_t idMap,
 
 	pthread_mutex_unlock(&mutexListaNodo);
 
-	list_remove_and_destroy_by_condition(mapsPendientes, (void *) encuentraMapPendiente, (void *) liberarMapPendiente);
+	list_remove_and_destroy_by_condition(mapsPendientes,
+			(void *) encuentraMapPendiente, (void *) liberarMapPendiente);
 }
 
 //la función que planifica todos los map de un job determinado.
@@ -231,21 +273,26 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 			//Aca dada la información que le manda job, la info del primer
 			//archivo de la lista de archivos a mapear, elige el destino del map
 			//Al que debe mandar hacer ese map
-			destinoMap = planificarMap(info_job, infoArchivo->idArchivo, j, &ultimoIDMap);
+			destinoMap = planificarMap(info_job, infoArchivo->idArchivo, j,
+					&ultimoIDMap);
 
 			//Si obtiene un destino, le ordena al job realizar el map en ese destino
-			resultado = (destinoMap != NULL) ? ordenarMapAJob(destinoMap, sockjob) : -2;
+			resultado =
+					(destinoMap != NULL) ?
+							ordenarMapAJob(destinoMap, sockjob) : -2;
 
 			if (resultado > 0) {
 				//agrega a la lista de maps pendientes ese map, con la info
 				//del archivo a mapear, la posicion y el destino
 
-				agregarMapPendiente(listaMapsPendientes, infoArchivo, j, destinoMap);
+				agregarMapPendiente(listaMapsPendientes, infoArchivo, j,
+						destinoMap);
 
 			} else {
 				//elemina todos los maps pendientes, porque no se puede realizar
 				//este job
-				list_destroy_and_destroy_elements(listaMapsPendientes, (void *) liberarMapPendiente);
+				list_destroy_and_destroy_elements(listaMapsPendientes,
+						(void *) liberarMapPendiente);
 				return -1;
 			}
 		}
@@ -269,32 +316,43 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 
 			switch (resultadoDeMap.prot) {
 			case MAP_OK:
-				borrarMapPendiente(listaMapsPendientes, resultadoDeMap.id_map, ListaTemporal, &ultimoIDTemporal);
+				borrarMapPendiente(listaMapsPendientes, resultadoDeMap.id_map,
+						ListaTemporal, &ultimoIDTemporal);
 				break;
 
 			case NODO_NOT_FOUND:
-				mapPendiente = list_find(listaMapsPendientes, (void *) encuentreMapPendiente);
+				mapPendiente = list_find(listaMapsPendientes,
+						(void *) encuentreMapPendiente);
 
 				liberarDestinoMap(mapPendiente->map_dest);
-				mapPendiente->map_dest = planificarMap(info_job, mapPendiente->file->idArchivo, mapPendiente->block, &ultimoIDMap);
+				mapPendiente->map_dest = planificarMap(info_job,
+						mapPendiente->file->idArchivo, mapPendiente->block,
+						&ultimoIDMap);
 
-				resultado = (mapPendiente->map_dest != NULL) ? ordenarMapAJob(mapPendiente->map_dest, sockjob) : -2;
+				resultado =
+						(mapPendiente->map_dest != NULL) ?
+								ordenarMapAJob(mapPendiente->map_dest,
+										sockjob) :
+								-2;
 
 				if (resultado <= 0) {
-					list_destroy_and_destroy_elements(listaMapsPendientes, (void *) liberarMapPendiente);
+					list_destroy_and_destroy_elements(listaMapsPendientes,
+							(void *) liberarMapPendiente);
 					return -1;
 				}
 				break;
 			}
 
 		} else {
-			list_destroy_and_destroy_elements(listaMapsPendientes, (void *) liberarMapPendiente);
+			list_destroy_and_destroy_elements(listaMapsPendientes,
+					(void *) liberarMapPendiente);
 			return -1;
 		}
 	}
 
 	//termina toda la planificacion, destruyendo lo que quedo de las listas pendientes
 	//de map
-	list_destroy_and_destroy_elements(listaMapsPendientes, (void *) liberarMapPendiente);
+	list_destroy_and_destroy_elements(listaMapsPendientes,
+			(void *) liberarMapPendiente);
 	return 1;
 }
