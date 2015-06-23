@@ -194,6 +194,13 @@ int enviarBuffer(t_buffer* buffer, int socket){
 			t_buffer* buffer = crearBufferConProtocolo(CONEXION_MARTA_A_FS);
 			return enviarBuffer(buffer,socket);
 		}
+	int dameBloqueArchFS(int socket,char *nombreArchivo , int padre, int numeroBloqueArch){
+		t_buffer *buffer = crearBufferConProtocolo(ENVIO_BLOQUEARCH_A_MARTA);
+		bufferAgregarString(buffer, nombreArchivo, strlen(nombreArchivo)+1);
+		bufferAgregarInt(buffer,padre);
+		bufferAgregarInt(buffer, numeroBloqueArch);
+		return enviarBuffer(buffer, socket);
+	}
 
 
 //Deserializar mensajes
@@ -212,6 +219,19 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		int resultado = recvall(socket,*(char**)buffer,tamanio);
 		return resultado;
 
+	}
+	//De Marta
+	t_bloqueDeArchPedido* recibirPedidoDeBloqueArch(int socket){
+		t_bloqueDeArchPedido* bloque = malloc(sizeof(t_bloqueDeArchPedido));
+		int tamanio;
+		int padre;
+		int numeroBloqueArch;
+		recvall(socket, &tamanio,sizeof(int));
+		bloque->nombreArch = malloc(tamanio);
+		recvall(socket,bloque->nombreArch,tamanio);
+		recvall(socket,&bloque->padre,sizeof(int));
+		recvall(socket,&bloque->numeroDeBloqueArch,sizeof(int));
+		return bloque;
 	}
 //Nodo
 	//De FileSystem

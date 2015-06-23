@@ -451,6 +451,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 	t_nodo* nodo;
 	int respuestaSetBloque;
 	void* buffer;
+	t_bloqueDeArchPedido* infoBloquePedido;
 	t_registro_id_ipPuerto* unRegistro=malloc(sizeof(t_registro_id_ipPuerto));
 	while ( (recibido=recvall(socket,&protocolo,4))>0) {
 		switch (protocolo) {
@@ -507,6 +508,11 @@ void *interaccionFSNodo(void* sock_ptr) {
 			}
 			list_iterate(listaRegistrosIDIP,(void*)actualizarAMarta);
 			//TODO esta bien
+			break;
+		case ENVIO_BLOQUEARCH_A_MARTA:
+			infoBloquePedido = recibirPedidoDeBloqueArch(socketDeMarta);
+			//TODO completar esta funcion
+
 			break;
 		}
 	}

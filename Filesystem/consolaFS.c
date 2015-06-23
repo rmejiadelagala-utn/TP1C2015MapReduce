@@ -324,7 +324,7 @@ void eliminarNodo(char *nodo) {
 		  int padre, numeroDeBloqueEnArchivo;
 		  t_list *copias = list_create();
 		  int resultado;
-		  printf ("Ingrese nombre del archivo a eliminar: ");
+		  printf ("Ingrese nombre del archivo a enviar: ");
 		  scanf ("%79s",str);
 		  printf ("Ingrese el padre de dicho archivo: ");
 		  scanf ("%d",&padre);
@@ -343,26 +343,12 @@ void eliminarNodo(char *nodo) {
 				  }
 		  else{
 			  int cantCopias = list_size(copias);
+			  t_bloqueEnNodo *copia;
 			  int i;
-			  int puerto;
-			  t_bloqueEnNodo copia;
-			  int tamanioCopia = sizeof(uint32_t) + sizeof(uint16_t) + sizeof(uint16_t);
-			  void *buffer = malloc(cantCopias * sizeof(tamanioCopia));
-
 			  for(i = 0 ; i< cantCopias; i++){
 				  copia = list_get(copias,i);
-				  char* ip = separarIpPuerto(copia->ipPuerto, &puerto);
-
-				  memcpy(buffer + i* sizeof(tamanioCopia), &(inet_addr (ip)), sizeof(uint32_t));
-				  memcpy(buffer + i* sizeof(tamanioCopia) + sizeof(uint32_t), &(puerto), sizeof(uint16_t));
-				  memcpy(buffer + i* sizeof(tamanioCopia) + sizeof(uint32_t) + sizeof(uint16_t) , &(copia->numeroDeBloqueEnNodo ), sizeof(uint16_t));
-
-
+				  sendall(socketDeMarta,copia,sizeof(t_bloqueEnNodo),0 );
 			  }
-
-			  //faltaria otro send mas arriba diciendole cuantas copias les voy a mandar
-			  //martaSocket debería estar en algun lado definido
-			  //send(martaSocket, buffer, cantCopias * tamanioCopia, 0);
 
 		  }
 
