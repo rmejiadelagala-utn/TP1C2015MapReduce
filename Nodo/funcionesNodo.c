@@ -157,4 +157,17 @@ char* getFileContent(char* nombreFile, char * ruta_archivo){
 	return fileMaped;
 }
 
+void crearScriptMapper(const char* codigo_script){
 
+	FILE* scriptMapper;
+
+	if((scriptMapper=fopen("/home/utnso/mapper.sh","w+"))==NULL){
+		perror("Error al crear el script del mapper");
+		exit(1);
+	}
+
+	fputs(codigo_script,scriptMapper);
+	fclose(scriptMapper);
+
+	return;
+}
