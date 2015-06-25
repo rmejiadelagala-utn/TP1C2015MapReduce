@@ -13,6 +13,8 @@
 #include<string.h>
 #include<commons/config.h>
 #include<socketes/servidor.h>
+#include<socketes/envioDeMensajes.h>
+#include<stdbool.h>
 
 #define TRUE 1
 #define FALSE 0
