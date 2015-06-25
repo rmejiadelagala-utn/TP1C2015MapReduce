@@ -7,6 +7,7 @@
 
 #include"job.h"
 #include"funcionesJob.h"
+#include "procesarOrdenesDeMarta.h"
 
 int main(int argc,char *argv[]) {
 
@@ -43,7 +44,7 @@ int main(int argc,char *argv[]) {
 	serializer_y_send_solicitud(sock, &solicitud);
 	printf("termine de enviar solicitud a MaRTA\n");
 	printf("iniciare mapper y reducers");
-	recv_y_respuesta_operaciones();
+	procesarOrdenesDeMarta(sock);
 	free(info_config);
 return 0;
 }
