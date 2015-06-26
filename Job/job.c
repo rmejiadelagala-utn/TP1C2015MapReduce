@@ -6,17 +6,19 @@
  */
 
 #include"job.h"
-#include"funcionesJob.h"
-#include "procesarOrdenesDeMarta.h"
 
 int main(int argc,char *argv[]) {
 
 	char *c;
-	int sock;
+	int sockMarta,result;
 	t_config_job* info_config;
-	t_solicitud solicitud;
+	t_solicitud* solicitud;
+	t_rutinas* rutinas;
 
+	solicitud =(t_solicitud*)malloc(sizeof(t_solicitud));
+	rutinas =(t_rutinas*)malloc(sizeof(t_rutinas));
 	info_config=(t_config_job*)malloc(sizeof(t_config_job));
+
 	if(argc!=2){
 		printf("Error: Uso: ./job path_archconfig\n");
 		return 1;
@@ -24,28 +26,22 @@ int main(int argc,char *argv[]) {
 	c=argv[1];
 	info_config=leer_archivo_configuracion(c);
 //	Por ahora comento lo del socket, ya que voy a usar el puntero a t_config_job	
-	sock= crearCliente(info_config->IP,info_config->PORT);
-	printf("se creo socket cliente con nro: %d\n",sock);
-//	Armar la estructura solicitud
-	printf("voy a armar solicitud\n");
-	solicitud.archivos=info_config->archivos;
-	solicitud.archivo_resultado=info_config->archivo_resultado;
-	if (!strcmp(info_config->COMBINER,"NO")){
-		solicitud.combiner=0;
-	} else {
-		if (!strcmp(info_config->COMBINER,"SI")){
-			solicitud.combiner=1;
-		} else {
-			printf("el valor ingresado para el combiner es incorrecto\n");
-			printf("me las tomo, bye!\n");
-			exit(1);
-		}
-	}
-	serializer_y_send_solicitud(sock, &solicitud);
+	sockMarta= crearCliente(info_config->IP,info_config->PORT);
+	printf("se creo socket cliente con nro: %d\n",sockMarta);
+//	Armar la estructura solicitud para enviar a MaRTA
+	*solicitud=cargarEstructuraSolicitud(info_config);
+//	Enviar solicitud de procesamiento a MaRTA
+	serializer_y_send_solicitud(sockMarta, solicitud);
 	printf("termine de enviar solicitud a MaRTA\n");
 	printf("iniciare mapper y reducers");
-	procesarOrdenesDeMarta(sock);
+//	cargar estructura rutinas para procesar ordenes de MaRTA
+	*rutinas=cargarEstructuraRutinas(info_config);
+/*	recepciono las ordenes de MaRTA y mando los hilos al Nodo
+ 	hasta que se me indique que finalizo todas las operaciones */
+	result=procesarOrdenesDeMarta(sockMarta,rutinas);
 	free(info_config);
-return 0;
+	free(solicitud);
+	free(rutinas);
+return result;
 }
 

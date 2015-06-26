@@ -5,7 +5,7 @@
  *      Author: rmejia
  */
 
-# include "funcionesJob.h"
+# include "job.h"
 
 t_config_job* leer_archivo_configuracion(char* arch){
 	t_config *config;
@@ -120,4 +120,27 @@ void serializer_y_send_solicitud(int sock, t_solicitud* solicitud) {
 	free(payload);
 }
 
+t_solicitud cargarEstructuraSolicitud(t_config_job* info_config){
+	t_solicitud solicitud;
+	solicitud.archivos=info_config->archivos;
+	solicitud.archivo_resultado=info_config->archivo_resultado;
+	if (!strcmp(info_config->COMBINER,"NO")){
+		solicitud.combiner=0;
+	} else {
+		if (!strcmp(info_config->COMBINER,"SI")){
+			solicitud.combiner=1;
+		} else {
+			printf("el valor ingresado para el combiner es incorrecto\n");
+			printf("me las tomo, bye!\n");
+			exit(1);
+		}
+	}
+	return solicitud;
+}
 
+t_rutinas cargarEstructuraRutinas(t_config_job* config_job){
+	t_rutinas rutinas;
+	rutinas.MAPPER=strdup(config_job->MAPPER);
+	rutinas.REDUCE=strdup(config_job->REDUCE);
+	return rutinas;
+}
