@@ -11,7 +11,7 @@
 void* hilo_mapper (void* arg_thread){
 	t_arg_hilo_map ordenToNodo= *((t_arg_hilo_map*)arg_thread);
 	int sockNodo, ip_nodo, puerto_nodo,block;
-	char* tmp_file_name=malloc(strlen(ordenToNodo.ordenMapper->temp_file_name));
+	char* tmp_file_name;
 	tmp_file_name=strdup(ordenToNodo.ordenMapper->temp_file_name);
 	block=ordenToNodo.ordenMapper->block;
 	ip_nodo=ordenToNodo.ordenMapper->ip_nodo;

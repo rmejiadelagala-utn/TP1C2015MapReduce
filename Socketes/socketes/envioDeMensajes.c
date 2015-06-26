@@ -204,10 +204,11 @@ int enviarBuffer(t_buffer* buffer, int socket){
 //Job
 	//A Nodo
 	int enviarMapperANodo(int socket, char* mapper, int nroDeBloqueNodo, char* nombreArchivoTmp ){
-		t_buffer* buffer = crearBufferConProtocolo(ORDER_MAP);
-                bufferAgregarString(buffer,mapper,strlen(mapper)+1); 
+		t_buffer* buffer = crearBufferConProtocolo(CONEXION_JOB_A_NODO);
+		bufferAgregarInt(buffer,ORDER_MAP);
+        bufferAgregarString(buffer,mapper,strlen(mapper)+1);
 		bufferAgregarInt(buffer,nroDeBloqueNodo);
-                bufferAgregarString(buffer,nombreArchivoTmp,strlen(nombreArchivoTmp)+1);
+        bufferAgregarString(buffer,nombreArchivoTmp,strlen(nombreArchivoTmp)+1);
 		int resultado = enviarBuffer(buffer,socket);
 		return resultado;
 	}
@@ -271,4 +272,19 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		t_registro_id_ipPuerto* unRegistro = malloc(sizeof(t_registro_id_ipPuerto));
 		recvall(socket, unRegistro, sizeof(t_registro_id_ipPuerto));
 		return unRegistro;
+	}
+//Job
+	//De Marta
+	t_ordenMap* recibirOrdenMapDeMarta(int sockMarta){
+		t_ordenMap* ordenMap = malloc(sizeof(t_ordenMap));
+		uint32_t temp_file_len;
+		recvall(sockMarta,&(ordenMap->id_map),sizeof(uint32_t));
+		recvall(sockMarta,&(ordenMap->id_nodo),sizeof(uint32_t));
+		recvall(sockMarta,&(ordenMap->ip_nodo),sizeof(uint32_t));
+		recvall(sockMarta,&(ordenMap->puerto_nodo),sizeof(uint32_t));
+		recvall(sockMarta,&(ordenMap->block),sizeof(uint32_t));
+		recvall(sockMarta,&temp_file_len,sizeof(uint32_t));
+		ordenMap->temp_file_name= malloc(temp_file_len);
+		recvall(sockMarta,ordenMap->temp_file_name,temp_file_len);
+		return ordenMap;
 	}
