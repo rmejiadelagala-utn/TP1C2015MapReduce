@@ -157,4 +157,51 @@ char* getFileContent(char* nombreFile, char * ruta_archivo){
 	return fileMaped;
 }
 
+void crearScriptMapper(const char* codigo_script){
 
+	FILE* scriptMapper;
+
+	if((scriptMapper=fopen("/home/utnso/mapper.sh","w+"))==NULL){
+		perror("Error al crear el script del mapper");
+		exit(1);
+	}
+
+	fputs(codigo_script,scriptMapper);
+	fclose(scriptMapper);
+
+	return;
+}
+
+void crearScriptReduce(const char* codigo_script){
+
+	FILE* fd;
+	FILE* scriptReduce;
+	char texto[100];
+
+//	if((fd =fopen("/home/utnso/Escritorio/TPSO-2015/reduce.pl","r"))==NULL){
+//		perror("Error al abrir el script del reduce");
+//		exit(1);
+//	}
+
+//	while (feof(fd) == 0) {
+//		fgets(texto,100,fd);
+//		printf( "%s",texto );
+//	}
+
+
+	if((scriptReduce=fopen("/home/utnso/reduce.pl","w+"))==NULL){
+		perror("Error al crear el script del mapper");
+		exit(1);
+	}
+
+//	while (feof(fd) == 0) {
+//		fgets(texto,100,fd);
+//		fputs(texto,scriptReduce);
+//	}
+
+	fputs(codigo_script,scriptReduce);
+	fclose(scriptReduce);
+
+	return;
+
+}

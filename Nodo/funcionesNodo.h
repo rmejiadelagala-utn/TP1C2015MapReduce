@@ -20,5 +20,7 @@ uint32_t obtener_tamanio_disco(char*);
 int obtener_cant_elem_array(char **);
 char* obtenerNombreArchivo(char*);
 char* getFileContent(char*, char *);
+void crearScriptMapper(const char*);
+void crearScriptReduce(const char*);
 
 #endif /* FUNCIONESNODO_H_ */
