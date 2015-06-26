@@ -2,6 +2,8 @@
 #ifndef ENVIODEMENSAJES_H_
 #define ENVIODEMENSAJES_H_
 #include<stdio.h>
+#include<stdlib.h>
+#include<stdint.h>
 #include<sys/socket.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -36,6 +38,17 @@ typedef struct {
 
 } t_bloqueDeArchPedido;
 
+// estructuras para Job
+typedef struct {
+ 	uint32_t id_map;
+ 	uint32_t id_nodo;
+ 	uint32_t ip_nodo;
+ 	uint32_t puerto_nodo;
+ 	uint32_t block;
+ 	char* temp_file_name;
+ } t_ordenMap;
+
+
 //sendall y recvall aseguran que se mande/reciba toda la informacion
 
 int sendall(int socket, void *mensaje, size_t tamanio);
@@ -47,7 +60,7 @@ int recvall(int socket, void *mensaje, size_t tamanio);
 enum protocolos {
 	CONEXION_NODO_A_FS, CONEXION_MARTA_A_FS, SET_BLOQUE, GET_BLOQUE, RTA_SET_BLOQUE, DISCONNECTED,
 	MAP_OK, NODO_NOT_FOUND, ORDER_MAP, MARTA_ACTUALIZA_EL_REGISTRO, ENVIO_BLOQUEARCH_A_MARTA,
-	ORDER_REDUCE, FIN_OPERACION
+	ORDER_REDUCE, FIN_OPERACION,CONEXION_JOB_A_NODO
 };
 
 //Primitivas
@@ -111,5 +124,9 @@ int enviarBuffer(t_buffer* buffer, int socket);
 
 	int respuestaSetBloque(int socket, int resultado);
 
-	getBloqueParaFileSystem(int socket,char* dataBin, int block_size);
+	int getBloqueParaFileSystem(int socket,char* dataBin, int block_size);
+
+ //Job
+ 	//De Marta
+ 	t_ordenMap* recibirOrdenMapDeMarta(int sockMarta);
 #endif
