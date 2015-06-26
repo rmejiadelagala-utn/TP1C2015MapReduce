@@ -109,6 +109,12 @@ int enviarBuffer(t_buffer* buffer, int socket);
 	//A FileSystem
 
 	int presentarseMartaAlFileSystem(int socket);
+	
+	int dameBloqueArchFS(int socket,char *nombreArchivo , int padre, int numeroBloqueArch);
+	
+//Job
+	//A Nodo
+	int enviarMapperANodo(int socket, char* mapper, int nroDeBloqueNodo, char* nombreArchivoTmp );
 
 //Deserializar mensajes
 
