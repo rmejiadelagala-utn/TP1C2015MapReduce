@@ -68,7 +68,7 @@ t_solicitud cargarEstructuraSolicitud(t_config_job*);
 t_rutinas cargarEstructuraRutinas(t_config_job*);
 int procesarOrdenesDeMarta(int , t_rutinas* );
 int recibirResultadoFromNodo(int sockNodo);
-int responderOrdenMapAMarta(int sockMarta, t_arg_hilo_map ordenToNodo, t_ordenMap ordenMapper,int resOper);
+int responderOrdenMapAMarta(int sockMarta, t_ordenMap ordenMapper,int resOper);
 
 #endif /* JOB_H_ */
 

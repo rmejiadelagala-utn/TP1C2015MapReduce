@@ -7,11 +7,37 @@
 
 #include "job.h"
 
+int recibirResultadoFromNodo(int sockNodo){
+		uint32_t recibido, protocolo, rptaNodoAJob;
+		if((recibido=recvall(sockNodo,&protocolo,sizeof(uint32_t)))<0){
+			return -1;
+		}
+		if(protocolo=RES_MAP){
+			recvall(sockNodo,&rptaNodoAJob,sizeof(uint32_t));
+		}else {
+			printf("no entiendo el protocolo, usa: RES_MAP");
+		}
+		return rptaNodoAJob;
+	}
+
+int responderOrdenMapAMarta(int sockMarta,t_ordenMap ordenMapper, uint32_t resOper){
+	int result_envio;
+	t_buffer* buffer = crearBufferConProtocolo(RES_MAP);
+	if(resOper==OK_MAP){
+		bufferAgregarInt(buffer,OK_MAP);
+	} else
+		bufferAgregarInt(buffer,NOTOK_MAP);
+	bufferAgregarInt(buffer,ordenMapper.id_map);
+	bufferAgregarInt(buffer,ordenMapper.id_nodo);
+	result_envio=enviarBuffer(buffer,sockMarta);
+	return result_envio;
+}
+
 void* hilo_mapper (void* arg_thread){
 	t_arg_hilo_map ordenToNodo;
 	t_ordenMap ordenMapper;
 	ordenToNodo= *((t_arg_hilo_map*)arg_thread);
-	int sockMarta,sockNodo, ip_nodo, puerto_nodo,block,res;
+	int sockMarta,sockNodo, ip_nodo, puerto_nodo,block,res,envioRes;
 	int resOper; //resultado de la operación de mapper
 	char* tmp_file_name;
 	char* codigoMapper;
@@ -35,9 +61,17 @@ void* hilo_mapper (void* arg_thread){
 		exit(-1);
 	}
 	//recibir resultado de la Operacion mapper desde el Nodo
-/*	resOper=recibirResultadoFromNodo(sockNodo);
-	responderOrdenMapAMarta(sockMarta,ordenToNodo.ordenMapper,resOper);
-	*/
+	resOper=recibirResultadoFromNodo(sockNodo);
+	if(resOper==OK_MAP){
+		printf("mapper id= %d, terminó OK, aviso a Marta\n",ordenMapper.id_map);
+	} else {
+		printf("mapper id= %d, falló, aviso a Marta de esto\n",ordenMapper.id_map);
+	}
+	//re-enviar a marta resultado de la operacion, recibida de Nodo
+	envioRes=responderOrdenMapAMarta(sockMarta,ordenMapper,resOper);
+	if(envioRes<0){
+		printf("no pude enviar la respuesta a marta, algo pasó\n")
+	}
 	return NULL;
 }
 
