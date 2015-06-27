@@ -67,7 +67,8 @@ int recvall(int socket, void *mensaje, size_t tamanio);
 enum protocolos {
 	CONEXION_NODO_A_FS, CONEXION_MARTA_A_FS, SET_BLOQUE, GET_BLOQUE, RTA_SET_BLOQUE, DISCONNECTED,
 	MAP_OK, NODO_NOT_FOUND, ORDER_MAP, MARTA_ACTUALIZA_EL_REGISTRO, ENVIO_BLOQUEARCH_A_MARTA,
-	ORDER_REDUCE, FIN_OPERACION,CONEXION_JOB_A_NODO,MARTA_SE_CAYO_UN_NODO
+	MARTA_SE_CAYO_UN_NODO,ORDER_REDUCE, FIN_OPERACION,CONEXION_JOB_A_NODO,RES_MAP,RES_REDUCE,OK_MAP,OK_REDUCE,
+	NOTOK_MAP,NOTOK_REDUCE
 };
 
 //Primitivas
@@ -121,6 +122,12 @@ int enviarBuffer(t_buffer* buffer, int socket);
 	int dameBloqueArchFS(int socket,char *nombreArchivo , int padre, int numeroBloqueArch);
 
 	int presentarseMartaAlFileSystem(int socket);
+	
+	int dameBloqueArchFS(int socket,char *nombreArchivo , int padre, int numeroBloqueArch);
+	
+//Job
+	//A Nodo
+	int enviarMapperANodo(int socket, char* mapper, int nroDeBloqueNodo, char* nombreArchivoTmp );
 
 //Deserializar mensajes
 

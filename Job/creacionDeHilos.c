@@ -6,33 +6,84 @@
  */
 
 #include "job.h"
-#include "string.h"
+
+int recibirResultadoFromNodo(int sockNodo){
+		uint32_t recibido, protocolo, rptaNodoAJob;
+		if((recibido=recvall(sockNodo,&protocolo,sizeof(uint32_t)))<0){
+			return -1;
+		}
+		if(protocolo=RES_MAP){
+			recvall(sockNodo,&rptaNodoAJob,sizeof(uint32_t));
+		}else {
+			printf("no entiendo el protocolo, usa: RES_MAP");
+		}
+		return rptaNodoAJob;
+	}
+
+int responderOrdenMapAMarta(int sockMarta,t_ordenMap ordenMapper, uint32_t resOper){
+	int result_envio;
+	t_buffer* buffer = crearBufferConProtocolo(RES_MAP);
+	if(resOper==OK_MAP){
+		bufferAgregarInt(buffer,OK_MAP);
+	} else
+		bufferAgregarInt(buffer,NOTOK_MAP);
+	bufferAgregarInt(buffer,ordenMapper.id_map);
+	bufferAgregarInt(buffer,ordenMapper.id_nodo);
+	result_envio=enviarBuffer(buffer,sockMarta);
+	return result_envio;
+}
 
 void* hilo_mapper (void* arg_thread){
-	t_arg_hilo_map ordenToNodo= *((t_arg_hilo_map*)arg_thread);
-	int sockNodo, ip_nodo, puerto_nodo,block;
+	t_arg_hilo_map ordenToNodo;
+	t_ordenMap ordenMapper;
+	ordenToNodo= *((t_arg_hilo_map*)arg_thread);
+	int sockMarta,sockNodo, ip_nodo, puerto_nodo,block,res,envioRes;
+	int resOper; //resultado de la operación de mapper
 	char* tmp_file_name;
-	tmp_file_name=strdup(ordenToNodo.ordenMapper->temp_file_name);
-	block=ordenToNodo.ordenMapper->block;
-	ip_nodo=ordenToNodo.ordenMapper->ip_nodo;
-	puerto_nodo=ordenToNodo.ordenMapper->puerto_nodo;
+	char* codigoMapper;
+	sockMarta=ordenToNodo.sockMarta;
+	codigoMapper=strdup(ordenToNodo.rutinaMapper);
+	ordenMapper=*(ordenToNodo.ordenMapper);
+	tmp_file_name=strdup(ordenMapper.temp_file_name);
+	block=ordenMapper.block;
+	ip_nodo=ordenMapper.ip_nodo;
+	puerto_nodo=ordenMapper.puerto_nodo;
+
 	//Me conecto a nodo
 	//para que pueda funcionar creo esta variable ip, ya que me la estan
 	//pasando como entero y necesito para mis funciones un char
 	char* ip_nodo_char="127.0.0.1";
 	sockNodo= crearCliente(ip_nodo_char,puerto_nodo);
-	enviarMapperANodo(sockNodo, ordenToNodo.rutinaMapper,block,tmp_file_name);
-
+	//Enviamos rutina mapper a Nodo
+	res=enviarMapperANodo(sockNodo,codigoMapper,block,tmp_file_name);
+	if(res<0){
+		printf("todo mal, no pude enviar mapper a Nodo: %d", ip_nodo);
+		exit(-1);
+	}
+	//recibir resultado de la Operacion mapper desde el Nodo
+	resOper=recibirResultadoFromNodo(sockNodo);
+	if(resOper==OK_MAP){
+		printf("mapper id= %d, terminó OK, aviso a Marta\n",ordenMapper.id_map);
+	} else {
+		printf("mapper id= %d, falló, aviso a Marta de esto\n",ordenMapper.id_map);
+	}
+	//re-enviar a marta resultado de la operacion, recibida de Nodo
+	envioRes=responderOrdenMapAMarta(sockMarta,ordenMapper,resOper);
+	if(envioRes<0){
+		printf("no pude enviar la respuesta a marta, algo pasó\n")
+	}
 	return NULL;
 }
 
-void crearHiloMapper(int sockMarta, char* rutinaMap) {
+void crearHiloMapper(int sockMarta, char* codMapper) {
 	pthread_t thread_map;
+	t_ordenMap *ordenMapper;
 	t_arg_hilo_map* arg_thread;
+	ordenMapper=recibirOrdenMapDeMarta(sockMarta);
 	arg_thread=(t_arg_hilo_map*)malloc(sizeof(t_arg_hilo_map));
 	arg_thread->sockMarta=sockMarta;
-	arg_thread->rutinaMapper=strdup(rutinaMap);
-	arg_thread->ordenMapper=recibirOrdenMapDeMarta(sockMarta);
+	arg_thread->rutinaMapper=strdup(codMapper);
+	arg_thread->ordenMapper=ordenMapper;
 
 	pthread_create (&thread_map, NULL, &hilo_mapper, (void*)arg_thread);
 }

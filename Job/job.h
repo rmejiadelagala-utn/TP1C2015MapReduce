@@ -52,18 +52,9 @@ typedef struct{
 }t_rutinas;
 
 typedef struct {
-	uint32_t id_map;
-	uint32_t id_nodo;
-	uint32_t ip_nodo;
-	uint32_t puerto_nodo;
-	uint32_t block;
-	char* temp_file_name;
-} t_ordenMapp;
-
-typedef struct {
 	int sockMarta;
 	char* rutinaMapper;
-	t_ordenMapp* ordenMapper;
+	t_ordenMap* ordenMapper;
 	} t_arg_hilo_map;
 
 void crearHiloMapper(int , char*);
@@ -76,6 +67,8 @@ void recv_y_respuesta_operaciones(void);
 t_solicitud cargarEstructuraSolicitud(t_config_job*);
 t_rutinas cargarEstructuraRutinas(t_config_job*);
 int procesarOrdenesDeMarta(int , t_rutinas* );
+int recibirResultadoFromNodo(int sockNodo);
+int responderOrdenMapAMarta(int sockMarta, t_ordenMap ordenMapper,int resOper);
 
 #endif /* JOB_H_ */
 
