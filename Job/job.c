@@ -25,7 +25,7 @@ int main(int argc,char *argv[]) {
 	}
 	c=argv[1];
 	info_config=leer_archivo_configuracion(c);
-//	Por ahora comento lo del socket, ya que voy a usar el puntero a t_config_job	
+//	Por ahora comento lo del socket, ya que voy a usar el puntero a t_config_job
 	sockMarta= crearCliente(info_config->IP,info_config->PORT);
 	printf("se creo socket cliente con nro: %d\n",sockMarta);
 //	Armar la estructura solicitud para enviar a MaRTA

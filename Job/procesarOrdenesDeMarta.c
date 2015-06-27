@@ -12,7 +12,7 @@ int procesarOrdenesDeMarta(int sockMarta, t_rutinas* rutinas) {
     bool finOperacion=false;
     uint32_t protocolo, recibido; //de acuerdo al protocolo puede ser mapper o reduce
 
-    while ( !finOperacion ||
+    while ( !finOperacion &&
             (recibido=recvall(sockMarta,&protocolo,sizeof(uint32_t)))>0) {
 
         switch (protocolo) {
