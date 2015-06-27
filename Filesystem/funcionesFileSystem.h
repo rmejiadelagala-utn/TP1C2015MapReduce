@@ -7,8 +7,13 @@
 
 #ifndef FUNCIONESFILESYSTEM_H_
 #define FUNCIONESFILESYSTEM_H_
+#define BLOCK_SIZE 150 //2* 1024 * 1024;//Probar con menos
 #include"estructurasFileSystem.h"
 #include "fsystem.h"
+
+
+int nodoEstaActivo (t_registro_id_ipPuerto* unRegistro);
+
 /*
  * @NAME: distribuirBloquesEnNodos
  * @DESC: recibe una lista de bloques de archivo, por la cual crea 3 copias y cada una se la asigna a un nodo específico. Ademas internamente ordena la lista para lograr una mejor distribucion

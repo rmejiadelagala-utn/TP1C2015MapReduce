@@ -93,22 +93,14 @@ void bufferAgregarChar(t_buffer* buffer, char unChar){
 void bufferAgregarString(t_buffer* buffer,char* unString, int tamanio){
 	int largoString = tamanio;
 	bufferAgregarInt(buffer,largoString);
+
 	int tamanioAnterior=buffer->tamanio;
+
 	buffer->tamanio+= largoString;
 	buffer->data = realloc(buffer->data,buffer->tamanio);
+
 	memcpy((buffer->data + tamanioAnterior),unString,largoString);
-}
 
-void buffer_add_string(t_buffer* self, char *string_to_add) {
-	uint32_t size_string = strlen(string_to_add) + 1;
-	bufferAgregarInt(self,size_string);
-
-	off_t offset_to_write = self->tamanio;
-
-	self->tamanio += size_string;
-	self->data = realloc(self->data, self->tamanio);
-
-	memcpy((self->data + offset_to_write), string_to_add, size_string);
 }
 
 int recibirIntEnOrden(int socket, uint32_t *numero) {
@@ -188,6 +180,29 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		memcpy(buffer+4,unRegistro,sizeof(t_registro_id_ipPuerto));
 		return sendall(socket, buffer, tamanioAEnviar);
 	}
+	int martaSeCayoUnNodo(int socket, int id){
+		t_buffer* buffer = crearBufferConProtocolo(MARTA_SE_CAYO_UN_NODO);
+		bufferAgregarInt(buffer,id);
+		return enviarBuffer(buffer,socket);
+	}
+	int enviarCopiasAMarta(int socket, t_list* copias){
+		printf("Entre a enviarCopiasAmARTA\n");
+				fflush(stdout);
+		int cantidad = list_size(copias);
+		int tamanio =cantidad*sizeof(t_bloqueEnNodo) + sizeof(int);
+
+		void* buffer = malloc(tamanio);
+		memcpy(buffer,&cantidad,4);
+		int offset = 4;
+		/*void agregarCopia(t_bloqueEnNodo* unBloque){
+			printf("ID bloque:%d\n",unBloque->id);
+			fflush(stdout);
+			memcpy(buffer+offset,unBloque,sizeof(t_bloqueEnNodo));
+			offset+=sizeof(t_bloqueEnNodo);
+		}
+		list_iterate(copias,(void*)agregarCopia);*/
+		return sendall(socket, buffer, 4);
+	}
 //Marta
 	//A Filesystem
 	int presentarseMartaAlFileSystem(int socket){ //TODO posiblemente haya que agregar alguna funcionalidad mas
@@ -195,11 +210,16 @@ int enviarBuffer(t_buffer* buffer, int socket){
 			return enviarBuffer(buffer,socket);
 		}
 	int dameBloqueArchFS(int socket,char *nombreArchivo , int padre, int numeroBloqueArch){
+		printf("entro a dameBloqueArh:D\n" );
+		fflush(stdout);
 		t_buffer *buffer = crearBufferConProtocolo(ENVIO_BLOQUEARCH_A_MARTA);
 		bufferAgregarString(buffer, nombreArchivo, strlen(nombreArchivo)+1);
 		bufferAgregarInt(buffer,padre);
 		bufferAgregarInt(buffer, numeroBloqueArch);
+		printf("socket antes de enviar es %d :D\n", socket);
+		fflush(stdout);
 		return enviarBuffer(buffer, socket);
+		return 1;
 	}
 //Job
 	//A Nodo
@@ -272,6 +292,17 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		t_registro_id_ipPuerto* unRegistro = malloc(sizeof(t_registro_id_ipPuerto));
 		recvall(socket, unRegistro, sizeof(t_registro_id_ipPuerto));
 		return unRegistro;
+	}
+	void recibirBloqueArchFS(int socketAuxiliar,t_list* copiasDeBloque){ //TODO retornar un resultado
+		int cantidadDeCopias;
+		recvall(socketAuxiliar,&cantidadDeCopias,sizeof(int));
+		printf("\n\nCantidad de copias: %d\n\n",cantidadDeCopias);
+		int i;
+		for(i=0;i<cantidadDeCopias;i++){
+			t_bloqueEnNodo* copiaDeBloque=malloc(sizeof(t_bloqueEnNodo));
+			recvall(socketAuxiliar,copiaDeBloque,sizeof(t_bloqueEnNodo));
+			list_add(copiasDeBloque,copiaDeBloque);
+		}
 	}
 //Job
 	//De Marta

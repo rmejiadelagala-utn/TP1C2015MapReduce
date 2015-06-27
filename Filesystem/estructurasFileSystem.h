@@ -14,13 +14,13 @@
 #include <socketes/envioDeMensajes.h>
 
 //estructura Archivo
-
+/*
 typedef struct {
 	int id;
 	int numeroDeBloqueEnNodo;
 
 } t_bloqueEnNodo;
-
+*/
 typedef struct {
 	t_list *copiasDeBloque;
 } t_bloqueArch;

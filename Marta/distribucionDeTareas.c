@@ -13,9 +13,9 @@
 #include <pthread.h>
 #include "estructurasMaRTA.h"
 #include "socketes/envioDeMensajes.h"
+#include "MaRTA.h"
 
-pthread_mutex_t mutexListaNodo;
-t_list* cargaNodos;
+
 
 void liberarDestinoMap(t_DestinoMap* self);
 void liberarMapPendiente(t_MapPendiente* self);
@@ -71,12 +71,30 @@ t_CopiaDeBloque* elegirMejorNodoParaMap(t_list* copiasDeBloque) {
 	return list_get(copiasDeBloque, 0);
 }
 
-int buscarBloquesEnFS(t_InfoJob infoDeJob, uint32_t idArchivo,
+int buscarBloquesEnFS(/*t_InfoJob infoDeJob,*/ uint32_t idArchivo,
 		uint32_t numeroDeBloque, t_list* copiasDeBloque) {
 
-	//TODO pone en copiasDeBloque la info de en qué nodos
-	//están las copias de ese bloqArch
 
+
+	pthread_t pedirBloques_thread;
+	printf("creo thread :D\n");
+	fflush(stdout);
+	int *new_sock;
+	new_sock = malloc(sizeof(int));
+
+    *new_sock = crearCliente(config_get_string_value(config,"IP_FS"),config_get_int_value(config,"PUERTO_FS"));
+
+
+	printf("EL SOCKET AUXILIAR ES %d",*new_sock);
+	printf("creo socket auxiliar :D\n");
+	fflush(stdout);
+	printf("Voy a crear un thread:D\n");
+	fflush(stdout);
+	if( pthread_create( &pedirBloques_thread , NULL ,  recibirBloque , (void*) new_sock) < 0)
+	                {
+	                    perror("could not create thread");
+	                    return 1;
+	                }
 	return 1;	//1 salió bien, <= 0 no lo encontró
 }
 //planifica un map de los que tiene que hacer el job
@@ -89,7 +107,7 @@ t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 	t_list* copiasDeBloque = list_create();
 
 	//TODO falta implementar buscarBloquesEnFS
-	if (buscarBloquesEnFS(infoDeJob, idArchivo, numeroDeBloque, copiasDeBloque)
+	if (buscarBloquesEnFS(/*infoDeJob,*/ idArchivo, numeroDeBloque, copiasDeBloque)
 			<= 0) {
 		printf("No se encontraron las copias del Archivo: %i, Bloque: %i",
 				idArchivo, numeroDeBloque);
@@ -129,7 +147,7 @@ int ordenarMapAJob(t_DestinoMap* destinoDeMap, int socket) {
 	bufferAgregarInt(map_order, destinoDeMap->ip_nodo);
 	bufferAgregarInt(map_order, destinoDeMap->puerto_nodo);
 	bufferAgregarInt(map_order, destinoDeMap->block);
-	buffer_add_string(map_order, destinoDeMap->temp_file_name);
+	bufferAgregarString(map_order, destinoDeMap->temp_file_name,strlen(destinoDeMap->temp_file_name)+1);
 
 	result = enviarBuffer(socket, map_order);
 

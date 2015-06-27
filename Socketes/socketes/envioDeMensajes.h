@@ -8,6 +8,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <commons/collections/list.h>
 
 
 typedef struct {
@@ -15,6 +16,12 @@ typedef struct {
 	char* data;
 
 }t_buffer;
+//estructuras interaccion Marta-Fs
+typedef struct {
+	int id;
+	int numeroDeBloqueEnNodo;
+
+}__attribute__ ((__packed__)) t_bloqueEnNodo;
 
 //Estructuras del Nodo
 typedef struct {
@@ -60,7 +67,7 @@ int recvall(int socket, void *mensaje, size_t tamanio);
 enum protocolos {
 	CONEXION_NODO_A_FS, CONEXION_MARTA_A_FS, SET_BLOQUE, GET_BLOQUE, RTA_SET_BLOQUE, DISCONNECTED,
 	MAP_OK, NODO_NOT_FOUND, ORDER_MAP, MARTA_ACTUALIZA_EL_REGISTRO, ENVIO_BLOQUEARCH_A_MARTA,
-	ORDER_REDUCE, FIN_OPERACION,CONEXION_JOB_A_NODO
+	ORDER_REDUCE, FIN_OPERACION,CONEXION_JOB_A_NODO,MARTA_SE_CAYO_UN_NODO
 };
 
 //Primitivas
@@ -103,10 +110,15 @@ int enviarBuffer(t_buffer* buffer, int socket);
 	int pedirBloqueANodo(int socket, int numeroDeBloque);
 
 	//A Marta
+	int enviarCopiasAMarta(int socket, t_list* copias);
+
 	int actualizarIdIpPuertoEnMarta(int socket, t_registro_id_ipPuerto* unRegistro);
+
+	int martaSeCayoUnNodo(int socket, int id);
 
 //Marta
 	//A FileSystem
+	int dameBloqueArchFS(int socket,char *nombreArchivo , int padre, int numeroBloqueArch);
 
 	int presentarseMartaAlFileSystem(int socket);
 
@@ -129,4 +141,10 @@ int enviarBuffer(t_buffer* buffer, int socket);
  //Job
  	//De Marta
  	t_ordenMap* recibirOrdenMapDeMarta(int sockMarta);
+
+ //Marta
+ 	//De Filesystem
+ 	t_registro_id_ipPuerto* recibirRegistroNodo(int socket);
+
+ 	void recibirBloqueArchFS(int socketAuxiliar,t_list* copiasDeBloque);
 #endif

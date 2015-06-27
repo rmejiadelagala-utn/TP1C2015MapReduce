@@ -11,10 +11,6 @@
 #include<commons/collections/list.h>
 
 ////////// Planificación JOB ///////////
-typedef struct {
-	char *ipPuerto; //quizas conviene en un futuro que
-	int numeroDeBloqueEnNodo;
-} t_bloqueEnNodo;
 
 typedef struct {
 	int numeroDeBloqueArchivo;

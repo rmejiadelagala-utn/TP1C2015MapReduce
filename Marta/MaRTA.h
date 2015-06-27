@@ -17,7 +17,14 @@
 #include "interaccionMartaFS.h"
 #include <socketes/envioDeMensajes.h>
 #include <commons/collections/list.h>
+#include "tests.h"
+#include "estructurasMaRTA.h"
 
+pthread_mutex_t mutexListaNodo;
+t_list* cargaNodos;
 t_list *listaRegistrosIDIP;
+int socketDeFS; //socket cliente del FS
+pthread_mutex_t mutexConexionFS;
+t_config *config;
 
 #endif /* MARTA_H_ */

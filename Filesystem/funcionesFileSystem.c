@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include"funcionesFileSystem.h"
+int CANT_COPIAS = 3;
 t_list *listaArchivos;
 t_list *listaNodos;
 t_list *listaDirectorios;
@@ -76,15 +77,22 @@ static bool tieneLugar(t_nodo *unNodo);
  }
  */
 
-int BLOCK_SIZE = 150; //2* 1024 * 1024;//Probar con menos
-int CANT_COPIAS = 3;
+
+
+int nodoEstaActivo (t_registro_id_ipPuerto* unRegistro){
+	t_nodo* unNodo = malloc(sizeof(t_nodo));
+	unNodo= buscarNodoPorId(unRegistro->id,listaNodos);
+	int activo = unNodo->activo;
+	free(unNodo);
+	return activo;
+}
+
 /*
  * //FIXME a la hora de tener un archivo mayor a 20MB o que el BLOCK_SIZE sea menor estalla
  * hay 2 motivos para que estalle, uno no encontro un barra n en el bloque por lo que debería devolver error
  * e imprimir por pantalla que el archivo esta mal formateado. Y el otro es cuando de verdad esta buscando /n
  * y hay un /n tambien tira segment fault. Por lo cual es importante arreglarlo
  */
-
 int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
 
 		t_list** listaDeBloques) {
@@ -427,6 +435,7 @@ void eliminarReferencias(t_nodo *nodoAEliminar, t_list *archivos) { //probada
 
 void formatear(t_list **listaNodos, t_list **listaArchivos,	//probada
 		t_list **listaDirectorios) {
+	//FIXME no destruir los nodos quizas
 	list_destroy_and_destroy_elements(*listaArchivos, (void*) liberarArchivo);
 	list_destroy_and_destroy_elements(*listaNodos, (void*) liberarNodo);
 	list_destroy_and_destroy_elements(*listaDirectorios,
@@ -694,16 +703,6 @@ int obtenerArchivo(t_archivo *archivo) {
 	if(!nodoEncontrado) return -1;
 	pedirBloqueANodo(nodoEncontrado->socket,bloque->numeroDeBloqueEnNodo);
 	sem_wait(&semaforo);
-
-		//HAY QUE CREAR EL CAMPO SOCKET EN NODO
-		/*int socket_desc = nodoEncontrado.socket;
-		 send(socket_desc,1,sizeOf(1),0);
-		 int tamanioData;
-		 recv(socket_desc, &tamanioData,1,0);
-		 char **data = malloc(&tamanioData);
-		 recv(socket_desc, *data, tamanioData, 0);
-		 puts(*data);*/
-		//FALTA ESCRIBIR EN ARCHIVO EN VEZ DE MOSTRAR POR PANTALLA
 	}
 	list_iterate(archivo->bloquesDeArch, (void *) obtenerBloque);
 	return 1;
