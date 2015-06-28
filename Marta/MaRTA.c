@@ -33,7 +33,10 @@ int main(/*int argc, char *argv[]*/) {
 	pthread_create(&thr_fs, NULL, interaccionMartaFS, (void*) &socketDeFS );
 
 //	scanf(stdin);
-
+	sleep(2);
+	printf("Ahora le voy a pedir unos bloques al FS");
+	fflush(stdout);
+	sleep(2);
 	buscarBloquesEnFS(/*t_InfoJob infoDeJob,*/ 1,
 			3, copiasDeBloque);
 

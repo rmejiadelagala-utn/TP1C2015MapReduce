@@ -522,7 +522,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 			//TODO esta bien
 			break;
 		case ENVIO_BLOQUEARCH_A_MARTA:
-			infoBloquePedido = recibirPedidoDeBloqueArch(socketDeMarta);
+			infoBloquePedido = recibirPedidoDeBloqueArch(socket);
 			copias = list_create();
 			resultado = encontrarCopias(infoBloquePedido->nombreArch, infoBloquePedido->padre,
 					infoBloquePedido->numeroDeBloqueArch, &copias);

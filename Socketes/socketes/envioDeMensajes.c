@@ -186,22 +186,18 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		return enviarBuffer(buffer,socket);
 	}
 	int enviarCopiasAMarta(int socket, t_list* copias){
-		printf("Entre a enviarCopiasAmARTA\n");
-				fflush(stdout);
-		int cantidad = list_size(copias);
-		int tamanio =cantidad*sizeof(t_bloqueEnNodo) + sizeof(int);
 
-		void* buffer = malloc(tamanio);
-		memcpy(buffer,&cantidad,4);
-		int offset = 4;
-		/*void agregarCopia(t_bloqueEnNodo* unBloque){
+		int cantidad = list_size(copias);
+		sendall(socket,&cantidad,sizeof(int));
+
+		void enviarCopia(t_bloqueEnNodo* unBloque){
 			printf("ID bloque:%d\n",unBloque->id);
 			fflush(stdout);
-			memcpy(buffer+offset,unBloque,sizeof(t_bloqueEnNodo));
-			offset+=sizeof(t_bloqueEnNodo);
+			sendall(socket,unBloque,sizeof(t_bloqueEnNodo));
 		}
-		list_iterate(copias,(void*)agregarCopia);*/
-		return sendall(socket, buffer, 4);
+
+		list_iterate(copias,(void*)enviarCopia);
+		return 1; //TODO VALIDACIONES
 	}
 //Marta
 	//A Filesystem
@@ -297,10 +293,13 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		int cantidadDeCopias;
 		recvall(socketAuxiliar,&cantidadDeCopias,sizeof(int));
 		printf("\n\nCantidad de copias: %d\n\n",cantidadDeCopias);
+		fflush(stdout);
 		int i;
 		for(i=0;i<cantidadDeCopias;i++){
 			t_bloqueEnNodo* copiaDeBloque=malloc(sizeof(t_bloqueEnNodo));
 			recvall(socketAuxiliar,copiaDeBloque,sizeof(t_bloqueEnNodo));
+			printf("ID de copia: %d\n",copiaDeBloque->id);
+			fflush(stdout);
 			list_add(copiasDeBloque,copiaDeBloque);
 		}
 	}

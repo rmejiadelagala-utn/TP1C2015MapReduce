@@ -57,13 +57,7 @@ void* recibirBloque(void* sock){
 			printf("entro a recibirBloque :D\n");
 			fflush(stdout);
 			int socket= *(int*)sock;
-			presentarseMartaAlFileSystem(socket);
-			presentarseMartaAlFileSystem(socket);
 			dameBloqueArchFS(socket,"unArchivo",1,2);
-			presentarseMartaAlFileSystem(socket);
-			presentarseMartaAlFileSystem(socket);
-			presentarseMartaAlFileSystem(socket);
-			presentarseMartaAlFileSystem(socket);
 			 //FIXME deshardcodear
 			t_list* copiasDeBloque=list_create();
 			recibirBloqueArchFS(socket,copiasDeBloque);
@@ -72,5 +66,7 @@ void* recibirBloque(void* sock){
 				fflush(stdout);
 			}
 			list_iterate(copiasDeBloque,(void*)mostrarBloque);
+			printf("El tamaño de la lista es %d",list_size(copiasDeBloque));
+			fflush(stdout);
 			return 1;
 		}
