@@ -62,6 +62,8 @@ int main() {
 	listaDirectorios = list_create();
 	listaRegistrosIDIP = list_create();
 	t_registro_id_ipPuerto* registroVacio = malloc(registroVacio);
+	sem_init(&consola_sem,0,0);
+	sem_init(&escuchar_sem,0,0);
 	/*registroVacio->id=0;
 	 registroVacio->ip.s_addr=inet_addr("0.0.0.0");
 	 registroVacio->puerto=0;
@@ -470,7 +472,6 @@ void *interaccionFSNodo(void* sock_ptr) {
 				unRegistro->puerto = infoNodo->PUERTO_NODO;
 				list_add(listaRegistrosIDIP, unRegistro);
 				actualizarRegistro(unRegistro, infoNodo->IP_NODO, infoNodo->PUERTO_NODO);
-				mostrarLista(listaRegistrosIDIP, mostrarRegistro);
 				printf("\n\n");
 				break;
 
@@ -506,18 +507,24 @@ void *interaccionFSNodo(void* sock_ptr) {
 			break;
 		case GET_BLOQUE:
 			recibido = recvall(socket, &protocolo, 4);
-			recibirBloqueDeNodo(socket, (void*) &buffer);
 				switch(protocolo){
 				case COPIAR_ARCHIVO_A_FS_LOCAL:
+					recibirBloqueDeNodo(socket, (void*) &buffer);
 					write(fileno(archivoReconstruido), buffer, strlen(buffer));
 					free(buffer);
 					sem_post(&semaforo);
 					break;
 				case VER_BLOQUE_NODO:
+					recibirBloqueDeNodo(socket, (void*) &buffer);
 					printf("\n\n%s\n\n",buffer);
 					fflush(stdout);
 					write(fileno(archivoReconstruido), buffer, strlen(buffer));
 					free(buffer);
+					break;
+				case COPIAR_BLOQUE_NODO:
+					sem_post(&consola_sem);
+					//La consola se encarga del resto
+					sem_wait(&escuchar_sem);
 					break;
 				}
 			break;

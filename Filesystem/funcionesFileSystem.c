@@ -93,7 +93,7 @@ int nodoEstaActivo (t_registro_id_ipPuerto* unRegistro){
  * e imprimir por pantalla que el archivo esta mal formateado. Y el otro es cuando de verdad esta buscando /n
  * y hay un /n tambien tira segment fault. Por lo cual es importante arreglarlo
  */
-int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
+int mandarBloquesANodos(char* data, int* cantidadBloquesEnviados,
 
 		t_list** listaDeBloques) {
 
@@ -102,12 +102,9 @@ int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
 	t_bloqueArch *bloqueDeArchivo;
 //	t_list *nodosOrdenados = list_create();
 	t_nodo *nodoActual;
-	int posicionEnNodo;
-	int *aux;
-	t_bloqueEnNodo *bloqueEnNodo;
 	int ultimoIndiceDelData = string_length(data)-1;//Juanchi dice que -1 no va
 
-	*cantidadBolquesEnviados = 0;
+	*cantidadBloquesEnviados = 0;
 	int cant=0;
 	while (!fin) {
 
@@ -142,25 +139,9 @@ int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
 			//nodoActual = nodoElegdoYConLugar(nodosOrdenados);
 			if (nodoElegido(nodosOrdenados, &nodoActual,&k) != -1) {
 				//salio bien el elegir nodo, estando en nodoActual
+				int tamanio = finDeBloque-comienzoDeBloque;
+				setBloque(nodoActual,data,tamanio,comienzoDeBloque, bloqueDeArchivo->copiasDeBloque);
 
-				//cargarEnListaArchivoElNodo(nodoElegido);
-				if (queue_is_empty(nodoActual->bloquesLiberados)) {
-					posicionEnNodo = nodoActual->cantidadBloquesOcupados + 1;
-				} else {
-					aux = queue_pop(nodoActual->bloquesLiberados);
-					posicionEnNodo = *aux;
-					free(aux);
-				}
-				nodoActual->cantidadBloquesOcupados++;
-				bloqueEnNodo = nuevoBloqueEnNodo(nodoActual->id,
-										posicionEnNodo);
-				int tamanio = finDeBloque - comienzoDeBloque;
-
-
-				enviarBloqueANodo(nodoActual->socket, bloqueEnNodo->numeroDeBloqueEnNodo, data,comienzoDeBloque,tamanio);
-
-				//termino de agregar a la lista de archivos, la info nueva del bloque
-				list_add(bloqueDeArchivo->copiasDeBloque, bloqueEnNodo);//algo malo puede pasar
 			} else {
 				printf("No hay nodos disponibles\n");
 				return -1;
@@ -169,11 +150,37 @@ int mandarBloquesANodos(char* data, int* cantidadBolquesEnviados,
 		}
 		//cambiar el bloque start al siguiente y agrega el Bloque a la lista de bloques
 		list_add(*listaDeBloques, bloqueDeArchivo);
-		(*cantidadBolquesEnviados)++;
+		(*cantidadBloquesEnviados)++;
 		comienzoDeBloque = finDeBloque + 1;
 		list_destroy(nodosOrdenados);
 	}
 	return 1;
+}
+
+int setBloque(t_nodo* nodo, char* dataBloque, int tamanio, int comienzoDeBloque,t_list *copias){
+	int posicionEnNodo;
+	int *aux;
+	t_bloqueEnNodo *bloqueEnNodo;
+	//cargarEnListaArchivoElNodo(nodoElegido);
+	if (queue_is_empty(nodo->bloquesLiberados)) {
+		posicionEnNodo = nodo->cantidadBloquesOcupados + 1;
+	} else {
+		aux = queue_pop(nodo->bloquesLiberados);
+		posicionEnNodo = *aux;
+		free(aux);
+	}
+	nodo->cantidadBloquesOcupados++;
+	bloqueEnNodo = nuevoBloqueEnNodo(nodo->id,
+							posicionEnNodo);
+
+	int resultado = enviarBloqueANodo(nodo->socket, bloqueEnNodo->numeroDeBloqueEnNodo, dataBloque,comienzoDeBloque,tamanio);
+
+	//termino de agregar a la lista de archivos, la info nueva del bloque
+
+	if (resultado==(-1)) return resultado; //ERROR
+
+	list_add(copias, bloqueEnNodo);//algo malo puede pasar
+	return resultado;
 }
 
 int nodoElegido(t_list *nodosOrdenados, t_nodo **nodoActual, int *posicion) {

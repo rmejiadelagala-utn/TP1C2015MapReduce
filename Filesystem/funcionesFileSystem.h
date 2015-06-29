@@ -21,6 +21,12 @@ int nodoEstaActivo (t_registro_id_ipPuerto* unRegistro);
 void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos);
 
 /*
+ * @NAME: setBloque
+ * @DESC: envia el dataBloque al nodo para que lo almacene, se le pasa el tamanio del bloque y en donde comienza (por si el bloque es solo una parte de un archivo mapeado a memoria. Luego, guarda el archivo en la lista de copias del bloque de archivo.
+ */
+int setBloque(t_nodo* nodo, char* dataBloque, int tamanio, int comienzoDeBloque,t_list *copias);
+
+/*
  * @NAME: formatear
  * @DESC: recibe la lista de archivos, nodos y directorios, y las vacía
  */

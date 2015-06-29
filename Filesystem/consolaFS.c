@@ -1,6 +1,5 @@
 #include "consolaFS.h"
-#include "funcionesFileSystem.h"
-#include "fsystem.h"
+
 
 t_directorio *directorioActual;
 char *direccion;
@@ -8,7 +7,6 @@ int consola(void* unListaNodo) {
 	directorioActual = nuevoDirectorio(1, "root", 0);
 	list_add(listaDirectorios,directorioActual);
 	direccion = string_duplicate(directorioActual->nombre);
-	t_list *listaNodo = unListaNodo;
 	// // lo defino como un char** porque necesito tener un "array"
 	//con todas las cadenas, donde la primera es el comando y las demas los parametros
 	char **comandoSeparado;
@@ -110,12 +108,12 @@ int consola(void* unListaNodo) {
 			verBloque(comandoSeparado[1],comandoSeparado[2]);
 			break;
 		case ELIMINAR_BLOQUE:
-			if(comprobarParametros(1,comandoSeparado)==1)
-			eliminarBloque(comandoSeparado[1]);
+			if(comprobarParametros(2,comandoSeparado)==1)
+			eliminarBloque(comandoSeparado[1],comandoSeparado[2]);
 			break;
 		case COPIAR_BLOQUE:
-			if(comprobarParametros(1,comandoSeparado)==1)
-			copiarBloque(comandoSeparado[1]);
+			if(comprobarParametros(3,comandoSeparado)==1)
+			copiarBloque(comandoSeparado[1],comandoSeparado[2],comandoSeparado[3]);
 			break;
 		case LEVANTAR_NODO:
 			if(comprobarParametros(1,comandoSeparado)==1)
@@ -308,12 +306,29 @@ void verBloque(char *archivo, char *numeroBloque) {
 	validarArchivoYEjecutar(archivo, (void*)pedirBloque);
 }
 
-void eliminarBloque(char *bloque) {
-	printf("Borra el Bloque nro %s\n", bloque);
+void eliminarBloque(char *archivo, char* numeroBloque) {
+
+	int nroBloque=atoi(numeroBloque);
+	void eliminarBloque(t_archivo *unArchivo){
+			t_bloqueArch* bloqueDeArchivo = list_get(unArchivo->bloquesDeArch,nroBloque);
+			list_remove(bloqueDeArchivo->copiasDeBloque,1);
+			}
+	validarArchivoYEjecutar(archivo, (void*)eliminarBloque);
 }
 
-void copiarBloque(char *bloque) {
-	printf("Copia el Bloque nro %s\n", bloque);
+void copiarBloque(char *archivo, char* numeroBloque, char* idNodo) {
+
+	int nroBloque=atoi(numeroBloque);
+
+	int id=atoi(idNodo);
+
+	void copiarBloque(t_archivo* unArchivo){
+
+	funcionCopiarBloque(unArchivo,nroBloque,id);
+
+	}
+
+		validarArchivoYEjecutar(archivo, (void*)copiarBloque);
 }
 
 void levantarNodo(char *nodo) {
@@ -327,7 +342,7 @@ void levantarNodo(char *nodo) {
 }
 
 void eliminarNodo(char *nodo) {
-	if(!strcmp(nodo,"VerNodos")){//XXX PARA TESTEAR
+	if(string_equals_ignore_case(nodo,"VerNodos")){//XXX PARA TESTEAR
 		mostrarLista(listaNodos, (void*)mostrarNodo);
 	}
 	/*else if(!strcmp(nodo,"responderAMarta")){//XXX PARA TESTEAR
@@ -541,4 +556,30 @@ int descargarArchivo(t_archivo *unArchivo){
 
 				return 1;
 		}
+}
+
+void funcionCopiarBloque(t_archivo *unArchivo, int nroBloque, int id){
+
+	t_bloqueArch* bloqueDeArchivo = list_get(unArchivo->bloquesDeArch,nroBloque);
+
+	t_list* copiasDelBloque = bloqueDeArchivo->copiasDeBloque;
+
+	t_bloqueEnNodo* bloqueEnNodo = list_get(copiasDelBloque,1);
+
+	t_nodo *nodoAlQuePidoBloque = buscarNodoPorId(bloqueEnNodo->id, listaNodos);
+
+	pedirBloqueANodo(nodoAlQuePidoBloque->socket,bloqueEnNodo->numeroDeBloqueEnNodo,COPIAR_BLOQUE_NODO);
+
+	sem_wait(&consola_sem);
+
+	t_nodo *nodoAlQueEnvioBloque = buscarNodoPorId(id, listaNodos);
+
+	void* buffer;
+
+	int tamanio = recibirBloqueDeNodo(nodoAlQuePidoBloque->socket, (void*) &buffer);
+
+	setBloque(nodoAlQueEnvioBloque, buffer, tamanio, 0,copiasDelBloque);
+
+	sem_post(&escuchar_sem);
+
 }

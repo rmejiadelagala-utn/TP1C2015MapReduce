@@ -7,6 +7,8 @@
 #include <commons/string.h>
 #include <string.h>
 #include <socketes/envioDeMensajes.h>
+#include "fsystem.h"
+#include "funcionesFileSystem.h"
 
 int consola();
 void leerComando(char *command, int maximoLargo);
@@ -23,8 +25,8 @@ void copiarAMDFS(char *archivo, char *archivoACopiar);
 void copiarAFS(char *archivo);
 void solicitarMD5(char *archivo);
 void verBloque(char *bloque, char* numeroDeBloque);
-void eliminarBloque(char *bloque);
-void copiarBloque(char* bloque);
+void eliminarBloque(char *archivo, char* numeroBloque);
+void copiarBloque(char *archivo, char* numeroBloque, char* idNodo);
 void levantarNodo(char *nodo);
 void eliminarNodo(char *nodo);
 void help();
@@ -38,6 +40,8 @@ int comprobarParametros(int cantParametros, char** parametros);
 t_list *directoriosVisiblesDesdeActual(void);
 t_list *archivosVisiblesDesdeActual(void);
 int string_to_int(char* string);
+void funcionCopiarBloque(t_archivo *unArchivo, int nroBloque, int id);
+int descargarArchivo(t_archivo *unArchivo);
 //
 
 enum entrada {

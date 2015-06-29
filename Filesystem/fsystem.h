@@ -55,8 +55,11 @@ t_list *listaNodos;
 t_list *listaDirectorios;
 t_list *listaRegistrosIDIP;
 sem_t semaforo;
+sem_t consola_sem;
+sem_t escuchar_sem;
 FILE *archivoReconstruido;
 int socketDeMarta;
+
 
 
 void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* nombreArchivo, int padre);
