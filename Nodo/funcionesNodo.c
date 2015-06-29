@@ -161,12 +161,19 @@ void crearScriptMapper(const char* codigo_script){
 
 	FILE* scriptMapper;
 
-	if((scriptMapper=fopen("/home/utnso/mapper.sh","w+"))==NULL){
+	if((scriptMapper=fopen("/tmp/mapper.sh","w+"))==NULL){
 		perror("Error al crear el script del mapper");
 		exit(1);
 	}
 
 	fputs(codigo_script,scriptMapper);
+	
+	char *permisosCommand = string_new();
+
+	string_append(&permisosCommand, "chmod u+x ");
+	string_append(&permisosCommand,"/tmp/reduce.pl");
+
+	system(permisosCommand);
 	fclose(scriptMapper);
 
 	return;
@@ -189,8 +196,8 @@ void crearScriptReduce(const char* codigo_script){
 //	}
 
 
-	if((scriptReduce=fopen("/home/utnso/reduce.pl","w+"))==NULL){
-		perror("Error al crear el script del mapper");
+	if((scriptReduce=fopen("/tmp/reduce.pl","w+"))==NULL){
+		perror("Error al crear el script del Reduce");
 		exit(1);
 	}
 
@@ -200,8 +207,79 @@ void crearScriptReduce(const char* codigo_script){
 //	}
 
 	fputs(codigo_script,scriptReduce);
+	
+	char *permisosCommand = string_new();
+
+	string_append(&permisosCommand, "chmod u+x ");
+	string_append(&permisosCommand,"/tmp/reduce.pl");
+
+	system(permisosCommand);
+	
 	fclose(scriptReduce);
 
 	return;
+}
 
+int redireccionar_stdin_stdout(char *pathPrograma,char *pathArchivoSalida,char* data_bloque)
+{
+	FILE *stdin = NULL;
+
+	char *comando = malloc(strlen(pathPrograma)+11+strlen(pathArchivoSalida));
+
+	sprintf(comando,"%s | sort > %s",pathPrograma, pathArchivoSalida);	
+
+	stdin = popen (comando,"w");
+
+	if (stdin != NULL){
+
+		fprintf(stdin, "%s\n",data_bloque);
+
+		pclose (stdin);
+		free(comando);
+	}
+	else{
+
+		printf("No se pudo ejecutar el programa!");
+		return -1;
+	}
+
+	return 0;
+}
+
+void ejecutarMapper(char * path_s, char* path_tmp, char* datos_bloque){
+
+	if ((redireccionar_stdin_stdout(path_s, path_tmp, datos_bloque)) < 0)
+		printf("Error al ejecutar Mapper");
+
+}
+
+void ejecutarReduce(char * path_s, char* path_tmp, char* datos_bloque){
+
+	if ((redireccionar_stdin_stdout(path_s, path_tmp, datos_bloque)) < 0)
+		printf("Error al ejecutar Reduce");
+
+}
+
+char* aparear_registros(char* datos_archivo){
+
+	char** reg_archivo;
+	char* copiar_datos;
+	int i;
+
+	reg_archivo = string_split(datos_archivo, "\n");
+	copiar_datos = malloc (BLKSIZE);
+
+	strcpy(copiar_datos, reg_archivo[0]);
+
+	for(i = 0; reg_archivo[i]!= NULL; i++){
+
+		if ((strcmp(reg_archivo[i],copiar_datos)) <= 0){
+			copiar_datos = malloc (BLKSIZE);
+            		strcpy(copiar_datos, reg_archivo[i]);
+		}
+
+	}
+    strcat(copiar_datos, "\n");
+    return copiar_datos;
+    
 }
