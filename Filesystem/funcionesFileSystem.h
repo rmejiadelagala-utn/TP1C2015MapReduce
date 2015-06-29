@@ -183,6 +183,12 @@ t_directorio *buscarDirPorPadre(int padre);
 t_archivo *buscarArchPorPadre(int padre);
 
 /**
+ * @NAME: disminuirNodo
+ * @DESC: libera el espacio del nodo que era ocupado por la copia de bloque
+ */
+void disminuirNodo(t_bloqueEnNodo *copia);
+
+/**
  * @NAME: dameUnSubdir
  * @DESC: devuelve un subdirectorio del directorio enviado por parametro o NULL si no existe
  */

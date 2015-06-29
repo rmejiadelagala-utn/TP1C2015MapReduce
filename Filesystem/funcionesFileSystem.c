@@ -36,7 +36,6 @@ static void *buscarEnListaPorIntKey(t_list *lista, int key,
 		int *keyGetter(void*));
 static void recorrerCopiasDeUnArch(t_archivo *unArchivo,
 		void (*accionACopia)(t_bloqueEnNodo*));
-static void disminuirNodo(t_bloqueEnNodo *copia);
 static int dirPadre(t_directorio *unDir);
 static int dirIndex(t_directorio *unDir);
 static int archPadre(t_archivo *unArch);
@@ -589,6 +588,14 @@ int archivoActivoPorFlag(t_archivo *unArchivo) {
 	return unArchivo->estado;
 }
 
+void disminuirNodo(t_bloqueEnNodo *copia) {
+	t_nodo *nodo = buscarNodoPorId(copia->id, listaNodos);
+	nodo->cantidadBloquesOcupados = nodo->cantidadBloquesOcupados - 1;
+	int *numero = malloc(sizeof(int));
+	*numero = copia->numeroDeBloqueEnNodo;
+	queue_push(nodo->bloquesLiberados, numero);
+}
+
 /******************************************/
 /********* PRIVATE FUNCTIONS **************/
 /******************************************/
@@ -697,22 +704,35 @@ int obtenerArchivo(t_archivo *archivo) {
 		printf("Archivo no está disponible.");
 		return -1;
 	}
-	int noEsNull(void* unBloque) {
-		return unBloque != NULL;
-	}
+
+	int huboError = 0;
+
 	int obtenerBloque(t_bloqueArch *bloqueDeArchivo) {
-		t_bloqueEnNodo *bloque = list_find(bloqueDeArchivo->copiasDeBloque,
-				(void*) noEsNull);
-		int ipPuertoCoincide(t_nodo *unNodo) {
-			return (unNodo->id == bloque->id);
-		}
-	t_nodo *nodoEncontrado = list_find(listaNodos, (void*) ipPuertoCoincide);
-	if(!nodoEncontrado) return -1;
-	pedirBloqueANodo(nodoEncontrado->socket,bloque->numeroDeBloqueEnNodo,COPIAR_ARCHIVO_A_FS_LOCAL);
-	sem_wait(&semaforo);
+
+			if(huboError) return -1;
+
+			huboError =	detectarError(bloqueDeArchivo->copiasDeBloque, list_is_empty,
+							"El archivo no está disponible. Faltan las copias de alguno de sus bloques en los nodos.\n");
+
+			if(huboError) return -1;
+
+			t_bloqueEnNodo *bloque = list_get(bloqueDeArchivo->copiasDeBloque, 0);
+
+			t_nodo *nodoEncontrado = buscarNodoPorId(bloque->id, listaNodos);
+
+			if (!nodoEncontrado) return -1;
+
+			pedirBloqueANodo(nodoEncontrado->socket, bloque->numeroDeBloqueEnNodo,
+					COPIAR_ARCHIVO_A_FS_LOCAL);
+
+			sem_wait(&semaforo);
+
+
 	}
+
 	list_iterate(archivo->bloquesDeArch, (void *) obtenerBloque);
-	return 1;
+
+	return !huboError;
 }
 
 static void recorrerCopiasDeUnArch(t_archivo *unArchivo,
@@ -721,14 +741,6 @@ static void recorrerCopiasDeUnArch(t_archivo *unArchivo,
 		list_iterate(bloqueArchivo->copiasDeBloque, (void*) accionACopia);
 	}
 	list_iterate(unArchivo->bloquesDeArch, (void*) _recorrerCopias);
-}
-
-static void disminuirNodo(t_bloqueEnNodo *copia) {
-	t_nodo *nodo = buscarNodoPorId(copia->id, listaNodos);
-	nodo->cantidadBloquesOcupados = nodo->cantidadBloquesOcupados - 1;
-	int *numero = malloc(sizeof(int));
-	*numero = copia->numeroDeBloqueEnNodo;
-	queue_push(nodo->bloquesLiberados, numero);
 }
 
 static bool tieneLugar(t_nodo *unNodo) {

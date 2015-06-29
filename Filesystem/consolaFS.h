@@ -40,8 +40,11 @@ int comprobarParametros(int cantParametros, char** parametros);
 t_list *directoriosVisiblesDesdeActual(void);
 t_list *archivosVisiblesDesdeActual(void);
 int string_to_int(char* string);
-void funcionCopiarBloque(t_archivo *unArchivo, int nroBloque, int id);
+int verBloqueDeArchivo(t_archivo *unArchivo, int nroBloque);
+int funcionCopiarBloque(t_archivo *unArchivo, int nroBloque, int id);
 int descargarArchivo(t_archivo *unArchivo);
+int detectarError(void* cosaAChequear,int (*condicion)(void*),char* mensaje);
+int esNull(void* algo);
 //
 
 enum entrada {

@@ -292,28 +292,37 @@ void solicitarMD5(char *archivo) {
 void verBloque(char *archivo, char *numeroBloque) {
 
 	int nroBloque=atoi(numeroBloque);
-	void pedirBloque(t_archivo *unArchivo){
-		archivoReconstruido = fopen("../Archivos/bloqueObtenido","w");
-		t_bloqueArch* bloqueDeArchivo = list_get(unArchivo->bloquesDeArch,nroBloque);
-		t_bloqueEnNodo* bloqueEnNodo = list_get(bloqueDeArchivo->copiasDeBloque,1);
-		int ipPuertoCoincide(t_nodo *unNodo) {
-					return (unNodo->id == bloqueEnNodo->id);
-				}
-		t_nodo *nodoEncontrado = list_find(listaNodos, (void*) ipPuertoCoincide);
-		pedirBloqueANodo(nodoEncontrado->socket,bloqueEnNodo->numeroDeBloqueEnNodo,VER_BLOQUE_NODO);
+
+	void verBloqueArch(t_archivo* unArchivo){
+
+		verBloqueDeArchivo(unArchivo,nroBloque);
+
 	}
 
-	validarArchivoYEjecutar(archivo, (void*)pedirBloque);
+	validarArchivoYEjecutar(archivo, (void*)verBloqueArch);
 }
 
 void eliminarBloque(char *archivo, char* numeroBloque) {
 
 	int nroBloque=atoi(numeroBloque);
-	void eliminarBloque(t_archivo *unArchivo){
+
+	int eliminarBloqueDeArchivo(t_archivo *unArchivo){
+
 			t_bloqueArch* bloqueDeArchivo = list_get(unArchivo->bloquesDeArch,nroBloque);
-			list_remove(bloqueDeArchivo->copiasDeBloque,1);
+
+			if(detectarError(bloqueDeArchivo->copiasDeBloque,list_is_empty,"No existen mas copias de ese bloque para eliminar.\n")) return -1;
+
+			t_bloqueEnNodo* copiaDelBloque = list_remove(bloqueDeArchivo->copiasDeBloque,0);
+
+			disminuirNodo(copiaDelBloque);
+
+			free(copiaDelBloque);
+
+			return 1;
+
 			}
-	validarArchivoYEjecutar(archivo, (void*)eliminarBloque);
+
+	validarArchivoYEjecutar(archivo, (void*)eliminarBloqueDeArchivo);
 }
 
 void copiarBloque(char *archivo, char* numeroBloque, char* idNodo) {
@@ -558,21 +567,68 @@ int descargarArchivo(t_archivo *unArchivo){
 		}
 }
 
-void funcionCopiarBloque(t_archivo *unArchivo, int nroBloque, int id){
+int verBloqueDeArchivo(t_archivo *unArchivo, int nroBloque){
+
+		archivoReconstruido = fopen("../Archivos/bloqueObtenido","w");
+
+		t_bloqueArch* bloqueDeArchivo = list_get(unArchivo->bloquesDeArch,nroBloque);
+
+		if(detectarError(bloqueDeArchivo->copiasDeBloque,list_is_empty,"No existen copias disponibles de ese bloque.\n")) return -1;
+
+		t_bloqueEnNodo* bloqueEnNodo = list_get(bloqueDeArchivo->copiasDeBloque,0);
+
+		t_nodo *nodoEncontrado = buscarNodoPorId(bloqueEnNodo->id, listaNodos);
+
+		if (detectarError(nodoEncontrado,(void*)esNull,"Nodo no encontrado.\n")) return -1;
+
+		pedirBloqueANodo(nodoEncontrado->socket,bloqueEnNodo->numeroDeBloqueEnNodo,VER_BLOQUE_NODO);
+
+		sem_wait(&consola_sem);
+
+		void* buffer;
+
+		recibirBloqueDeNodo(nodoEncontrado->socket, (void*) &buffer);
+
+		printf("\n\n%s\n\n",buffer);
+
+		fflush(stdout);
+
+		write(fileno(archivoReconstruido), buffer, strlen(buffer));
+
+		free(buffer);
+
+		sem_wait(&escuchar_sem);
+
+		return 1;
+
+	}
+
+int funcionCopiarBloque(t_archivo *unArchivo, int nroBloque, int id){
+
+	int esMayorACantDeBloques(int unNumero){
+		return unNumero>=list_size(unArchivo->bloquesDeArch);
+	}
+
+	if (detectarError(nroBloque, esMayorACantDeBloques, "El numero de bloque no existe. Posiblemente estés tratando de acceder a un número mayor a la cantidad de bloques del archivo.\n")) return -1;
 
 	t_bloqueArch* bloqueDeArchivo = list_get(unArchivo->bloquesDeArch,nroBloque);
 
 	t_list* copiasDelBloque = bloqueDeArchivo->copiasDeBloque;
 
-	t_bloqueEnNodo* bloqueEnNodo = list_get(copiasDelBloque,1);
+	if(detectarError(bloqueDeArchivo->copiasDeBloque,list_is_empty,"No existen copias disponibles de ese bloque.\n")) return -1;
+	t_bloqueEnNodo* bloqueEnNodo = list_get(copiasDelBloque,0);
 
 	t_nodo *nodoAlQuePidoBloque = buscarNodoPorId(bloqueEnNodo->id, listaNodos);
+
+	if(detectarError(nodoAlQuePidoBloque,esNull,"Copia del bloque no disponible.\n")) return -1;
+
+	t_nodo *nodoAlQueEnvioBloque = buscarNodoPorId(id, listaNodos);
+
+	if(detectarError(nodoAlQueEnvioBloque,esNull,"Nodo no encontrado.\n")) return -1;
 
 	pedirBloqueANodo(nodoAlQuePidoBloque->socket,bloqueEnNodo->numeroDeBloqueEnNodo,COPIAR_BLOQUE_NODO);
 
 	sem_wait(&consola_sem);
-
-	t_nodo *nodoAlQueEnvioBloque = buscarNodoPorId(id, listaNodos);
 
 	void* buffer;
 
@@ -582,4 +638,21 @@ void funcionCopiarBloque(t_archivo *unArchivo, int nroBloque, int id){
 
 	sem_post(&escuchar_sem);
 
+	return 1;
+
+}
+
+int detectarError(void* cosaAChequear,int (*condicion)(void*),char* mensaje){
+
+	if(condicion(cosaAChequear)){
+		if(mensaje!=NULL){
+		printf(mensaje);
+		}
+		return 1;
+	}
+	return 0;
+}
+
+int esNull(void* algo){
+	return algo==NULL;
 }

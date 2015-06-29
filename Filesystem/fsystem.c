@@ -61,7 +61,7 @@ int main() {
 	listaNodos = list_create();
 	listaDirectorios = list_create();
 	listaRegistrosIDIP = list_create();
-	t_registro_id_ipPuerto* registroVacio = malloc(registroVacio);
+	t_registro_id_ipPuerto* registroVacio = malloc(sizeof(t_registro_id_ipPuerto));
 	sem_init(&consola_sem,0,0);
 	sem_init(&escuchar_sem,0,0);
 	/*registroVacio->id=0;
@@ -509,17 +509,16 @@ void *interaccionFSNodo(void* sock_ptr) {
 			recibido = recvall(socket, &protocolo, 4);
 				switch(protocolo){
 				case COPIAR_ARCHIVO_A_FS_LOCAL:
+					//La consola se encarga del resto
 					recibirBloqueDeNodo(socket, (void*) &buffer);
 					write(fileno(archivoReconstruido), buffer, strlen(buffer));
 					free(buffer);
 					sem_post(&semaforo);
 					break;
 				case VER_BLOQUE_NODO:
-					recibirBloqueDeNodo(socket, (void*) &buffer);
-					printf("\n\n%s\n\n",buffer);
-					fflush(stdout);
-					write(fileno(archivoReconstruido), buffer, strlen(buffer));
-					free(buffer);
+					sem_post(&consola_sem);
+					//La consola se encarga del resto
+					sem_wait(&escuchar_sem);
 					break;
 				case COPIAR_BLOQUE_NODO:
 					sem_post(&consola_sem);
