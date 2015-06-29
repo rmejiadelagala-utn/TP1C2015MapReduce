@@ -267,14 +267,14 @@ char* aparear_registros(char* datos_archivo){
 	int i;
 
 	reg_archivo = string_split(datos_archivo, "\n");
-	copiar_datos = malloc (TAM_BLOQUE);
+	copiar_datos = malloc (BLKSIZE);
 
 	strcpy(copiar_datos, reg_archivo[0]);
 
 	for(i = 0; reg_archivo[i]!= NULL; i++){
 
 		if ((strcmp(reg_archivo[i],copiar_datos)) <= 0){
-			copiar_datos = malloc (TAM_BLOQUE);
+			copiar_datos = malloc (BLKSIZE);
             		strcpy(copiar_datos, reg_archivo[i]);
 		}
 
