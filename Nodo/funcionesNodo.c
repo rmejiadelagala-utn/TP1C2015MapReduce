@@ -161,12 +161,19 @@ void crearScriptMapper(const char* codigo_script){
 
 	FILE* scriptMapper;
 
-	if((scriptMapper=fopen("/home/utnso/mapper.sh","w+"))==NULL){
+	if((scriptMapper=fopen("/tmp/mapper.sh","w+"))==NULL){
 		perror("Error al crear el script del mapper");
 		exit(1);
 	}
 
 	fputs(codigo_script,scriptMapper);
+	
+	char *permisosCommand = string_new();
+
+	string_append(&permisosCommand, "chmod u+x ");
+	string_append(&permisosCommand,"/tmp/reduce.pl");
+
+	system(permisosCommand);
 	fclose(scriptMapper);
 
 	return;
@@ -189,8 +196,8 @@ void crearScriptReduce(const char* codigo_script){
 //	}
 
 
-	if((scriptReduce=fopen("/home/utnso/reduce.pl","w+"))==NULL){
-		perror("Error al crear el script del mapper");
+	if((scriptReduce=fopen("/tmp/reduce.pl","w+"))==NULL){
+		perror("Error al crear el script del Reduce");
 		exit(1);
 	}
 
@@ -200,6 +207,14 @@ void crearScriptReduce(const char* codigo_script){
 //	}
 
 	fputs(codigo_script,scriptReduce);
+	
+	char *permisosCommand = string_new();
+
+	string_append(&permisosCommand, "chmod u+x ");
+	string_append(&permisosCommand,"/tmp/reduce.pl");
+
+	system(permisosCommand);
+	
 	fclose(scriptReduce);
 
 	return;
