@@ -12,12 +12,12 @@
 
 #define TAM_BLOQUE 1093
 
-char* path_a = "PruebaMap3.txt";
 void ejecutarMapper(char*, char*, char*);
 void ejecutarReduce(char*, char*, char*);
 int redireccionar_stdin_stdout(char*,char*,char*);
 char* aparear_registros(char*);
 
+char* path_a = "PruebaMap3.txt";
 
 int main (void) {
 
@@ -41,7 +41,9 @@ int main (void) {
 	memcpy(copiar_datos, arch_mapeado, TAM_BLOQUE);
 	copiar_datos = aparear_registros(copiar_datos);
 
-	ejecutarReduce("/home/utnso/reduce.pl", "/tmp/tempReduce1.txt", copiar_datos);
+	ejecutarReduce("/tmp/reduce.pl", "/tmp/tempReduce1.txt", copiar_datos);
+	free(copiar_datos);
+	free(arch_mapeado);
 
 	return 0;
 
@@ -65,7 +67,6 @@ int redireccionar_stdin_stdout(char *pathPrograma,char *pathArchivoSalida,char* 
 		free(comando);
 	}
 	else{
-
 		printf("No se pudo ejecutar el programa!");
 		return -1;
 	}
@@ -102,10 +103,10 @@ char* aparear_registros(char* datos_archivo){
 
 		if ((strcmp(reg_archivo[i],copiar_datos)) <= 0){
 			copiar_datos = malloc (TAM_BLOQUE);
-            strcpy(copiar_datos, reg_archivo[i]);
+            		strcpy(copiar_datos, reg_archivo[i]);
 		}
 
 	}
     strcat(copiar_datos, "\n");
-	  return copiar_datos;
+    return copiar_datos;
 }
