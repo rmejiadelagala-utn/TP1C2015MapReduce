@@ -22,5 +22,9 @@ char* obtenerNombreArchivo(char*);
 char* getFileContent(char*, char *);
 void crearScriptMapper(const char*);
 void crearScriptReduce(const char*);
+void ejecutarMapper(char*, char*, char*);
+void ejecutarReduce(char*, char*, char*);
+int redireccionar_stdin_stdout(char*,char*,char*);
+char* aparear_registros(char*);
 
 #endif /* FUNCIONESNODO_H_ */
