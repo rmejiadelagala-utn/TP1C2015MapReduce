@@ -505,10 +505,21 @@ void *interaccionFSNodo(void* sock_ptr) {
 				printf("Hubo un problema al escribir el archivo.");
 			break;
 		case GET_BLOQUE:
+			recibido = recvall(socket, &protocolo, 4);
 			recibirBloqueDeNodo(socket, (void*) &buffer);
-			write(fileno(archivoReconstruido), buffer, strlen(buffer));
-			free(buffer);
-			sem_post(&semaforo);
+				switch(protocolo){
+				case COPIAR_ARCHIVO_A_FS_LOCAL:
+					write(fileno(archivoReconstruido), buffer, strlen(buffer));
+					free(buffer);
+					sem_post(&semaforo);
+					break;
+				case VER_BLOQUE_NODO:
+					printf("\n\n%s\n\n",buffer);
+					fflush(stdout);
+					write(fileno(archivoReconstruido), buffer, strlen(buffer));
+					free(buffer);
+					break;
+				}
 			break;
 		case CONEXION_MARTA_A_FS:
 			printf("Hola Marta!\n");

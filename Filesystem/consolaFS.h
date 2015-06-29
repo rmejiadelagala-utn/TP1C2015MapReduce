@@ -22,7 +22,7 @@ void moverDirectorio(char *directorio, char* padre);
 void copiarAMDFS(char *archivo, char *archivoACopiar);
 void copiarAFS(char *archivo);
 void solicitarMD5(char *archivo);
-void verBloque(char *bloque);
+void verBloque(char *bloque, char* numeroDeBloque);
 void eliminarBloque(char *bloque);
 void copiarBloque(char* bloque);
 void levantarNodo(char *nodo);

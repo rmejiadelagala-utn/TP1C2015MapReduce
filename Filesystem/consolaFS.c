@@ -106,8 +106,8 @@ int consola(void* unListaNodo) {
 			solicitarMD5(comandoSeparado[1]);
 			break;
 		case VER_BLOQUE:
-			if(comprobarParametros(1,comandoSeparado)==1)
-			verBloque(comandoSeparado[1]);
+			if(comprobarParametros(2,comandoSeparado)==1)
+			verBloque(comandoSeparado[1],comandoSeparado[2]);
 			break;
 		case ELIMINAR_BLOQUE:
 			if(comprobarParametros(1,comandoSeparado)==1)
@@ -291,8 +291,21 @@ void solicitarMD5(char *archivo) {
 	validarArchivoYEjecutar(archivo, (void*)pedirMD5);
 }
 
-void verBloque(char *bloque) {
-	printf("Vee el Bloque nro %s\n", bloque);
+void verBloque(char *archivo, char *numeroBloque) {
+
+	int nroBloque=atoi(numeroBloque);
+	void pedirBloque(t_archivo *unArchivo){
+		archivoReconstruido = fopen("../Archivos/bloqueObtenido","w");
+		t_bloqueArch* bloqueDeArchivo = list_get(unArchivo->bloquesDeArch,nroBloque);
+		t_bloqueEnNodo* bloqueEnNodo = list_get(bloqueDeArchivo->copiasDeBloque,1);
+		int ipPuertoCoincide(t_nodo *unNodo) {
+					return (unNodo->id == bloqueEnNodo->id);
+				}
+		t_nodo *nodoEncontrado = list_find(listaNodos, (void*) ipPuertoCoincide);
+		pedirBloqueANodo(nodoEncontrado->socket,bloqueEnNodo->numeroDeBloqueEnNodo,VER_BLOQUE_NODO);
+	}
+
+	validarArchivoYEjecutar(archivo, (void*)pedirBloque);
 }
 
 void eliminarBloque(char *bloque) {

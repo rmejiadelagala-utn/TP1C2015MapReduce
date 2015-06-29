@@ -150,8 +150,9 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		memcpy(buffer+4,infoNodo,sizeof(t_nodoParaFS));
 		return sendall(socket, buffer, tamanioAEnviar);
 	}
-	int enviarBloqueAFileSystem(int socket, char* dataBin){
+	int enviarBloqueAFileSystem(int socket, char* dataBin, int funcionARealizar){
 		t_buffer* buffer = crearBufferConProtocolo(GET_BLOQUE);
+		bufferAgregarInt(buffer,funcionARealizar);
 		bufferAgregarString(buffer,dataBin,strlen(dataBin)+1);
 		return enviarBuffer(buffer,socket);
 	}
@@ -165,8 +166,9 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		int resultado = enviarBuffer(buffer,socket);
 		return resultado;
 	}
-	int pedirBloqueANodo(int socket, int numeroDeBloque){
+	int pedirBloqueANodo(int socket, int numeroDeBloque, int protocoloDeRegreso){
 		t_buffer* buffer = crearBufferConProtocolo(GET_BLOQUE);
+		bufferAgregarInt(buffer,protocoloDeRegreso);
 		bufferAgregarInt(buffer,numeroDeBloque);
 		int resultado = enviarBuffer(buffer,socket);
 		return resultado;
@@ -278,9 +280,11 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		return enviarBuffer(buffer,socket);
 	}
 	int getBloqueParaFileSystem(int socket,char* dataBin, int block_size){
+		int protocoloDeRegreso;
+		recvall(socket,&protocoloDeRegreso,4);
 		int nroBloque;
 		recvall(socket,&nroBloque,4);
-		return enviarBloqueAFileSystem(socket, dataBin+(nroBloque*block_size));
+		return enviarBloqueAFileSystem(socket, dataBin+(nroBloque*block_size),protocoloDeRegreso);
 	}
 //Marta
 	//De Filesystem

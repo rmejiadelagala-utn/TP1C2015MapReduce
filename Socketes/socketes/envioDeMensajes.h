@@ -68,7 +68,7 @@ enum protocolos {
 	CONEXION_NODO_A_FS, CONEXION_MARTA_A_FS, SET_BLOQUE, GET_BLOQUE, RTA_SET_BLOQUE, DISCONNECTED,
 	MAP_OK, NODO_NOT_FOUND, ORDER_MAP, MARTA_ACTUALIZA_EL_REGISTRO, ENVIO_BLOQUEARCH_A_MARTA,
 	MARTA_SE_CAYO_UN_NODO,ORDER_REDUCE, FIN_OPERACION,CONEXION_JOB_A_NODO,RES_MAP,RES_REDUCE,OK_MAP,OK_REDUCE,
-	NOTOK_MAP,NOTOK_REDUCE
+	NOTOK_MAP,NOTOK_REDUCE,COPIAR_ARCHIVO_A_FS_LOCAL,VER_BLOQUE_NODO
 };
 
 //Primitivas
@@ -101,14 +101,14 @@ int enviarBuffer(t_buffer* buffer, int socket);
 	//A FileSystem
 	int presentarseAlFileSystem(t_nodoParaFS* infoNodo, int socket);
 
-	int enviarBloqueAFileSystem(int socket, char* dataBin);
+	int enviarBloqueAFileSystem(int socket, char* dataBin, int funcionARealizar);
 
 //FileSystem
 	//A Nodo
 
 	int enviarBloqueANodo(int socket, int numeroDeBloque, char* dataBloque,int comienzoBloque, int tamanio);
 
-	int pedirBloqueANodo(int socket, int numeroDeBloque);
+	int pedirBloqueANodo(int socket, int numeroDeBloque, int protocoloDeRegreso);
 
 	//A Marta
 	int enviarCopiasAMarta(int socket, t_list* copias);

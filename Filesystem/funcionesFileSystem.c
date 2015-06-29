@@ -701,7 +701,7 @@ int obtenerArchivo(t_archivo *archivo) {
 		}
 	t_nodo *nodoEncontrado = list_find(listaNodos, (void*) ipPuertoCoincide);
 	if(!nodoEncontrado) return -1;
-	pedirBloqueANodo(nodoEncontrado->socket,bloque->numeroDeBloqueEnNodo);
+	pedirBloqueANodo(nodoEncontrado->socket,bloque->numeroDeBloqueEnNodo,COPIAR_ARCHIVO_A_FS_LOCAL);
 	sem_wait(&semaforo);
 	}
 	list_iterate(archivo->bloquesDeArch, (void *) obtenerBloque);
