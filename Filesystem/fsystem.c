@@ -472,7 +472,6 @@ void *interaccionFSNodo(void* sock_ptr) {
 				unRegistro->puerto = infoNodo->PUERTO_NODO;
 				list_add(listaRegistrosIDIP, unRegistro);
 				actualizarRegistro(unRegistro, infoNodo->IP_NODO, infoNodo->PUERTO_NODO);
-				printf("\n\n");
 				break;
 
 			case NODO_NUEVO_Y_TENGO_SU_ID:
