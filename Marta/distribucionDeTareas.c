@@ -74,27 +74,18 @@ t_CopiaDeBloque* elegirMejorNodoParaMap(t_list* copiasDeBloque) {
 int buscarBloquesEnFS(/*t_InfoJob infoDeJob,*/ uint32_t idArchivo,
 		uint32_t numeroDeBloque, t_list* copiasDeBloque) {
 
-
-
-	pthread_t pedirBloques_thread;
-	printf("creo thread :D\n");
+	dameBloqueArchFS(socketDeFS, "unArchivo", 1, 2);
+	sem_wait(&funcionesMarta);
+	copiasDeBloque = list_create();
+	recibirBloqueArchFS(socketDeFS, copiasDeBloque);
+	void mostrarBloque(t_bloqueEnNodo* unBloque) {
+		printf("ID bloque:%d\nNumero de bloque:%d\n", unBloque->id, unBloque->numeroDeBloqueEnNodo);
+		fflush(stdout);
+	}
+	list_iterate(copiasDeBloque, (void*) mostrarBloque);
+	printf("El tamaño de la lista es %d",list_size(copiasDeBloque));
 	fflush(stdout);
-	int *new_sock;
-	new_sock = malloc(sizeof(int));
-
-    *new_sock = crearCliente(config_get_string_value(config,"IP_FS"),config_get_int_value(config,"PUERTO_FS"));
-
-
-	printf("EL SOCKET AUXILIAR ES %d",*new_sock);
-	printf("creo socket auxiliar :D\n");
-	fflush(stdout);
-	printf("Voy a crear un thread:D\n");
-	fflush(stdout);
-	if( pthread_create( &pedirBloques_thread , NULL ,  recibirBloque , (void*) new_sock) < 0)
-	                {
-	                    perror("could not create thread");
-	                    return 1;
-	                }
+	sem_post(&interaccionFS);
 	return 1;	//1 salió bien, <= 0 no lo encontró
 }
 //planifica un map de los que tiene que hacer el job

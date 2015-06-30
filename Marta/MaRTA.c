@@ -17,6 +17,8 @@ int main(/*int argc, char *argv[]*/) {
 	int serv; //socket servidor
 	pthread_t thr;
 	pthread_t thr_fs;
+	sem_init(&funcionesMarta,0,0);
+	sem_init(&interaccionFS,0,0);
 
 
 	/*if (argc != 2){

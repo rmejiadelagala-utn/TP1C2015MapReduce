@@ -115,7 +115,7 @@ void serializer_y_send_solicitud(int sock, t_solicitud* solicitud) {
 	cursor+=strlen(solicitud->archivo_resultado);
 	memcpy(payload + cursor, &solicitud->combiner, sizeof(uint32_t));
 
-	if ((nbytes=send(sock, payload,tam_paquete+sizeof(uint32_t) , 0)) < 0) {
+	if ((nbytes=sendall(sock, payload,tam_paquete+sizeof(uint32_t))) < 0) {
 					perror("error en el send del paquete a MaRTA");
 					exit(1);
 	}

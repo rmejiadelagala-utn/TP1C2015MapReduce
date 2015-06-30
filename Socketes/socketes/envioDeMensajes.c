@@ -188,6 +188,8 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		return enviarBuffer(buffer,socket);
 	}
 	int enviarCopiasAMarta(int socket, t_list* copias){
+		int protocolo=ENVIO_BLOQUEARCH_A_MARTA;
+		sendall(socket,&protocolo,sizeof(int));
 
 		int cantidad = list_size(copias);
 		sendall(socket,&cantidad,sizeof(int));

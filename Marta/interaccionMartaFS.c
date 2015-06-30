@@ -49,24 +49,11 @@ void* interaccionMartaFS(void* sock){
 			list_iterate(listaRegistrosIDIP,(void*)mostrarRegistro);
 			fflush(stdout);
 			break;
+		case ENVIO_BLOQUEARCH_A_MARTA:
+			sem_post(&funcionesMarta);
+
+			sem_wait(&interaccionFS);
 		}
 	}
 
 }
-void* recibirBloque(void* sock){
-			printf("entro a recibirBloque :D\n");
-			fflush(stdout);
-			int socket= *(int*)sock;
-			dameBloqueArchFS(socket,"unArchivo",1,2);
-			 //FIXME deshardcodear
-			t_list* copiasDeBloque=list_create();
-			recibirBloqueArchFS(socket,copiasDeBloque);
-			void mostrarBloque(t_bloqueEnNodo* unBloque){
-				printf("ID bloque:%d\nNumero de bloque:%d\n",unBloque->id,unBloque->numeroDeBloqueEnNodo);
-				fflush(stdout);
-			}
-			list_iterate(copiasDeBloque,(void*)mostrarBloque);
-			printf("El tamaño de la lista es %d",list_size(copiasDeBloque));
-			fflush(stdout);
-			return 1;
-		}

@@ -65,6 +65,10 @@ void deserealizar(char* buffer, int sockCliente) {
 		cursor+=long_arch;
 		memcpy(&solicitud.combiner,payload + cursor,  sizeof(uint32_t));
 		printf("%s\n",solicitud.archivo_resultado);
+		//Pido al FileSystem los bloques en los que esta el archivo
+
+
+
 		free(bufftmp);
 	}
 
