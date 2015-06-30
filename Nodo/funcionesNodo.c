@@ -171,7 +171,7 @@ void crearScriptMapper(const char* codigo_script){
 	char *permisosCommand = string_new();
 
 	string_append(&permisosCommand, "chmod u+x ");
-	string_append(&permisosCommand,"/tmp/reduce.pl");
+	string_append(&permisosCommand,"/tmp/mapper.sh");
 
 	system(permisosCommand);
 	fclose(scriptMapper);
@@ -181,9 +181,9 @@ void crearScriptMapper(const char* codigo_script){
 
 void crearScriptReduce(const char* codigo_script){
 
-	FILE* fd;
+//	FILE* fd;
 	FILE* scriptReduce;
-	char texto[100];
+//	char texto[100];
 
 //	if((fd =fopen("/home/utnso/Escritorio/TPSO-2015/reduce.pl","r"))==NULL){
 //		perror("Error al abrir el script del reduce");
@@ -214,7 +214,6 @@ void crearScriptReduce(const char* codigo_script){
 	string_append(&permisosCommand,"/tmp/reduce.pl");
 
 	system(permisosCommand);
-	
 	fclose(scriptReduce);
 
 	return;
