@@ -6,13 +6,22 @@
  */
 
 #include "job.h"
+#include<stdint.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<commons/config.h>
+#include<socketes/servidor.h>
+#include<socketes/envioDeMensajes.h>
+#include<stdbool.h>
+#include <pthread.h>
 
 int recibirResultadoFromNodo(int sockNodo){
 		uint32_t recibido, protocolo, rptaNodoAJob;
 		if((recibido=recvall(sockNodo,&protocolo,sizeof(uint32_t)))<0){
 			return -1;
 		}
-		if(protocolo=RES_MAP){
+		if(protocolo==RES_MAP){
 			recvall(sockNodo,&rptaNodoAJob,sizeof(uint32_t));
 		}else {
 			printf("no entiendo el protocolo, usa: RES_MAP");
@@ -20,7 +29,7 @@ int recibirResultadoFromNodo(int sockNodo){
 		return rptaNodoAJob;
 	}
 
-int responderOrdenMapAMarta(int sockMarta,t_ordenMap ordenMapper, uint32_t resOper){
+int responderOrdenMapAMarta(int sockMarta,t_ordenMap ordenMapper, int resOper){
 	int result_envio;
 	t_buffer* buffer = crearBufferConProtocolo(RES_MAP);
 	if(resOper==OK_MAP){
@@ -70,7 +79,7 @@ void* hilo_mapper (void* arg_thread){
 	//re-enviar a marta resultado de la operacion, recibida de Nodo
 	envioRes=responderOrdenMapAMarta(sockMarta,ordenMapper,resOper);
 	if(envioRes<0){
-		printf("no pude enviar la respuesta a marta, algo pasó\n")
+		printf("no pude enviar la respuesta a marta, algo pasó\n");
 	}
 	return NULL;
 }
@@ -80,12 +89,23 @@ void crearHiloMapper(int sockMarta, char* codMapper) {
 	t_ordenMap *ordenMapper;
 	t_arg_hilo_map* arg_thread;
 	ordenMapper=recibirOrdenMapDeMarta(sockMarta);
+	//Muestro lo que recibo de marta
+	printf("Muestro lo que recibo de marta\n");
+	printf("id_map:%d\n",ordenMapper->id_map);
+	printf("id_nodo:%d\n",ordenMapper->id_nodo);
+	printf("ip_nodo:%d\n",ordenMapper->ip_nodo);
+	struct in_addr addr;
+	addr.s_addr=ordenMapper->ip_nodo;
+	printf("muestro ip en formato de numeros y puntos: %s\n",inet_ntoa(addr));
+	printf("puerto_nodo:%d\n",ordenMapper->puerto_nodo);
+	printf("tmp_arch: %s\n",ordenMapper->temp_file_name);
 	arg_thread=(t_arg_hilo_map*)malloc(sizeof(t_arg_hilo_map));
 	arg_thread->sockMarta=sockMarta;
 	arg_thread->rutinaMapper=strdup(codMapper);
 	arg_thread->ordenMapper=ordenMapper;
 
 	pthread_create (&thread_map, NULL, &hilo_mapper, (void*)arg_thread);
+	return ;
 }
 
 /*

@@ -33,7 +33,7 @@ int main(int argc,char *argv[]) {
 //	Enviar solicitud de procesamiento a MaRTA
 	serializer_y_send_solicitud(sockMarta, solicitud);
 	printf("termine de enviar solicitud a MaRTA\n");
-	printf("iniciare mapper y reducers");
+	printf("iniciare mapper y reducers\n");
 //	cargar estructura rutinas para procesar ordenes de MaRTA
 	*rutinas=cargarEstructuraRutinas(info_config);
 /*	recepciono las ordenes de MaRTA y mando los hilos al Nodo

@@ -56,14 +56,16 @@ uint32_t cantidadArchivosToProcesar(t_solicitud* sol){
 uint32_t tamanioBufferSerializar(t_solicitud* sol) {
 	int i=0;
 	size_t tam;
-	tam=sizeof(uint32_t);//reserva 4bytes para el campo tam_arch_result
-	tam+= strlen(sol->archivo_resultado);//reserva tam_arch_result bytes
-	tam += sizeof(sol->combiner); //reserva 4 bytes para el campo combiner
+	tam=sizeof(uint32_t); //4 bytes para campo cant_arch_a_proc
 	while(sol->archivos[i] != 0){
 		tam+=sizeof(uint32_t); //reserva 4 bytes para el campo tam_arch1,2,3 etc
 		tam+= strlen(sol->archivos[i]);// reserva tam_arch bytes para el campo nombre_arch
 		i++;
 	}
+	tam+=sizeof(uint32_t);//reserva 4bytes para el campo tam_arch_result
+	tam+= strlen(sol->archivo_resultado);//reserva tam_arch_result bytes
+	tam += sizeof(sol->combiner); //reserva 4 bytes para el campo combiner
+	printf("tmamaño del baffer calculado en tamaniBufferSerializar: %d\n",tam);
 	return (uint32_t)tam;
 }
 
