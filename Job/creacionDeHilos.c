@@ -90,7 +90,7 @@ void crearHiloMapper(int sockMarta, char* codMapper) {
 	t_arg_hilo_map* arg_thread;
 	ordenMapper=recibirOrdenMapDeMarta(sockMarta);
 	//Muestro lo que recibo de marta
-	printf("Muestro lo que recibo de marta");
+	printf("Muestro lo que recibo de marta\n");
 	printf("id_map:%d\n",ordenMapper->id_map);
 	printf("id_nodo:%d\n",ordenMapper->id_nodo);
 	printf("ip_nodo:%d\n",ordenMapper->ip_nodo);
@@ -105,6 +105,7 @@ void crearHiloMapper(int sockMarta, char* codMapper) {
 	arg_thread->ordenMapper=ordenMapper;
 
 	pthread_create (&thread_map, NULL, &hilo_mapper, (void*)arg_thread);
+	return ;
 }
 
 /*
