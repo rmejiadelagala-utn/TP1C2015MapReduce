@@ -65,6 +65,25 @@ void deserealizar(char* buffer, int sockCliente) {
 		cursor+=long_arch;
 		memcpy(&solicitud.combiner,payload + cursor,  sizeof(uint32_t));
 		printf("%s\n",solicitud.archivo_resultado);
+		//Pido al FileSystem los bloques en los que esta el archivo
+		/*t_InfoJob* info_job = malloc(sizeof(t_InfoJob));
+		info_job->combiner=solicitud.combiner;
+		//info_job.idJob= TODO, de donde saco la id del job?
+		info_job->pathDeResultado=strdup("uno");
+		int j;
+		for(j=0;j<cant_arch;j++){
+			info_job->pathsDeArchivos[j]=malloc(20);
+		info_job->pathsDeArchivos[j]=strdup("dos");
+		}*/
+		t_list* listaDeArchivos = obtenerIDyCantBloquesDeArchivosDelFS(solicitud.archivos,cant_arch);
+		void mostrarCantidadDeBloquesPorArchivo(t_InfoArchivo* unaInfoArchivo){
+			printf("\nRecibi un archivo con %d bloques.",unaInfoArchivo->cantidadDeBloques);
+		}
+		printf("\nLa lista de archivos es de tamaño %d",list_size(listaDeArchivos));
+		list_iterate(listaDeArchivos,mostrarCantidadDeBloquesPorArchivo);
+		//planificarTodosLosMaps(info_job, listaDeArchivos,listaTemporal, sockCliente);
+
+
 		free(bufftmp);
 	}
 

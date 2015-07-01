@@ -11,7 +11,6 @@
 #include "MaRTA.h"
 
 void* interaccionMartaFS();
-void* recibirBloque(void* sock);
 
 
 #endif /* INTERACCIONMARTA_H_*/

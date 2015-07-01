@@ -68,7 +68,7 @@ enum protocolos {
 	CONEXION_NODO_A_FS, CONEXION_MARTA_A_FS, SET_BLOQUE, GET_BLOQUE, RTA_SET_BLOQUE, DISCONNECTED,
 	MAP_OK, NODO_NOT_FOUND, ORDER_MAP, MARTA_ACTUALIZA_EL_REGISTRO, ENVIO_BLOQUEARCH_A_MARTA,
 	MARTA_SE_CAYO_UN_NODO,ORDER_REDUCE, FIN_OPERACION,CONEXION_JOB_A_NODO,RES_MAP,RES_REDUCE,OK_MAP,OK_REDUCE,
-	NOTOK_MAP,NOTOK_REDUCE,COPIAR_ARCHIVO_A_FS_LOCAL,VER_BLOQUE_NODO, COPIAR_BLOQUE_NODO
+	NOTOK_MAP,NOTOK_REDUCE,COPIAR_ARCHIVO_A_FS_LOCAL,VER_BLOQUE_NODO, COPIAR_BLOQUE_NODO, DAME_LISTA_DE_ARCHIVOS_FS
 };
 
 //Primitivas
@@ -85,7 +85,7 @@ void bufferAgregarChar(t_buffer* buffer, char unChar);
 
 void bufferAgregarString(t_buffer* buffer,char* unString, int tamanio);
 
-void buffer_add_string(t_buffer* self, char *string_to_add);
+char* recibirString(int socket);
 
 int recibirIntEnOrden(int socket, uint32_t *numero);
 
@@ -119,12 +119,12 @@ int enviarBuffer(t_buffer* buffer, int socket);
 
 //Marta
 	//A FileSystem
-	int dameBloqueArchFS(int socket,char *nombreArchivo , int padre, int numeroBloqueArch);
-
 	int presentarseMartaAlFileSystem(int socket);
 	
 	int dameBloqueArchFS(int socket,char *nombreArchivo , int padre, int numeroBloqueArch);
 	
+	int dameListaArchFS(int socket,char **archivos, int cantArchivos);
+
 //Job
 	//A Nodo
 	int enviarMapperANodo(int socket, char* mapper, int nroDeBloqueNodo, char* nombreArchivoTmp );
@@ -136,6 +136,11 @@ int enviarBuffer(t_buffer* buffer, int socket);
 	t_nodoParaFS* conocerAlNodo(int socket);
 
 	int recibirBloqueDeNodo(int socket, void* buffer);
+
+	//De Marta
+	t_bloqueDeArchPedido* recibirPedidoDeBloqueArch(int socket);
+
+	t_list* recibirPedidoListaArchivos(int socket);
 
 //Nodo
 	//De FileSystem

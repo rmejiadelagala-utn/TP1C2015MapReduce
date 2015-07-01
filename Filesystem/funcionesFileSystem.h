@@ -20,6 +20,8 @@ int nodoEstaActivo (t_registro_id_ipPuerto* unRegistro);
  */
 void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos);
 
+void enviarCantBloquesDeArch(char* unArchivo,int socket);
+
 /*
  * @NAME: setBloque
  * @DESC: envia el dataBloque al nodo para que lo almacene, se le pasa el tamanio del bloque y en donde comienza (por si el bloque es solo una parte de un archivo mapeado a memoria. Luego, guarda el archivo en la lista de copias del bloque de archivo.
@@ -157,6 +159,8 @@ void renombrarDirectorioConNombre(char *nombre,t_directorio *unDirectorio);
  */
 void moverDirectorioConPadre(int padre,t_directorio *unDirectorio);
 int obtenerArchivo(t_archivo *archivo);
+
+t_bloqueEnNodo* encontrarBloqueDisponible(t_list* copiasDelBloque);
 
 /**
  * @NAME: eliminarDirectorioYContenido

@@ -17,6 +17,9 @@ int main(/*int argc, char *argv[]*/) {
 	int serv; //socket servidor
 	pthread_t thr;
 	pthread_t thr_fs;
+	sem_init(&funcionesMarta,0,0);
+	sem_init(&interaccionFS,0,0);
+	listaTemporal = list_create();
 
 
 	/*if (argc != 2){
@@ -33,14 +36,6 @@ int main(/*int argc, char *argv[]*/) {
 	pthread_create(&thr_fs, NULL, interaccionMartaFS, (void*) &socketDeFS );
 
 //	scanf(stdin);
-	sleep(2);
-	printf("Ahora le voy a pedir unos bloques al FS");
-	fflush(stdout);
-	sleep(2);
-	buscarBloquesEnFS(/*t_InfoJob infoDeJob,*/ 1,
-			3, copiasDeBloque);
-
-
 
 	testear();
 
