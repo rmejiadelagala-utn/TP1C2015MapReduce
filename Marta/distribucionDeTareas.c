@@ -36,6 +36,7 @@ void liberarCopiaDeBloque(t_CopiaDeBloque* self) {
 }
 
 t_CopiaDeBloque* elegirMejorNodoParaMap(t_list* copiasDeBloque) {
+	printf("La lista que me llego tiene tamanio: %d\n",list_size(copiasDeBloque));
 
 	t_CargaNodo* cargaNodo;
 	t_CargaNodo* cargaNodoOtroBloque;
@@ -68,11 +69,14 @@ t_CopiaDeBloque* elegirMejorNodoParaMap(t_list* copiasDeBloque) {
 	list_sort(copiasDeBloque, (void*) compararNodosPorMenorCarga);
 
 	//elijo la primera de las copias de la lista ordena por menor carga.
+	printf("La lista AHORA tiene tamanio: %d\n",list_size(copiasDeBloque));
+	t_CopiaDeBloque* copiaElegida = list_get(copiasDeBloque,0);
+	printf("La copia elegida tiene id %d\n",copiaElegida->id_nodo);
 	return list_get(copiasDeBloque, 0);
 }
 
 int buscarBloquesEnFS(t_InfoJob infoDeJob, uint32_t idArchivo,
-		uint32_t numeroDeBloque, t_list* copiasDeBloque) {
+		uint32_t numeroDeBloque, t_list *copiasDeBloque) {
 
 	printf("El id del archivo es %d\n",idArchivo);
 	printf("El nombre del archivo es %s\n",infoDeJob.pathsDeArchivos[idArchivo]);
@@ -82,15 +86,24 @@ int buscarBloquesEnFS(t_InfoJob infoDeJob, uint32_t idArchivo,
 	printf("Me pongo a esperar en el semaforo.\n");
 	sem_wait(&funcionesMarta);
 	printf("Me desperte.\n");
-	copiasDeBloque = list_create();
-	recibirBloqueArchFS(socketDeFS, copiasDeBloque);
-	void mostrarBloque(t_bloqueEnNodo* unBloque) {
-		printf("ID bloque:%d\nNumero de bloque:%d\n", unBloque->id, unBloque->numeroDeBloqueEnNodo);
+	t_list* copias = list_create();
+	recibirBloqueArchFS(socketDeFS, copias);
+	void deBloqueEnNodoACopiaDeBloque(t_bloqueEnNodo* bloqueEnNodo){
+		t_CopiaDeBloque* copiaDeBloque = malloc(sizeof(t_CopiaDeBloque));
+		copiaDeBloque->block=bloqueEnNodo->numeroDeBloqueEnNodo;
+		copiaDeBloque->id_nodo=bloqueEnNodo->id;
+		list_add(copiasDeBloque,copiaDeBloque);
+	}
+	list_iterate(copias,(void*)deBloqueEnNodoACopiaDeBloque);
+	//copiasDeBloque = list_map(copias,deBloqueEnNodoACopiaDeBloque);
+	void mostrarBloque(t_CopiaDeBloque* unBloque) {
+		printf("ID bloque:%d\nNumero de bloque:%d\n", unBloque->id_nodo, unBloque->block);
 		fflush(stdout);
 	}
 	list_iterate(copiasDeBloque, (void*) mostrarBloque);
-	printf("El tamaño de la lista es %d",list_size(copiasDeBloque));
+	printf("El tamaño de la lista es %d\n",list_size(copiasDeBloque));
 	fflush(stdout);
+	list_destroy_and_destroy_elements(copias,free);
 	sem_post(&interaccionFS);
 	return 1;	//1 salió bien, <= 0 no lo encontró
 }
@@ -113,17 +126,21 @@ t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 		return NULL;
 	}
 
+	printf("Voy a buscar la mejor copia\n");
 	//Selecciona la copia de bloque que está en el nodo que menos trabajo tiene
 	copiaSeleccionada = elegirMejorNodoParaMap(copiasDeBloque);
+
+	t_registro_id_ipPuerto* unRegistro = buscarRegistroPorId(copiaSeleccionada->id_nodo);
 
 	self = malloc(sizeof(t_DestinoMap));
 	self->id_map = ++(*ultimoIDMap);
 	self->id_nodo = copiaSeleccionada->id_nodo;
-	self->ip_nodo = copiaSeleccionada->ip_nodo;
-	self->puerto_nodo = copiaSeleccionada->puerto_nodo;
+	self->ip_nodo = unRegistro->ip.s_addr;
+	self->puerto_nodo = unRegistro->puerto;
 	self->block = copiaSeleccionada->block;
 	self->temp_file_name = string_from_format("map_%i_%i.temp", infoDeJob.idJob,
 			self->block);
+	printf("Pude armar bien el self :D \n");
 
 	list_destroy_and_destroy_elements(copiasDeBloque,
 			(void *) liberarCopiaDeBloque);
