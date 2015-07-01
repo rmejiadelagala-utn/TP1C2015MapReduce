@@ -20,7 +20,6 @@ void* interaccionMartaFS(void* sock){
 	void mostrarRegistro(t_registro_id_ipPuerto* unRegistro){
 		printf("ID: %d.--------------IP: %s. Puerto: %d\n",unRegistro->id,inet_ntoa(unRegistro->ip),unRegistro->puerto);
 	}
-	pthread_mutex_lock(&mutexConexionFS);
 	while ((recibido=recvall(socket,&protocolo,4))>0) {
 		switch (protocolo) {
 		fflush(stdout);

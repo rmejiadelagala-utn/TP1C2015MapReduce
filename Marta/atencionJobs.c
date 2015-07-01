@@ -78,6 +78,7 @@ void deserealizar(char* buffer, int sockCliente) {
 		t_list* listaDeArchivos = obtenerIDyCantBloquesDeArchivosDelFS(solicitud.archivos,cant_arch);
 		void mostrarCantidadDeBloquesPorArchivo(t_InfoArchivo* unaInfoArchivo){
 			printf("\nRecibi un archivo con %d bloques.",unaInfoArchivo->cantidadDeBloques);
+			fflush(stdout);
 		}
 		printf("\nLa lista de archivos es de tamaño %d",list_size(listaDeArchivos));
 		list_iterate(listaDeArchivos,mostrarCantidadDeBloquesPorArchivo);

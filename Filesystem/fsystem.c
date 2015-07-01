@@ -557,6 +557,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 
 			break;
 		case DAME_LISTA_DE_ARCHIVOS_FS:
+			sendall(socket,&protocolo,sizeof(int)); //Le respondo con el mismo protocolo
 			listaArchivosPedidos = recibirPedidoListaArchivos(socket); //IRA UN MALLOC ANTES DE ESTO?
 			void mandarCantidadDeBloquesDeArchivo(char* unArchivo){
 				enviarCantBloquesDeArch(unArchivo,socket);
