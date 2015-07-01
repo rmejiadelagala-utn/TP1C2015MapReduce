@@ -36,6 +36,7 @@ int main(int argc,char *argv[]) {
 	printf("iniciare mapper y reducers\n");
 //	cargar estructura rutinas para procesar ordenes de MaRTA
 	*rutinas=cargarEstructuraRutinas(info_config);
+	fflush(stdout);
 /*	recepciono las ordenes de MaRTA y mando los hilos al Nodo
  	hasta que se me indique que finalizo todas las operaciones */
 	result=procesarOrdenesDeMarta(sockMarta,rutinas);

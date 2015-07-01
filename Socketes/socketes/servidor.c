@@ -53,7 +53,7 @@ int crearCliente(char *ip, uint16_t port) {
 	}
 
 	printf("Conectado con server en %s:%d\n", ip, port);
-
+	fflush(stdout);
 	return sock;
 }
 

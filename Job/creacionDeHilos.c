@@ -51,6 +51,7 @@ void* hilo_mapper (void* arg_thread){
 	char* tmp_file_name;
 	char* codigoMapper;
 	sockMarta=ordenToNodo.sockMarta;
+	printf("El path del codigo mapper es %s",ordenToNodo.rutinaMapper);
 	codigoMapper=subirCodigoDeMapper(ordenToNodo.rutinaMapper);
 	ordenMapper=*(ordenToNodo.ordenMapper);
 	tmp_file_name=strdup(ordenMapper.temp_file_name);
@@ -64,6 +65,7 @@ void* hilo_mapper (void* arg_thread){
 	char* ip_nodo_char="127.0.0.1";
 	sockNodo= crearCliente(ip_nodo_char,puerto_nodo);
 	//Enviamos rutina mapper a Nodo
+	fflush(stdout);
 	res=enviarMapperANodo(sockNodo,codigoMapper,block,tmp_file_name);
 	if(res<0){
 		printf("todo mal, no pude enviar mapper a Nodo: %d", ip_nodo);
@@ -102,9 +104,11 @@ void crearHiloMapper(int sockMarta, char* codMapper) {
 	arg_thread=(t_arg_hilo_map*)malloc(sizeof(t_arg_hilo_map));
 	arg_thread->sockMarta=sockMarta;
 	arg_thread->rutinaMapper=strdup(codMapper);
+	int tamanioDeLaOrden = sizeof(t_ordenMap) + strlen(ordenMapper->temp_file_name);
+	arg_thread->ordenMapper=malloc(tamanioDeLaOrden);
 	arg_thread->ordenMapper=ordenMapper;
 
-	pthread_create (&thread_map, NULL, &hilo_mapper, (void*)arg_thread);
+	pthread_create (&thread_map, NULL, hilo_mapper, (void*)arg_thread);
 	return ;
 }
 

@@ -163,7 +163,7 @@ int ordenarMapAJob(t_DestinoMap* destinoDeMap, int socket) {
 	bufferAgregarInt(map_order, destinoDeMap->block);
 	bufferAgregarString(map_order, destinoDeMap->temp_file_name,strlen(destinoDeMap->temp_file_name)+1);
 
-	result = enviarBuffer(socket, map_order);
+	result = enviarBuffer(map_order, socket);
 
 	if (result < 0) {
 		printf("No se Pudo enviar la Orden de Map al Job");
