@@ -103,6 +103,14 @@ void bufferAgregarString(t_buffer* buffer,char* unString, int tamanio){
 
 }
 
+char* recibirString(int socket){
+	int tamanioString;
+	recvall(socket,&tamanioString,sizeof(int));
+	char* string=malloc(tamanioString);
+	recvall(socket,string,tamanioString);
+	return string;
+}
+
 int recibirIntEnOrden(int socket, uint32_t *numero) {
 	int resultado;
 
@@ -221,6 +229,14 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		return enviarBuffer(buffer, socket);
 		return 1;
 	}
+	int dameListaArchFS(int socket,char **archivos, int cantArchivos){
+		t_buffer* buffer = crearBufferConProtocolo(DAME_LISTA_DE_ARCHIVOS_FS);
+		bufferAgregarInt(buffer,cantArchivos);
+		int i;
+		for(i=0;i<cantArchivos;i++) bufferAgregarString(buffer,archivos[i],strlen(archivos[i]));
+		int resultado = enviarBuffer(buffer,socket);
+		return resultado;
+	}
 //Job
 	//A Nodo
 	int enviarMapperANodo(int socket, char* mapper, int nroDeBloqueNodo, char* nombreArchivoTmp ){
@@ -262,6 +278,17 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		recvall(socket,&bloque->padre,sizeof(int));
 		recvall(socket,&bloque->numeroDeBloqueArch,sizeof(int));
 		return bloque;
+	}
+	t_list* recibirPedidoListaArchivos(int socket){
+		int cantArchivos;
+		recvall(socket,&cantArchivos,sizeof(int));
+		int i;
+		t_list* archivosPedidos=list_create();
+		for(i=0;i<cantArchivos;i++){
+			char* archivoPedido = recibirString(socket);
+			list_add(archivosPedidos,archivoPedido);
+		}
+		return archivosPedidos;
 	}
 //Nodo
 	//De FileSystem

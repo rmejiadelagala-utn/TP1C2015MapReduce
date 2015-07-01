@@ -454,6 +454,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 	t_registro_id_ipPuerto* unRegistro = malloc(sizeof(t_registro_id_ipPuerto));
 	int condicionDeConexionNodo;
 	t_list *copias;
+	t_list* listaArchivosPedidos;
 	while ((recibido = recvall(socket, &protocolo, 4)) > 0) {
 		switch (protocolo) {
 		case CONEXION_NODO_A_FS:
@@ -554,6 +555,14 @@ void *interaccionFSNodo(void* sock_ptr) {
 			}
 			//TODO completar esta funcion
 
+			break;
+		case DAME_LISTA_DE_ARCHIVOS_FS:
+			listaArchivosPedidos = recibirPedidoListaArchivos(socket); //IRA UN MALLOC ANTES DE ESTO?
+			void mandarCantidadDeBloquesDeArchivo(char* unArchivo){
+				enviarCantBloquesDeArch(unArchivo,socket);
+			}
+			list_iterate(listaArchivosPedidos,mandarCantidadDeBloquesDeArchivo);
+			list_destroy_and_destroy_elements(listaArchivosPedidos,free);
 			break;
 		}
 	}

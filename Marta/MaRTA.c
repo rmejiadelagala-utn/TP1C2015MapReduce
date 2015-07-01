@@ -19,6 +19,7 @@ int main(/*int argc, char *argv[]*/) {
 	pthread_t thr_fs;
 	sem_init(&funcionesMarta,0,0);
 	sem_init(&interaccionFS,0,0);
+	listaTemporal = list_create();
 
 
 	/*if (argc != 2){

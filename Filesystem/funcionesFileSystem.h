@@ -158,6 +158,8 @@ void renombrarDirectorioConNombre(char *nombre,t_directorio *unDirectorio);
 void moverDirectorioConPadre(int padre,t_directorio *unDirectorio);
 int obtenerArchivo(t_archivo *archivo);
 
+t_bloqueEnNodo* encontrarBloqueDisponible(t_list* copiasDelBloque);
+
 /**
  * @NAME: eliminarDirectorioYContenido
  * @DESC: elimina un Directorio eliminando todo su contenido

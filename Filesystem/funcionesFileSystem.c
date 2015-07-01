@@ -92,6 +92,7 @@ int nodoEstaActivo (t_registro_id_ipPuerto* unRegistro){
  * e imprimir por pantalla que el archivo esta mal formateado. Y el otro es cuando de verdad esta buscando /n
  * y hay un /n tambien tira segment fault. Por lo cual es importante arreglarlo
  */
+
 int mandarBloquesANodos(char* data, int* cantidadBloquesEnviados,
 
 		t_list** listaDeBloques) {
@@ -155,6 +156,18 @@ int mandarBloquesANodos(char* data, int* cantidadBloquesEnviados,
 	}
 	return 1;
 }
+
+void enviarCantBloquesDeArch(char* nombreArchivo, int socket) {
+	int protocolo=DAME_LISTA_DE_ARCHIVOS_FS;
+	sendall(socket,&protocolo,sizeof(int));
+	void enviarBloquesDeArchivo(t_archivo* unArchivo) {
+		int cantidad = list_size(unArchivo->bloquesDeArch);
+		sendall(socket, &cantidad, sizeof(int));
+	}
+	validarArchivoYEjecutar(nombreArchivo, (void*) enviarBloquesDeArchivo);
+}
+
+
 
 int setBloque(t_nodo* nodo, char* dataBloque, int tamanio, int comienzoDeBloque,t_list *copias){
 	int posicionEnNodo;
@@ -716,7 +729,12 @@ int obtenerArchivo(t_archivo *archivo) {
 
 			if(huboError) return -1;
 
-			t_bloqueEnNodo *bloque = list_get(bloqueDeArchivo->copiasDeBloque, 0);
+			t_bloqueEnNodo *bloque = encontrarBloqueDisponible(bloqueDeArchivo->copiasDeBloque);
+
+			if(!bloque) {
+				huboError=1;
+				return -1;
+			}
 
 			t_nodo *nodoEncontrado = buscarNodoPorId(bloque->id, listaNodos);
 
@@ -733,6 +751,14 @@ int obtenerArchivo(t_archivo *archivo) {
 	list_iterate(archivo->bloquesDeArch, (void *) obtenerBloque);
 
 	return !huboError;
+}
+
+t_bloqueEnNodo* encontrarBloqueDisponible(t_list* copiasDelBloque){
+	int bloqueEstaDisponible(t_bloqueEnNodo* unBloque){
+		t_nodo* nodoDelBloque = buscarNodoPorId(unBloque->id,listaNodos);
+		return nodoDelBloque->activo;
+	}
+	return list_find(copiasDelBloque, bloqueEstaDisponible);
 }
 
 static void recorrerCopiasDeUnArch(t_archivo *unArchivo,

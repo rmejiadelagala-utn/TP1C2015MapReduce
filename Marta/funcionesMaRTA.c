@@ -14,6 +14,20 @@ t_registro_id_ipPuerto* buscarRegistroPorId(int id) {
 	return unReg != NULL ? unReg : NULL;
 }
 
+t_list* obtenerIDyCantBloquesDeArchivosDelFS(char** archivos,int cantidadArchivos){
+	dameListaArchFS(socketDeFS,archivos,cantidadArchivos);
+	sem_wait(&funcionesMarta);
+	t_list* listaArchivos = list_create();
+	int i;
+	for (i=0;i<cantidadArchivos;i++){
+		t_InfoArchivo* infoArchivo= malloc(sizeof(t_InfoArchivo));
+		recvall(socketDeFS,&(infoArchivo->cantidadDeBloques),sizeof(int));
+		list_add(listaArchivos,infoArchivo);
+	}
+	return listaArchivos;
+	sem_post(&interaccionFS);
+}
+
 /******************************************/
 /********* PRIVATE FUNCTIONS **************/
 /******************************************/

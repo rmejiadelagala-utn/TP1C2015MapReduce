@@ -53,6 +53,11 @@ void* interaccionMartaFS(void* sock){
 			sem_post(&funcionesMarta);
 
 			sem_wait(&interaccionFS);
+			break;
+		case DAME_LISTA_DE_ARCHIVOS_FS:
+			sem_post(&funcionesMarta);
+
+			sem_wait(&interaccionFS);
 		}
 	}
 
