@@ -140,7 +140,6 @@ t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 	self->block = copiaSeleccionada->block;
 	self->temp_file_name = string_from_format("map_%i_%i.temp", infoDeJob.idJob,
 			self->block);
-	printf("Pude armar bien el self :D \n");
 
 	list_destroy_and_destroy_elements(copiasDeBloque,
 			(void *) liberarCopiaDeBloque);
@@ -165,6 +164,7 @@ int ordenarMapAJob(t_DestinoMap* destinoDeMap, int socket) {
 
 	result = enviarBuffer(map_order, socket);
 
+
 	if (result < 0) {
 		printf("No se Pudo enviar la Orden de Map al Job");
 	}
@@ -177,7 +177,7 @@ int recibirResultadoDeMap(int sockjob, t_ResultadoMap* resultadoMap) {
 	resultadoMap->prot = recibirProtocoloEnOrden(sockjob);
 
 	switch (resultadoMap->prot) {
-	case MAP_OK:
+	case OK_MAP:
 		printf("Map realizado con exito");
 		break;
 
@@ -309,10 +309,14 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 			destinoMap = planificarMap(info_job, infoArchivo->idArchivo, j,
 					&ultimoIDMap);
 
+
+
 			//Si obtiene un destino, le ordena al job realizar el map en ese destino
 			resultado =
 					(destinoMap != NULL) ?
 							ordenarMapAJob(destinoMap, sockjob) : -2;
+
+
 
 			if (resultado > 0) {
 				//agrega a la lista de maps pendientes ese map, con la info
@@ -321,7 +325,9 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 				agregarMapPendiente(listaMapsPendientes, infoArchivo, j,
 						destinoMap);
 
+
 			} else {
+
 				//elemina todos los maps pendientes, porque no se puede realizar
 				//este job
 				list_destroy_and_destroy_elements(listaMapsPendientes,

@@ -26,13 +26,14 @@ int sendall(int socket, void *mensaje, size_t tamanio){
 	    while(total < tamanio) {
 	        bytesSent = send(socket, mensaje+total, bytesleft, 0);
 	        if (bytesSent == -1) { break; }
+	        if (bytesSent == 0) { break; }
 	        total += bytesSent;
 	        bytesleft -= bytesSent;
 	    }
 
 	    tamanio = total; // return number actually sent here
 
-	    return bytesSent==-1?-1:0; // return -1 on failure, 0 on success
+	    return (bytesSent<1) ?-1:bytesSent; // return -1 on failure, 0 on success
 
 }
 
