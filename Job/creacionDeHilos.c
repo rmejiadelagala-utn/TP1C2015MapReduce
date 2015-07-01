@@ -27,6 +27,7 @@ int recibirResultadoFromNodo(int sockNodo){
 			printf("no entiendo el protocolo, usa: RES_MAP");
 		}
 		return rptaNodoAJob;
+
 	}
 
 int responderOrdenMapAMarta(int sockMarta,t_ordenMap ordenMapper, int resOper){

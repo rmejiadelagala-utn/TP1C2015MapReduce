@@ -240,8 +240,9 @@ int enviarBuffer(t_buffer* buffer, int socket){
 //Job
 	//A Nodo
 	int enviarMapperANodo(int socket, char* mapper, int nroDeBloqueNodo, char* nombreArchivoTmp ){
-		t_buffer* buffer = crearBufferConProtocolo(CONEXION_JOB_A_NODO);
-		bufferAgregarInt(buffer,ORDER_MAP);
+		//t_buffer* buffer = crearBufferConProtocolo(CONEXION_JOB_A_NODO);
+		//bufferAgregarInt(buffer,ORDER_MAP);
+		t_buffer* buffer = crearBufferConProtocolo(ORDER_MAP);
         bufferAgregarString(buffer,mapper,strlen(mapper)+1);
 		bufferAgregarInt(buffer,nroDeBloqueNodo);
         bufferAgregarString(buffer,nombreArchivoTmp,strlen(nombreArchivoTmp)+1);

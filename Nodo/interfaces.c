@@ -97,6 +97,25 @@ void* conexionFS(void* arg){
 void* conexionJobs(void* sockJobNodo){
 
 	int sock_in = *(int*)sockJobNodo;
+	int recibido;
+	int protocolo;
+	char* unString;
+	int nroBloque;
+	while(recibido=recvall(sock_in,&protocolo,sizeof(int))>1){
+		switch(protocolo){
+		case ORDER_MAP:
+			//Dejo que el nodo conteste que todo esta bien por ahora, despues hay que hacer el map aca
+
+			printf("Recibi una orden de map, esta todo OK.\n");
+			unString=recibirString(sock_in);
+			recvall(sock_in,&nroBloque,sizeof(int));
+			unString=recibirString(sock_in);
+			protocolo=RES_MAP;
+			sendall(sock_in,&protocolo,sizeof(int));
+			protocolo=OK_MAP;
+			sendall(sock_in,&protocolo,sizeof(int));
+		}
+	}
 
 
 	return 0;
