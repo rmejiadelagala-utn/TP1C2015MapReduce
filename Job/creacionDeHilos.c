@@ -51,7 +51,7 @@ void* hilo_mapper (void* arg_thread){
 	char* tmp_file_name;
 	char* codigoMapper;
 	sockMarta=ordenToNodo.sockMarta;
-	codigoMapper=strdup(ordenToNodo.rutinaMapper);
+	codigoMapper=subirCodigoDeMapper(ordenToNodo.rutinaMapper);
 	ordenMapper=*(ordenToNodo.ordenMapper);
 	tmp_file_name=strdup(ordenMapper.temp_file_name);
 	block=ordenMapper.block;

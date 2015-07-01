@@ -69,6 +69,7 @@ t_rutinas cargarEstructuraRutinas(t_config_job*);
 int procesarOrdenesDeMarta(int , t_rutinas* );
 int recibirResultadoFromNodo(int sockNodo);
 int responderOrdenMapAMarta(int sockMarta, t_ordenMap ordenMapper,int resOper);
+char* subirCodigoDeMapper(char* path);
 
 #endif /* JOB_H_ */
 
