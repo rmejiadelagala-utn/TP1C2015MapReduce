@@ -36,8 +36,6 @@ int main(/*int argc, char *argv[]*/) {
 	pthread_create(&thr_fs, NULL, interaccionMartaFS, (void*) &socketDeFS );
 
 
-//	scanf(stdin);
-
 	testear();
 
 	pthread_join(thr,NULL);

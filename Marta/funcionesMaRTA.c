@@ -25,8 +25,8 @@ t_list* obtenerIDyCantBloquesDeArchivosDelFS(char** archivos,int cantidadArchivo
 		infoArchivo->idArchivo=i;
 		list_add(listaArchivos,infoArchivo);
 	}
-	return listaArchivos;
 	sem_post(&interaccionFS);
+	return listaArchivos;
 }
 
 /******************************************/

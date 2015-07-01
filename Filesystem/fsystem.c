@@ -539,7 +539,6 @@ void *interaccionFSNodo(void* sock_ptr) {
 			//TODO esta bien
 			break;
 		case ENVIO_BLOQUEARCH_A_MARTA:
-			sendall(socket,&protocolo,sizeof(int));
 			infoBloquePedido = recibirPedidoDeBloqueArch(socket);
 			copias = list_create();
 			resultado = encontrarCopias(infoBloquePedido->nombreArch, infoBloquePedido->padre,

@@ -77,6 +77,7 @@ int buscarBloquesEnFS(t_InfoJob infoDeJob, uint32_t idArchivo,
 	printf("El id del archivo es %d\n",idArchivo);
 	printf("El nombre del archivo es %s\n",infoDeJob.pathsDeArchivos[idArchivo]);
 	printf("El numero de bloque es %d\n",numeroDeBloque);
+	printf("El socket del file system es %d",socketDeFS);
 	dameBloqueArchFS(socketDeFS, infoDeJob.pathsDeArchivos[idArchivo], 1, numeroDeBloque);
 	printf("Me pongo a esperar en el semaforo.\n");
 	sem_wait(&funcionesMarta);
