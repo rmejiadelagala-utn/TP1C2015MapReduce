@@ -161,6 +161,8 @@ void enviarCantBloquesDeArch(char* nombreArchivo, int socket) {
 	int protocolo=DAME_LISTA_DE_ARCHIVOS_FS;
 	sendall(socket,&protocolo,sizeof(int));
 	void enviarBloquesDeArchivo(t_archivo* unArchivo) {
+		printf("Voy a mandar el archivo %s\n",unArchivo->nombre);
+		fflush(stdout);
 		int cantidad = list_size(unArchivo->bloquesDeArch);
 		sendall(socket, &cantidad, sizeof(int));
 	}
