@@ -22,6 +22,7 @@ t_list* obtenerIDyCantBloquesDeArchivosDelFS(char** archivos,int cantidadArchivo
 	for (i=0;i<cantidadArchivos;i++){
 		t_InfoArchivo* infoArchivo= malloc(sizeof(t_InfoArchivo));
 		recvall(socketDeFS,&(infoArchivo->cantidadDeBloques),sizeof(int));
+		infoArchivo->idArchivo=i;
 		list_add(listaArchivos,infoArchivo);
 	}
 	return listaArchivos;

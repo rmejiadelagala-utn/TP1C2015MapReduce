@@ -71,11 +71,16 @@ t_CopiaDeBloque* elegirMejorNodoParaMap(t_list* copiasDeBloque) {
 	return list_get(copiasDeBloque, 0);
 }
 
-int buscarBloquesEnFS(/*t_InfoJob infoDeJob,*/ uint32_t idArchivo,
+int buscarBloquesEnFS(t_InfoJob infoDeJob, uint32_t idArchivo,
 		uint32_t numeroDeBloque, t_list* copiasDeBloque) {
 
-	dameBloqueArchFS(socketDeFS, "unArchivo", 1, 2);
+	printf("El id del archivo es %d\n",idArchivo);
+	printf("El nombre del archivo es %s\n",infoDeJob.pathsDeArchivos[idArchivo]);
+	printf("El numero de bloque es %d\n",numeroDeBloque);
+	dameBloqueArchFS(socketDeFS, infoDeJob.pathsDeArchivos[idArchivo], 1, numeroDeBloque);
+	printf("Me pongo a esperar en el semaforo.\n");
 	sem_wait(&funcionesMarta);
+	printf("Me desperte.\n");
 	copiasDeBloque = list_create();
 	recibirBloqueArchFS(socketDeFS, copiasDeBloque);
 	void mostrarBloque(t_bloqueEnNodo* unBloque) {
@@ -98,7 +103,7 @@ t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 	t_list* copiasDeBloque = list_create();
 
 	//TODO falta implementar buscarBloquesEnFS
-	if (buscarBloquesEnFS(/*infoDeJob,*/ idArchivo, numeroDeBloque, copiasDeBloque)
+	if (buscarBloquesEnFS(infoDeJob, idArchivo, numeroDeBloque, copiasDeBloque)
 			<= 0) {
 		printf("No se encontraron las copias del Archivo: %i, Bloque: %i",
 				idArchivo, numeroDeBloque);
@@ -282,6 +287,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 			//Aca dada la información que le manda job, la info del primer
 			//archivo de la lista de archivos a mapear, elige el destino del map
 			//Al que debe mandar hacer ese map
+			printf("Planifico el map para el archivo de id %d",infoArchivo->idArchivo);
 			destinoMap = planificarMap(info_job, infoArchivo->idArchivo, j,
 					&ultimoIDMap);
 

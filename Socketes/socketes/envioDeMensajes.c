@@ -198,6 +198,7 @@ int enviarBuffer(t_buffer* buffer, int socket){
 	int enviarCopiasAMarta(int socket, t_list* copias){
 		int protocolo=ENVIO_BLOQUEARCH_A_MARTA;
 		sendall(socket,&protocolo,sizeof(int));
+		printf("Mande el protocolo: %d.\n",protocolo);
 
 		int cantidad = list_size(copias);
 		sendall(socket,&cantidad,sizeof(int));
@@ -217,15 +218,14 @@ int enviarBuffer(t_buffer* buffer, int socket){
 			t_buffer* buffer = crearBufferConProtocolo(CONEXION_MARTA_A_FS);
 			return enviarBuffer(buffer,socket);
 		}
-	int dameBloqueArchFS(int socket,char *nombreArchivo , int padre, int numeroBloqueArch){
+	int dameBloqueArchFS(int socket,char *nombreArchivo, int padre, int numeroBloqueArch){
 		printf("entro a dameBloqueArh:D\n" );
+		printf("Voy a agregar el string %s\n",nombreArchivo);
 		fflush(stdout);
 		t_buffer *buffer = crearBufferConProtocolo(ENVIO_BLOQUEARCH_A_MARTA);
 		bufferAgregarString(buffer, nombreArchivo, strlen(nombreArchivo)+1);
 		bufferAgregarInt(buffer,padre);
 		bufferAgregarInt(buffer, numeroBloqueArch);
-		printf("socket antes de enviar es %d :D\n", socket);
-		fflush(stdout);
 		return enviarBuffer(buffer, socket);
 		return 1;
 	}

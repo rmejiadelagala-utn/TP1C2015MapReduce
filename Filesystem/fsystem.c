@@ -539,6 +539,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 			//TODO esta bien
 			break;
 		case ENVIO_BLOQUEARCH_A_MARTA:
+			sendall(socket,&protocolo,sizeof(int));
 			infoBloquePedido = recibirPedidoDeBloqueArch(socket);
 			copias = list_create();
 			resultado = encontrarCopias(infoBloquePedido->nombreArch, infoBloquePedido->padre,
@@ -550,7 +551,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 				printf("No existe ese numero De Bloque En Archivo \n");
 			}
 			else {
-				printf("Voy a entrar a enviar copia");
+				printf("Voy a entrar a enviar copia al socket %d\n",socket);
 				enviarCopiasAMarta(socket,copias);
 			}
 			//TODO completar esta funcion
