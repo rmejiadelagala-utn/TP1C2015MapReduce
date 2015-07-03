@@ -47,29 +47,27 @@ void* hilo_mapper (void* arg_thread){
 	t_arg_hilo_map ordenToNodo;
 	t_ordenMap ordenMapper;
 	ordenToNodo= *((t_arg_hilo_map*)arg_thread);
-	int sockMarta,sockNodo, ip_nodo, puerto_nodo,block,res,envioRes;
+	int sockMarta,sockNodo, puerto_nodo,block,res,envioRes;
 	int resOper; //resultado de la operación de mapper
 	char* tmp_file_name;
 	char* codigoMapper;
+	char* ip_nodo_char;
 	sockMarta=ordenToNodo.sockMarta;
-	printf("El path del codigo mapper es %s",ordenToNodo.rutinaMapper);
-	codigoMapper=subirCodigoDeMapper(ordenToNodo.rutinaMapper);
+	printf("El path del codigo mapper es %s\n",ordenToNodo.pathMapper);
+	codigoMapper=subirCodigoDeMapper(ordenToNodo.pathMapper);
 	ordenMapper=*(ordenToNodo.ordenMapper);
 	tmp_file_name=strdup(ordenMapper.temp_file_name);
 	block=ordenMapper.block;
-	ip_nodo=ordenMapper.ip_nodo;
 	puerto_nodo=ordenMapper.puerto_nodo;
-
-	//Me conecto a nodo
-	//para que pueda funcionar creo esta variable ip, ya que me la estan
-	//pasando como entero y necesito para mis funciones un char
-	char* ip_nodo_char="127.0.0.1";
+	struct in_addr addr;
+	addr.s_addr=ordenMapper.ip_nodo;
+	ip_nodo_char= inet_ntoa(addr);
 	sockNodo= crearCliente(ip_nodo_char,puerto_nodo);
 	//Enviamos rutina mapper a Nodo
 	fflush(stdout);
 	res=enviarMapperANodo(sockNodo,codigoMapper,block,tmp_file_name);
 	if(res<0){
-		printf("todo mal, no pude enviar mapper a Nodo: %d", ip_nodo);
+		printf("todo mal, no pude enviar mapper a Nodo: %d", ip_nodo_char);
 		exit(-1);
 	}
 	//recibir resultado de la Operacion mapper desde el Nodo
@@ -87,7 +85,7 @@ void* hilo_mapper (void* arg_thread){
 	return NULL;
 }
 
-void crearHiloMapper(int sockMarta, char* codMapper) {
+void crearHiloMapper(int sockMarta, char* pathMapper) {
 	pthread_t thread_map;
 	t_ordenMap *ordenMapper;
 	t_arg_hilo_map* arg_thread;
@@ -104,7 +102,7 @@ void crearHiloMapper(int sockMarta, char* codMapper) {
 	printf("tmp_arch: %s\n",ordenMapper->temp_file_name);
 	arg_thread=(t_arg_hilo_map*)malloc(sizeof(t_arg_hilo_map));
 	arg_thread->sockMarta=sockMarta;
-	arg_thread->rutinaMapper=strdup(codMapper);
+	arg_thread->pathMapper=strdup(pathMapper);
 	int tamanioDeLaOrden = sizeof(t_ordenMap) + strlen(ordenMapper->temp_file_name);
 	arg_thread->ordenMapper=malloc(tamanioDeLaOrden);
 	arg_thread->ordenMapper=ordenMapper;
