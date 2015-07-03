@@ -101,7 +101,7 @@ void* conexionJobs(void* sockJobNodo){
 	int protocolo;
 	char* unString;
 	int nroBloque;
-	while(recibido=recvall(sock_in,&protocolo,sizeof(int))>1){
+	while((recibido=recvall(sock_in,&protocolo,sizeof(int)))>1){
 		switch(protocolo){
 		case ORDER_MAP:
 			//Dejo que el nodo conteste que todo esta bien por ahora, despues hay que hacer el map aca
