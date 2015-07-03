@@ -53,7 +53,7 @@ typedef struct{
 
 typedef struct {
 	int sockMarta;
-	char* rutinaMapper;
+	char* pathMapper;
 	t_ordenMap* ordenMapper;
 	} t_arg_hilo_map;
 
