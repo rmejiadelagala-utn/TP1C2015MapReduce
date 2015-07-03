@@ -65,7 +65,6 @@ uint32_t tamanioBufferSerializar(t_solicitud* sol) {
 	tam+=sizeof(uint32_t);//reserva 4bytes para el campo tam_arch_result
 	tam+= strlen(sol->archivo_resultado);//reserva tam_arch_result bytes
 	tam += sizeof(sol->combiner); //reserva 4 bytes para el campo combiner
-	printf("tmamaño del baffer calculado en tamaniBufferSerializar: %d\n",tam);
 	return (uint32_t)tam;
 }
 
