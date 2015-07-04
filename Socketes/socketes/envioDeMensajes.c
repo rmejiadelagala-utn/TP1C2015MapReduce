@@ -351,5 +351,6 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		recvall(sockMarta,&temp_file_len,sizeof(uint32_t));
 		ordenMap->temp_file_name= malloc(temp_file_len);
 		recvall(sockMarta,ordenMap->temp_file_name,temp_file_len);
+		ordenMap->temp_file_name[temp_file_len]='\0';//cierro el string
 		return ordenMap;
 	}
