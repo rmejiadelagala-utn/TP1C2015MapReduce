@@ -15,8 +15,6 @@
 #include "socketes/envioDeMensajes.h"
 #include "MaRTA.h"
 
-
-
 void liberarDestinoMap(t_DestinoMap* self);
 void liberarMapPendiente(t_MapPendiente* self);
 int recibirResultadoDeMap(int sockjob, t_ResultadoMap* resultadoMap);
@@ -36,7 +34,8 @@ void liberarCopiaDeBloque(t_CopiaDeBloque* self) {
 }
 
 t_CopiaDeBloque* elegirMejorNodoParaMap(t_list* copiasDeBloque) {
-	printf("La lista que me llego tiene tamanio: %d\n",list_size(copiasDeBloque));
+	printf("La lista que me llego tiene tamanio: %d\n",
+			list_size(copiasDeBloque));
 
 	t_CargaNodo* cargaNodo;
 	t_CargaNodo* cargaNodoOtroBloque;
@@ -69,41 +68,44 @@ t_CopiaDeBloque* elegirMejorNodoParaMap(t_list* copiasDeBloque) {
 	list_sort(copiasDeBloque, (void*) compararNodosPorMenorCarga);
 
 	//elijo la primera de las copias de la lista ordena por menor carga.
-	printf("La lista AHORA tiene tamanio: %d\n",list_size(copiasDeBloque));
-	t_CopiaDeBloque* copiaElegida = list_get(copiasDeBloque,0);
-	printf("La copia elegida tiene id %d\n",copiaElegida->id_nodo);
+	printf("La lista AHORA tiene tamanio: %d\n", list_size(copiasDeBloque));
+	t_CopiaDeBloque* copiaElegida = list_get(copiasDeBloque, 0);
+	printf("La copia elegida tiene id %d\n", copiaElegida->id_nodo);
 	return list_get(copiasDeBloque, 0);
 }
 
 int buscarBloquesEnFS(t_InfoJob infoDeJob, uint32_t idArchivo,
 		uint32_t numeroDeBloque, t_list *copiasDeBloque) {
 
-	printf("El id del archivo es %d\n",idArchivo);
-	printf("El nombre del archivo es %s\n",infoDeJob.pathsDeArchivos[idArchivo]);
-	printf("El numero de bloque es %d\n",numeroDeBloque);
-	printf("El socket del file system es %d",socketDeFS);
-	dameBloqueArchFS(socketDeFS, infoDeJob.pathsDeArchivos[idArchivo], 1, numeroDeBloque);
+	printf("El id del archivo es %d\n", idArchivo);
+	printf("El nombre del archivo es %s\n",
+			infoDeJob.pathsDeArchivos[idArchivo]);
+	printf("El numero de bloque es %d\n", numeroDeBloque);
+	printf("El socket del file system es %d", socketDeFS);
+	dameBloqueArchFS(socketDeFS, infoDeJob.pathsDeArchivos[idArchivo], 1,
+			numeroDeBloque);
 	printf("Me pongo a esperar en el semaforo.\n");
 	sem_wait(&funcionesMarta);
 	printf("Me desperte.\n");
 	t_list* copias = list_create();
 	recibirBloqueArchFS(socketDeFS, copias);
-	void deBloqueEnNodoACopiaDeBloque(t_bloqueEnNodo* bloqueEnNodo){
+	void deBloqueEnNodoACopiaDeBloque(t_bloqueEnNodo* bloqueEnNodo) {
 		t_CopiaDeBloque* copiaDeBloque = malloc(sizeof(t_CopiaDeBloque));
-		copiaDeBloque->block=bloqueEnNodo->numeroDeBloqueEnNodo;
-		copiaDeBloque->id_nodo=bloqueEnNodo->id;
-		list_add(copiasDeBloque,copiaDeBloque);
+		copiaDeBloque->block = bloqueEnNodo->numeroDeBloqueEnNodo;
+		copiaDeBloque->id_nodo = bloqueEnNodo->id;
+		list_add(copiasDeBloque, copiaDeBloque);
 	}
-	list_iterate(copias,(void*)deBloqueEnNodoACopiaDeBloque);
+	list_iterate(copias, (void*) deBloqueEnNodoACopiaDeBloque);
 	//copiasDeBloque = list_map(copias,deBloqueEnNodoACopiaDeBloque);
 	void mostrarBloque(t_CopiaDeBloque* unBloque) {
-		printf("ID bloque:%d\nNumero de bloque:%d\n", unBloque->id_nodo, unBloque->block);
+		printf("ID bloque:%d\nNumero de bloque:%d\n", unBloque->id_nodo,
+				unBloque->block);
 		fflush(stdout);
 	}
 	list_iterate(copiasDeBloque, (void*) mostrarBloque);
-	printf("El tamaño de la lista es %d\n",list_size(copiasDeBloque));
+	printf("El tamaño de la lista es %d\n", list_size(copiasDeBloque));
 	fflush(stdout);
-	list_destroy_and_destroy_elements(copias,free);
+	list_destroy_and_destroy_elements(copias, free);
 	sem_post(&interaccionFS);
 	return 1;	//1 salió bien, <= 0 no lo encontró
 }
@@ -130,7 +132,8 @@ t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 	//Selecciona la copia de bloque que está en el nodo que menos trabajo tiene
 	copiaSeleccionada = elegirMejorNodoParaMap(copiasDeBloque);
 
-	t_registro_id_ipPuerto* unRegistro = buscarRegistroPorId(copiaSeleccionada->id_nodo);
+	t_registro_id_ipPuerto* unRegistro = buscarRegistroPorId(
+			copiaSeleccionada->id_nodo);
 
 	self = malloc(sizeof(t_DestinoMap));
 	self->id_map = ++(*ultimoIDMap);
@@ -160,10 +163,10 @@ int ordenarMapAJob(t_DestinoMap* destinoDeMap, int socket) {
 	bufferAgregarInt(map_order, destinoDeMap->ip_nodo);
 	bufferAgregarInt(map_order, destinoDeMap->puerto_nodo);
 	bufferAgregarInt(map_order, destinoDeMap->block);
-	bufferAgregarString(map_order, destinoDeMap->temp_file_name,strlen(destinoDeMap->temp_file_name)+1);
+	bufferAgregarString(map_order, destinoDeMap->temp_file_name,
+			strlen(destinoDeMap->temp_file_name) + 1);
 
 	result = enviarBuffer(map_order, socket);
-
 
 	if (result < 0) {
 		printf("No se Pudo enviar la Orden de Map al Job");
@@ -258,11 +261,11 @@ void borrarMapPendiente(t_list* mapsPendientes, uint32_t idMap,
 
 	t_MapTemporal* temp_map = malloc(sizeof(t_MapTemporal));
 
-	temp_map->id_temp = ++(*ultimoIdTemporal);
+	temp_map->idMapTemporal = ++(*ultimoIdTemporal);
 	temp_map->path = strdup(mapPendiente->map_dest->temp_file_name);
 	temp_map->id_nodo = mapPendiente->map_dest->id_nodo;
-	temp_map->id_file_origin = mapPendiente->file->idArchivo;
-	temp_map->block_origin = mapPendiente->block;
+	temp_map->idArchivoOrigen = mapPendiente->file->idArchivo;
+	temp_map->bloqueOrigen = mapPendiente->block;
 
 	list_add(listaTemporal, temp_map);
 
@@ -305,18 +308,15 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 			//Aca dada la información que le manda job, la info del primer
 			//archivo de la lista de archivos a mapear, elige el destino del map
 			//Al que debe mandar hacer ese map
-			printf("Planifico el map para el archivo de id %d",infoArchivo->idArchivo);
+			printf("Planifico el map para el archivo de id %d",
+					infoArchivo->idArchivo);
 			destinoMap = planificarMap(info_job, infoArchivo->idArchivo, j,
 					&ultimoIDMap);
-
-
 
 			//Si obtiene un destino, le ordena al job realizar el map en ese destino
 			resultado =
 					(destinoMap != NULL) ?
 							ordenarMapAJob(destinoMap, sockjob) : -2;
-
-
 
 			if (resultado > 0) {
 				//agrega a la lista de maps pendientes ese map, con la info
@@ -324,7 +324,6 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 
 				agregarMapPendiente(listaMapsPendientes, infoArchivo, j,
 						destinoMap);
-
 
 			} else {
 
@@ -395,3 +394,104 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 			(void *) liberarMapPendiente);
 	return 1;
 }
+
+ordenarReduceAJob(int idNodoDondeAplicarReduce, t_list* destinosDeReduce) {
+
+	//todo Al final hacer liberacion de memoria de la lista destinosDeRecuce
+}
+
+int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
+
+	int idJobAlQueAplica = infoJob.idJob;
+
+	if (infoJob.combiner == 1) {	//Con combiner
+
+	} else //Sin combiner
+	{
+		//funciones auxiliares dentro del sin combiner
+		int obtenerIdJobDelMapTemporal(t_MapTemporal* unMapTemporal) {
+
+			char** archivoTemporalSeparadoPorGuionBajo;
+
+			archivoTemporalSeparadoPorGuionBajo = string_split(
+					unMapTemporal->path, "_");
+
+			char* stringIdJob = archivoTemporalSeparadoPorGuionBajo[1];
+
+			return atoi(stringIdJob);
+		}
+
+		bool temporalesDelJobTrabajado(t_MapTemporal* unMapTemporal) {
+			return idJobAlQueAplica == obtenerIdJobDelMapTemporal(unMapTemporal);
+		}
+
+		int mejorNodoDondeAplicarReduceSinCombiner(t_list *mapsTemporales) { //XXX testear. Puede fallar feo
+			int maxTemporalesPorNodo = 0;
+			int idMejorNodo = -1;
+			int cantidadDeApariciones = 0;
+
+			void elegirNodoConMasTemporales(t_MapTemporal unMapTemporal) {
+
+				bool apareceNodoAEvaluar(t_MapTemporal otroMapTemporal) {
+					return otroMapTemporal.id_nodo == unMapTemporal.id_nodo;
+				}
+
+				cantidadDeApariciones = list_count_satisfying(mapsTemporales,
+						(void*) apareceNodoAEvaluar);
+
+				if (cantidadDeApariciones > maxTemporalesPorNodo) {
+					idMejorNodo = unMapTemporal.id_nodo;
+					maxTemporalesPorNodo = cantidadDeApariciones;
+					cantidadDeApariciones = 0;
+				}
+
+			}
+
+			list_iterate(mapsTemporales, (void*) elegirNodoConMasTemporales);
+
+			return idMejorNodo; //si devuelve -1, no selecciono ningun nodo. Error de algoritmo
+		}
+
+		//fin funciones auxiliares
+
+		t_list* mapsTemporalesDeLosArchivosDelJob = list_filter(
+				listaMapsTemporales, (void*) temporalesDelJobTrabajado);
+
+		int idNodoDondeAplicarReduce = mejorNodoDondeAplicarReduceSinCombiner(
+				mapsTemporalesDeLosArchivosDelJob);
+
+		//ahora le tengo que decir al job, que en el nodo idNodoDondeAplicarRedecu,
+		//aplique reduce sobre nodo-tal, nodo-tal.Archtemp
+		int resultado;
+		t_list* destinosDeReduce; //lista de: (idNodo, archivoTemporal)
+
+		//FIXME Job necesitaría ip-Puerto del nodo con ese id, eso debería sacarlo MaRTA
+		//de sus listas de nodos. No se si eso se hace acá o en otro lado.
+		//Si es así, hay que agregar esos campos en t_DestinoReduce
+		t_DestinoReduce* convertirAEstructuraNecesaria(
+				t_MapTemporal* unMapTemporal) {
+
+			t_DestinoReduce* destinoReduce = malloc(sizeof(t_DestinoReduce));
+
+			destinoReduce->id_nodo = unMapTemporal->id_nodo;
+			destinoReduce->temp_file_name = unMapTemporal->path;
+
+			return destinoReduce;
+		}
+
+		destinosDeReduce = list_map(mapsTemporalesDeLosArchivosDelJob,
+				(void*) convertirAEstructuraNecesaria);
+
+		resultado = ordenarReduceAJob(idNodoDondeAplicarReduce,
+				destinosDeReduce);
+
+		//todo hacer que reciba que ordeno bien, y luego que si se hizo
+		//exitosamente el reduce o no (espera a la respuesta del job) similar a map
+		//si fue exitoso el resuce, termina el job y manda a guardar el resultado
+		//al AMDFS
+		//Si falló el reduce, termina el Job por completo y no hace más nada (no replanifico el reduce)
+}
+
+return 1;
+}
+

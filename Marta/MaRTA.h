@@ -17,6 +17,7 @@
 #include "interaccionMartaFS.h"
 #include <socketes/envioDeMensajes.h>
 #include <commons/collections/list.h>
+#include <commons/string.h>
 #include "tests.h"
 #include "estructurasMaRTA.h"
 #include <semaphore.h>
