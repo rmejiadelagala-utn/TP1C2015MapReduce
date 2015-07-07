@@ -395,7 +395,8 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 	return 1;
 }
 
-ordenarReduceAJob(int idNodoDondeAplicarReduce, t_list* destinosDeReduce) {
+ordenarReduceAJob(int idNodoDondeAplicarReduce, t_list* destinosDeReduce,
+		int sockJob) {
 
 	//todo Al final hacer liberacion de memoria de la lista destinosDeRecuce
 }
@@ -403,95 +404,178 @@ ordenarReduceAJob(int idNodoDondeAplicarReduce, t_list* destinosDeReduce) {
 int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 
 	int idJobAlQueAplica = infoJob.idJob;
+	int sockJob;
+
+	t_list* listaIdNodosDondeAplicarReduce;
+
+	//FIXME esto es inecesario, pero queria usar el t_list y con esto lo soluciono por ahora
+	typedef struct {
+		int idNodo;
+	} t_idNodo;
+
+	//funciones auxiliares
+	int obtenerIdJobDelMapTemporal(t_MapTemporal* unMapTemporal) {
+
+		char** archivoTemporalSeparadoPorGuionBajo;
+
+		archivoTemporalSeparadoPorGuionBajo = string_split(unMapTemporal->path,
+				"_");
+
+		char* stringIdJob = archivoTemporalSeparadoPorGuionBajo[1];
+
+		return atoi(stringIdJob);
+	}
+
+	bool temporalesDelJobTrabajado(t_MapTemporal* unMapTemporal) {
+		return idJobAlQueAplica == obtenerIdJobDelMapTemporal(unMapTemporal);
+	}
+
+	int mejorNodoDondeAplicarReduceSinCombiner(t_list *mapsTemporales) { //XXX testear. Puede fallar feo
+		int maxTemporalesPorNodo = 0;
+		int idMejorNodo = -1;
+		int cantidadDeApariciones = 0;
+
+		void elegirNodoConMasTemporales(t_MapTemporal* unMapTemporal) {
+
+			bool apareceNodoAEvaluar(t_MapTemporal* otroMapTemporal) {
+				return otroMapTemporal->id_nodo == unMapTemporal->id_nodo;
+			}
+
+			cantidadDeApariciones = list_count_satisfying(mapsTemporales,
+					(void*) apareceNodoAEvaluar);
+
+			if (cantidadDeApariciones > maxTemporalesPorNodo) {
+				idMejorNodo = unMapTemporal->id_nodo;
+				maxTemporalesPorNodo = cantidadDeApariciones;
+				cantidadDeApariciones = 0;
+			}
+
+		}
+
+		list_iterate(mapsTemporales, (void*) elegirNodoConMasTemporales);
+
+		return idMejorNodo; //si devuelve -1, no selecciono ningun nodo. Error de algoritmo
+	}
+
+	void tomarIdsNodo(t_MapTemporal* unMapTemporal) {
+
+		t_idNodo* tIdNodo;
+		tIdNodo->idNodo = unMapTemporal->id_nodo;
+
+		bool estaEseNodoCargado(t_idNodo* idCargado) {
+			return unMapTemporal->id_nodo== idCargado->idNodo;
+		}
+
+		if (!list_any_satisfy(listaIdNodosDondeAplicarReduce,
+				(void*) estaEseNodoCargado)) {
+
+			list_add(listaIdNodosDondeAplicarReduce, tIdNodo);
+
+		}
+	}
+
+	//FIXME Job necesitaría ip-Puerto del nodo con ese id, eso debería sacarlo MaRTA
+	//de sus listas de nodos. No se si eso se hace acá o en otro lado.
+	//Si es así, hay que agregar esos campos en t_DestinoReduce
+	t_DestinoReduce* convertirAEstructuraNecesaria(t_MapTemporal* unMapTemporal) {
+
+		t_DestinoReduce* destinoReduce = malloc(sizeof(t_DestinoReduce));
+
+		destinoReduce->id_nodo = unMapTemporal->id_nodo;
+		destinoReduce->temp_file_name = unMapTemporal->path;
+
+		return destinoReduce;
+	}
+	//fin funciones auxiliares
+
+	t_list* mapsTemporalesDeLosArchivosDelJob = list_filter(listaMapsTemporales,
+			(void*) temporalesDelJobTrabajado);
 
 	if (infoJob.combiner == 1) {	//Con combiner
 
-	} else //Sin combiner
-	{
-		//funciones auxiliares dentro del sin combiner
-		int obtenerIdJobDelMapTemporal(t_MapTemporal* unMapTemporal) {
+		//debo aplicar reduce dentro de cada nodo que tenga maps temporales
+		//Es decir, debo agarrar y mandar a reducir todos las archivos tmp que tenga
+		//cada uno de esos nodos. Una vez terminados todos estos reduce en cada nodo
+		//hacer un reduce general con todos los tmp auxiliares de reduce generados
 
-			char** archivoTemporalSeparadoPorGuionBajo;
+		//con esto cargo la lista listaIdNodosDondeAplicarReduce con los
+		//distintos idNodo que estan involucrados en este reduce combiner
+		list_iterate(mapsTemporalesDeLosArchivosDelJob, (void*) tomarIdsNodo);
 
-			archivoTemporalSeparadoPorGuionBajo = string_split(
-					unMapTemporal->path, "_");
+		while (!list_is_empty(listaIdNodosDondeAplicarReduce)) {
 
-			char* stringIdJob = archivoTemporalSeparadoPorGuionBajo[1];
+			//ordenar hacer los reduce en cada uno de estos nodos
+			//luego sacar el nodo de la lista
+			//si alguno falla, fallar el job completo
+			//ir guardando los temporales de reduce en una lista
+			//luego si salen bien, aplicar reduce sobre
+			//todos esos tmpReduce en alguno de los nodos que participaron
+			t_list* mapsTemporalesDondeHacerReduceEnNodo;
+			t_list* destinosReduceEnNodo;
+			t_idNodo* idAux = list_get(listaIdNodosDondeAplicarReduce, 0);
+			int resReduceEnNodo;
 
-			return atoi(stringIdJob);
-		}
+			bool destinosDelNodoAAplicarReduceLocal(t_MapTemporal* unMapTemporal) {
 
-		bool temporalesDelJobTrabajado(t_MapTemporal* unMapTemporal) {
-			return idJobAlQueAplica == obtenerIdJobDelMapTemporal(unMapTemporal);
-		}
-
-		int mejorNodoDondeAplicarReduceSinCombiner(t_list *mapsTemporales) { //XXX testear. Puede fallar feo
-			int maxTemporalesPorNodo = 0;
-			int idMejorNodo = -1;
-			int cantidadDeApariciones = 0;
-
-			void elegirNodoConMasTemporales(t_MapTemporal unMapTemporal) {
-
-				bool apareceNodoAEvaluar(t_MapTemporal otroMapTemporal) {
-					return otroMapTemporal.id_nodo == unMapTemporal.id_nodo;
-				}
-
-				cantidadDeApariciones = list_count_satisfying(mapsTemporales,
-						(void*) apareceNodoAEvaluar);
-
-				if (cantidadDeApariciones > maxTemporalesPorNodo) {
-					idMejorNodo = unMapTemporal.id_nodo;
-					maxTemporalesPorNodo = cantidadDeApariciones;
-					cantidadDeApariciones = 0;
-				}
-
+				return unMapTemporal->id_nodo == idAux->idNodo;
 			}
 
-			list_iterate(mapsTemporales, (void*) elegirNodoConMasTemporales);
+			mapsTemporalesDondeHacerReduceEnNodo = list_find(
+					mapsTemporalesDeLosArchivosDelJob,
+					(void*) destinosDelNodoAAplicarReduceLocal);
 
-			return idMejorNodo; //si devuelve -1, no selecciono ningun nodo. Error de algoritmo
+			destinosReduceEnNodo = list_map(
+					mapsTemporalesDondeHacerReduceEnNodo,
+					(void*) convertirAEstructuraNecesaria);
+
+			resReduceEnNodo = ordenarReduceAJob(idAux->idNodo,
+					destinosReduceEnNodo, sockJob);
+
+			//todo hacer que reciba que ordeno bien, y luego que si se hizo
+			//exitosamente el reduce o no (espera a la respuesta del job) similar a map
+			//si sale bien continúa guardando los temp de los reduce
+			//, sino borra todo y cancela job
+
+			//si salio bien
+
+			void destruirTIdNodo(t_idNodo* unTIdNodo){
+				free(unTIdNodo);
+			}
+
+			list_remove_and_destroy_element(listaIdNodosDondeAplicarReduce, 0,
+					(void*) destruirTIdNodo);
+
 		}
 
-		//fin funciones auxiliares
-
-		t_list* mapsTemporalesDeLosArchivosDelJob = list_filter(
-				listaMapsTemporales, (void*) temporalesDelJobTrabajado);
-
+	} else //Sin combiner
+	{
 		int idNodoDondeAplicarReduce = mejorNodoDondeAplicarReduceSinCombiner(
 				mapsTemporalesDeLosArchivosDelJob);
 
 		//ahora le tengo que decir al job, que en el nodo idNodoDondeAplicarRedecu,
 		//aplique reduce sobre nodo-tal, nodo-tal.Archtemp
+
+		//TODO me olvide de hacer la estructura destino con el archivo temporal
+		//que va a generar para guardar el reduce que acaba de hacer.
+		//En el caso de sin combiner, es solo el resultado final
+
 		int resultado;
 		t_list* destinosDeReduce; //lista de: (idNodo, archivoTemporal)
-
-		//FIXME Job necesitaría ip-Puerto del nodo con ese id, eso debería sacarlo MaRTA
-		//de sus listas de nodos. No se si eso se hace acá o en otro lado.
-		//Si es así, hay que agregar esos campos en t_DestinoReduce
-		t_DestinoReduce* convertirAEstructuraNecesaria(
-				t_MapTemporal* unMapTemporal) {
-
-			t_DestinoReduce* destinoReduce = malloc(sizeof(t_DestinoReduce));
-
-			destinoReduce->id_nodo = unMapTemporal->id_nodo;
-			destinoReduce->temp_file_name = unMapTemporal->path;
-
-			return destinoReduce;
-		}
 
 		destinosDeReduce = list_map(mapsTemporalesDeLosArchivosDelJob,
 				(void*) convertirAEstructuraNecesaria);
 
 		resultado = ordenarReduceAJob(idNodoDondeAplicarReduce,
-				destinosDeReduce);
+				destinosDeReduce,
+				sockJob/*sockJob de la conexion aun no hecha*/);
 
 		//todo hacer que reciba que ordeno bien, y luego que si se hizo
 		//exitosamente el reduce o no (espera a la respuesta del job) similar a map
 		//si fue exitoso el resuce, termina el job y manda a guardar el resultado
 		//al AMDFS
 		//Si falló el reduce, termina el Job por completo y no hace más nada (no replanifico el reduce)
-}
+	}
 
-return 1;
+	return 1;
 }
 
