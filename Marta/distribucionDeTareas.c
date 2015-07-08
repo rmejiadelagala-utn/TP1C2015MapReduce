@@ -539,13 +539,6 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 		int idNodoDondeAplicarReduceFinal;
 
 		while (!list_is_empty(listaIdNodosDondeAplicarReduce)) {
-
-			//ordenar hacer los reduce en cada uno de estos nodos
-			//luego sacar el nodo de la lista
-			//si alguno falla, fallar el job completo
-			//ir guardando los temporales de reduce en una lista
-			//luego si salen bien, aplicar reduce sobre
-			//todos esos tmpReduce en alguno de los nodos que participaron
 			t_list* mapsTemporalesDondeHacerReduceEnNodo;
 			t_list* origenesReduceEnNodo;
 
@@ -586,6 +579,11 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 			//, sino borra todo y cancela job
 			//si salio bien
 
+			if(resReduceEnNodo > 0){
+				printf("");
+			}
+
+
 			list_add(destinosIntermedios, destinoIntermedioReduce);
 
 			//asigno como responsable del reduce final a aquel nodo que sea el útlimo
@@ -607,19 +605,18 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 		//Sería como hacer un reduce sinCombiner en la lista tmp de reduce del job
 		int resultadoReduceFinal;
 
-		t_DestinoReduce* destinoFinalReduce = malloc(
-				sizeof(t_DestinoReduce));
+		t_DestinoReduce* destinoFinalReduce = malloc(sizeof(t_DestinoReduce));
 
 		//XXX el nombre del reduce no se si siempre será único. supuestamente si
 		destinoFinalReduce->id_nodo = idNodoDondeAplicarReduceFinal;
 		destinoFinalReduce->ip_nodo = ipDeNodo(idNodoDondeAplicarReduceFinal);
-		destinoFinalReduce->puerto_nodo = puertoDeNodo(idNodoDondeAplicarReduceFinal);
+		destinoFinalReduce->puerto_nodo = puertoDeNodo(
+				idNodoDondeAplicarReduceFinal);
 		destinoFinalReduce->temp_file_name = string_from_format(
 				"reduce_final_%i.temp", infoJob.idJob);
 
 		resultadoReduceFinal = ordenarReduceAJob(destinoFinalReduce,
-							destinosIntermedios, sockJob);
-
+				destinosIntermedios, sockJob);
 
 		void destruirDestinoReduce(t_DestinoReduce* unDestinoReduce) {
 			free(unDestinoReduce);
@@ -635,10 +632,6 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 
 		//ahora le tengo que decir al job, que en el nodo idNodoDondeAplicarRedecu,
 		//aplique reduce sobre nodo-tal, nodo-tal.Archtemp
-
-		//TODO me olvide de hacer la estructura destino con el archivo temporal
-		//que va a generar para guardar el reduce que acaba de hacer.
-		//En el caso de sin combiner, es solo el resultado final
 
 		int resultado;
 		t_list* origenesDeReduce; //lista de: (idNodo, archivoTemporal)
@@ -658,18 +651,26 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 		resultado = ordenarReduceAJob(destinoReduce, origenesDeReduce,
 				sockJob/*sockJob de la conexion aun no hecha*/);
 
-		//todo hacer que reciba que ordeno bien, y luego que si se hizo
-		//exitosamente el reduce o no (espera a la respuesta del job) similar a map
-		//si fue exitoso el resuce, termina el job y manda a guardar el resultado
-		//al AMDFS
-		//Si falló el reduce, termina el Job por completo y no hace más nada (no replanifico el reduce)
+		if (resultado > 0) {
+			printf("Reduce sin combiner enviado exitosamente\n");
+		}
+		else{
+			printf("falló envío de la orden de reduce. Cancelo job\n");
+			//todo mandar a borrar cosas y eso. No se bien que hacer acá
+		}
+
+		//todo funcion que reciba resultado de reduce por parte del job
 
 		//todo guardar la info del reduce que voy a necesitar luego de que se hizo correctamente
 		//Si salió bien, libero las variables internas
+
+		//todo mandar a guardar el resultado del reduce al MDFS
+
 		free(destinoReduce);
 		list_destroy_and_destroy_elements(origenesDeReduce, (void*) free);
 	}
 
+	list_destroy_and_destroy_elements(mapsTemporalesDeLosArchivosDelJob, (void*)free);
 	return 1;
 }
 
