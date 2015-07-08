@@ -8,6 +8,7 @@
 #ifndef FUNCIONESNODO_H_
 #define FUNCIONESNODO_H_
 
+#include "estructurasNodo.h"
 #include "nodo.h"
 #include <string.h>
 #include <stdio.h>
@@ -26,5 +27,7 @@ void ejecutarMapper(char*, char*, char*);
 void ejecutarReduce(char*, char*, char*);
 int redireccionar_stdin_stdout(char*,char*,char*);
 char* aparear_registros(char*);
+void guardarEnDisco(t_archivoTemporal* unArchivo);
+void liberarArchivoTemporal(t_archivoTemporal* unArchivo);
 
 #endif /* FUNCIONESNODO_H_ */

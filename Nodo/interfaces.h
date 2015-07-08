@@ -9,6 +9,7 @@
 #define INTERFACES_H_
 
 #include "funcionesNodo.h"
+#include "nodo.h"
 #include <socketes/envioDeMensajes.h>
 
 void* conexionFS(void*);

@@ -28,29 +28,14 @@
 #include <sys/mman.h>
 #include <sys/time.h>
 #include <sys/stat.h>
+#include "interfaces.h"
+#include "funcionesNodo.h"
+#include "estructurasNodo.h"
 
 //#define BLKSIZE 1024*1024*20
 #define BLKSIZE 150 //Ejemplo para probar el data.bin
 
-typedef struct {
-	char* IP_FS;
-	uint16_t PUERTO_FS;
-	char* ARCH_BIN;
-	char* DIR_TEMP;
-	char NODO_NEW;
-	char* IP_NODO;
-	uint16_t PUERTO_NODO;
-	int ID;
-} t_config_nodo;
-typedef struct {
-	 int socket;
-	char* ARCH_BIN;
-	char* IP_NODO;
-	uint16_t PUERTO_NODO;
-	char NODO_NEW;
-	char* DIR_TEMP;
-	int ID;
-}t_hilofs;
+
 
 
 
