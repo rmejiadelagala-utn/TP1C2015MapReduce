@@ -112,6 +112,12 @@ char* recibirString(int socket){
 	return string;
 }
 
+int recibirInt(int socket){
+	int entero;
+	recvall(socket,&entero,sizeof(int));
+	return entero;
+}
+
 int recibirIntEnOrden(int socket, uint32_t *numero) {
 	int resultado;
 

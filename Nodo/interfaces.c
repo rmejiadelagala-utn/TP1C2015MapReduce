@@ -52,39 +52,7 @@ void* conexionFS(void* arg){
 
 		 case GET_BLOQUE:
 
-			  resultado = getBloqueParaFileSystem(socket,DATOS,BLKSIZE);/*
-
-			    memcpy(mensaje_nodo->info,DATOS + obtenerDirBloque(nrobloque), BLKSIZE);
-			  stream = empaquetar_mensaje(mensaje_nodo);
-
-			  printf("Voy a mandar el bloque %d\n",nrobloque);
-			  send(ptr->socket, &stream->length, sizeof(int),0);
-
-			  if (enviar_mensaje(ptr->socket, stream->data, stream->length) > 0)
-				printf("Enviando mensaje a Filesystem\n");
-
-	      break;
-
-		  default: //Recibo mensaje GET_FILE del FS
-			  printf("Recibiendo mensaje GET_FILE del Filesystem\n");
-			  char * namefile = string_new();
-
-			  strcpy(namefile, mensaje_fs->info);
-
-			  free(mensaje_nodo->info);
-			  free(mensaje_nodo);
-			  free(stream);
-
-			  mensaje_nodo->id = GET_FILE_OK;
-			  mensaje_nodo->tipo = 'N';
-			  mensaje_nodo->info = getFileContent(namefile, ptr->DIR_TEMP);
-
-			  stream = empaquetar_mensaje(mensaje_nodo);
-
-			  if (enviar_mensaje(ptr->socket, stream->data, stream->length) > 0)
-				  printf("Enviando mensaje GET_FILE_OK a Filesystem\n");
-
-		  break;*/
+			  resultado = getBloqueParaFileSystem(socket,DATOS,BLKSIZE);
 
 		}
 
@@ -98,9 +66,12 @@ void* conexionJobs(void* sockJobNodo){
 
 	int sock_in = *(int*)sockJobNodo;
 	int recibido;
+	int i;
 	int protocolo;
 	char* unString;
 	int nroBloque;
+	int cantArchivosRecibidos;
+	t_list* archivosRecibidos;
 	while((recibido=recvall(sock_in,&protocolo,sizeof(int)))>1){
 		switch(protocolo){
 		case ORDER_MAP:
@@ -114,17 +85,18 @@ void* conexionJobs(void* sockJobNodo){
 			sendall(sock_in,&protocolo,sizeof(int));
 			protocolo=OK_MAP;
 			sendall(sock_in,&protocolo,sizeof(int));
+			break;
+
+		case ENVIO_ARCHIVOS_NODO_NODO:
+			archivosRecibidos = list_create();
+			cantArchivosRecibidos = recibirInt(sock_in);
+			for(i=0;i<cantArchivosRecibidos;i++){
+				guardarEnDisco(recibirArchivo(sock_in));
+			}
+			break;
 		}
 	}
 
 
 	return 0;
 }
-
-/*
-void* conexionNodos(void * sockNodo){
-
-	return 0;
-}
-*/
-
