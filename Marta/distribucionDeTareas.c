@@ -118,7 +118,6 @@ t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 
 	t_list* copiasDeBloque = list_create();
 
-	//TODO falta implementar buscarBloquesEnFS
 	if (buscarBloquesEnFS(infoDeJob, idArchivo, numeroDeBloque, copiasDeBloque)
 			<= 0) {
 		printf("No se encontraron las copias del Archivo: %i, Bloque: %i",
@@ -132,6 +131,7 @@ t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 	//Selecciona la copia de bloque que está en el nodo que menos trabajo tiene
 	copiaSeleccionada = elegirMejorNodoParaMap(copiasDeBloque);
 
+	//XXX ojo acá hay warning feo. Me parece que no estaría funcionando bien esto.
 	t_registro_id_ipPuerto* unRegistro = buscarRegistroPorId(
 			copiaSeleccionada->id_nodo);
 
@@ -395,16 +395,20 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 	return 1;
 }
 
-ordenarReduceAJob(int idNodoDondeAplicarReduce, t_list* destinosDeReduce,
+int ordenarReduceAJob(t_DestinoReduce* destinoReduce, t_list* origenesDeReduce,
 		int sockJob) {
 
+	int resultado;
+
 	//todo Al final hacer liberacion de memoria de la lista destinosDeRecuce
+
+	return resultado;
 }
 
 int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 
 	int idJobAlQueAplica = infoJob.idJob;
-	int sockJob;
+	int sockJob = 0;
 
 	t_list* listaIdNodosDondeAplicarReduce;
 
@@ -459,11 +463,11 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 
 	void tomarIdsNodo(t_MapTemporal* unMapTemporal) {
 
-		t_idNodo* tIdNodo;
+		t_idNodo* tIdNodo = malloc(sizeof(t_idNodo));
 		tIdNodo->idNodo = unMapTemporal->id_nodo;
 
 		bool estaEseNodoCargado(t_idNodo* idCargado) {
-			return unMapTemporal->id_nodo== idCargado->idNodo;
+			return unMapTemporal->id_nodo == idCargado->idNodo;
 		}
 
 		if (!list_any_satisfy(listaIdNodosDondeAplicarReduce,
@@ -477,15 +481,44 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 	//FIXME Job necesitaría ip-Puerto del nodo con ese id, eso debería sacarlo MaRTA
 	//de sus listas de nodos. No se si eso se hace acá o en otro lado.
 	//Si es así, hay que agregar esos campos en t_DestinoReduce
-	t_DestinoReduce* convertirAEstructuraNecesaria(t_MapTemporal* unMapTemporal) {
+	t_OrigenReduce* convertirAEstructuraNecesaria(t_MapTemporal* unMapTemporal) {
 
-		t_DestinoReduce* destinoReduce = malloc(sizeof(t_DestinoReduce));
+		t_OrigenReduce* origenReduce = malloc(sizeof(t_OrigenReduce));
 
-		destinoReduce->id_nodo = unMapTemporal->id_nodo;
-		destinoReduce->temp_file_name = unMapTemporal->path;
+		origenReduce->id_nodo = unMapTemporal->id_nodo;
+		origenReduce->temp_file_name = unMapTemporal->path;
 
-		return destinoReduce;
+		return origenReduce;
 	}
+
+	int ipDeNodo(int idNodo) {
+		t_registro_id_ipPuerto* registroIpPuerto = malloc(
+				sizeof(t_registro_id_ipPuerto));
+
+		//XXX ver warning. No lo entiendo bien
+		registroIpPuerto = buscarRegistroPorId(idNodo);
+
+		int ipDelNodo = registroIpPuerto->ip.s_addr;
+
+		free(registroIpPuerto);
+
+		return ipDelNodo;
+	}
+
+	int puertoDeNodo(int idNodo) {
+		t_registro_id_ipPuerto* registroIpPuerto = malloc(
+				sizeof(t_registro_id_ipPuerto));
+
+		//XXX ver warning. No lo entiendo bien
+		registroIpPuerto = buscarRegistroPorId(idNodo);
+
+		int puertoDelNodo = registroIpPuerto->puerto;
+
+		free(registroIpPuerto);
+
+		return puertoDelNodo;
+	}
+
 	//fin funciones auxiliares
 
 	t_list* mapsTemporalesDeLosArchivosDelJob = list_filter(listaMapsTemporales,
@@ -502,20 +535,18 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 		//distintos idNodo que estan involucrados en este reduce combiner
 		list_iterate(mapsTemporalesDeLosArchivosDelJob, (void*) tomarIdsNodo);
 
-		while (!list_is_empty(listaIdNodosDondeAplicarReduce)) {
+		t_list* destinosIntermedios = list_create();
+		int idNodoDondeAplicarReduceFinal;
 
-			//ordenar hacer los reduce en cada uno de estos nodos
-			//luego sacar el nodo de la lista
-			//si alguno falla, fallar el job completo
-			//ir guardando los temporales de reduce en una lista
-			//luego si salen bien, aplicar reduce sobre
-			//todos esos tmpReduce en alguno de los nodos que participaron
+		while (!list_is_empty(listaIdNodosDondeAplicarReduce)) {
 			t_list* mapsTemporalesDondeHacerReduceEnNodo;
-			t_list* destinosReduceEnNodo;
+			t_list* origenesReduceEnNodo;
+
 			t_idNodo* idAux = list_get(listaIdNodosDondeAplicarReduce, 0);
 			int resReduceEnNodo;
 
-			bool destinosDelNodoAAplicarReduceLocal(t_MapTemporal* unMapTemporal) {
+			bool destinosDelNodoAAplicarReduceLocal(
+					t_MapTemporal* unMapTemporal) {
 
 				return unMapTemporal->id_nodo == idAux->idNodo;
 			}
@@ -524,21 +555,43 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 					mapsTemporalesDeLosArchivosDelJob,
 					(void*) destinosDelNodoAAplicarReduceLocal);
 
-			destinosReduceEnNodo = list_map(
+			origenesReduceEnNodo = list_map(
 					mapsTemporalesDondeHacerReduceEnNodo,
 					(void*) convertirAEstructuraNecesaria);
 
-			resReduceEnNodo = ordenarReduceAJob(idAux->idNodo,
-					destinosReduceEnNodo, sockJob);
+			//XXX ojo, malloc dentro de while. Al finalizar, hago free de la lista que los contiene
+			t_DestinoReduce* destinoIntermedioReduce = malloc(
+					sizeof(t_DestinoReduce));
+
+			//XXX el nombre del reduce no se si siempre será único. supuestamente si
+			destinoIntermedioReduce->id_nodo = idAux->idNodo;
+			destinoIntermedioReduce->ip_nodo = ipDeNodo(idAux->idNodo);
+			destinoIntermedioReduce->puerto_nodo = puertoDeNodo(idAux->idNodo);
+			destinoIntermedioReduce->temp_file_name = string_from_format(
+					"reduce_intermedio_%i.temp", infoJob.idJob);
+
+			resReduceEnNodo = ordenarReduceAJob(destinoIntermedioReduce,
+					origenesReduceEnNodo, sockJob);
 
 			//todo hacer que reciba que ordeno bien, y luego que si se hizo
 			//exitosamente el reduce o no (espera a la respuesta del job) similar a map
 			//si sale bien continúa guardando los temp de los reduce
 			//, sino borra todo y cancela job
-
 			//si salio bien
 
-			void destruirTIdNodo(t_idNodo* unTIdNodo){
+			if(resReduceEnNodo > 0){
+				printf("");
+			}
+
+
+			list_add(destinosIntermedios, destinoIntermedioReduce);
+
+			//asigno como responsable del reduce final a aquel nodo que sea el útlimo
+			//que aplicó un reduce intermedio. Esto es así porque es más probable
+			//que si ese acaba de ser exitoso, siga activo ¿?
+			idNodoDondeAplicarReduceFinal = idAux->idNodo;
+
+			void destruirTIdNodo(t_idNodo* unTIdNodo) {
 				free(unTIdNodo);
 			}
 
@@ -546,6 +599,31 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 					(void*) destruirTIdNodo);
 
 		}
+
+		//Una vez realizados todos los reduce intermedios en los nodos
+		//debo aplicar un reduce general y final sobre esos tmp de reduce intermedios
+		//Sería como hacer un reduce sinCombiner en la lista tmp de reduce del job
+		int resultadoReduceFinal;
+
+		t_DestinoReduce* destinoFinalReduce = malloc(sizeof(t_DestinoReduce));
+
+		//XXX el nombre del reduce no se si siempre será único. supuestamente si
+		destinoFinalReduce->id_nodo = idNodoDondeAplicarReduceFinal;
+		destinoFinalReduce->ip_nodo = ipDeNodo(idNodoDondeAplicarReduceFinal);
+		destinoFinalReduce->puerto_nodo = puertoDeNodo(
+				idNodoDondeAplicarReduceFinal);
+		destinoFinalReduce->temp_file_name = string_from_format(
+				"reduce_final_%i.temp", infoJob.idJob);
+
+		resultadoReduceFinal = ordenarReduceAJob(destinoFinalReduce,
+				destinosIntermedios, sockJob);
+
+		void destruirDestinoReduce(t_DestinoReduce* unDestinoReduce) {
+			free(unDestinoReduce);
+		}
+
+		list_destroy_and_destroy_elements(destinosIntermedios,
+				(void*) destruirDestinoReduce);
 
 	} else //Sin combiner
 	{
@@ -555,27 +633,44 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 		//ahora le tengo que decir al job, que en el nodo idNodoDondeAplicarRedecu,
 		//aplique reduce sobre nodo-tal, nodo-tal.Archtemp
 
-		//TODO me olvide de hacer la estructura destino con el archivo temporal
-		//que va a generar para guardar el reduce que acaba de hacer.
-		//En el caso de sin combiner, es solo el resultado final
-
 		int resultado;
-		t_list* destinosDeReduce; //lista de: (idNodo, archivoTemporal)
+		t_list* origenesDeReduce; //lista de: (idNodo, archivoTemporal)
 
-		destinosDeReduce = list_map(mapsTemporalesDeLosArchivosDelJob,
+		origenesDeReduce = list_map(mapsTemporalesDeLosArchivosDelJob,
 				(void*) convertirAEstructuraNecesaria);
 
-		resultado = ordenarReduceAJob(idNodoDondeAplicarReduce,
-				destinosDeReduce,
+		t_DestinoReduce* destinoReduce = malloc(sizeof(t_DestinoReduce));
+
+		//XXX el nombre del reduce no se si siempre será único. supuestamente si
+		destinoReduce->id_nodo = idNodoDondeAplicarReduce;
+		destinoReduce->ip_nodo = ipDeNodo(idNodoDondeAplicarReduce);
+		destinoReduce->puerto_nodo = puertoDeNodo(idNodoDondeAplicarReduce);
+		destinoReduce->temp_file_name = string_from_format(
+				"reduce_final_%i.temp", infoJob.idJob);
+
+		resultado = ordenarReduceAJob(destinoReduce, origenesDeReduce,
 				sockJob/*sockJob de la conexion aun no hecha*/);
 
-		//todo hacer que reciba que ordeno bien, y luego que si se hizo
-		//exitosamente el reduce o no (espera a la respuesta del job) similar a map
-		//si fue exitoso el resuce, termina el job y manda a guardar el resultado
-		//al AMDFS
-		//Si falló el reduce, termina el Job por completo y no hace más nada (no replanifico el reduce)
+		if (resultado > 0) {
+			printf("Reduce sin combiner enviado exitosamente\n");
+		}
+		else{
+			printf("falló envío de la orden de reduce. Cancelo job\n");
+			//todo mandar a borrar cosas y eso. No se bien que hacer acá
+		}
+
+		//todo funcion que reciba resultado de reduce por parte del job
+
+		//todo guardar la info del reduce que voy a necesitar luego de que se hizo correctamente
+		//Si salió bien, libero las variables internas
+
+		//todo mandar a guardar el resultado del reduce al MDFS
+
+		free(destinoReduce);
+		list_destroy_and_destroy_elements(origenesDeReduce, (void*) free);
 	}
 
+	list_destroy_and_destroy_elements(mapsTemporalesDeLosArchivosDelJob, (void*)free);
 	return 1;
 }
 

@@ -9,6 +9,26 @@
 uint32_t TAMANIODISCO, TAMANIOARCHIVO;
 int fd = -1, fd_a;
 
+void guardarEnDisco(t_archivoTemporal* unArchivo){
+	FILE *archivoEnDisco = fopen(unArchivo->pathDestino,"w");
+	write(fileno(archivoEnDisco), unArchivo->data, unArchivo->tamanio);
+	free(archivoEnDisco);
+	liberarArchivoTemporal(unArchivo);
+}
+
+void liberarArchivoTemporal(t_archivoTemporal* unArchivo){
+	free(unArchivo->data);
+	free(unArchivo->pathDestino);
+	free(unArchivo);
+}
+
+void recibirArchivo (int socket){
+	t_archivoTemporal *unArchivo= malloc(sizeof(t_archivoTemporal));
+	unArchivo->tamanio=recibirInt(socket);
+	unArchivo->pathDestino=strdup(recibirString(socket));
+	unArchivo->data=strdup(recibirString(socket));
+}
+
 t_config_nodo* leerArchivoConfig(char *path_config){
 
 	t_config *config;
