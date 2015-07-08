@@ -395,10 +395,14 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 	return 1;
 }
 
-ordenarReduceAJob(t_DestinoReduce* destinoReduce, t_list* origenesDeReduce,
+int ordenarReduceAJob(t_DestinoReduce* destinoReduce, t_list* origenesDeReduce,
 		int sockJob) {
 
+	int resultado;
+
 	//todo Al final hacer liberacion de memoria de la lista destinosDeRecuce
+
+	return resultado;
 }
 
 int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {

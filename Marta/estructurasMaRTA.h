@@ -78,6 +78,9 @@ typedef struct {
 	int id_nodo;
 	char* temp_file_name;
 } t_OrigenReduce;
+//xxx el origenReduce y destinoReduce son lo mismo, salvo que se los usa
+//distinto en cuanto al file. En un caso es el que extrae, en el otro el que genera.
+//por ahora lo dejo así, porque OrigenReduce no se si ponerle ip-puerto o no
 
 typedef struct {
 	int id_nodo;
