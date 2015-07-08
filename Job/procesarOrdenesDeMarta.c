@@ -15,6 +15,8 @@ int procesarOrdenesDeMarta(int sockMarta, t_rutinas* rutinas) {
     while ( !finOperacion &&
             (recibido=recvall(sockMarta,&protocolo,sizeof(uint32_t)))>0) {
 
+    	sleep(4);
+
         switch (protocolo) {
         case ORDER_MAP:
             printf("Crear hilo mapper\n");

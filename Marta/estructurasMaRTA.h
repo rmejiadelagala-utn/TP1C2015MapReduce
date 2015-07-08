@@ -77,7 +77,15 @@ typedef struct {
 typedef struct {
 	int id_nodo;
 	char* temp_file_name;
+} t_OrigenReduce;
+
+typedef struct {
+	int id_nodo;
+	int ip_nodo;
+	int puerto_nodo;
+	char* temp_file_name;
 } t_DestinoReduce;
+
 
 typedef struct {
 	t_InfoArchivo* file;
