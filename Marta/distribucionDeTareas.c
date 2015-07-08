@@ -118,7 +118,6 @@ t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 
 	t_list* copiasDeBloque = list_create();
 
-	//TODO falta implementar buscarBloquesEnFS
 	if (buscarBloquesEnFS(infoDeJob, idArchivo, numeroDeBloque, copiasDeBloque)
 			<= 0) {
 		printf("No se encontraron las copias del Archivo: %i, Bloque: %i",
@@ -132,6 +131,7 @@ t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 	//Selecciona la copia de bloque que está en el nodo que menos trabajo tiene
 	copiaSeleccionada = elegirMejorNodoParaMap(copiasDeBloque);
 
+	//XXX ojo acá hay warning feo. Me parece que no estaría funcionando bien esto.
 	t_registro_id_ipPuerto* unRegistro = buscarRegistroPorId(
 			copiaSeleccionada->id_nodo);
 
@@ -395,7 +395,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 	return 1;
 }
 
-ordenarReduceAJob(int idNodoDondeAplicarReduce, t_list* destinosDeReduce,
+ordenarReduceAJob(t_DestinoReduce* destinoReduce, t_list* destinosDeReduce,
 		int sockJob) {
 
 	//todo Al final hacer liberacion de memoria de la lista destinosDeRecuce
@@ -459,11 +459,11 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 
 	void tomarIdsNodo(t_MapTemporal* unMapTemporal) {
 
-		t_idNodo* tIdNodo;
+		t_idNodo* tIdNodo = malloc(sizeof(t_idNodo));
 		tIdNodo->idNodo = unMapTemporal->id_nodo;
 
 		bool estaEseNodoCargado(t_idNodo* idCargado) {
-			return unMapTemporal->id_nodo== idCargado->idNodo;
+			return unMapTemporal->id_nodo == idCargado->idNodo;
 		}
 
 		if (!list_any_satisfy(listaIdNodosDondeAplicarReduce,
@@ -477,15 +477,44 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 	//FIXME Job necesitaría ip-Puerto del nodo con ese id, eso debería sacarlo MaRTA
 	//de sus listas de nodos. No se si eso se hace acá o en otro lado.
 	//Si es así, hay que agregar esos campos en t_DestinoReduce
-	t_DestinoReduce* convertirAEstructuraNecesaria(t_MapTemporal* unMapTemporal) {
+	t_OrigenReduce* convertirAEstructuraNecesaria(t_MapTemporal* unMapTemporal) {
 
-		t_DestinoReduce* destinoReduce = malloc(sizeof(t_DestinoReduce));
+		t_OrigenReduce* destinoReduce = malloc(sizeof(t_OrigenReduce));
 
 		destinoReduce->id_nodo = unMapTemporal->id_nodo;
 		destinoReduce->temp_file_name = unMapTemporal->path;
 
 		return destinoReduce;
 	}
+
+	int ipDeNodo(int idNodo) {
+		t_registro_id_ipPuerto* registroIpPuerto = malloc(
+				sizeof(t_registro_id_ipPuerto));
+
+		//XXX ver warning. No lo entiendo bien
+		registroIpPuerto = buscarRegistroPorId(idNodo);
+
+		int ipDelNodo = registroIpPuerto->ip.s_addr;
+
+		free(registroIpPuerto);
+
+		return ipDelNodo;
+	}
+
+	int puertoDeNodo(int idNodo) {
+		t_registro_id_ipPuerto* registroIpPuerto = malloc(
+				sizeof(t_registro_id_ipPuerto));
+
+		//XXX ver warning. No lo entiendo bien
+		registroIpPuerto = buscarRegistroPorId(idNodo);
+
+		int puertoDelNodo = registroIpPuerto->puerto;
+
+		free(registroIpPuerto);
+
+		return puertoDelNodo;
+	}
+
 	//fin funciones auxiliares
 
 	t_list* mapsTemporalesDeLosArchivosDelJob = list_filter(listaMapsTemporales,
@@ -515,7 +544,8 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 			t_idNodo* idAux = list_get(listaIdNodosDondeAplicarReduce, 0);
 			int resReduceEnNodo;
 
-			bool destinosDelNodoAAplicarReduceLocal(t_MapTemporal* unMapTemporal) {
+			bool destinosDelNodoAAplicarReduceLocal(
+					t_MapTemporal* unMapTemporal) {
 
 				return unMapTemporal->id_nodo == idAux->idNodo;
 			}
@@ -528,8 +558,9 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 					mapsTemporalesDondeHacerReduceEnNodo,
 					(void*) convertirAEstructuraNecesaria);
 
-			resReduceEnNodo = ordenarReduceAJob(idAux->idNodo,
+			/*resReduceEnNodo = ordenarReduceAJob(idAux->idNodo,
 					destinosReduceEnNodo, sockJob);
+*/
 
 			//todo hacer que reciba que ordeno bien, y luego que si se hizo
 			//exitosamente el reduce o no (espera a la respuesta del job) similar a map
@@ -538,7 +569,7 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 
 			//si salio bien
 
-			void destruirTIdNodo(t_idNodo* unTIdNodo){
+			void destruirTIdNodo(t_idNodo* unTIdNodo) {
 				free(unTIdNodo);
 			}
 
@@ -560,13 +591,22 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 		//En el caso de sin combiner, es solo el resultado final
 
 		int resultado;
-		t_list* destinosDeReduce; //lista de: (idNodo, archivoTemporal)
+		t_list* origenesDeReduce; //lista de: (idNodo, archivoTemporal)
 
-		destinosDeReduce = list_map(mapsTemporalesDeLosArchivosDelJob,
+		origenesDeReduce = list_map(mapsTemporalesDeLosArchivosDelJob,
 				(void*) convertirAEstructuraNecesaria);
 
-		resultado = ordenarReduceAJob(idNodoDondeAplicarReduce,
-				destinosDeReduce,
+		t_DestinoReduce* destinoReduce = malloc(sizeof(t_DestinoReduce));
+
+		//XXX el nombre del reduce no se si siempre será único. supuestamente si
+		destinoReduce->id_nodo = idNodoDondeAplicarReduce;
+		destinoReduce->ip_nodo = ipDeNodo(idNodoDondeAplicarReduce);
+		destinoReduce->puerto_nodo = puertoDeNodo(idNodoDondeAplicarReduce);
+		destinoReduce->temp_file_name = string_from_format(
+				"reduce_final_%i.temp", infoJob.idJob);
+
+		resultado = ordenarReduceAJob(destinoReduce,
+				origenesDeReduce,
 				sockJob/*sockJob de la conexion aun no hecha*/);
 
 		//todo hacer que reciba que ordeno bien, y luego que si se hizo
@@ -576,6 +616,7 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 		//Si falló el reduce, termina el Job por completo y no hace más nada (no replanifico el reduce)
 	}
 
+	//XXX faltan varios free de listas
 	return 1;
 }
 
