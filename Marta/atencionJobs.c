@@ -71,8 +71,11 @@ void deserealizar(char* buffer, int sockCliente) {
 		//info_job.idJob= TODO, de donde saco la id del job?
 		info_job.pathDeResultado=strdup(solicitud.archivo_resultado);
 		int j;
+		//debo reservar memoria para punteros a char
+		info_job.pathsDeArchivos = malloc(sizeof(char*)*cant_arch);
 		for(j=0;j<cant_arch;j++){
-		info_job.pathsDeArchivos[j]=strdup(solicitud.archivos[j]);
+			info_job.pathsDeArchivos[j]=(char*)malloc(strlen(solicitud.archivos[j])+1);
+		    info_job.pathsDeArchivos[j]=strdup(solicitud.archivos[j]);
 		}
 		t_list* listaDeArchivos = obtenerIDyCantBloquesDeArchivosDelFS(solicitud.archivos,cant_arch);
 		void mostrarCantidadDeBloquesPorArchivo(t_InfoArchivo* unaInfoArchivo){
