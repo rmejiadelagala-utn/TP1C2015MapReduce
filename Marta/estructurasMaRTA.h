@@ -75,6 +75,22 @@ typedef struct {
 } t_DestinoMap;
 
 typedef struct {
+	int id_nodo;
+	char* temp_file_name;
+} t_OrigenReduce;
+//xxx el origenReduce y destinoReduce son lo mismo, salvo que se los usa
+//distinto en cuanto al file. En un caso es el que extrae, en el otro el que genera.
+//por ahora lo dejo así, porque OrigenReduce no se si ponerle ip-puerto o no
+
+typedef struct {
+	int id_nodo;
+	int ip_nodo;
+	int puerto_nodo;
+	char* temp_file_name;
+} t_DestinoReduce;
+
+
+typedef struct {
 	t_InfoArchivo* file;
 	uint32_t block;
 	t_DestinoMap* map_dest;
@@ -86,11 +102,11 @@ typedef struct {
 } t_ResultadoMap;
 
 typedef struct {
-	uint32_t id_temp;
+	uint32_t idMapTemporal;
 	char* path;
 	uint32_t id_nodo;
-	uint32_t id_file_origin;
-	uint32_t block_origin;
+	uint32_t idArchivoOrigen;
+	uint32_t bloqueOrigen;
 } t_MapTemporal; //Revisar bien esta
 
 ///Esto va en envioDeMensajes me parece///

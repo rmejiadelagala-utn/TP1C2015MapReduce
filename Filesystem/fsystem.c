@@ -529,12 +529,13 @@ void *interaccionFSNodo(void* sock_ptr) {
 			break;
 		case CONEXION_MARTA_A_FS:
 			printf("Hola Marta!\n");
-			fflush(stdout);
+
 			socketDeMarta = socket;
 			void actualizarAMarta(t_registro_id_ipPuerto* unRegistro) {
 				actualizarIdIpPuertoEnMarta(socketDeMarta, unRegistro);
 			}
 			list_filter(listaRegistrosIDIP, (void*) nodoEstaActivo);
+			fflush(stdout);
 			list_iterate(listaRegistrosIDIP, (void*) actualizarAMarta);
 			//TODO esta bien
 			break;

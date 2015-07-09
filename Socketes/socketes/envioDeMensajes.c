@@ -112,6 +112,12 @@ char* recibirString(int socket){
 	return string;
 }
 
+int recibirInt(int socket){
+	int entero;
+	recvall(socket,&entero,sizeof(int));
+	return entero;
+}
+
 int recibirIntEnOrden(int socket, uint32_t *numero) {
 	int resultado;
 
@@ -184,6 +190,7 @@ int enviarBuffer(t_buffer* buffer, int socket){
 	}
 	//A Marta
 	int actualizarIdIpPuertoEnMarta(int socket, t_registro_id_ipPuerto* unRegistro){
+		fflush(stdout);
 		int tamanioAEnviar = sizeof(t_registro_id_ipPuerto) + 4;
 		void* buffer = malloc(tamanioAEnviar);
 		int protocolo = MARTA_ACTUALIZA_EL_REGISTRO;

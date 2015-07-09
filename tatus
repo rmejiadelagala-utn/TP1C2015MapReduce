@@ -1,0 +1,132 @@
+[33mcommit 28daa7b846e40112055196c24c6ffaa482e94a5a[m
+Author: j9794 <juanmanuel9794@hotmail.com>
+Date:   Tue Jul 7 21:18:06 2015 -0300
+
+    Arreglados un par de detalles para la creacion del ambiente.
+
+[1mdiff --git a/Job/config.cfg b/Job/config.cfg[m
+[1mindex 4a27bbb..f218f4f 100644[m
+[1m--- a/Job/config.cfg[m
+[1m+++ b/Job/config.cfg[m
+[36m@@ -1,14 +1,8 @@[m
+ # This is the IP[m
+ IP=127.0.0.1[m
+[31m-[m
+ PORT=4000[m
+[31m-[m
+[31m-MAPPER=map.sh[m
+[31m-[m
+[32m+[m[32mMAPPER=../map.sh[m
+ REDUCE=reduce.sh[m
+[31m-[m
+ COMBINER=NO[m
+[31m-[m
+ ARCHIVOS=[temperaturas1.txt,temperaturas2.txt,temperaturas3.txt][m
+[31m-[m
+ RESULTADO=resultado.txt[m
+[1mdiff --git a/Nodo/ArchivosVarios/ConfigNodo.txt b/Nodo/ArchivosVarios/ConfigNodo.txt[m
+[1mindex b04f6e9..3ecb4d4 100644[m
+[1m--- a/Nodo/ArchivosVarios/ConfigNodo.txt[m
+[1m+++ b/Nodo/ArchivosVarios/ConfigNodo.txt[m
+[36m@@ -4,5 +4,5 @@[m [mARCHIVO_BIN=data.bin[m
+ DIR_TEMP=/tmp[m
+ NODO_NUEVO=SI[m
+ IP_NODO=127.0.0.1[m
+[31m-PUERTO_NODO=5032[m
+[31m-ID=1[m
+[32m+[m[32mPUERTO_NODO=5000[m
+[32m+[m[32mID=0[m
+[1mdiff --git a/Nodo4/ArchivosVarios/ConfigNodo.txt b/Nodo4/ArchivosVarios/ConfigNodo.txt[m
+[1mindex 91da23b..bcc7908 100644[m
+[1m--- a/Nodo4/ArchivosVarios/ConfigNodo.txt[m
+[1m+++ b/Nodo4/ArchivosVarios/ConfigNodo.txt[m
+[36m@@ -5,4 +5,4 @@[m [mDIR_TEMP=/tmp[m
+ NODO_NUEVO=SI[m
+ IP_NODO=127.0.0.1[m
+ PUERTO_NODO=5004[m
+[31m-ID=5[m
+\ No newline at end of file[m
+[32m+[m[32mID=4[m
+[1mdiff --git a/Nodo5/ArchivosVarios/ConfigNodo.txt b/Nodo5/ArchivosVarios/ConfigNodo.txt[m
+[1mindex 25eec13..ddb0c06 100644[m
+[1m--- a/Nodo5/ArchivosVarios/ConfigNodo.txt[m
+[1m+++ b/Nodo5/ArchivosVarios/ConfigNodo.txt[m
+[36m@@ -5,4 +5,4 @@[m [mDIR_TEMP=/tmp[m
+ NODO_NUEVO=SI[m
+ IP_NODO=127.0.0.1[m
+ PUERTO_NODO=5005[m
+[31m-ID=6[m
+\ No newline at end of file[m
+[32m+[m[32mID=5[m
+[1mdiff --git a/Nodo6/ArchivosVarios/ConfigNodo.txt b/Nodo6/ArchivosVarios/ConfigNodo.txt[m
+[1mindex 0bc8cdc..1d94804 100644[m
+[1m--- a/Nodo6/ArchivosVarios/ConfigNodo.txt[m
+[1m+++ b/Nodo6/ArchivosVarios/ConfigNodo.txt[m
+[36m@@ -5,4 +5,4 @@[m [mDIR_TEMP=/tmp[m
+ NODO_NUEVO=SI[m
+ IP_NODO=127.0.0.1[m
+ PUERTO_NODO=5006[m
+[31m-ID=7[m
+\ No newline at end of file[m
+[32m+[m[32mID=6[m
+[1mdiff --git a/Nodo7/ArchivosVarios/ConfigNodo.txt b/Nodo7/ArchivosVarios/ConfigNodo.txt[m
+[1mindex 8d3afc9..7a87b9e 100644[m
+[1m--- a/Nodo7/ArchivosVarios/ConfigNodo.txt[m
+[1m+++ b/Nodo7/ArchivosVarios/ConfigNodo.txt[m
+[36m@@ -2,7 +2,7 @@[m [mPUERTO_FS=3000[m
+ IP_FS=127.0.0.1[m
+ ARCHIVO_BIN=data.bin[m
+ DIR_TEMP=/tmp[m
+[31m-NODO_NUEVO=sO[m
+[32m+[m[32mNODO_NUEVO=SI[m
+ IP_NODO=127.0.0.1[m
+[31m-PUERTO_NODO=5009[m
+[31m-ID=8[m
+\ No newline at end of file[m
+[32m+[m[32mPUERTO_NODO=5007[m
+[32m+[m[32mID=7[m
+[1mdiff --git a/creacionAmbienteNodos.sh b/creacionAmbienteNodos.sh[m
+[1mindex 757a208..c4b5889 100755[m
+[1m--- a/creacionAmbienteNodos.sh[m
+[1m+++ b/creacionAmbienteNodos.sh[m
+[36m@@ -3,6 +3,15 @@[m
+ echo "Debo estar parado en Mi repo: "[m
+ echo "			tp-2015-1c-socketes-planificados"[m
+ [m
+[32m+[m[32m#Crear directorios Nodo[m
+[32m+[m[32mmkdir Nodo1[m
+[32m+[m[32mmkdir Nodo2[m
+[32m+[m[32mmkdir Nodo3[m
+[32m+[m[32mmkdir Nodo4[m
+[32m+[m[32mmkdir Nodo5[m
+[32m+[m[32mmkdir Nodo6[m
+[32m+[m[32mmkdir Nodo7[m
+[32m+[m
+ # Crear directorios Debug[m
+ mkdir Nodo1/Debug[m
+ mkdir Nodo2/Debug[m
+[36m@@ -12,6 +21,24 @@[m [mmkdir Nodo5/Debug[m
+ mkdir Nodo6/Debug[m
+ mkdir Nodo7/Debug[m
+ [m
+[32m+[m[32m# Crear directorios ArchivosVarios[m
+[32m+[m[32mmkdir Nodo1/ArchivosVarios[m
+[32m+[m[32mmkdir Nodo2/ArchivosVarios[m
+[32m+[m[32mmkdir Nodo3/ArchivosVarios[m
+[32m+[m[32mmkdir Nodo4/ArchivosVarios[m
+[32m+[m[32mmkdir Nodo5/ArchivosVarios[m
+[32m+[m[32mmkdir Nodo6/ArchivosVarios[m
+[32m+[m[32mmkdir Nodo7/ArchivosVarios[m
+[32m+[m
+[32m+[m[32m#Copiar el ConfigNodo.txt desde el Nodo a los otros nodos NodoX[m
+[32m+[m[32mcp  Nodo/ArchivosVarios/ConfigNodo.txt  Nodo1/ArchivosVarios[m
+[32m+[m[32mcp  Nodo/ArchivosVarios/ConfigNodo.txt  Nodo2/ArchivosVarios[m
+[32m+[m[32mcp  Nodo/ArchivosVarios/ConfigNodo.txt  Nodo3/ArchivosVarios[m
+[32m+[m[32mcp  Nodo/ArchivosVarios/ConfigNodo.txt  Nodo4/ArchivosVarios[m
+[32m+[m[32mcp  Nodo/ArchivosVarios/ConfigNodo.txt  Nodo5/ArchivosVarios[m
+[32m+[m[32mcp  Nodo/ArchivosVarios/ConfigNodo.txt  Nodo6/ArchivosVarios[m
+[32m+[m[32mcp  Nodo/ArchivosVarios/ConfigNodo.txt  Nodo7/ArchivosVarios[m
+[32m+[m
+ #Copiar el databin desde el Nodo a los otros nodos NodoX[m
+ cp  Nodo/ArchivosVarios/data.bin  Nodo1/Debug/[m
+ cp  Nodo/ArchivosVarios/data.bin  Nodo2/Debug/[m
