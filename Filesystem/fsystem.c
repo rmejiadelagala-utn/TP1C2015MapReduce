@@ -57,6 +57,7 @@
 void *interaccionFSNodo(void*);
 
 int main() {
+	//Posiblemente vayan en la funcion persistir los list_create()
 	listaArchivos = list_create();
 	listaNodos = list_create();
 	listaDirectorios = list_create();
@@ -68,6 +69,34 @@ int main() {
 	 registroVacio->ip.s_addr=inet_addr("0.0.0.0");
 	 registroVacio->puerto=0;
 	 list_add(listaRegistrosIDIP,registroVacio);*/
+
+	//Para probar la persistencia en sus inicios
+	/*
+		fpArch = fopen("archivos.bin", "wb+");
+		 t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo(1, 11);
+		 guardarBloqueEnNodo(copiaBloqueA1C1);
+		 fseek(fpArch, SEEK_SET, 0);
+		 cargarBloqueEnNodo();
+		 fclose(fpArch);
+	*/
+		/*
+		fpNodos = fopen("nodos.bin", "wb+");
+		 t_nodo *nodoA = nuevoNodo(2,50);
+		 guardarNodo(nodoA);
+		 fseek(fpNodos, SEEK_SET, 0);
+		 cargarNodo();
+		 fclose(fpNodos);
+	*/
+		/*
+		fpDir = fopen("directorios.bin", "wb+");
+		t_directorio *dirA = nuevoDirectorio(2,"pepito",0);
+		guardarDir(dirA);
+		fseek(fpDir, SEEK_SET, 0);
+		cargarDir();
+		fclose(fpDir);
+	*/
+//fin de prueba de persistencia
+
 	/*//probando funcion de mostrar listas
 
 

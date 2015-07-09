@@ -59,6 +59,9 @@ sem_t consola_sem;
 sem_t escuchar_sem;
 FILE *archivoReconstruido;
 int socketDeMarta;
+FILE *fpArch;
+FILE *fpDir;
+FILE *fpNodos;
 
 
 
