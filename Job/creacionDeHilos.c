@@ -32,13 +32,13 @@ int recibirResultadoFromNodo(int sockNodo){
 
 int responderOrdenMapAMarta(int sockMarta,t_ordenMap ordenMapper, int resOper){
 	int result_envio;
-	t_buffer* buffer = crearBufferConProtocolo(RES_MAP);
+	t_buffer* buffer = crearBuffer();//crearBufferConProtocolo(RES_MAP);
 	if(resOper==OK_MAP){
 		bufferAgregarInt(buffer,OK_MAP);
 	} else
 		bufferAgregarInt(buffer,NOTOK_MAP);
 	bufferAgregarInt(buffer,ordenMapper.id_map);
-	bufferAgregarInt(buffer,ordenMapper.id_nodo);
+	//bufferAgregarInt(buffer,ordenMapper.id_nodo);
 	result_envio=enviarBuffer(buffer,sockMarta);
 	return result_envio;
 }

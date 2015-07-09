@@ -68,7 +68,6 @@ t_CopiaDeBloque* elegirMejorNodoParaMap(t_list* copiasDeBloque) {
 	list_sort(copiasDeBloque, (void*) compararNodosPorMenorCarga);
 
 	//elijo la primera de las copias de la lista ordena por menor carga.
-	printf("La lista AHORA tiene tamanio: %d\n", list_size(copiasDeBloque));
 	t_CopiaDeBloque* copiaElegida = list_get(copiasDeBloque, 0);
 	printf("La copia elegida tiene id %d\n", copiaElegida->id_nodo);
 	return list_get(copiasDeBloque, 0);
@@ -177,7 +176,7 @@ int ordenarMapAJob(t_DestinoMap* destinoDeMap, int socket) {
 
 int recibirResultadoDeMap(int sockjob, t_ResultadoMap* resultadoMap) {
 
-	resultadoMap->prot = recibirProtocoloEnOrden(sockjob);
+	resultadoMap->prot = recibirInt(sockjob);
 
 	switch (resultadoMap->prot) {
 	case OK_MAP:
@@ -204,7 +203,8 @@ int recibirResultadoDeMap(int sockjob, t_ResultadoMap* resultadoMap) {
 		break;
 	}
 
-	return recibirIntEnOrden(sockjob, &(resultadoMap->id_map));
+	resultadoMap->id_map = recibirInt(sockjob);
+	return 1;
 }
 
 void agregarMapPendiente(t_list* mapsPendientes, t_InfoArchivo* infoArchivo,
@@ -336,6 +336,9 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 		}
 	}
 
+	printf("\nEnvie todos los pedidos");
+	fflush(stdout);
+
 	t_ResultadoMap resultadoDeMap;
 
 	int encuentreMapPendiente(t_MapPendiente* pending_map) {
@@ -343,17 +346,21 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 	}
 
 	while (!list_is_empty(listaMapsPendientes)) {
+
+
 		//se queda esperando los resultados de los job mientras que la lista
 		//de pendientes no esté vacía
 
 		//recibe el resultado de un map por parte del job
 		resultado = recibirResultadoDeMap(sockjob, &resultadoDeMap);
+		printf("\nSali de recibir resultado\n");
+		fflush(stdout);
 
 		//En base al resultado, realiza las tareas que le corresponden
 		if (resultado > 0) {
 
 			switch (resultadoDeMap.prot) {
-			case MAP_OK:
+			case OK_MAP:
 				borrarMapPendiente(listaMapsPendientes, resultadoDeMap.id_map,
 						ListaTemporal, &ultimoIDTemporal);
 				break;
