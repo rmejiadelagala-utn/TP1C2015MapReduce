@@ -36,7 +36,7 @@ int responderOrdenMapAMarta(int sockMarta,t_ordenMap ordenMapper, int resOper){
 	if(resOper==OK_MAP){
 		bufferAgregarInt(buffer,OK_MAP);
 	} else
-		bufferAgregarInt(buffer,NOTOK_MAP);
+		bufferAgregarInt(buffer,NODO_NOT_FOUND);
 	bufferAgregarInt(buffer,ordenMapper.id_map);
 	//bufferAgregarInt(buffer,ordenMapper.id_nodo);
 	result_envio=enviarBuffer(buffer,sockMarta);
@@ -44,6 +44,7 @@ int responderOrdenMapAMarta(int sockMarta,t_ordenMap ordenMapper, int resOper){
 }
 
 void* hilo_mapper (void* arg_thread){
+
 	t_arg_hilo_map ordenToNodo;
 	t_ordenMap ordenMapper;
 	ordenToNodo= *((t_arg_hilo_map*)arg_thread);
@@ -62,7 +63,13 @@ void* hilo_mapper (void* arg_thread){
 	struct in_addr addr;
 	addr.s_addr=ordenMapper.ip_nodo;
 	ip_nodo_char= inet_ntoa(addr);
-	sockNodo= crearCliente(ip_nodo_char,puerto_nodo);
+	if ((sockNodo= crearCliente(ip_nodo_char,puerto_nodo))<0){
+		void* buffer = crearBufferConProtocolo(NODO_NOT_FOUND);
+		int protocolo=NODO_NOT_FOUND;
+		printf("\n\n\nProtocolo que le mando a marta: %d\n\n\n",protocolo);
+		enviarBuffer(buffer,sockMarta);
+		return -1;
+	}
 	//Enviamos rutina mapper a Nodo
 	fflush(stdout);
 	res=enviarMapperANodo(sockNodo,codigoMapper,block,tmp_file_name);

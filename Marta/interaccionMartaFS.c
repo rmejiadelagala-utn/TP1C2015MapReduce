@@ -15,7 +15,7 @@ void* interaccionMartaFS(void* sock){
 		return unRegistro->id == id;
 	}
 	void mostrarCargaNodo(t_CargaNodo* cargaNodo){
-		printf("ID del Nodo: %d.\n",cargaNodo->id_nodo);
+		printf("ID del Nodo: %d. Su carga actual es: %d\n",cargaNodo->id_nodo, cargaNodo->cantidadOperacionesEnCurso);
 	}
 	void mostrarRegistro(t_registro_id_ipPuerto* unRegistro){
 		printf("ID: %d.--------------IP: %s. Puerto: %d\n",unRegistro->id,inet_ntoa(unRegistro->ip),unRegistro->puerto);
@@ -39,7 +39,13 @@ void* interaccionMartaFS(void* sock){
 			break;
 		case MARTA_SE_CAYO_UN_NODO:
 			recvall(socket,&id,sizeof(int));
+
+			pthread_mutex_lock(&mutexListaNodo);
+
 			list_remove_and_destroy_by_condition(cargaNodos,(void*)coincideIDNodo,(void*)free);
+
+			pthread_mutex_unlock(&mutexListaNodo);
+
 			list_remove_and_destroy_by_condition(listaRegistrosIDIP,(void*)coincideIDRegistro,(void*)free);
 			printf("Nodos:\n");
 			list_iterate(cargaNodos,(void*)mostrarCargaNodo);

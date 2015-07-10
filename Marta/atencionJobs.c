@@ -23,7 +23,7 @@ void deserealizar(char* buffer, int sockCliente) {
 	printf("tam_payload: %d\n", tam_payload);
 	//payload tiene los datos sin el tamaño total
 	payload=(char*)malloc(tam_payload);
-	if((nbytes=recv(sockCliente,payload,tam_payload,0))<=0) {
+	if((nbytes=recvall(sockCliente,payload,tam_payload))<=0) {
         // error o conexión cerrada por el cliente
         if (nbytes == 0) {
             // conexión cerrada

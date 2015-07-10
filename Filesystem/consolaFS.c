@@ -604,7 +604,7 @@ int verBloqueDeArchivo(t_archivo *unArchivo, int nroBloque){
 
 		free(buffer);
 
-		sem_wait(&escuchar_sem);
+		sem_post(&escuchar_sem);
 
 		return 1;
 

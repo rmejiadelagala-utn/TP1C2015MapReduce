@@ -270,9 +270,9 @@ int enviarBuffer(t_buffer* buffer, int socket){
 	int recibirBloqueDeNodo(int socket, void* buffer){
 		int tamanio;
 		recvall(socket,&tamanio,4);
-		*(char**)buffer = malloc(tamanio+2);
+		*(char**)buffer = malloc(tamanio);
 		int resultado = recvall(socket,*(char**)buffer,tamanio);
-		return resultado;
+		return tamanio;
 
 	}
 	//De Marta
