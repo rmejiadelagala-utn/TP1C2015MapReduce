@@ -87,14 +87,34 @@ int main() {
 		 cargarNodo();
 		 fclose(fpNodos);
 	*/
-		/*
+/*
 		fpDir = fopen("directorios.bin", "wb+");
 		t_directorio *dirA = nuevoDirectorio(2,"pepito",0);
-		guardarDir(dirA);
+		mostrarDirectorio(dirA);
+		guardarDirectorio(dirA);
 		fseek(fpDir, SEEK_SET, 0);
-		cargarDir();
+		dirA = cargarDirectorio();
+		mostrarDirectorio(dirA);
 		fclose(fpDir);
-	*/
+*/
+	/*
+	t_directorio *directorioRoot = nuevoDirectorio(1, "Root", 0);
+	t_directorio *directorioHome = nuevoDirectorio(3, "home", 1);
+	t_directorio *directorioMedia = nuevoDirectorio(2, "media", 1);
+	t_directorio *directorioFotos = nuevoDirectorio(10, "fotos", 2);
+
+	list_add(listaDirectorios, directorioRoot);
+	list_add(listaDirectorios, directorioHome);
+	list_add(listaDirectorios, directorioMedia);
+	list_add(listaDirectorios, directorioFotos);
+	mostrarLista(listaDirectorios,(void*) mostrarDirectorio);
+	guardarListaDirectorios();
+	list_destroy_and_destroy_elements(listaDirectorios, (void*) liberarDirectorio);
+	listaDirectorios = list_create();
+	cargarListaDirectorios();
+	mostrarLista(listaDirectorios,(void*) mostrarDirectorio);
+	printf("termino\n");
+*/
 //fin de prueba de persistencia
 
 	/*//probando funcion de mostrar listas

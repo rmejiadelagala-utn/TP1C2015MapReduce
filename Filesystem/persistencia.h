@@ -45,7 +45,9 @@ void guardarDirectorio(t_directorio *unDir) ;
  * @NAME: cargarDirectorio
  * @DESC: Carga un directorio desde el archivo apuntado por fpDir y lo agrega a la listaDirectorios
  */
-void cargarDirectorio();
+t_directorio *cargarDirectorio();
 
+void guardarListaDirectorios();
+void cargarListaDirectorios();
 
 #endif /* PERSISTENCIA_H_ */

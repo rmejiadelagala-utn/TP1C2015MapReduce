@@ -7,6 +7,8 @@
 #include "persistencia.h"
 
 static void escribirCola(FILE * fp,t_queue *cola);
+static void fwrite_str(char* string,FILE *fp);
+static void fread_str(char** string,FILE *fp);
 
 //Funciones para guardar estructuras basicas
 
@@ -53,20 +55,32 @@ void cargarNodo() {
 
 void guardarDirectorio(t_directorio *unDir) {
 	fwrite(&unDir->index, sizeof(unDir->index), 1, fpDir);
-	fwrite(strlen(unDir->nombre)+1, sizeof(int), 1, fpDir);
-	fwrite(&unDir->nombre, strlen(unDir->nombre)+1, 1, fpDir);
+	fwrite_str(unDir->nombre,fpDir);
 	fwrite(&unDir->padre, sizeof(unDir->padre), 1, fpDir);
 }
-void cargarDirectorio() {
+t_directorio *cargarDirectorio() {
 	t_directorio *unDir = malloc(sizeof(t_directorio)); //nueva estructura
-	int length;
-	//asignacion de valores a la estructura
-	fread(&unDir->index, sizeof(unDir->index), 1, fpArch);
-	fread(&length, sizeof(int), 1, fpArch);
-	unDir->nombre = malloc(length);
-	fread(&unDir->nombre, length, 1, fpArch);
+	fread(&unDir->index, sizeof(unDir->index), 1, fpDir);
+	fread_str(&unDir->nombre,fpDir);
 	fread(&unDir->padre, sizeof(unDir->padre), 1, fpDir);
-	list_add(listaDirectorios, unDir);
+	return unDir;
+}
+
+void guardarListaDirectorios() {
+	fpDir = fopen("directorios.txt", "w");//era wb+
+	list_iterate(listaDirectorios,(void*)guardarDirectorio);
+	fclose(fpDir);
+}
+
+void cargarListaDirectorios() {
+	fpDir = fopen("directorios.txt", "r");
+	t_directorio *unDir;
+	while(!feof(fpDir)) {
+		unDir = cargarDirectorio();
+		if (!feof(fpDir)) list_add(listaDirectorios,unDir);
+		//esto lo tengo que hacer así porque el eof da true cuando se paso, entonces la ultima estructura podria estar mal. Por lo tanto no quiero agregarla a la lista
+	}
+	fclose(fpDir);
 }
 /*
 void mostrarBloqueArch(t_bloqueArch *bloqueArch) {
@@ -125,4 +139,15 @@ static void escribirCola(FILE * fp,t_queue *cola){
 		fwrite(&entero, sizeof(int), 1, fp);
 	}
 	if(!queue_is_empty(cola)) list_iterate(cola->elements,(void*) escribirEntero);
+}
+static void fwrite_str(char* string,FILE *fp) {
+	int length =(strlen(string)+1);
+	fwrite(&length, sizeof(int), 1, fp);
+	fwrite(string, sizeof(char), length, fp);
+}
+static void fread_str(char** string,FILE *fp) {
+	int length;
+	fread(&length, sizeof(int), 1, fpDir);
+	*string = malloc(length);
+	fread(*string, sizeof(char), length, fpDir);
 }
