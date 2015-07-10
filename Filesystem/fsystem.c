@@ -79,15 +79,41 @@ int main() {
 		 cargarBloqueEnNodo();
 		 fclose(fpArch);
 	*/
+	//Pruebas persistir Nodos
 		/*
-		fpNodos = fopen("nodos.bin", "wb+");
-		 t_nodo *nodoA = nuevoNodo(2,50);
-		 guardarNodo(nodoA);
-		 fseek(fpNodos, SEEK_SET, 0);
-		 cargarNodo();
-		 fclose(fpNodos);
+	fpNodos = fopen("nodos.bin", "wb+");
+	 t_nodo *nodoA = nuevoNodo(2,50);
+	 guardarNodo(nodoA);
+	 fseek(fpNodos, SEEK_SET, 0);
+	 cargarNodo();
+	 fclose(fpNodos);
 	*/
-/*
+	/*
+	t_nodo *nodoA = nuevoNodo(2, 10);
+	t_nodo *nodoB = nuevoNodo(3, 20);
+	t_nodo *nodoC = nuevoNodo(4, 60);
+
+	nodoA->cantidadBloquesOcupados = 1;
+	int *a = malloc(sizeof(int));
+	*a = 1;
+	queue_push(nodoA->bloquesLiberados, a);
+	int *b = malloc(sizeof(int));
+	*b = 2;
+	queue_push(nodoA->bloquesLiberados, b);
+	printf("%d\n", queue_size(nodoA->bloquesLiberados) );
+	list_add(listaNodos, nodoA);
+	list_add(listaNodos, nodoB);
+	list_add(listaNodos, nodoC);
+
+	mostrarLista(listaNodos,(void*) mostrarNodo);
+	guardarListaNodos();
+	list_destroy_and_destroy_elements(listaNodos, (void*) liberarNodo);
+	listaNodos = list_create();
+	cargarListaNodos();
+	mostrarLista(listaNodos,(void*) mostrarNodo);
+	printf("termino\n");
+	*/
+/*Pruebas persistir directorios
 		fpDir = fopen("directorios.bin", "wb+");
 		t_directorio *dirA = nuevoDirectorio(2,"pepito",0);
 		mostrarDirectorio(dirA);
@@ -119,12 +145,6 @@ int main() {
 
 	/*//probando funcion de mostrar listas
 
-
-
-
-
-
-
 	 t_directorio *directorioRoot = nuevoDirectorio(1, "Root", 0);
 	 t_directorio *directorioHome = nuevoDirectorio(3, "home", 1);
 	 t_directorio *directorioMedia = nuevoDirectorio(2, "media", 1);
@@ -141,22 +161,10 @@ int main() {
 	 t_nodo *nodoC = nuevoNodo("127.0.0.1:243C", 60);
 
 
-
-
-
-
-
-	 /*
 	 nodoA->cantidadBloquesOcupados = 1;
 	 int *a = malloc(sizeof(int));
 	 *a = 1;
 	 queue_push(nodoA->bloquesLiberados, a);
-
-
-
-
-
-
 
 	 nodoA->cantidadBloquesOcupados = 0;
 	 nodoB->cantidadBloquesOcupados = 3;
@@ -167,22 +175,9 @@ int main() {
 	 list_add(listaNodos, nodoC);
 
 
-
-
-
-
-
-
-
 	 //	mostrarLista(listaNodos, (void*) mostrarNodo);
 
 	 //muestro archivos
-
-
-
-
-
-
 
 	 t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo("127.0.0.1:80A", 11);
 	 t_bloqueEnNodo *copiaBloqueA1C2 = nuevoBloqueEnNodo("127.0.0.1:12B", 12);

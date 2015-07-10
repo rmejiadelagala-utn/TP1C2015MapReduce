@@ -24,7 +24,6 @@ t_list *listaNodos;
 t_list *listaDirectorios;
 static int registroID(t_registro_id_ipPuerto *unRegistro);
 static bool ordenarPorMenorUso(t_nodo *data, t_nodo *dataSiguiente);
-static int buscarPosicionEnListaDadoUnArchivo(t_list *lista, t_archivo *archivo);
 static bool existeEseIndiceComoPadre(t_list *listaDirectorios, int padre);
 static int indiceNuevo(t_list *listaDirectorio);
 static int nodoID(t_nodo *unNodo);
@@ -659,19 +658,6 @@ static char* archNombre(t_archivo *unArch) {
 	return unArch->nombre;
 }
 
-//XXX posible eliminacion
-static int buscarPosicionEnListaDadoUnArchivo(t_list *listaArchivos,
-		t_archivo *archivo) {
-	int posDondeReemplazar = -1;
-//Busco la posición en la lista de este archivo que debo modificar
-	int i = 0;
-	for (i = 0; i < listaArchivos->elements_count; i++) {
-		if (list_get(listaArchivos, i) == archivo) {
-			posDondeReemplazar = i;
-		}
-	}
-	return posDondeReemplazar;
-}
 
 static int indiceNuevo(t_list *listaDirectorio) {
 	int i;
@@ -710,7 +696,6 @@ static bool existeEseIndiceComoPadre(t_list *listaDirectorios, int padre) {
 	return list_any_satisfy(listaDirectorios, (bool*) existePadre);
 }
 
-//XXX posible eliminacion
 int obtenerArchivo(t_archivo *archivo) {
 	if (!(archivo->estado)) {
 		printf("Archivo no está disponible.");
