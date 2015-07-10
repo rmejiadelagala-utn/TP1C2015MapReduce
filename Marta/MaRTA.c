@@ -20,6 +20,7 @@ int main(/*int argc, char *argv[]*/) {
 	sem_init(&funcionesMarta,0,0);
 	sem_init(&interaccionFS,0,0);
 	listaTemporal = list_create();
+	contadorDeIdJob=0;
 
 
 	/*if (argc != 2){

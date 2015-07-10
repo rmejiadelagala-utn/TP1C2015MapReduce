@@ -68,7 +68,8 @@ void deserealizar(char* buffer, int sockCliente) {
 		//Pido al FileSystem los bloques en los que esta el archivo
 		t_InfoJob info_job;
 		info_job.combiner=solicitud.combiner;
-		//info_job.idJob= TODO, de donde saco la id del job?
+		info_job.idJob= contadorDeIdJob;
+		contadorDeIdJob++;
 		info_job.pathDeResultado=strdup(solicitud.archivo_resultado);
 		int j;
 		for(j=0;j<cant_arch;j++){

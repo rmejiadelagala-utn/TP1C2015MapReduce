@@ -68,7 +68,8 @@ void* conexionJobs(void* sockJobNodo){
 	int recibido;
 	int i;
 	int protocolo;
-	char* unString;
+	char* script;
+	char* archivoSalida;
 	int nroBloque;
 	int cantArchivosRecibidos;
 	t_list* archivosRecibidos;
@@ -78,9 +79,12 @@ void* conexionJobs(void* sockJobNodo){
 			//Dejo que el nodo conteste que todo esta bien por ahora, despues hay que hacer el map aca
 
 			printf("Recibi una orden de map, esta todo OK.\n");
-			unString=recibirString(sock_in);
+			script=recibirString(sock_in);
 			recvall(sock_in,&nroBloque,sizeof(int));
-			unString=recibirString(sock_in);
+			archivoSalida=recibirString(sock_in);
+			printf("El script recibido es %s\n",script);
+			printf("El archivo de salida recibido es %s\n",archivoSalida);
+			ejecutarMapper(script,archivoSalida,);
 			protocolo=RES_MAP;
 			sendall(sock_in,&protocolo,sizeof(int));
 			protocolo=OK_MAP;

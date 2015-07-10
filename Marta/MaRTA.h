@@ -31,5 +31,6 @@ t_config *config;
 sem_t funcionesMarta;
 sem_t interaccionFS;
 t_list* listaTemporal;
+int contadorDeIdJob;
 
 #endif /* MARTA_H_ */
