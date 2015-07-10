@@ -239,7 +239,7 @@ void crearScriptReduce(const char* codigo_script){
 	return;
 }
 
-int redireccionar_stdin_stdout(char *pathPrograma,char *pathArchivoSalida,char* data_bloque)
+int redireccionar_stdin_stdout_mapper(char *pathPrograma,char *pathArchivoSalida,char* data_bloque)
 {
 	FILE *stdin = NULL;
 
@@ -265,16 +265,42 @@ int redireccionar_stdin_stdout(char *pathPrograma,char *pathArchivoSalida,char* 
 	return 0;
 }
 
+int redireccionar_stdin_stdout_reduce(char *pathPrograma,char *pathArchivoSalida,char* data_bloque)
+{
+	FILE *stdin = NULL;
+
+	char *comando = malloc(strlen(pathPrograma)+12+strlen(pathArchivoSalida));
+
+	sprintf(comando,"%s | sort >> %s",pathPrograma, pathArchivoSalida);	
+
+	stdin = popen (comando,"w");
+
+	if (stdin != NULL){
+
+		fprintf(stdin, "%s\n",data_bloque);
+
+		pclose (stdin);
+		free(comando);
+	}
+	else{
+
+		printf("No se pudo ejecutar el programa!");
+		return -1;
+	}
+
+	return 0;
+}
+
 void ejecutarMapper(char * path_s, char* path_tmp, char* datos_bloque){
 
-	if ((redireccionar_stdin_stdout(path_s, path_tmp, datos_bloque)) < 0)
+	if ((redireccionar_stdin_stdout_mapper(path_s, path_tmp, datos_bloque)) < 0)
 		printf("Error al ejecutar Mapper");
 
 }
 
 void ejecutarReduce(char * path_s, char* path_tmp, char* datos_bloque){
 
-	if ((redireccionar_stdin_stdout(path_s, path_tmp, datos_bloque)) < 0)
+	if ((redireccionar_stdin_stdout_reduce(path_s, path_tmp, datos_bloque)) < 0)
 		printf("Error al ejecutar Reduce");
 
 }
