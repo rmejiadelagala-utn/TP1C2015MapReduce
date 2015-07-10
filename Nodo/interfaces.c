@@ -7,11 +7,11 @@
 #include "interfaces.h"
 
 #include <socketes/paquetesNodo.h>
-
+    char *DATOS;
 
 void* conexionFS(void* arg){
 
-    char *DATOS;
+
 	uint32_t tam_disco;
 	t_hilofs* ptr;
 	ptr = (t_hilofs*) arg;
@@ -84,7 +84,11 @@ void* conexionJobs(void* sockJobNodo){
 			archivoSalida=recibirString(sock_in);
 			printf("El script recibido es %s\n",script);
 			printf("El archivo de salida recibido es %s\n",archivoSalida);
-			ejecutarMapper(script,archivoSalida,);
+			crearScriptMapper(script);
+			char* dataAUX = malloc(BLKSIZE);
+			memcpy(dataAUX,DATOS+nroBloque*BLKSIZE,strlen(DATOS+nroBloque*BLKSIZE));
+			ejecutarMapper("/tmp/mapper.sh","/tmp/archivo",dataAUX);
+			free(dataAUX);
 			protocolo=RES_MAP;
 			sendall(sock_in,&protocolo,sizeof(int));
 			protocolo=OK_MAP;
