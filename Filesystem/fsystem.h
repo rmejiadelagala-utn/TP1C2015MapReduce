@@ -46,6 +46,7 @@ enum condConexionNodo {
 #include <semaphore.h>
 #include <commons/string.h>
 #include "interaccionMarta.h"
+#include "persistencia.h"
 
 
 t_config* config;

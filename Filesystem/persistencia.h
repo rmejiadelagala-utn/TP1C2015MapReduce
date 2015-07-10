@@ -33,7 +33,7 @@ void guardarNodo(t_nodo *unNodo);
  * @NAME: cargarNodo
  * @DESC: carga un nodo desde el archivo apuntado por fpNodos y lo agrega a la listaNodos
  */
-void cargarNodo();
+t_nodo *cargarNodo();
 
 /**
  * @NAME: guardarDirectorio
@@ -45,7 +45,11 @@ void guardarDirectorio(t_directorio *unDir) ;
  * @NAME: cargarDirectorio
  * @DESC: Carga un directorio desde el archivo apuntado por fpDir y lo agrega a la listaDirectorios
  */
-void cargarDirectorio();
+t_directorio *cargarDirectorio();
 
+void guardarListaDirectorios();
+void cargarListaDirectorios();
+void guardarListaNodos();
+void cargarListaNodos();
 
 #endif /* PERSISTENCIA_H_ */
