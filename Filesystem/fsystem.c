@@ -469,6 +469,11 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* nombreArchi
 }
 
 void *interaccionFSNodo(void* sock_ptr) {
+
+	int tamanioBloqueRecibido;
+
+	int tamanioPosta;
+
 	int socket = *(int*) sock_ptr;
 	int protocolo;
 	int recibido;
@@ -538,9 +543,15 @@ void *interaccionFSNodo(void* sock_ptr) {
 			recibido = recvall(socket, &protocolo, 4);
 				switch(protocolo){
 				case COPIAR_ARCHIVO_A_FS_LOCAL:
-					//La consola se encarga del resto
-					recibirBloqueDeNodo(socket, (void*) &buffer);
-					write(fileno(archivoReconstruido), buffer, strlen(buffer));
+					tamanioBloqueRecibido = recibirBloqueDeNodo(socket, (void*) &buffer);
+					tamanioPosta =  strlen(buffer);
+
+					printf("El tamaño calculado es de %d, pero en realidad guardo %d\n",tamanioBloqueRecibido,tamanioPosta);
+
+					tamanioBloqueRecibido-=tamanioPosta;
+					printf("La diferencia entre ambos es %d\n",tamanioBloqueRecibido);
+
+					write(fileno(archivoReconstruido), buffer, tamanioPosta);
 					free(buffer);
 					sem_post(&semaforo);
 					break;
@@ -599,9 +610,14 @@ void *interaccionFSNodo(void* sock_ptr) {
 	}
 
 	if (recibido == 0) {
-		nodo->activo = 0;
-		martaSeCayoUnNodo(socketDeMarta, id);
-		printf("Nodo desconectado.\n");
+		if(nodo){
+			nodo->activo = 0;
+			printf("Nodo desconectado.\n");
+		}
+		else{
+			martaSeCayoUnNodo(socketDeMarta, id);
+			printf("Marta desconectada.\n");
+		}
 	}
 	if (recibido < 0) {
 		printf("Error.");

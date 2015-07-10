@@ -65,11 +65,18 @@ t_CopiaDeBloque* elegirMejorNodoParaMap(t_list* copiasDeBloque) {
 	}
 
 	//ordena las copiasDeBloque por los nodos que menos están trabajando
+	pthread_mutex_lock(&mutexListaNodo);
+
+	printf("Voy a ordenar las copias de bloque\n");
+	fflush(stdout);
 	list_sort(copiasDeBloque, (void*) compararNodosPorMenorCarga);
+
+	pthread_mutex_unlock(&mutexListaNodo);
 
 	//elijo la primera de las copias de la lista ordena por menor carga.
 	t_CopiaDeBloque* copiaElegida = list_get(copiasDeBloque, 0);
 	printf("La copia elegida tiene id %d\n", copiaElegida->id_nodo);
+	fflush(stdout);
 	return list_get(copiasDeBloque, 0);
 }
 
@@ -146,6 +153,7 @@ t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 	list_destroy_and_destroy_elements(copiasDeBloque,
 			(void *) liberarCopiaDeBloque);
 
+	fflush(stdout);
 	return self;
 }
 
@@ -165,12 +173,14 @@ int ordenarMapAJob(t_DestinoMap* destinoDeMap, int socket) {
 	bufferAgregarString(map_order, destinoDeMap->temp_file_name,
 			strlen(destinoDeMap->temp_file_name) + 1);
 
+
 	result = enviarBuffer(map_order, socket);
 
 	if (result < 0) {
 		printf("No se Pudo enviar la Orden de Map al Job");
 	}
 
+	printf("Le mandé la orden al job\n");
 	return result;
 }
 
@@ -187,7 +197,7 @@ int recibirResultadoDeMap(int sockjob, t_ResultadoMap* resultadoMap) {
 		printf("No se encontró el nodo donde mapear");
 		break;
 
-	case DISCONNECTED:
+	case 0:
 		printf("Job se desconectó de forma inesperada");
 		return 0;
 		break;
@@ -366,6 +376,8 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 				break;
 
 			case NODO_NOT_FOUND:
+				printf("\n\n\n\n\nNO SE ENCONTRO UN NODO\n\n\n\n\n");
+				fflush(stdout);
 				mapPendiente = list_find(listaMapsPendientes,
 						(void *) encuentreMapPendiente);
 

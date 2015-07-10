@@ -48,8 +48,7 @@ int crearCliente(char *ip, uint16_t port) {
 	dest.sin_addr.s_addr = inet_addr(ip);
 
 	if (connect(sock, (struct sockaddr*) &dest, sizeof(dest)) == (-1)) {
-		perror("connect");
-		exit(1);
+		return -1;
 	}
 
 	printf("Conectado con server en %s:%d\n", ip, port);

@@ -79,10 +79,8 @@ static bool tieneLugar(t_nodo *unNodo);
 
 
 int nodoEstaActivo (t_registro_id_ipPuerto* unRegistro){
-	t_nodo* unNodo = malloc(sizeof(t_nodo));
-	unNodo= buscarNodoPorId(unRegistro->id,listaNodos);
+	t_nodo* unNodo = buscarNodoPorId(unRegistro->id,listaNodos);
 	int activo = unNodo->activo;
-	free(unNodo);
 	return activo;
 }
 
@@ -176,7 +174,7 @@ int setBloque(t_nodo* nodo, char* dataBloque, int tamanio, int comienzoDeBloque,
 	t_bloqueEnNodo *bloqueEnNodo;
 	//cargarEnListaArchivoElNodo(nodoElegido);
 	if (queue_is_empty(nodo->bloquesLiberados)) {
-		posicionEnNodo = nodo->cantidadBloquesOcupados + 1;
+		posicionEnNodo = nodo->cantidadBloquesOcupados +1 ; //TODO tratar de hacer que empiece desde 0
 	} else {
 		aux = queue_pop(nodo->bloquesLiberados);
 		posicionEnNodo = *aux;

@@ -86,8 +86,8 @@ void* conexionJobs(void* sockJobNodo){
 			printf("El script recibido es %s\n",script);
 			printf("El archivo de salida recibido es %s\n",archivoSalida);
 			crearScriptMapper(script);
-			char* dataAUX = malloc(BLKSIZE);
-			memcpy(dataAUX,DATOS+nroBloque*BLKSIZE,strlen(DATOS+nroBloque*BLKSIZE));
+			char* dataAUX = malloc(strlen(DATOS+(nroBloque*BLKSIZE))-1);
+			memcpy(dataAUX,DATOS+(nroBloque*BLKSIZE),strlen(DATOS+(nroBloque*BLKSIZE))-1);
 			ejecutarMapper("/tmp/mapper.sh",archivoSalida,dataAUX);
 			free(dataAUX);
 			protocolo=RES_MAP;
