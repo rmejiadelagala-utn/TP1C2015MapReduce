@@ -592,7 +592,11 @@ void *interaccionFSNodo(void* sock_ptr) {
 			}
 			else {
 				printf("Voy a entrar a enviar copia al socket %d\n",socket);
-				enviarCopiasAMarta(socket,copias);
+				int suNodoEstaActivo(t_bloqueEnNodo* copiaDeBloque){
+					t_nodo* unNodo = buscarNodoPorId(copiaDeBloque->id,listaNodos);
+					return unNodo->activo;
+				}
+				enviarCopiasAMarta(socket,list_filter(copias,suNodoEstaActivo));
 			}
 			//TODO completar esta funcion
 
@@ -613,9 +617,9 @@ void *interaccionFSNodo(void* sock_ptr) {
 		if(nodo){
 			nodo->activo = 0;
 			printf("Nodo desconectado.\n");
+			martaSeCayoUnNodo(socketDeMarta, id);
 		}
 		else{
-			martaSeCayoUnNodo(socketDeMarta, id);
 			printf("Marta desconectada.\n");
 		}
 	}

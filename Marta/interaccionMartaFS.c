@@ -22,8 +22,10 @@ void* interaccionMartaFS(void* sock){
 	}
 	while ((recibido=recvall(socket,&protocolo,4))>0) {
 		switch (protocolo) {
+
 		case MARTA_ACTUALIZA_EL_REGISTRO:
 			printf("Se recibio el mensaje.\n");
+			fflush(stdout);
 			registroRecibido = recibirRegistroNodo(socket);
 			id=registroRecibido->id;
 			list_add(listaRegistrosIDIP,registroRecibido);
@@ -54,7 +56,6 @@ void* interaccionMartaFS(void* sock){
 			fflush(stdout);
 			break;
 		case ENVIO_BLOQUEARCH_A_MARTA:
-			printf("Lei el protocolo ENVIO_BLOQUEARCH_A_MARTA.\n");
 			sem_post(&funcionesMarta);
 			printf("Despertate marta.\n");
 			sem_wait(&interaccionFS);

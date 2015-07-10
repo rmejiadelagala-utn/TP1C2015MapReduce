@@ -18,7 +18,7 @@ int procesarOrdenesDeMarta(int sockMarta, t_rutinas* rutinas) {
         switch (protocolo) {
         case ORDER_MAP:
             printf("Crear hilo mapper\n");
-        	sleep(5);
+        	sleep(2);
             crearHiloMapper(sockMarta, rutinas->MAPPER );
             break;
         case ORDER_REDUCE:

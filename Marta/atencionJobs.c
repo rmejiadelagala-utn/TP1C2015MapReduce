@@ -78,6 +78,7 @@ void deserealizar(char* buffer, int sockCliente) {
 			info_job.pathsDeArchivos[j]=(char*)malloc(strlen(solicitud.archivos[j])+1);
 		    info_job.pathsDeArchivos[j]=strdup(solicitud.archivos[j]);
 		}
+
 		t_list* listaDeArchivos = obtenerIDyCantBloquesDeArchivosDelFS(solicitud.archivos,cant_arch);
 		void mostrarCantidadDeBloquesPorArchivo(t_InfoArchivo* unaInfoArchivo){
 			printf("Recibi un archivo con %d bloques.\n",unaInfoArchivo->cantidadDeBloques);
@@ -147,7 +148,7 @@ void* atencionJobs(void* sock){
 				else {
                     // gestionar datos de un cliente
 					buff=(char*)malloc(sizeof(uint32_t));
-                    if ((nbytes = recv(i, buff, sizeof(uint32_t), 0)) <= 0) {
+                    if ((nbytes = recvall(i, buff, sizeof(uint32_t))) <= 0) {
                         // error o conexión cerrada por el cliente
                         if (nbytes == 0) {
                             // conexión cerrada

@@ -16,7 +16,11 @@ t_registro_id_ipPuerto* buscarRegistroPorId(int id) {
 
 t_list* obtenerIDyCantBloquesDeArchivosDelFS(char** archivos,int cantidadArchivos){
 	dameListaArchFS(socketDeFS,archivos,cantidadArchivos);
+	printf("Me pongo a esperar los archivos del FS");
+	fflush(stdout);
 	sem_wait(&funcionesMarta);
+	printf("Sali del semaforo");
+	fflush(stdout);
 	t_list* listaArchivos = list_create();
 	int i;
 	for (i=0;i<cantidadArchivos;i++){

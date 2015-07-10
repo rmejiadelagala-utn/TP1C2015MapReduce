@@ -162,7 +162,6 @@ int ordenarMapAJob(t_DestinoMap* destinoDeMap, int socket) {
 	int result;
 
 	//mostrar_map_dest(destinoDeMap);
-
 	t_buffer* map_order = crearBufferConProtocolo(ORDER_MAP);
 
 	bufferAgregarInt(map_order, destinoDeMap->id_map);
@@ -177,14 +176,17 @@ int ordenarMapAJob(t_DestinoMap* destinoDeMap, int socket) {
 	result = enviarBuffer(map_order, socket);
 
 	if (result < 0) {
-		printf("No se Pudo enviar la Orden de Map al Job");
+		printf("No se Pudo enviar la Orden de Map al Job\n");
 	}
-
+	else{
 	printf("Le mandé la orden al job\n");
+	}
 	return result;
 }
 
 int recibirResultadoDeMap(int sockjob, t_ResultadoMap* resultadoMap) {
+
+
 
 	resultadoMap->prot = recibirInt(sockjob);
 
@@ -199,7 +201,7 @@ int recibirResultadoDeMap(int sockjob, t_ResultadoMap* resultadoMap) {
 
 	case 0:
 		printf("Job se desconectó de forma inesperada");
-		return 0;
+		return -1;
 		break;
 
 	case -1:
@@ -346,7 +348,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 		}
 	}
 
-	printf("\nEnvie todos los pedidos");
+	printf("\nEnvie todos los pedidos\n");
 	fflush(stdout);
 
 	t_ResultadoMap resultadoDeMap;
@@ -363,7 +365,6 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 
 		//recibe el resultado de un map por parte del job
 		resultado = recibirResultadoDeMap(sockjob, &resultadoDeMap);
-		printf("\nSali de recibir resultado\n");
 		fflush(stdout);
 
 		//En base al resultado, realiza las tareas que le corresponden
@@ -380,11 +381,13 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 				fflush(stdout);
 				mapPendiente = list_find(listaMapsPendientes,
 						(void *) encuentreMapPendiente);
-
+				if(mapPendiente)printf("El resultado del map no es null\n");
+						else printf("El resultado del map es null\n");
 				liberarDestinoMap(mapPendiente->map_dest);
 				mapPendiente->map_dest = planificarMap(info_job,
 						mapPendiente->file->idArchivo, mapPendiente->block,
 						&ultimoIDMap);
+
 
 				resultado =
 						(mapPendiente->map_dest != NULL) ?
@@ -393,6 +396,8 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 								-2;
 
 				if (resultado <= 0) {
+					printf("\n\n\n VOY A DESTRUIR TODOS LOS MAPS PENDIENTES\n\n\n");
+					fflush(stdout);
 					list_destroy_and_destroy_elements(listaMapsPendientes,
 							(void *) liberarMapPendiente);
 					return -1;

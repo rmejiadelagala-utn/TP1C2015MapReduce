@@ -24,6 +24,7 @@ int recibirResultadoFromNodo(int sockNodo){
 		if(protocolo==RES_MAP){
 			recvall(sockNodo,&rptaNodoAJob,sizeof(uint32_t));
 		}else {
+			//printf("PROTOCOLO RECIBIDO: %d\n",protocolo);
 			printf("no entiendo el protocolo, usa: RES_MAP");
 		}
 		return rptaNodoAJob;
@@ -63,22 +64,25 @@ void* hilo_mapper (void* arg_thread){
 	struct in_addr addr;
 	addr.s_addr=ordenMapper.ip_nodo;
 	ip_nodo_char= inet_ntoa(addr);
+	sockNodo= crearCliente(ip_nodo_char,puerto_nodo);
 	if ((sockNodo= crearCliente(ip_nodo_char,puerto_nodo))<0){
+		printf("No se pudo conectar al nodo %d\n",ordenMapper.id_nodo);
+		fflush(stdout);
 		void* buffer = crearBufferConProtocolo(NODO_NOT_FOUND);
-		int protocolo=NODO_NOT_FOUND;
-		printf("\n\n\nProtocolo que le mando a marta: %d\n\n\n",protocolo);
+		bufferAgregarInt(buffer,ordenMapper.id_map);
 		enviarBuffer(buffer,sockMarta);
 		return -1;
 	}
 	//Enviamos rutina mapper a Nodo
-	fflush(stdout);
+
 	res=enviarMapperANodo(sockNodo,codigoMapper,block,tmp_file_name);
 	if(res<0){
 		printf("todo mal, no pude enviar mapper a Nodo: %d", ip_nodo_char);
-		exit(-1);
 	}
 	//recibir resultado de la Operacion mapper desde el Nodo
 	resOper=recibirResultadoFromNodo(sockNodo);
+	//printf("le mando a marta el protocolo %d\n", resOper);
+	fflush(stdout);
 	if(resOper==OK_MAP){
 		printf("mapper id= %d, terminó OK, aviso a Marta\n",ordenMapper.id_map);
 	} else {
