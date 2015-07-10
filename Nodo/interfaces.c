@@ -81,7 +81,8 @@ void* conexionJobs(void* sockJobNodo){
 			printf("Recibi una orden de map, esta todo OK.\n");
 			script=recibirString(sock_in);
 			recvall(sock_in,&nroBloque,sizeof(int));
-			archivoSalida=recibirString(sock_in);
+			archivoSalida=strdup("tmp/");
+			string_append(&archivoSalida,recibirString(sock_in));
 			printf("El script recibido es %s\n",script);
 			printf("El archivo de salida recibido es %s\n",archivoSalida);
 			crearScriptMapper(script);
