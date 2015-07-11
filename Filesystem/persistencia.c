@@ -14,17 +14,9 @@ static void fread_str(char** string,FILE *fp);
 
 //Funciones para guardar estructuras basicas
 //Persistencia para archivos
-void guardarBloqueEnNodo(t_bloqueEnNodo *bloqueEnNodo) {
-	fwrite(&bloqueEnNodo->id, sizeof(bloqueEnNodo->id), 1, fpArch);
-	fwrite(&bloqueEnNodo->numeroDeBloqueEnNodo, sizeof(bloqueEnNodo->numeroDeBloqueEnNodo), 1, fpArch);
-}
 
-t_bloqueEnNodo *cargarBloqueEnNodo() {
-	t_bloqueEnNodo *unBloqueEnNodo = malloc(sizeof(t_bloqueEnNodo)); //nueva estructura
-	fread(&unBloqueEnNodo->id, sizeof(unBloqueEnNodo->id), 1, fpArch);
-	fread(&unBloqueEnNodo->numeroDeBloqueEnNodo, sizeof(unBloqueEnNodo->numeroDeBloqueEnNodo), 1, fpArch);
-	return unBloqueEnNodo;
-}/*
+
+/*
 void guardarListabloqueEnNodo(t_list *listaBloqueEnNodo) {
 	int i = list_size(listaBloqueEnNodo);
 	fwrite(&i, sizeof(int), 1, fpArch);
@@ -43,16 +35,57 @@ t_list* cargarListabloqueEnNodo () {
 	return listaBloqueEnNodo;
 }*/
 
-fwrite_subList(t_list *subList, FILE *fp,void(*struct_writer)(void*));
 
-fread_subList(FILE *fp,void(*struct_reader)) ;
+void guardarBloqueEnNodo(t_bloqueEnNodo *bloqueEnNodo) {
+	fwrite(&bloqueEnNodo->id, sizeof(bloqueEnNodo->id), 1, fpArch);
+	fwrite(&bloqueEnNodo->numeroDeBloqueEnNodo, sizeof(bloqueEnNodo->numeroDeBloqueEnNodo), 1, fpArch);
+}
 
+void guardarBloqueDeArch(t_bloqueArch *unBloqueDeArch) {
+	fwrite_subList(unBloqueDeArch->copiasDeBloque,fpArch,(void*)guardarBloqueEnNodo);
+}
 
+void guardarArchivo(t_archivo *unArchivo){
+	fwrite(&unArchivo->estado, sizeof(unArchivo->estado), 1, fpArch);
+	fwrite_str(unArchivo->nombre,fpArch);
+	fwrite(&unArchivo->padre, sizeof(unArchivo->padre), 1, fpArch);
+	fwrite(&unArchivo->tamanio, sizeof(unArchivo->tamanio), 1, fpArch);
+	fwrite_subList(unArchivo->bloquesDeArch,fpArch,(void*)guardarBloqueDeArch);
 
+}
 
 void guardarListaArchivos() {
+	fwrite_List("archivos",listaArchivos, fpArch,(void*)guardarArchivo);
+}
+//t_list *fread_list(char* nombreArch, FILE *fp,void(*struct_reader
+t_bloqueEnNodo *cargarBloqueEnNodo() {
+	t_bloqueEnNodo *unBloqueEnNodo = malloc(sizeof(t_bloqueEnNodo)); //nueva estructura
+	fread(&unBloqueEnNodo->id, sizeof(unBloqueEnNodo->id), 1, fpArch);
+	fread(&unBloqueEnNodo->numeroDeBloqueEnNodo, sizeof(unBloqueEnNodo->numeroDeBloqueEnNodo), 1, fpArch);
+	return unBloqueEnNodo;
+}
+
+t_bloqueArch *cargarBloqueDeArch() {
+	t_bloqueArch *unBloqueDeArch = malloc(sizeof(t_bloqueArch));
+	fread_subList(unBloqueDeArch->copiasDeBloque,fpArch,(void*)cargarBloqueEnNodo);
+	return unBloqueDeArch;
+}
+
+t_list *cargarArchivo(){
+	t_archivo *unArchivo = malloc(sizeof(unArchivo));
+	fread(&unArchivo->estado, sizeof(unArchivo->estado), 1, fpArch);
+	fread_str(unArchivo->nombre,fpArch);
+	fread(&unArchivo->padre, sizeof(unArchivo->padre), 1, fpArch);
+	fread(&unArchivo->tamanio, sizeof(unArchivo->tamanio), 1, fpArch);
+	unArchivo->bloquesDeArch = fread_subList(unArchivo->bloquesDeArch,fpArch,(void*)cargarBloqueDeArch);
+	return unArchivo;
+}
+void cargarListaArchivos() {
+	listaArchivos = fwrite_List("archivos", fpArch,(void*)cargarArchivo);
+}
+/*void guardarListaArchivos() {
 	fpArch = fopen("archivos", "w+");//era wb+
-	list_iterate(listaNodos,(void*)guardarNodo);
+	list_iterate(listaArchivos,(void*)guardarArchivo);
 	fclose(fpArch);
 }
 
@@ -67,7 +100,7 @@ void cargarListaArchivos() {
 	fclose(fpArch);
 }
 
-
+*/
 
 
 
@@ -93,7 +126,15 @@ t_nodo *cargarNodo() {
 	return unNodo;
 
 }
-
+//void fwrite_List(char* nombreArch,t_list *list, FILE *fp,void(*struct_writer)(void*)) {
+void guardarListaNodos() {
+	fwrite_List("nodos",listaNodos, fpNodos,(void*)guardarNodo);
+}
+//t_list *fread_list(char* nombreArch, FILE *fp,void(*struct_reader))
+void cargarListaNodos() {
+	listaNodos = fread_list("nodos", fpNodos,(void*)cargarNodo);
+}
+/*
 void guardarListaNodos() {
 	fpNodos = fopen("nodos", "w+");//era wb+
 	int length;
@@ -115,7 +156,7 @@ void cargarListaNodos() {
 	fclose(fpNodos);
 }
 
-
+*/
 //persistencia para directorios
 void guardarDirectorio(t_directorio *unDir) {
 	fwrite(&unDir->index, sizeof(unDir->index), 1, fpDir);
@@ -130,7 +171,7 @@ t_directorio *cargarDirectorio() {
 	return unDir;
 }
 //void fwrite_List(char* nombreArch,t_list *list, FILE *fp,void(*struct_writer)(void*)) {
-t_list *fread_list(char* nombreArch, FILE *fp,void(*struct_reader))
+//t_list *fread_list(char* nombreArch, FILE *fp,void(*struct_reader))
 void guardarListaDirectorios() {
 	fwrite_List("directorios",listaDirectorios, fpDir,(void*)guardarDirectorio);
 }
