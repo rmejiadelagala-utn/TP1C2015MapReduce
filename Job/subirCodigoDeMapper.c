@@ -7,7 +7,7 @@
 #include "job.h"
 #include <sys/stat.h>
 
-char* subirCodigoDeMapper(char* path) {
+char* subirCodigoFromPathToBuffer(char* path) {
 
 	struct stat stat_file;
 	stat(path, &stat_file);

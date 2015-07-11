@@ -23,7 +23,7 @@ int procesarOrdenesDeMarta(int sockMarta, t_rutinas* rutinas) {
             break;
         case ORDER_REDUCE:
             printf("Crear hilo reducer\n");
-//            crearHiloReduce(sockMarta,rutinas->REDUCE);
+            crearHiloReduce(sockMarta,rutinas->REDUCE);
             break;
         case FIN_OPERACION:
             printf("Se terminó de procesar todos los archivos solicitados\n");

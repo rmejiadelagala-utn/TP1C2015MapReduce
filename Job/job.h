@@ -57,6 +57,33 @@ typedef struct {
 	t_ordenMap* ordenMapper;
 	} t_arg_hilo_map;
 
+
+/******************************
+* Estructuras para el Reduce *
+******************************/
+
+typedef struct {
+	uint32_t ip_nodo;
+	uint32_t puerto_nodo;
+	t_filename archTmp;
+} t_nodoArchTmp;
+
+typedef struct {
+//	uint32_t id_reduce;
+	uint32_t ip_nodo;
+	uint32_t puerto_nodo;
+	uint32_t cantArchAreducir;
+	t_nodoArchTmp** nodosArchTmp;
+	t_filename archResultado;
+}t_ordenReduce;
+
+typedef struct {
+	int sockMarta;
+	char* pathReduce;
+	t_ordenReduce* ordenReduce;
+} t_arg_hilo_reduce;
+
+
 void crearHiloMapper(int , char*);
 void crearHiloReduce(int , char*);
 t_config_job* leer_archivo_configuracion(char* arch);

@@ -190,7 +190,7 @@ void crearScriptMapper(const char* codigo_script){
 	
 	char *permisosCommand = string_new();
 
-	string_append(&permisosCommand, "chmod u+x ");
+	string_append(&permisosCommand, "chmod a+x ");
 	string_append(&permisosCommand,"/tmp/mapper.sh");
 
 	system(permisosCommand);

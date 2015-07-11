@@ -79,12 +79,14 @@ void* conexionJobs(void* sockJobNodo){
 			//Dejo que el nodo conteste que todo esta bien por ahora, despues hay que hacer el map aca
 
 			printf("Recibi una orden de map, esta todo OK.\n");
+			fflush(stdout);
 			script=recibirString(sock_in);
 			recvall(sock_in,&nroBloque,sizeof(int));
-			archivoSalida=strdup("tmp/");
+			archivoSalida=strdup("/tmp/");
 			string_append(&archivoSalida,recibirString(sock_in));
 			printf("El script recibido es %s\n",script);
 			printf("El archivo de salida recibido es %s\n",archivoSalida);
+			fflush(stdout);
 			crearScriptMapper(script);
 			char* dataAUX = malloc(strlen(DATOS+(nroBloque*BLKSIZE))-1);
 			memcpy(dataAUX,DATOS+(nroBloque*BLKSIZE),strlen(DATOS+(nroBloque*BLKSIZE))-1);
@@ -92,7 +94,7 @@ void* conexionJobs(void* sockJobNodo){
 			free(dataAUX);
 			protocolo=RES_MAP;
 			sendall(sock_in,&protocolo,sizeof(int));
-			protocolo=OK_MAP;
+			protocolo=OK_MAP; //TODO responder NOTOOK_MAP si hubo algun error
 			sendall(sock_in,&protocolo,sizeof(int));
 			break;
 
