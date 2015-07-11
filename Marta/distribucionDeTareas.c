@@ -172,21 +172,17 @@ int ordenarMapAJob(t_DestinoMap* destinoDeMap, int socket) {
 	bufferAgregarString(map_order, destinoDeMap->temp_file_name,
 			strlen(destinoDeMap->temp_file_name) + 1);
 
-
 	result = enviarBuffer(map_order, socket);
 
 	if (result < 0) {
 		printf("No se Pudo enviar la Orden de Map al Job\n");
-	}
-	else{
-	printf("Le mandé la orden al job\n");
+	} else {
+		printf("Le mandé la orden al job\n");
 	}
 	return result;
 }
 
 int recibirResultadoDeMap(int sockjob, t_ResultadoMap* resultadoMap) {
-
-
 
 	resultadoMap->prot = recibirInt(sockjob);
 
@@ -326,9 +322,10 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 					&ultimoIDMap);
 
 			//Si obtiene un destino, le ordena al job realizar el map en ese destino
-			resultado =
-					(destinoMap != NULL) ?
-							ordenarMapAJob(destinoMap, sockjob) : -2;
+			if (!destinoMap) {
+				resultado = ordenarMapAJob(destinoMap, sockjob);
+			} else
+				return -2;
 
 			if (resultado > 0) {
 				//agrega a la lista de maps pendientes ese map, con la info
@@ -359,7 +356,6 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 
 	while (!list_is_empty(listaMapsPendientes)) {
 
-
 		//se queda esperando los resultados de los job mientras que la lista
 		//de pendientes no esté vacía
 
@@ -381,13 +377,14 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 				fflush(stdout);
 				mapPendiente = list_find(listaMapsPendientes,
 						(void *) encuentreMapPendiente);
-				if(mapPendiente)printf("El resultado del map no es null\n");
-						else printf("El resultado del map es null\n");
+				if (mapPendiente)
+					printf("El resultado del map no es null\n");
+				else
+					printf("El resultado del map es null\n");
 				liberarDestinoMap(mapPendiente->map_dest);
 				mapPendiente->map_dest = planificarMap(info_job,
 						mapPendiente->file->idArchivo, mapPendiente->block,
 						&ultimoIDMap);
-
 
 				resultado =
 						(mapPendiente->map_dest != NULL) ?
@@ -396,7 +393,8 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 								-2;
 
 				if (resultado <= 0) {
-					printf("\n\n\n VOY A DESTRUIR TODOS LOS MAPS PENDIENTES\n\n\n");
+					printf(
+							"\n\n\n VOY A DESTRUIR TODOS LOS MAPS PENDIENTES\n\n\n");
 					fflush(stdout);
 					list_destroy_and_destroy_elements(listaMapsPendientes,
 							(void *) liberarMapPendiente);
@@ -419,13 +417,67 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 	return 1;
 }
 
+int ipDeNodo(int idNodo) {
+	t_registro_id_ipPuerto* registroIpPuerto = malloc(
+			sizeof(t_registro_id_ipPuerto));
+
+	//XXX ver warning. No lo entiendo bien
+	registroIpPuerto = buscarRegistroPorId(idNodo);
+
+	int ipDelNodo = registroIpPuerto->ip.s_addr;
+
+	free(registroIpPuerto);
+
+	return ipDelNodo;
+}
+
+int puertoDeNodo(int idNodo) {
+	t_registro_id_ipPuerto* registroIpPuerto = malloc(
+			sizeof(t_registro_id_ipPuerto));
+
+	//XXX ver warning. No lo entiendo bien
+	registroIpPuerto = buscarRegistroPorId(idNodo);
+
+	int puertoDelNodo = registroIpPuerto->puerto;
+
+	free(registroIpPuerto);
+
+	return puertoDelNodo;
+}
+
+
 int ordenarReduceAJob(t_DestinoReduce* destinoReduce, t_list* origenesDeReduce,
 		int sockJob) {
 
 	int resultado;
 
-	//todo Al final hacer liberacion de memoria de la lista destinosDeRecuce
+	//mostrar_map_dest(destinoDeMap);
+	t_buffer* reduce_order = crearBufferConProtocolo(ORDER_REDUCE);
 
+	//XXX decir si sse mandaono id_Reduce
+	///XXX puede ir o no esto. bufferAgregarInt(reduce_order, destinoReduce->id_nodo);
+	bufferAgregarInt(reduce_order, destinoReduce->ip_nodo);
+	bufferAgregarInt(reduce_order, destinoReduce->puerto_nodo);
+	bufferAgregarString(reduce_order, destinoReduce->temp_file_name,
+			strlen(destinoReduce->temp_file_name) + 1);
+	bufferAgregarInt(reduce_order, list_size(origenesDeReduce));
+
+	void bufferAgregarOrigenesReduce(t_OrigenReduce* unOrigenReduce) {
+		bufferAgregarInt(reduce_order, puertoDeNodo(unOrigenReduce->id_nodo));
+		bufferAgregarInt(reduce_order, ipDeNodo(unOrigenReduce->id_nodo));
+		bufferAgregarString(reduce_order, unOrigenReduce->temp_file_name,
+				strlen(unOrigenReduce->temp_file_name));
+	}
+
+	list_iterate(origenesDeReduce, (void*) bufferAgregarOrigenesReduce);
+
+	resultado = enviarBuffer(reduce_order, sockJob);
+
+	if (resultado < 0) {
+		printf("No se Pudo enviar la Orden de Reduce al Job\n");
+	} else {
+		printf("Le mandé la orden de Reduce al job\n");
+	}
 	return resultado;
 }
 
@@ -514,35 +566,6 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 
 		return origenReduce;
 	}
-
-	int ipDeNodo(int idNodo) {
-		t_registro_id_ipPuerto* registroIpPuerto = malloc(
-				sizeof(t_registro_id_ipPuerto));
-
-		//XXX ver warning. No lo entiendo bien
-		registroIpPuerto = buscarRegistroPorId(idNodo);
-
-		int ipDelNodo = registroIpPuerto->ip.s_addr;
-
-		free(registroIpPuerto);
-
-		return ipDelNodo;
-	}
-
-	int puertoDeNodo(int idNodo) {
-		t_registro_id_ipPuerto* registroIpPuerto = malloc(
-				sizeof(t_registro_id_ipPuerto));
-
-		//XXX ver warning. No lo entiendo bien
-		registroIpPuerto = buscarRegistroPorId(idNodo);
-
-		int puertoDelNodo = registroIpPuerto->puerto;
-
-		free(registroIpPuerto);
-
-		return puertoDelNodo;
-	}
-
 	//fin funciones auxiliares
 
 	t_list* mapsTemporalesDeLosArchivosDelJob = list_filter(listaMapsTemporales,
@@ -603,10 +626,9 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 			//, sino borra todo y cancela job
 			//si salio bien
 
-			if(resReduceEnNodo > 0){
+			if (resReduceEnNodo > 0) {
 				printf("");
 			}
-
 
 			list_add(destinosIntermedios, destinoIntermedioReduce);
 
@@ -677,8 +699,7 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 
 		if (resultado > 0) {
 			printf("Reduce sin combiner enviado exitosamente\n");
-		}
-		else{
+		} else {
 			printf("falló envío de la orden de reduce. Cancelo job\n");
 			//todo mandar a borrar cosas y eso. No se bien que hacer acá
 		}
@@ -694,7 +715,8 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 		list_destroy_and_destroy_elements(origenesDeReduce, (void*) free);
 	}
 
-	list_destroy_and_destroy_elements(mapsTemporalesDeLosArchivosDelJob, (void*)free);
+	list_destroy_and_destroy_elements(mapsTemporalesDeLosArchivosDelJob,
+			(void*) free);
 	return 1;
 }
 
