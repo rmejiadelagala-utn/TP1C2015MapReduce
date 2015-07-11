@@ -21,6 +21,7 @@
 #include "tests.h"
 #include "estructurasMaRTA.h"
 #include <semaphore.h>
+#include "interaccionJobs.h"
 
 pthread_mutex_t mutexListaNodo;
 t_list* cargaNodos;
@@ -31,6 +32,7 @@ t_config *config;
 sem_t funcionesMarta;
 sem_t interaccionFS;
 t_list* listaTemporal;
+
 int contadorDeIdJob;
 
 #endif /* MARTA_H_ */

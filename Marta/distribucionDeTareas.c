@@ -322,7 +322,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 					&ultimoIDMap);
 
 			//Si obtiene un destino, le ordena al job realizar el map en ese destino
-			if (!destinoMap) {
+			if (destinoMap) {
 				resultado = ordenarMapAJob(destinoMap, sockjob);
 			} else
 				return -2;
@@ -355,7 +355,6 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 	}
 
 	while (!list_is_empty(listaMapsPendientes)) {
-
 		//se queda esperando los resultados de los job mientras que la lista
 		//de pendientes no esté vacía
 

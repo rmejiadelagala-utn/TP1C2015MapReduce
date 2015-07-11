@@ -29,12 +29,14 @@ int main(/*int argc, char *argv[]*/) {
 	}
 	c=argv[1];*/
 	config=config_create("../marta.cfg");
-	serv = crearServer(config_get_int_value(config, "PORT")); //Jobs
+	//serv = crearServer(config_get_int_value(config, "PORT")); //Jobs con select
 	socketDeFS = crearCliente(config_get_string_value(config,"IP_FS"),config_get_int_value(config,"PUERTO_FS")); //FS
 	printf("EL VALOR DEL SOCKET DEL FILESYSTEM ES %d",socketDeFS);
 	fflush(stdout);
-	pthread_create(&thr, NULL, atencionJobs, (void*) &serv );
+	//pthread_create(&thr, NULL, atencionJobs, (void*) &serv ); con select
 	pthread_create(&thr_fs, NULL, interaccionMartaFS, (void*) &socketDeFS );
+	crearServerMultiHilo(config_get_int_value(config,"PORT"),interaccionJobs);
+
 
 
 	testear();
