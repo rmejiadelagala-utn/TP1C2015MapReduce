@@ -331,7 +331,7 @@ int main() {
 //	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 //	mostrarLista(listaNodos, (void*) mostrarNodo);
 //	mostrarLista(listaArchivos, (void*) mostrarArchivo);
-	system("clear");
+/*	system("clear");
 
 	char* path = "ConfigFS.cfg";
 

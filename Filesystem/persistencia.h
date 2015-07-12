@@ -51,9 +51,11 @@ void guardarListaDirectorios();
 void cargarListaDirectorios();
 void guardarListaNodos();
 void cargarListaNodos();
-void fwrite_subList(t_list *subList, FILE *fp,void(*struct_writer)(void*));
-t_list* fread_subList(FILE *fp,void(*struct_reader));
-void fwrite_List(char* nombreArch,t_list *list, FILE *fp,void(*struct_writer)(void*));
-t_list * fread_list(char* nombreArch, FILE *fp,void(*struct_reader);
+void guardarListaArchivos();
+void cargarListaArchivos();
+void guardarBloqueDeArch(t_bloqueArch *unBloqueDeArch);
+void guardarArchivo(t_archivo *unArchivo);
+t_bloqueArch *cargarBloqueDeArch();
+t_archivo *cargarArchivo();
 
 #endif /* PERSISTENCIA_H_ */

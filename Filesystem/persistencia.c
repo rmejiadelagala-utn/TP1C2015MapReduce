@@ -10,6 +10,10 @@ static void escribirCola(t_queue *cola, FILE * fp);
 static void leerCola(t_queue **cola, FILE * fp) ;
 static void fwrite_str(char* string,FILE *fp);
 static void fread_str(char** string,FILE *fp);
+static void fwrite_subList(t_list *subList, FILE *fp,void(*struct_writer)(void*));
+static t_list* fread_subList(FILE *fp,void*(*struct_reader)());
+static void fwrite_list(char* nombreArch,t_list *list, FILE *fp,void(*struct_writer)(void*));
+static t_list * fread_list(char* nombreArch, FILE *fp,void(*struct_reader));
 
 
 //Funciones para guardar estructuras basicas
@@ -55,7 +59,7 @@ void guardarArchivo(t_archivo *unArchivo){
 }
 
 void guardarListaArchivos() {
-	fwrite_List("archivos",listaArchivos, fpArch,(void*)guardarArchivo);
+	fwrite_list("archivos",listaArchivos, fpArch,(void*)guardarArchivo);
 }
 //t_list *fread_list(char* nombreArch, FILE *fp,void(*struct_reader
 t_bloqueEnNodo *cargarBloqueEnNodo() {
@@ -67,21 +71,21 @@ t_bloqueEnNodo *cargarBloqueEnNodo() {
 
 t_bloqueArch *cargarBloqueDeArch() {
 	t_bloqueArch *unBloqueDeArch = malloc(sizeof(t_bloqueArch));
-	fread_subList(unBloqueDeArch->copiasDeBloque,fpArch,(void*)cargarBloqueEnNodo);
+	fread_subList(fpArch,(void*)cargarBloqueEnNodo);
 	return unBloqueDeArch;
 }
 
-t_list *cargarArchivo(){
+t_archivo *cargarArchivo(){
 	t_archivo *unArchivo = malloc(sizeof(unArchivo));
 	fread(&unArchivo->estado, sizeof(unArchivo->estado), 1, fpArch);
-	fread_str(unArchivo->nombre,fpArch);
+	fread_str(&unArchivo->nombre,fpArch);
 	fread(&unArchivo->padre, sizeof(unArchivo->padre), 1, fpArch);
 	fread(&unArchivo->tamanio, sizeof(unArchivo->tamanio), 1, fpArch);
-	unArchivo->bloquesDeArch = fread_subList(unArchivo->bloquesDeArch,fpArch,(void*)cargarBloqueDeArch);
+	unArchivo->bloquesDeArch = fread_subList(fpArch,(void*)cargarBloqueDeArch);
 	return unArchivo;
 }
 void cargarListaArchivos() {
-	listaArchivos = fwrite_List("archivos", fpArch,(void*)cargarArchivo);
+	listaArchivos = fread_list("archivos", fpArch,(void*)cargarArchivo);
 }
 /*void guardarListaArchivos() {
 	fpArch = fopen("archivos", "w+");//era wb+
@@ -128,7 +132,7 @@ t_nodo *cargarNodo() {
 }
 //void fwrite_List(char* nombreArch,t_list *list, FILE *fp,void(*struct_writer)(void*)) {
 void guardarListaNodos() {
-	fwrite_List("nodos",listaNodos, fpNodos,(void*)guardarNodo);
+	fwrite_list("nodos",listaNodos, fpNodos,(void*)guardarNodo);
 }
 //t_list *fread_list(char* nombreArch, FILE *fp,void(*struct_reader))
 void cargarListaNodos() {
@@ -173,56 +177,22 @@ t_directorio *cargarDirectorio() {
 //void fwrite_List(char* nombreArch,t_list *list, FILE *fp,void(*struct_writer)(void*)) {
 //t_list *fread_list(char* nombreArch, FILE *fp,void(*struct_reader))
 void guardarListaDirectorios() {
-	fwrite_List("directorios",listaDirectorios, fpDir,(void*)guardarDirectorio);
+	fwrite_list("directorios",listaDirectorios, fpDir,(void*)guardarDirectorio);
 }
 void cargarListaDirectorios() {
 	listaDirectorios = fread_list("directorios", fpDir,(void*)cargarDirectorio);
 }
-/* *void guardarListaDirectorios() {
-	fpDir = fopen("directorios", "w");//era wb+
-	list_iterate(listaDirectorios,(void*)guardarDirectorio);
-	fclose(fpDir);
-}
-
-void cargarListaDirectorios() {
-	fpDir = fopen("directorios", "r");//probablemente en vez de r+ así si no existe lo crea
-	t_directorio *unDir;
-	while(!feof(fpDir)) {
-		unDir = cargarDirectorio();
-		if (!feof(fpDir)) list_add(listaDirectorios,unDir);
-		//esto lo tengo que hacer así porque el eof da true cuando se paso, entonces la ultima estructura podria estar mal. Por lo tanto no quiero agregarla a la lista
-	}
-	fclose(fpDir);
-}*/
-/*
-void mostrarBloqueArch(t_bloqueArch *bloqueArch) {
-	fprintf(fpArch, "%d\n", list_size(bloqueArch->copiasDeBloque));
-	list_iterate((bloqueArch->copiasDeBloque), (void*) mostrarBloqueEnNodo);
-}
-
-void mostrarArchivo(t_archivo *unArchivo) {
-	printf("Estado: %d\n", unArchivo->estado);
-	printf("Nombre: %s\n", unArchivo->nombre);
-	printf("Padre: %d\n", unArchivo->padre);
-	printf("Tamanio: %f\n", unArchivo->tamanio);
-	list_iterate((unArchivo->bloquesDeArch), (void*) mostrarBloqueArch);
-}
-
-void mostrarNombreArchivo(t_archivo *unArchivo){
-	printf("Archivo:\t");
-	printf("%s\n",unArchivo->nombre);
-}
-
-void mostrarLista(t_list *unaLista, void (*shower)(void*)) {
-	list_iterate(unaLista, shower);
-}*/
-void fwrite_List(char* nombreArch,t_list *list, FILE *fp,void(*struct_writer)(void*)) {
+//Funciones genéricas
+/**********************************************************************/
+/*********************** PRIVATE FUNCTIONS ****************************/
+/**********************************************************************/
+static void fwrite_list(char* nombreArch,t_list *list, FILE *fp,void(*struct_writer)(void*)) {
 	fp = fopen(nombreArch, "w+");//era wb+
 	fwrite_subList(list, fp,struct_writer);//ojo struct_writer // o (void*)struct_writer
 	fclose(fp);
 }
 
-t_list *fread_list(char* nombreArch, FILE *fp,void(*struct_reader)) {
+static t_list *fread_list(char* nombreArch, FILE *fp,void(*struct_reader)) {
 	fp = fopen(nombreArch, "r+");//probablemente en vez de r+ así si no existe lo crea
 	t_list *lista = fread_subList(fp,struct_reader);
 	fclose(fp);
@@ -230,26 +200,24 @@ t_list *fread_list(char* nombreArch, FILE *fp,void(*struct_reader)) {
 }
 
 
-void fwrite_subList(t_list *subList, FILE *fp,void(*struct_writer)(void*)) {
+static void fwrite_subList(t_list *subList, FILE *fp,void(*struct_writer)(void*)) {
 	int i = list_size(subList);
 	fwrite(&i, sizeof(int), 1, fp);
 	list_iterate(subList,struct_writer);//quizas (void*) struct_writer/
 }
 
-t_list* fread_subList(FILE *fp,void(*struct_reader)) {
+static t_list* fread_subList(FILE *fp,void*(*struct_reader)()) {
 	t_list* subList = list_create();
 	int length;
-		fread(&length, sizeof(int), 1, fp);
-		while(length) {
+	fread(&length, sizeof(int), 1, fp);
+	while(length) {
 		void *unElemento = struct_reader();//o *struct_writer();
 		list_add(subList, unElemento);
 		length--;
-		}
+	}
 	return subList;
 }
-/**********************************************************************/
-/*********************** PRIVATE FUNCTIONS ****************************/
-/**********************************************************************/
+
 static void escribirCola(t_queue *cola, FILE * fp){
 	int tamanioCola;
 	void escribirEntero(int *entero){
