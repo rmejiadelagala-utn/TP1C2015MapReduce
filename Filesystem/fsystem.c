@@ -143,7 +143,7 @@ int main() {
 	printf("termino\n");
 */
 //pruebas de persistencia 2.0
-	t_nodo *nodoA = nuevoNodo(2, 10);
+/*	t_nodo *nodoA = nuevoNodo(2, 10);
 	t_nodo *nodoB = nuevoNodo(3, 20);
 	t_nodo *nodoC = nuevoNodo(4, 60);
 
@@ -187,83 +187,83 @@ int main() {
 
 
 	t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo(2, 11);
-		 t_bloqueEnNodo *copiaBloqueA1C2 = nuevoBloqueEnNodo(3, 12);
-		 t_bloqueEnNodo *copiaBloqueA1C3 = nuevoBloqueEnNodo(4, 13);
-		 t_list *copiasBloqueA1 = list_create();
-		 list_add(copiasBloqueA1, copiaBloqueA1C1);
-		 list_add(copiasBloqueA1, copiaBloqueA1C2);
-		 list_add(copiasBloqueA1, copiaBloqueA1C3);
+	 t_bloqueEnNodo *copiaBloqueA1C2 = nuevoBloqueEnNodo(3, 12);
+	 t_bloqueEnNodo *copiaBloqueA1C3 = nuevoBloqueEnNodo(4, 13);
+	 t_list *copiasBloqueA1 = list_create();
+	 list_add(copiasBloqueA1, copiaBloqueA1C1);
+	 list_add(copiasBloqueA1, copiaBloqueA1C2);
+	 list_add(copiasBloqueA1, copiaBloqueA1C3);
 
-		 t_bloqueEnNodo *copiaBloqueA2C1 = nuevoBloqueEnNodo(2, 21);
-		 t_bloqueEnNodo *copiaBloqueA2C2 = nuevoBloqueEnNodo(3, 22);
-		 t_bloqueEnNodo *copiaBloqueA2C3 = nuevoBloqueEnNodo(4, 23);
-		 t_list *copiasBloqueA2 = list_create();
-		 list_add(copiasBloqueA2, copiaBloqueA2C1);
-		 list_add(copiasBloqueA2, copiaBloqueA2C2);
-		 list_add(copiasBloqueA2, copiaBloqueA2C3);
+	 t_bloqueEnNodo *copiaBloqueA2C1 = nuevoBloqueEnNodo(2, 21);
+	 t_bloqueEnNodo *copiaBloqueA2C2 = nuevoBloqueEnNodo(3, 22);
+	 t_bloqueEnNodo *copiaBloqueA2C3 = nuevoBloqueEnNodo(4, 23);
+	 t_list *copiasBloqueA2 = list_create();
+	 list_add(copiasBloqueA2, copiaBloqueA2C1);
+	 list_add(copiasBloqueA2, copiaBloqueA2C2);
+	 list_add(copiasBloqueA2, copiaBloqueA2C3);
 
-		 t_bloqueEnNodo *copiaBloqueA3C1 = nuevoBloqueEnNodo(2, 31);
-		 t_bloqueEnNodo *copiaBloqueA3C2 = nuevoBloqueEnNodo(3, 32);
-		 t_bloqueEnNodo *copiaBloqueA3C3 = nuevoBloqueEnNodo(4, 33);
-		 t_list *copiasBloqueA3 = list_create();
-		 list_add(copiasBloqueA3, copiaBloqueA3C1);
-		 list_add(copiasBloqueA3, copiaBloqueA3C2);
-		 list_add(copiasBloqueA3, copiaBloqueA3C3);
+	 t_bloqueEnNodo *copiaBloqueA3C1 = nuevoBloqueEnNodo(2, 31);
+	 t_bloqueEnNodo *copiaBloqueA3C2 = nuevoBloqueEnNodo(3, 32);
+	 t_bloqueEnNodo *copiaBloqueA3C3 = nuevoBloqueEnNodo(4, 33);
+	 t_list *copiasBloqueA3 = list_create();
+	 list_add(copiasBloqueA3, copiaBloqueA3C1);
+	 list_add(copiasBloqueA3, copiaBloqueA3C2);
+	 list_add(copiasBloqueA3, copiaBloqueA3C3);
 
-		 //mostrarLista(copiasBloqueA1, (void*) mostrarBloqueEnNodo);
-		 //mostrarLista(copiasBloqueA2, (void*) mostrarBloqueEnNodo);
-		 //	mostrarLista(copiasBloqueA3, (void*) mostrarBloqueEnNodo);
+	 t_bloqueArch *bloqueArchivoA1 = nuevoBloqueArchivo(copiasBloqueA1);
+	 t_bloqueArch *bloqueArchivoA2 = nuevoBloqueArchivo(copiasBloqueA2);
+	 t_bloqueArch *bloqueArchivoA3 = nuevoBloqueArchivo(copiasBloqueA3);
 
-		 t_bloqueArch *bloqueArchivoA1 = nuevoBloqueArchivo(copiasBloqueA1);
-		 t_bloqueArch *bloqueArchivoA2 = nuevoBloqueArchivo(copiasBloqueA2);
-		 t_bloqueArch *bloqueArchivoA3 = nuevoBloqueArchivo(copiasBloqueA3);
+	 t_list * bloquesDeArchivoA = list_create();
 
-		 t_list * bloquesDeArchivoA = list_create();
+	 list_add(bloquesDeArchivoA, bloqueArchivoA1);
+	 list_add(bloquesDeArchivoA, bloqueArchivoA2);
+	 list_add(bloquesDeArchivoA, bloqueArchivoA3);
 
-		 list_add(bloquesDeArchivoA, bloqueArchivoA1);
-		 list_add(bloquesDeArchivoA, bloqueArchivoA2);
-		 list_add(bloquesDeArchivoA, bloqueArchivoA3);
+	 t_bloqueEnNodo *copiaBloqueB1C1 = nuevoBloqueEnNodo(2, 41);
+	 t_list *copiasBloqueB1 = list_create();
+	 list_add(copiasBloqueB1, copiaBloqueB1C1);
+	 t_bloqueArch *bloqueArchivoB1 = nuevoBloqueArchivo(copiasBloqueB1);
+	 t_list *bloquesDeArchivoB = list_create();
+	 list_add(bloquesDeArchivoB, bloqueArchivoB1);
 
-		 t_bloqueEnNodo *copiaBloqueB1C1 = nuevoBloqueEnNodo(2, 41);
-		 t_list *copiasBloqueB1 = list_create();
-		 list_add(copiasBloqueB1, copiaBloqueB1C1);
-		 t_bloqueArch *bloqueArchivoB1 = nuevoBloqueArchivo(copiasBloqueB1);
-		 t_list *bloquesDeArchivoB = list_create();
-		 list_add(bloquesDeArchivoB, bloqueArchivoB1);
+	 t_archivo *archivoA = nuevoArchivo("ArchivoA", 2, 3000, bloquesDeArchivoA,
+	 1);
+	 t_archivo *archivoB = nuevoArchivo("ArchivoB", 3, 3000, bloquesDeArchivoB,
+	 1);
 
-		 t_archivo *archivoA = nuevoArchivo("ArchivoA", 2, 3000, bloquesDeArchivoA,
-		 1);
-		 t_archivo *archivoB = nuevoArchivo("ArchivoB", 3, 3000, bloquesDeArchivoB,
-		 1);
-
-		 list_add(listaArchivos, archivoA);
-		 list_add(listaArchivos, archivoB);
+	 list_add(listaArchivos, archivoA);
+	 list_add(listaArchivos, archivoB);
 
 
-		 fpArch = fopen("archivos","w");
-		 guardarBloqueDeArch(bloqueArchivoA1);
-		 fclose(fpArch);
-		 mostrarBloqueArch(bloqueArchivoA1);
-		 fpArch = fopen("archivos","r");
-		 bloqueArchivoA1 = cargarBloqueDeArch();
-		 fclose(fpArch);
-/*
+	 fpArch = fopen("archivos","w");
+	 guardarBloqueDeArch(bloqueArchivoA1);
+	 fclose(fpArch);
 
-		 fpArch = fopen("archivos","w");
-		 guardarArchivo(archivoA);
-		 fclose(fpArch);
-		 mostrarArchivo(archivoA);
-		 fpArch = fopen("archivos","r");
-		 archivoA = cargarArchivo();
-		 fclose(fpArch);*/
-/*
-		mostrarLista(listaArchivos,(void*) mostrarArchivo);
-		guardarListaArchivos();
-		list_destroy_and_destroy_elements(listaArchivos, (void*) liberarArchivo);
-		listaArchivos = list_create();
-		cargarListaArchivos();
-		mostrarLista(listaArchivos,(void*) mostrarArchivo);*/
-		printf("termino\n");
+	 fpArch = fopen("archivos","r");
+	 bloqueArchivoA1 = cargarBloqueDeArch();
+	 mostrarBloqueArch(bloqueArchivoA1);
+	 fclose(fpArch);
+
+
+	 fpArch = fopen("archivos","w");
+	 guardarArchivo(archivoA);
+	 fclose(fpArch);
+	 mostrarArchivo(archivoA);
+	 fpArch = fopen("archivos","r");
+	 archivoA = cargarArchivo();
+//	 archivoA->nombre = "archivoA";
+//	 archivoA->bloquesDeArch = bloquesDeArchivoA;
+	 mostrarArchivo(archivoA);
+	 fclose(fpArch);
+
+	mostrarLista(listaArchivos,(void*) mostrarArchivo);
+	guardarListaArchivos();
+	list_destroy_and_destroy_elements(listaArchivos, (void*) liberarArchivo);
+	listaArchivos = list_create();
+	cargarListaArchivos();
+	mostrarLista(listaArchivos,(void*) mostrarArchivo);
+	printf("termino\n");*/
 //fin de prueba de persistencia
 
 	/*//probando funcion de mostrar listas

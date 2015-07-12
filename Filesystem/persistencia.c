@@ -9,7 +9,7 @@
 static void escribirCola(t_queue *cola, FILE * fp);
 static void leerCola(t_queue **cola, FILE * fp) ;
 static void fwrite_str(char* string,FILE *fp);
-static void fread_str(char** string,FILE *fp);
+static char* fread_str(FILE *fp);
 static void fwrite_list(t_list *subList, FILE *fp,void(*struct_writer)(void*));
 static t_list* fread_list(FILE *fp,void*(*struct_reader)());
 
@@ -50,6 +50,8 @@ void guardarBloqueDeArch(t_bloqueArch *unBloqueDeArch) {
 void guardarArchivo(t_archivo *unArchivo){
 	fwrite(&unArchivo->estado, sizeof(unArchivo->estado), 1, fpArch);
 	fwrite_str(unArchivo->nombre,fpArch);
+	printf("nombre arch: %s\n",unArchivo->nombre);
+	fflush(stdout);
 	fwrite(&unArchivo->padre, sizeof(unArchivo->padre), 1, fpArch);
 	fwrite(&unArchivo->tamanio, sizeof(unArchivo->tamanio), 1, fpArch);
 	fwrite_list(unArchivo->bloquesDeArch,fpArch,(void*)guardarBloqueDeArch);
@@ -71,14 +73,22 @@ t_bloqueEnNodo *cargarBloqueEnNodo() {
 
 t_bloqueArch *cargarBloqueDeArch() {
 	t_bloqueArch *unBloqueDeArch = malloc(sizeof(t_bloqueArch));
-	fread_list(fpArch,(void*)cargarBloqueEnNodo);
+	unBloqueDeArch->copiasDeBloque = fread_list(fpArch,(void*)cargarBloqueEnNodo);
 	return unBloqueDeArch;
 }
 
+
 t_archivo *cargarArchivo(){
-	t_archivo *unArchivo = malloc(sizeof(unArchivo));
+
+	t_archivo *unArchivo = malloc(sizeof(t_archivo));
+	printf("cargarArchivo\n");
+	fflush(stdout);
 	fread(&unArchivo->estado, sizeof(unArchivo->estado), 1, fpArch);
-	fread_str(&unArchivo->nombre,fpArch);
+	printf("cargarArchivo estado %d\n",unArchivo->estado);
+	fflush(stdout);
+	unArchivo->nombre = fread_str(fpArch);
+	printf("nombre :%s!!!!!!!!!!!!!!!\n",unArchivo->nombre);
+	fflush(stdout);
 	fread(&unArchivo->padre, sizeof(unArchivo->padre), 1, fpArch);
 	fread(&unArchivo->tamanio, sizeof(unArchivo->tamanio), 1, fpArch);
 	unArchivo->bloquesDeArch = fread_list(fpArch,(void*)cargarBloqueDeArch);
@@ -132,7 +142,6 @@ t_nodo *cargarNodo() {
 	return unNodo;
 
 }
-//void fwrite_List(char* nombreArch,t_list *list, FILE *fp,void(*struct_writer)(void*)) {
 void guardarListaNodos() {
 	fpNodos = fopen("nodos", "w");
 	fwrite_list(listaNodos, fpNodos,(void*)guardarNodo);
@@ -176,7 +185,7 @@ void guardarDirectorio(t_directorio *unDir) {
 t_directorio *cargarDirectorio() {
 	t_directorio *unDir = malloc(sizeof(t_directorio)); //nueva estructura
 	fread(&unDir->index, sizeof(unDir->index), 1, fpDir);
-	fread_str(&unDir->nombre,fpDir);
+	unDir->nombre = fread_str(fpDir);
 	fread(&unDir->padre, sizeof(unDir->padre), 1, fpDir);
 	return unDir;
 }
@@ -250,9 +259,10 @@ static void fwrite_str(char* string,FILE *fp) {
 	fwrite(&length, sizeof(int), 1, fp);
 	fwrite(string, sizeof(char), length, fp);
 }
-static void fread_str(char** string,FILE *fp) {
+static char* fread_str(FILE *fp) {
 	int length;
-	fread(&length, sizeof(int), 1, fpDir);
-	*string = malloc(length);
-	fread(*string, sizeof(char), length, fpDir);
+	fread(&length, sizeof(int), 1, fp);
+	char *string = malloc(length);
+	fread(string, sizeof(char), length, fp);
+	return string;
 }
