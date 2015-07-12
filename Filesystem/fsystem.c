@@ -65,6 +65,7 @@ int main() {
 	t_registro_id_ipPuerto* registroVacio = malloc(sizeof(t_registro_id_ipPuerto));
 	sem_init(&consola_sem,0,0);
 	sem_init(&escuchar_sem,0,0);
+
 	/*registroVacio->id=0;
 	 registroVacio->ip.s_addr=inet_addr("0.0.0.0");
 	 registroVacio->puerto=0;
@@ -141,6 +142,128 @@ int main() {
 	mostrarLista(listaDirectorios,(void*) mostrarDirectorio);
 	printf("termino\n");
 */
+//pruebas de persistencia 2.0
+	t_nodo *nodoA = nuevoNodo(2, 10);
+	t_nodo *nodoB = nuevoNodo(3, 20);
+	t_nodo *nodoC = nuevoNodo(4, 60);
+
+	nodoA->cantidadBloquesOcupados = 1;
+	int *a = malloc(sizeof(int));
+	*a = 1;
+	queue_push(nodoA->bloquesLiberados, a);
+	int *b = malloc(sizeof(int));
+	*b = 2;
+	queue_push(nodoA->bloquesLiberados, b);
+	printf("%d\n", queue_size(nodoA->bloquesLiberados) );
+	list_add(listaNodos, nodoA);
+	list_add(listaNodos, nodoB);
+	list_add(listaNodos, nodoC);
+
+	mostrarLista(listaNodos,(void*) mostrarNodo);
+	guardarListaNodos();
+	list_destroy_and_destroy_elements(listaNodos, (void*) liberarNodo);
+	listaNodos = list_create();
+	cargarListaNodos();
+	mostrarLista(listaNodos,(void*) mostrarNodo);
+	printf("termino\n");
+
+	t_directorio *directorioRoot = nuevoDirectorio(1, "Root", 0);
+	t_directorio *directorioHome = nuevoDirectorio(3, "home", 1);
+	t_directorio *directorioMedia = nuevoDirectorio(2, "media", 1);
+	t_directorio *directorioFotos = nuevoDirectorio(10, "fotos", 2);
+
+	list_add(listaDirectorios, directorioRoot);
+	list_add(listaDirectorios, directorioHome);
+	list_add(listaDirectorios, directorioMedia);
+	list_add(listaDirectorios, directorioFotos);
+	mostrarLista(listaDirectorios,(void*) mostrarDirectorio);
+	guardarListaDirectorios();
+	list_destroy_and_destroy_elements(listaDirectorios, (void*) liberarDirectorio);
+	listaDirectorios = list_create();
+	cargarListaDirectorios();
+	mostrarLista(listaDirectorios,(void*) mostrarDirectorio);
+	printf("termino\n");
+
+
+
+	t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo(2, 11);
+		 t_bloqueEnNodo *copiaBloqueA1C2 = nuevoBloqueEnNodo(3, 12);
+		 t_bloqueEnNodo *copiaBloqueA1C3 = nuevoBloqueEnNodo(4, 13);
+		 t_list *copiasBloqueA1 = list_create();
+		 list_add(copiasBloqueA1, copiaBloqueA1C1);
+		 list_add(copiasBloqueA1, copiaBloqueA1C2);
+		 list_add(copiasBloqueA1, copiaBloqueA1C3);
+
+		 t_bloqueEnNodo *copiaBloqueA2C1 = nuevoBloqueEnNodo(2, 21);
+		 t_bloqueEnNodo *copiaBloqueA2C2 = nuevoBloqueEnNodo(3, 22);
+		 t_bloqueEnNodo *copiaBloqueA2C3 = nuevoBloqueEnNodo(4, 23);
+		 t_list *copiasBloqueA2 = list_create();
+		 list_add(copiasBloqueA2, copiaBloqueA2C1);
+		 list_add(copiasBloqueA2, copiaBloqueA2C2);
+		 list_add(copiasBloqueA2, copiaBloqueA2C3);
+
+		 t_bloqueEnNodo *copiaBloqueA3C1 = nuevoBloqueEnNodo(2, 31);
+		 t_bloqueEnNodo *copiaBloqueA3C2 = nuevoBloqueEnNodo(3, 32);
+		 t_bloqueEnNodo *copiaBloqueA3C3 = nuevoBloqueEnNodo(4, 33);
+		 t_list *copiasBloqueA3 = list_create();
+		 list_add(copiasBloqueA3, copiaBloqueA3C1);
+		 list_add(copiasBloqueA3, copiaBloqueA3C2);
+		 list_add(copiasBloqueA3, copiaBloqueA3C3);
+
+		 //mostrarLista(copiasBloqueA1, (void*) mostrarBloqueEnNodo);
+		 //mostrarLista(copiasBloqueA2, (void*) mostrarBloqueEnNodo);
+		 //	mostrarLista(copiasBloqueA3, (void*) mostrarBloqueEnNodo);
+
+		 t_bloqueArch *bloqueArchivoA1 = nuevoBloqueArchivo(copiasBloqueA1);
+		 t_bloqueArch *bloqueArchivoA2 = nuevoBloqueArchivo(copiasBloqueA2);
+		 t_bloqueArch *bloqueArchivoA3 = nuevoBloqueArchivo(copiasBloqueA3);
+
+		 t_list * bloquesDeArchivoA = list_create();
+
+		 list_add(bloquesDeArchivoA, bloqueArchivoA1);
+		 list_add(bloquesDeArchivoA, bloqueArchivoA2);
+		 list_add(bloquesDeArchivoA, bloqueArchivoA3);
+
+		 t_bloqueEnNodo *copiaBloqueB1C1 = nuevoBloqueEnNodo(2, 41);
+		 t_list *copiasBloqueB1 = list_create();
+		 list_add(copiasBloqueB1, copiaBloqueB1C1);
+		 t_bloqueArch *bloqueArchivoB1 = nuevoBloqueArchivo(copiasBloqueB1);
+		 t_list *bloquesDeArchivoB = list_create();
+		 list_add(bloquesDeArchivoB, bloqueArchivoB1);
+
+		 t_archivo *archivoA = nuevoArchivo("ArchivoA", 2, 3000, bloquesDeArchivoA,
+		 1);
+		 t_archivo *archivoB = nuevoArchivo("ArchivoB", 3, 3000, bloquesDeArchivoB,
+		 1);
+
+		 list_add(listaArchivos, archivoA);
+		 list_add(listaArchivos, archivoB);
+
+
+		 fpArch = fopen("archivos","w");
+		 guardarBloqueDeArch(bloqueArchivoA1);
+		 fclose(fpArch);
+		 mostrarBloqueArch(bloqueArchivoA1);
+		 fpArch = fopen("archivos","r");
+		 bloqueArchivoA1 = cargarBloqueDeArch();
+		 fclose(fpArch);
+/*
+
+		 fpArch = fopen("archivos","w");
+		 guardarArchivo(archivoA);
+		 fclose(fpArch);
+		 mostrarArchivo(archivoA);
+		 fpArch = fopen("archivos","r");
+		 archivoA = cargarArchivo();
+		 fclose(fpArch);*/
+/*
+		mostrarLista(listaArchivos,(void*) mostrarArchivo);
+		guardarListaArchivos();
+		list_destroy_and_destroy_elements(listaArchivos, (void*) liberarArchivo);
+		listaArchivos = list_create();
+		cargarListaArchivos();
+		mostrarLista(listaArchivos,(void*) mostrarArchivo);*/
+		printf("termino\n");
 //fin de prueba de persistencia
 
 	/*//probando funcion de mostrar listas
@@ -252,7 +375,7 @@ int main() {
 
 
 
-
+*/
 	 //160 lugar de trabajo de juanchi
 	 /*
 	 t_list *copiasbloques1 = list_create();
@@ -312,6 +435,8 @@ int main() {
 	 printf("malBloqueArch %d\n",malBloqueArch);
 	 printf("malNombre %d\n",malNombre);
 	 //free(copias);
+
+	  */
 	 /*
 	 mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 	 mostrarLista(listaArchivos, (void*) mostrarArchivo);
@@ -331,7 +456,7 @@ int main() {
 //	mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 //	mostrarLista(listaNodos, (void*) mostrarNodo);
 //	mostrarLista(listaArchivos, (void*) mostrarArchivo);
-/*	system("clear");
+	system("clear");
 
 	char* path = "ConfigFS.cfg";
 

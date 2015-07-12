@@ -47,6 +47,9 @@ void guardarDirectorio(t_directorio *unDir) ;
  */
 t_directorio *cargarDirectorio();
 
+
+
+
 void guardarListaDirectorios();
 void cargarListaDirectorios();
 void guardarListaNodos();
@@ -57,5 +60,8 @@ void guardarBloqueDeArch(t_bloqueArch *unBloqueDeArch);
 void guardarArchivo(t_archivo *unArchivo);
 t_bloqueArch *cargarBloqueDeArch();
 t_archivo *cargarArchivo();
+
+
+
 
 #endif /* PERSISTENCIA_H_ */
