@@ -63,7 +63,7 @@ int socketDeMarta;
 FILE *fpArch;
 FILE *fpDir;
 FILE *fpNodos;
-
+FILE *fpReg;
 
 
 void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* nombreArchivo, int padre);

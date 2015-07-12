@@ -61,7 +61,10 @@ void guardarArchivo(t_archivo *unArchivo);
 t_bloqueArch *cargarBloqueDeArch();
 t_archivo *cargarArchivo();
 
-
+void guardarRegistroIDIP(t_registro_id_ipPuerto *unReg);
+t_registro_id_ipPuerto *cargarRegistroIDIP();
+void guardarListaRegistrosIDIP();
+void cargarListaRegistrosIDIP();
 
 
 #endif /* PERSISTENCIA_H_ */

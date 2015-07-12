@@ -200,6 +200,32 @@ void cargarListaDirectorios() {
 	listaDirectorios = fread_list(fpDir,(void*)cargarDirectorio);
 	fclose(fpDir);
 }
+//registros RegistrosIDIP
+
+void guardarRegistroIDIP(t_registro_id_ipPuerto *unReg) {
+	fwrite(&unReg->id, sizeof(unReg->id), 1, fpReg);
+	fwrite(&unReg->ip.s_addr, sizeof(unReg->ip.s_addr), 1, fpReg);
+	fwrite(&unReg->puerto, sizeof(unReg->puerto), 1, fpReg);
+}
+t_registro_id_ipPuerto *cargarRegistroIDIP() {
+	t_registro_id_ipPuerto *unReg = malloc(sizeof(t_registro_id_ipPuerto)); //nueva estructura
+	fread(&unReg->id, sizeof(unReg->id), 1, fpReg);
+	fread(&unReg->ip.s_addr, sizeof(unReg->ip.s_addr), 1, fpReg);
+	fread(&unReg->puerto, sizeof(unReg->puerto), 1, fpReg);
+	return unReg;
+}
+
+void guardarListaRegistrosIDIP() {
+	fpReg = fopen("registrosIDIP", "w");
+	fwrite_list(listaRegistrosIDIP, fpReg,(void*)guardarRegistroIDIP);
+	fclose(fpReg);
+}
+void cargarListaRegistrosIDIP() {
+	fpReg = fopen("registrosIDIP", "r");
+	listaRegistrosIDIP = fread_list(fpReg,(void*)cargarRegistroIDIP);
+	fclose(fpReg);
+}
+//
 
 void cargarPersistenciacfg() {
 	fpNodos = fopen("nodos", "r");
@@ -214,7 +240,11 @@ void cargarPersistenciacfg() {
 /*********************** PRIVATE FUNCTIONS ****************************/
 /**********************************************************************/
 static void fwrite_list(t_list *list, FILE *fp,void(*struct_writer)(void*)) {
-	int i = list_size(list);
+	int i = list_size(list
+			 //mostrarLista(copiasBloqueA1, (void*) mostrarBloqueEnNodo);
+			 //mostrarLista(copiasBloqueA2, (void*) mostrarBloqueEnNodo);
+			 //	mostrarLista(copiasBloqueA3, (void*) mostrarBloqueEnNodo);
+);
 	fwrite(&i, sizeof(int), 1, fp);
 	list_iterate(list,struct_writer);//quizas (void*) struct_writer/
 }
@@ -228,6 +258,10 @@ static t_list* fread_list(FILE *fp,void*(*struct_reader)()) {
 		list_add(list, unElemento);
 		length--;
 	}
+	 //mostrarLista(copiasBloqueA1, (void*) mostrarBloqueEnNodo);
+	 //mostrarLista(copiasBloqueA2, (void*) mostrarBloqueEnNodo);
+	 //	mostrarLista(copiasBloqueA3, (void*) mostrarBloqueEnNodo);
+
 	return list;
 }
 

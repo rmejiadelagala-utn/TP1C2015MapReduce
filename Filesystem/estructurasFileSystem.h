@@ -184,7 +184,7 @@ void liberarDirectorio(t_directorio *unDirectorio);
 /**
  * @NAME: mostrarRegistro
  * @DESC: muestra la estructura registro
- */
+*/
 void mostrarRegistro(t_registro_id_ipPuerto *registro);
 /**
  * @NAME: mostrarBloqueEnNodo

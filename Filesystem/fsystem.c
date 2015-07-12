@@ -66,10 +66,6 @@ int main() {
 	sem_init(&consola_sem,0,0);
 	sem_init(&escuchar_sem,0,0);
 
-	/*registroVacio->id=0;
-	 registroVacio->ip.s_addr=inet_addr("0.0.0.0");
-	 registroVacio->puerto=0;
-	 list_add(listaRegistrosIDIP,registroVacio);*/
 
 	//Para probar la persistencia en sus inicios
 	/*
@@ -264,6 +260,17 @@ int main() {
 	cargarListaArchivos();
 	mostrarLista(listaArchivos,(void*) mostrarArchivo);
 	printf("termino\n");*/
+	//persistir registros
+	/*
+	registroVacio->id=0;
+	 registroVacio->ip.s_addr=inet_addr("0.0.0.0");
+	 registroVacio->puerto=0;
+	 list_add(listaRegistrosIDIP,registroVacio);
+	 guardarListaRegistrosIDIP();
+	 mostrarLista(listaRegistrosIDIP,(void*)mostrarRegistro);
+	 cargarListaRegistrosIDIP();
+	 mostrarLista(listaRegistrosIDIP,(void*)mostrarRegistro);
+	*/
 //fin de prueba de persistencia
 
 	/*//probando funcion de mostrar listas
