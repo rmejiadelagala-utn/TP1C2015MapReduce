@@ -11,7 +11,7 @@ int consola(void* unListaNodo) {
 	//con todas las cadenas, donde la primera es el comando y las demas los parametros
 	char **comandoSeparado;
 	char comando[100];
-	char *comandosValidos[20];
+	char *comandosValidos[21];
 	int exit = 0;
 	//Incializo los comandos en un array para despues poder hacer
 	//el switch y llamar a la funcion correspondiente
@@ -35,6 +35,7 @@ int consola(void* unListaNodo) {
 	comandosValidos[17] = string_duplicate("salir");
 	comandosValidos[18] = string_duplicate("cd");
 	comandosValidos[19] = string_duplicate("ls");
+	comandosValidos[20] = string_duplicate("verNodos");
 	int i;
 
 	printf("\nBienvenido a la consola: \n");
@@ -50,7 +51,7 @@ int consola(void* unListaNodo) {
 
 		//Una vez que lo separe reviso si la primera parte de las separaciones comandoSeparado[0]
 		//se corresponde con alguno de los comandos validos para asignar a entrada
-		for (i = 0; i < 20; i++) {
+		for (i = 0; i < 21; i++) {
 			if (string_equals_ignore_case(comandoSeparado[0],
 					comandosValidos[i])) {
 				entrada = i;
@@ -140,6 +141,10 @@ int consola(void* unListaNodo) {
 			if(comprobarParametros(0,comandoSeparado)==1)
 			ls();
 			break;
+		case VER_NODOS:
+			if(comprobarParametros(0,comandoSeparado)==1)
+			verNodos();
+			break;
 		case COMANDO_INVALIDO:
 			printf("Comando Invalido\n");
 			break;
@@ -150,7 +155,7 @@ int consola(void* unListaNodo) {
 
 
 	} while (!exit);
-	for (i = 0; i < 20; i++) free(comandosValidos[i]);
+	for (i = 0; i < 21; i++) free(comandosValidos[i]);
 	free(direccion);
 	return 0;
 }
@@ -348,63 +353,29 @@ void copiarBloque(char *archivo, char* numeroBloque, char* idNodo) {
 }
 
 void levantarNodo(char *nodo) {
-/*
- * Levantar nodo se supone que es un nodo nuevo porque si no la consola no interviene
- * en la reconexion pero tampoco entiendo que hace levantar nodo en la consola, porque
- * en teoría el nodo se conectaba con el FS y ahí lo levantaba, osea no sé para que
- * estaría esta funcion si el nodo lo levanta el FS cuando el nodo se conecta
-*/
-	printf("Agrega el nodo %s\n", nodo);
+
+	if(string_equals_ignore_case(nodo,"todos")){
+		list_iterate(listaNodos,activarNodo);
+		printf("Se activaron todos los nodos\n");
+	}
+
+
+	else{
+		validarNodoYEjecutar(nodo,activarNodo);
+		printf("Se activo el nodo de id %d\n",atoi(nodo));
+	}
+
+
 }
 
 void eliminarNodo(char *nodo) {
-	if(string_equals_ignore_case(nodo,"VerNodos")){//XXX PARA TESTEAR
-		mostrarLista(listaNodos, (void*)mostrarNodo);
-	}
-	/*else if(!strcmp(nodo,"responderAMarta")){//XXX PARA TESTEAR
-
-		  char str [80];//asquerosamente hecho para probar que funciona
-		  char *nombreArchivo = malloc (80);
-		  int padre, numeroDeBloqueEnArchivo;
-		  t_list *copias = list_create();
-		  int resultado;
-		  printf ("Ingrese nombre del archivo a enviar: ");
-		  scanf ("%79s",str);
-		  printf ("Ingrese el padre de dicho archivo: ");
-		  scanf ("%d",&padre);
-		  printf ("Ingrese el numero De Bloque En Archivo que desea obtener : ");
-		  scanf ("%d",&numeroDeBloqueEnArchivo);
-		  strcpy(nombreArchivo,str);
-		  resultado = encontrarCopias(nombreArchivo,padre, numeroDeBloqueEnArchivo,&copias);
-		  if(resultado == -1){
-			  printf("El nombre del archivo o el padre están erroneos\n");
-		  }
-		  else if(resultado == -2){
-			  printf("El bloque de archivo pedido no existe\n");
-		  }
-		  else if(copias == NULL){
-					  printf("No existen copias de ese bloque de archivo\n");
-				  }
-		  else{
-			  int cantCopias = list_size(copias);
-			  t_bloqueEnNodo *copia;
-			  int i;
-			  for(i = 0 ; i< cantCopias; i++){
-				  copia = list_get(copias,i);
-				  sendall(socketDeMarta,copia,sizeof(t_bloqueEnNodo),0 );
-			  }
-
-		  }
-
-
-	}*/
-	else{
 		void eliminarNod(t_nodo *unNodo){
-			eliminarNodoYReferencias(unNodo,listaNodos,listaArchivos);
-			printf("Se elimino nodo de ip %s\n.",nodo);
+			/*eliminarNodoYReferencias(unNodo,listaNodos,listaArchivos); XXX habria que eliminarlo o desactivarlo?
+			printf("Se elimino nodo de id %d.\n",unNodo->id);*/
+			unNodo->activo=0;
+			printf("Se desactivo nodo de id %d\n",unNodo->id);
 		}
 		validarNodoYEjecutar(nodo,(void*)eliminarNod);
-	}
 }
 
 void help() {
@@ -497,6 +468,12 @@ void cd(char* nombreDirectorio){
 	}
 }
 }
+
+void verNodos(){
+	mostrarLista(listaNodos, (void*)mostrarNodo);
+}
+
+
 t_list *directoriosVisiblesDesdeActual(void){
 	return list_filter(listaDirectorios,({ bool esHijoDeActual(t_directorio* unDir)
 	{return esHijo(unDir,directorioActual);}esHijoDeActual;}));
@@ -545,7 +522,8 @@ void validarDirectorioYEjecutar(char* unDirectorio, void (*funcion)(void*)){
 }
 
 void validarNodoYEjecutar(char* unNodo, void (*funcion)(void*)){
-	t_nodo *nodoObjetivo = buscarNodoPorId(unNodo,listaNodos);
+	int idNodo = atoi(unNodo);
+	t_nodo *nodoObjetivo = buscarNodoPorId(idNodo,listaNodos);
 	if(nodoObjetivo!=NULL) funcion(nodoObjetivo);
 	else printf("Nodo no encontrado.\n");
 }
