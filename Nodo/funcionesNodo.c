@@ -305,7 +305,40 @@ void ejecutarReduce(char * path_s, char* path_tmp, char* datos_bloque){
 
 }
 
-char* aparear_registros(char* datos_archivo){
+
+t_RegistroArch* apareoDeRegistros(t_list* Lista_reg){
+
+	t_RegistroArch* datosReg = malloc(sizeof(t_RegistroArch));
+	t_RegistroArch* infoRegArch;
+	char* copiar_datos;
+
+	copiar_datos = malloc(BLKSIZE);
+
+	infoRegArch = list_get(Lista_reg, 0);
+
+	strcpy(copiar_datos, infoRegArch->registro);
+	printf("La copia es %s\n", infoRegArch->registro);
+
+	void realizoApareo(t_RegistroArch* unRegistro) {
+
+		if ((strcmp(unRegistro->registro,copiar_datos)) <= 0){
+			copiar_datos = malloc (BLKSIZE);
+
+			strcpy(copiar_datos, unRegistro->registro);
+			datosReg->registro = strdup(copiar_datos);
+			strcat(datosReg->registro, "\n");
+			datosReg->socket = unRegistro->socket;
+		}
+
+	}
+
+	list_iterate(Lista_reg, (void*)realizoApareo);
+
+	return datosReg;
+
+}
+
+/*char* aparear_registros(char* datos_archivo){
 
 	char** reg_archivo;
 	char* copiar_datos;
@@ -327,4 +360,4 @@ char* aparear_registros(char* datos_archivo){
     strcat(copiar_datos, "\n");
     return copiar_datos;
     
-}
+}*/
