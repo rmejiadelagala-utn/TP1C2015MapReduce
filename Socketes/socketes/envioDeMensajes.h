@@ -90,6 +90,8 @@ char* recibirString(int socket);
 
 int recibirInt(int socket);
 
+void enviarError(int socket);
+
 int recibirIntEnOrden(int socket, uint32_t *numero);
 
 uint32_t recibirProtocoloEnOrden(int socket);
@@ -161,5 +163,5 @@ int enviarBuffer(t_buffer* buffer, int socket);
  	//De Filesystem
  	t_registro_id_ipPuerto* recibirRegistroNodo(int socket);
 
- 	void recibirBloqueArchFS(int socketAuxiliar,t_list* copiasDeBloque);
+ 	int recibirBloqueArchFS(int socketAuxiliar,t_list* copiasDeBloque);
 #endif

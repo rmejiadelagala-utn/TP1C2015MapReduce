@@ -58,6 +58,7 @@ typedef struct {
 	int combiner;
 	char* pathDeResultado;
 	char** pathsDeArchivos;
+	int cantArchivos;
 } t_InfoJob;
 
 typedef struct {

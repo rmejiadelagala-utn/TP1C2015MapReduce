@@ -107,7 +107,8 @@ void bufferAgregarString(t_buffer* buffer,char* unString, int tamanio){
 char* recibirString(int socket){
 	int tamanioString;
 	recvall(socket,&tamanioString,sizeof(int));
-	char* string=malloc(tamanioString);
+	char* string;
+	string =malloc(sizeof(char)+tamanioString);
 	recvall(socket,string,tamanioString);
 	return string;
 }
@@ -116,6 +117,11 @@ int recibirInt(int socket){
 	int entero;
 	recvall(socket,&entero,sizeof(int));
 	return entero;
+}
+
+void enviarError(int socket){
+	int error=-1;
+	sendall(socket,&error,sizeof(int));
 }
 
 int recibirIntEnOrden(int socket, uint32_t *numero) {
@@ -331,9 +337,10 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		recvall(socket, unRegistro, sizeof(t_registro_id_ipPuerto));
 		return unRegistro;
 	}
-	void recibirBloqueArchFS(int socketAuxiliar,t_list* copiasDeBloque){ //TODO retornar un resultado
+	int recibirBloqueArchFS(int socketAuxiliar,t_list* copiasDeBloque){ //TODO retornar un resultado
 		int cantidadDeCopias;
 		recvall(socketAuxiliar,&cantidadDeCopias,sizeof(int));
+		if(cantidadDeCopias==-1) return -1;
 		printf("\n\nCantidad de copias: %d\n\n",cantidadDeCopias);
 		fflush(stdout);
 		int i;
@@ -344,6 +351,7 @@ int enviarBuffer(t_buffer* buffer, int socket){
 			fflush(stdout);
 			list_add(copiasDeBloque,copiaDeBloque);
 		}
+		return 1;
 	}
 //Job
 	//De Marta

@@ -15,21 +15,23 @@ t_registro_id_ipPuerto* buscarRegistroPorId(int id) {
 }
 
 t_list* obtenerIDyCantBloquesDeArchivosDelFS(char** archivos,int cantidadArchivos){
+	pthread_mutex_lock(&conexionFS);
 	dameListaArchFS(socketDeFS,archivos,cantidadArchivos);
-	printf("Me pongo a esperar los archivos del FS");
-	fflush(stdout);
 	sem_wait(&funcionesMarta);
-	printf("Sali del semaforo");
 	fflush(stdout);
 	t_list* listaArchivos = list_create();
 	int i;
+	int huboError=0;
 	for (i=0;i<cantidadArchivos;i++){
 		t_InfoArchivo* infoArchivo= malloc(sizeof(t_InfoArchivo));
 		recvall(socketDeFS,&(infoArchivo->cantidadDeBloques),sizeof(int));
+		if(infoArchivo->cantidadDeBloques==-1) huboError=1;
 		infoArchivo->idArchivo=i;
 		list_add(listaArchivos,infoArchivo);
 	}
 	sem_post(&interaccionFS);
+	pthread_mutex_unlock(&conexionFS);
+	if(huboError) return NULL;
 	return listaArchivos;
 }
 

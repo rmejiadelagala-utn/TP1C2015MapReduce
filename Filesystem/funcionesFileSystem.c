@@ -161,8 +161,12 @@ void enviarCantBloquesDeArch(char* nombreArchivo, int socket) {
 		int cantidad = list_size(unArchivo->bloquesDeArch);
 		printf("La cantidad de bloques mandados fue %d\n", cantidad);
 		sendall(socket, &cantidad, sizeof(int));
+		return;
 	}
 	validarArchivoYEjecutar(nombreArchivo, (void*) enviarBloquesDeArchivo);
+	int error=-1;
+	sendall(socket,&error,sizeof(int));
+
 }
 
 

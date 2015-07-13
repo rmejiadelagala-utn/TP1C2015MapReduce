@@ -19,6 +19,8 @@ int main(/*int argc, char *argv[]*/) {
 	pthread_t thr_fs;
 	sem_init(&funcionesMarta,0,0);
 	sem_init(&interaccionFS,0,0);
+	pthread_mutex_init(&contadorJobs,NULL);
+	pthread_mutex_init(&conexionFS,NULL);
 	listaTemporal = list_create();
 	contadorDeIdJob=0;
 

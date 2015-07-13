@@ -28,8 +28,13 @@ int procesarOrdenesDeMarta(int sockMarta, t_rutinas* rutinas) {
         case FIN_OPERACION:
             printf("Se terminó de procesar todos los archivos solicitados\n");
             finOperacion=true;
-            }
+        	break;
+        case -1:
+        	printf("Hubo un error");
+        	exit(1);
+        	break;
         }
+    }
 
         if (recibido == 0) {
             printf("Marta desconectado.\n");
