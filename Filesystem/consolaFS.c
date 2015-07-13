@@ -363,7 +363,11 @@ void levantarNodo(char *nodo) {
 		return string_itoa(nodoID(unNodo));
 	}
 
-	if(string_equals_ignore_case(nodo,"todos"))	list_iterate(list_map(listaNodos,nodoIDComoString),levantarNodo);
+	if(string_equals_ignore_case(nodo,"todos")){
+		t_list* idsDeNodos = list_map(listaNodos,nodoIDComoString);
+		list_iterate(idsDeNodos,levantarNodo);
+		list_destroy_and_destroy_elements(idsDeNodos,free);
+	}
 
 	else validarNodoYEjecutar(nodo,activarUnNodo);
 

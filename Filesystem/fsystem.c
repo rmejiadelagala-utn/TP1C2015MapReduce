@@ -721,7 +721,9 @@ void *interaccionFSNodo(void* sock_ptr) {
 			void actualizarAMarta(t_registro_id_ipPuerto* unRegistro) {
 				actualizarIdIpPuertoEnMarta(socketDeMarta, unRegistro);
 			}
-			list_iterate(list_filter(listaRegistrosIDIP, (void*) nodoEstaActivo), (void*) actualizarAMarta);
+			t_list* registrosActivos = list_filter(listaRegistrosIDIP, (void*) nodoEstaActivo);
+			list_iterate(registrosActivos, (void*) actualizarAMarta);
+			list_destroy(registrosActivos);
 			//TODO esta bien
 			break;
 		case ENVIO_BLOQUEARCH_A_MARTA:
