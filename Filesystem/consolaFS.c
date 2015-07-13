@@ -354,16 +354,18 @@ void copiarBloque(char *archivo, char* numeroBloque, char* idNodo) {
 
 void levantarNodo(char *nodo) {
 
-	if(string_equals_ignore_case(nodo,"todos")){
-		list_iterate(listaNodos,activarNodo);
-		printf("Se activaron todos los nodos\n");
+	void activarUnNodo(t_nodo* unNodo){
+		activarNodo(unNodo,socketDeMarta);
+		printf("Se activo el nodo de id %d\n",unNodo->id);
 	}
 
-
-	else{
-		validarNodoYEjecutar(nodo,activarNodo);
-		printf("Se activo el nodo de id %d\n",atoi(nodo));
+	char* nodoIDComoString(t_nodo* unNodo){
+		return string_itoa(nodoID(unNodo));
 	}
+
+	if(string_equals_ignore_case(nodo,"todos"))	list_iterate(list_map(listaNodos,nodoIDComoString),levantarNodo);
+
+	else validarNodoYEjecutar(nodo,activarUnNodo);
 
 
 }
@@ -372,7 +374,7 @@ void eliminarNodo(char *nodo) {
 		void eliminarNod(t_nodo *unNodo){
 			/*eliminarNodoYReferencias(unNodo,listaNodos,listaArchivos); XXX habria que eliminarlo o desactivarlo?
 			printf("Se elimino nodo de id %d.\n",unNodo->id);*/
-			unNodo->activo=0;
+			desactivarNodo(unNodo,socketDeMarta);
 			printf("Se desactivo nodo de id %d\n",unNodo->id);
 		}
 		validarNodoYEjecutar(nodo,(void*)eliminarNod);
@@ -521,12 +523,23 @@ void validarDirectorioYEjecutar(char* unDirectorio, void (*funcion)(void*)){
 	else printf("Directorio no encontrado.\n");
 }
 
-void validarNodoYEjecutar(char* unNodo, void (*funcion)(void*)){
+void validarNodoYEjecutar(char* unNodo, void (*funcion)(void*)) {
 	int idNodo = atoi(unNodo);
-	t_nodo *nodoObjetivo = buscarNodoPorId(idNodo,listaNodos);
-	if(nodoObjetivo!=NULL) funcion(nodoObjetivo);
-	else printf("Nodo no encontrado.\n");
+
+	t_nodo *nodoObjetivo = buscarNodoPorId(idNodo, listaNodos);
+
+	if ((nodoObjetivo != NULL)) {
+		if (nodoEstas(nodoObjetivo->socket)) {
+			funcion(nodoObjetivo);
+
+		} else
+			printf("El nodo no está conectado.\n");
+
+	} else
+		printf("El nodo no existe.\n");
 }
+
+
 int string_to_int(char* string){
 		int i; int j=0;
 		for (i=0;i<(strlen(string));i++){

@@ -208,13 +208,15 @@ int enviarBuffer(t_buffer* buffer, int socket){
 	}
 	//A Marta
 	int actualizarIdIpPuertoEnMarta(int socket, t_registro_id_ipPuerto* unRegistro){
+		if(socket>0){
 		fflush(stdout);
 		int tamanioAEnviar = sizeof(t_registro_id_ipPuerto) + 4;
 		void* buffer = malloc(tamanioAEnviar);
 		int protocolo = MARTA_ACTUALIZA_EL_REGISTRO;
 		memcpy(buffer,&protocolo,4);
 		memcpy(buffer+4,unRegistro,sizeof(t_registro_id_ipPuerto));
-		return sendall(socket, buffer, tamanioAEnviar);
+		return sendall(socket, buffer, tamanioAEnviar);}
+		return -1;
 	}
 	int martaSeCayoUnNodo(int socket, int id){
 		t_buffer* buffer = crearBufferConProtocolo(MARTA_SE_CAYO_UN_NODO);

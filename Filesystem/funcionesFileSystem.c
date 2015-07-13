@@ -26,7 +26,6 @@ static int registroID(t_registro_id_ipPuerto *unRegistro);
 static bool ordenarPorMenorUso(t_nodo *data, t_nodo *dataSiguiente);
 static bool existeEseIndiceComoPadre(t_list *listaDirectorios, int padre);
 static int indiceNuevo(t_list *listaDirectorio);
-static int nodoID(t_nodo *unNodo);
 static char* dirNombre(t_directorio *unDir);
 static char* archNombre(t_archivo *unArch);
 static void *buscarEnListaPorStrKey(t_list *lista, char *key,
@@ -391,7 +390,7 @@ void activarNodoReconectado(t_nodo *nodoABuscar, t_list *listaNodos) { //probada
 	for (i = 0; i < list_size(listaNodos); i++) {
 		nodoActual = list_get(listaNodos, i);
 		if (nodoABuscar->id == nodoActual->id) {
-			activarNodo(nodoActual);
+			activarNodo(nodoActual,socketDeMarta);
 			i = list_size(listaNodos);	//corto el ciclo como un campeon
 
 		}
@@ -402,8 +401,13 @@ void activarNodoReconectado(t_nodo *nodoABuscar, t_list *listaNodos) { //probada
 void actualizarRegistro(t_registro_id_ipPuerto* unRegistro,struct in_addr ip,uint16_t puerto){
 	unRegistro->ip = ip;
 	unRegistro->puerto = puerto;
-	actualizarIdIpPuertoEnMarta(socketDeMarta,unRegistro);
-	}
+}
+
+int nodoEstas(int socket){
+	void* buffer = crearBufferConProtocolo(NODO_ESTAS);
+	if(enviarBuffer(buffer,socket)>0) return 1;
+	return 0;
+}
 
 
 //XXX creo que no hace falta esta función porque el nodo cuando se conecta indíca si es nuevo o no
@@ -643,7 +647,7 @@ static void *buscarEnListaPorIntKey(t_list *lista, int key,
 static int registroID(t_registro_id_ipPuerto *unRegistro) {
 	return unRegistro->id;
 }
-static int nodoID(t_nodo *unNodo) {
+int nodoID(t_nodo *unNodo) {
 	return unNodo->id;
 }
 static char* dirNombre(t_directorio *unDir) {
