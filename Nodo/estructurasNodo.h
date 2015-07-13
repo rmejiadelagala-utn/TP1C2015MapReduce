@@ -10,10 +10,6 @@
 
 #include <stdint.h>
 
-
-
-
-
 typedef struct {
 	char* IP_FS;
 	uint16_t PUERTO_FS;
@@ -24,6 +20,7 @@ typedef struct {
 	uint16_t PUERTO_NODO;
 	int ID;
 } t_config_nodo;
+
 typedef struct {
 	 int socket;
 	char* ARCH_BIN;
@@ -39,5 +36,10 @@ typedef struct {
 	char* pathDestino;
 	char* data;
 }t_archivoTemporal;
+
+typedef struct {
+	int socket;
+	char* registro;
+}t_RegistroArch;
 
 #endif /* ESTRUCTURASNODO_H_ */
