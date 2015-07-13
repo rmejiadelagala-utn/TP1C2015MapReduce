@@ -15,7 +15,7 @@ t_registro_id_ipPuerto* buscarRegistroPorId(int id) {
 }
 
 t_list* obtenerIDyCantBloquesDeArchivosDelFS(char** archivos,int cantidadArchivos){
-	pthread_mutex_lock(&conexionFS);
+
 	dameListaArchFS(socketDeFS,archivos,cantidadArchivos);
 	sem_wait(&funcionesMarta);
 	fflush(stdout);
@@ -30,7 +30,6 @@ t_list* obtenerIDyCantBloquesDeArchivosDelFS(char** archivos,int cantidadArchivo
 		list_add(listaArchivos,infoArchivo);
 	}
 	sem_post(&interaccionFS);
-	pthread_mutex_unlock(&conexionFS);
 	if(huboError) return NULL;
 	return listaArchivos;
 }

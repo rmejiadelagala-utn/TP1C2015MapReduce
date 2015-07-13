@@ -60,6 +60,8 @@ t_CopiaDeBloque* elegirMejorNodoParaMap(t_list* copiasDeBloque) {
 		idNodoBloqueEvaluado = bloqueSiguiente->id_nodo;
 		cargaNodoOtroBloque = list_find(cargaNodos, (void *) encuentraNodoDeId);
 
+		if((!cargaNodo) || (!cargaNodoOtroBloque)) return -1;
+
 		return cargaNodo->cantidadOperacionesEnCurso
 				< cargaNodoOtroBloque->cantidadOperacionesEnCurso;
 	}
@@ -72,9 +74,12 @@ t_CopiaDeBloque* elegirMejorNodoParaMap(t_list* copiasDeBloque) {
 	list_sort(copiasDeBloque, (void*) compararNodosPorMenorCarga);
 
 	pthread_mutex_unlock(&mutexListaNodo);
+	int i;
+	t_CopiaDeBloque* copiaElegida;
+	for(i=0;(copiaElegida= list_get(copiasDeBloque, i))==NULL;i++);
 
 	//elijo la primera de las copias de la lista ordena por menor carga.
-	t_CopiaDeBloque* copiaElegida = list_get(copiasDeBloque, 0);
+	//t_CopiaDeBloque* copiaElegida = list_get(copiasDeBloque, 0);
 	printf("La copia elegida tiene id %d\n", copiaElegida->id_nodo);
 	fflush(stdout);
 	return list_get(copiasDeBloque, 0);
@@ -122,12 +127,13 @@ int buscarBloquesEnFS(t_InfoJob infoDeJob, uint32_t idArchivo,
 t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 		uint32_t numeroDeBloque, uint32_t* ultimoIDMap) {
 
+	pthread_mutex_lock(&planificarMapMutex);
+
 	t_CopiaDeBloque* copiaSeleccionada;
 	t_DestinoMap* self;
 
 	t_list* copiasDeBloque = list_create();
 
-	pthread_mutex_lock(&conexionFS);
 	if (buscarBloquesEnFS(infoDeJob, idArchivo, numeroDeBloque, copiasDeBloque)
 			<= 0) {
 		printf("No se encontraron las copias del Archivo: %i, Bloque: %i",
@@ -136,7 +142,6 @@ t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 				(void *) liberarCopiaDeBloque);
 		return NULL;
 	}
-	pthread_mutex_unlock(&conexionFS);
 	printf("Voy a buscar la mejor copia\n");
 	//Selecciona la copia de bloque que está en el nodo que menos trabajo tiene
 	copiaSeleccionada = elegirMejorNodoParaMap(copiasDeBloque);
@@ -144,6 +149,8 @@ t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 	//XXX ojo acá hay warning feo. Me parece que no estaría funcionando bien esto.
 	t_registro_id_ipPuerto* unRegistro = buscarRegistroPorId(
 			copiaSeleccionada->id_nodo);
+
+	if(!unRegistro) return NULL;
 
 	self = malloc(sizeof(t_DestinoMap));
 	self->id_map = ++(*ultimoIDMap);
@@ -158,7 +165,10 @@ t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 			(void *) liberarCopiaDeBloque);
 
 	fflush(stdout);
+
+
 	return self;
+
 }
 
 int ordenarMapAJob(t_DestinoMap* destinoDeMap, int socket) {
@@ -325,6 +335,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 					infoArchivo->idArchivo);
 			destinoMap = planificarMap(info_job, infoArchivo->idArchivo, j,
 					&ultimoIDMap);
+			pthread_mutex_unlock(&planificarMapMutex);
 
 			//Si obtiene un destino, le ordena al job realizar el map en ese destino
 			if (destinoMap) {
@@ -357,6 +368,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 
 	printf("\nEnvie todos los pedidos\n");
 	fflush(stdout);
+	pthread_mutex_unlock(&conexionFS);
 
 
 	t_ResultadoMap resultadoDeMap;
@@ -395,6 +407,8 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 				mapPendiente->map_dest = planificarMap(info_job,
 						mapPendiente->file->idArchivo, mapPendiente->block,
 						&ultimoIDMap);
+				pthread_mutex_unlock(&planificarMapMutex);
+
 
 				resultado =
 						(mapPendiente->map_dest != NULL) ?

@@ -1,6 +1,9 @@
 #include "interaccionJobs.h"
 
 void *interaccionJobs(void* sock_ptr) {
+
+	pthread_mutex_lock(&conexionFS);
+
 	int sockCliente = *(int*) sock_ptr;
 
 	t_solicitud solicitud = deserealizarSolicitudDeJob(sockCliente);

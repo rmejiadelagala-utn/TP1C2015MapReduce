@@ -21,6 +21,7 @@ int main(/*int argc, char *argv[]*/) {
 	sem_init(&interaccionFS,0,0);
 	pthread_mutex_init(&contadorJobs,NULL);
 	pthread_mutex_init(&conexionFS,NULL);
+	pthread_mutex_init(&planificarMapMutex,NULL);
 	listaTemporal = list_create();
 	contadorDeIdJob=0;
 
