@@ -88,6 +88,8 @@ void bufferAgregarString(t_buffer* buffer,char* unString, int tamanio);
 
 char* recibirString(int socket);
 
+void recibirStringEn(int socket, char** stringReceptor);
+
 int recibirInt(int socket);
 
 void enviarError(int socket);

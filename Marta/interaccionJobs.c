@@ -45,15 +45,15 @@ t_solicitud deserealizarSolicitudDeJob(int sockCliente){
 		t_solicitud solicitud;
 		solicitud.cantArchivos = recibirInt(sockCliente);
 
-		solicitud.archivos = malloc(sizeof(int) * solicitud.cantArchivos);
 
 		for (i = 0; i < solicitud.cantArchivos; i++) {
-			solicitud.archivos[i]=recibirString(sockCliente);
+
+			recibirStringEn(sockCliente,&solicitud.archivos[i]);
 
 		}
 
 
-		solicitud.archivo_resultado=recibirString(sockCliente);
+		recibirStringEn(sockCliente,&solicitud.archivo_resultado);
 		solicitud.combiner = recibirInt(sockCliente);
 
 		printf("Mostrare los datos del paquete deserealizados\n");
