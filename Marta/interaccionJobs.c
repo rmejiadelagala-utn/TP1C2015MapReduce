@@ -2,7 +2,7 @@
 
 void *interaccionJobs(void* sock_ptr) {
 
-
+	pthread_mutex_lock(&conexionFS);
 	int sockCliente = *(int*) sock_ptr;
 
 	t_solicitud solicitud = deserealizarSolicitudDeJob(sockCliente);
@@ -15,6 +15,7 @@ void *interaccionJobs(void* sock_ptr) {
 	if(!listaDeArchivos){
 		enviarError(sockCliente);
 		printf("Se produjo un error con el job\n");
+		close(sockCliente);
 		return NULL;
 	}
 
@@ -28,15 +29,8 @@ void *interaccionJobs(void* sock_ptr) {
 
 	list_iterate(listaTemporal, (void*) mostrarListaTemporal);
 
-	sleep(2);
-
 	close(sockCliente);
-	printf("Cerre al job\n");
-	fflush(stdout);
-	sleep(3);
-	printf("Cerre al job\n");
-	fflush(stdout);
-	sleep(3);
+
 	return NULL;
 
 }
@@ -51,15 +45,13 @@ t_solicitud deserealizarSolicitudDeJob(int sockCliente){
 		t_solicitud solicitud;
 		solicitud.cantArchivos = recibirInt(sockCliente);
 
-		printf("La cantidad de archivos recibidos es de %d",solicitud.cantArchivos);
+		printf("La cantidad de archivos recibidos es de %d\n",solicitud.cantArchivos);
 		fflush(stdout);
 
 		solicitud.archivos = malloc(sizeof(int) * solicitud.cantArchivos);
 
 		for (i = 0; i < solicitud.cantArchivos; i++) {
 
-			printf("Entro al ciclo por vez numero %d",i);
-			fflush(stdout);
 			solicitud.archivos[i] = recibirString(sockCliente);
 
 		}

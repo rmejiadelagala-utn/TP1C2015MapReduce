@@ -177,11 +177,13 @@ char* getFileContent(char* nombreFile, char * ruta_archivo){
 	return fileMaped;
 }
 
-void crearScriptMapper(const char* codigo_script){
+void crearScriptMapper(const char* codigo_script, char* nombre){
 
 	FILE* scriptMapper;
 
-	if((scriptMapper=fopen("/tmp/mapper.sh","w+"))==NULL){
+
+
+	if((scriptMapper=fopen(nombre,"w+"))==NULL){
 		perror("Error al crear el script del mapper");
 		exit(1);
 	}
@@ -191,7 +193,7 @@ void crearScriptMapper(const char* codigo_script){
 	char *permisosCommand = string_new();
 
 	string_append(&permisosCommand, "chmod a+x ");
-	string_append(&permisosCommand,"/tmp/mapper.sh");
+	string_append(&permisosCommand,nombre);
 
 	system(permisosCommand);
 	fclose(scriptMapper);

@@ -77,7 +77,10 @@ void* conexionJobs(void* sockJobNodo){
 	char* archivoSalida;
 	int nroBloque;
 	int cantArchivosRecibidos;
+	int numeroMapActual;
 	t_list* archivosRecibidos;
+	char* nombreScript;
+	char* nomArchSalida;
 	while((recibido=recvall(sock_in,&protocolo,sizeof(int)))>1){
 		switch(protocolo){
 		case ORDER_MAP:
@@ -88,19 +91,31 @@ void* conexionJobs(void* sockJobNodo){
 			script=recibirString(sock_in);
 			recvall(sock_in,&nroBloque,sizeof(int));
 			archivoSalida=strdup("/tmp/");
-			string_append(&archivoSalida,recibirString(sock_in));
+			nomArchSalida=recibirString(sock_in);
+			string_append(&archivoSalida,nomArchSalida);
 			printf("El script recibido es %s\n",script);
 			printf("El archivo de salida recibido es %s\n",archivoSalida);
 			fflush(stdout);
-			crearScriptMapper(script);
+			pthread_mutex_lock(&numeroMap);
+			nombreScript = strdup("tmp/mapper");
+			string_append(&nombreScript,string_itoa(numeroDeMap));
+			string_append(&nombreScript,".sh");
+			numeroMapActual = numeroDeMap;
+			crearScriptMapper(script,nombreScript);
+			numeroDeMap++;
+			pthread_mutex_unlock(&numeroMap);
 			char* dataAUX = malloc(strlen(DATOS+(nroBloque*BLKSIZE))-1);
 			memcpy(dataAUX,DATOS+(nroBloque*BLKSIZE),strlen(DATOS+(nroBloque*BLKSIZE))-1);
-			ejecutarMapper("/tmp/mapper.sh",archivoSalida,dataAUX);
+			ejecutarMapper(nombreScript,archivoSalida,dataAUX);
+			free(script);
 			free(dataAUX);
+			free(nombreScript);
+			free(nomArchSalida);
 			protocolo=RES_MAP;
 			sendall(sock_in,&protocolo,sizeof(int));
 			protocolo=OK_MAP; //TODO responder NOTOOK_MAP si hubo algun error
 			sendall(sock_in,&protocolo,sizeof(int));
+			pthread_exit(NULL);
 			break;
 
 		case ENVIO_ARCHIVOS_NODO_NODO:
