@@ -78,9 +78,12 @@ void* conexionJobs(void* sockJobNodo){
 	int nroBloque;
 	int cantArchivosRecibidos;
 	int numeroMapActual;
+	int numeroReduceActual;
 	t_list* archivosRecibidos;
 	char* nombreScript;
 	char* nomArchSalida;
+	int cantArchReduce;
+	t_list* archivosAReducir;
 	while((recibido=recvall(sock_in,&protocolo,sizeof(int)))>1){
 		switch(protocolo){
 		case ORDER_MAP:
@@ -125,9 +128,40 @@ void* conexionJobs(void* sockJobNodo){
 				guardarEnDisco(recibirArchivo(sock_in));
 			}
 			break;
+
+		case ORDER_REDUCE:
+			archivosAReducir=list_create();
+			script=recibirString(sock_in);
+			cantArchReduce=recibirInt(sock_in);
+		    for(i=0;i < cantArchReduce;i++){
+		    	list_add(archivosAReducir,nuevoArchReduce(recibirInt(sock_in),recibirInt(sock_in),recibirString(sock_in)));
+		    }
+		    nomArchSalida=recibirString(sock_in);
+		    printf("El script recibido es %s\n",script);
+		    printf("El archivo de salida recibido es %s\n",archivoSalida);
+		    fflush(stdout);
+		    pthread_mutex_lock(&numeroReduce);
+		    nombreScript = strdup("tmp/reduce");
+		    string_append(&nombreScript,string_itoa(numeroDeReduce));
+		    string_append(&nombreScript,".sh");
+		    numeroReduceActual = numeroDeReduce;
+		    crearScriptReduce(script,nombreScript);
+		    numeroDeReduce++;
+		    pthread_mutex_unlock(&numeroReduce);
+		    //APAREAR ARCHIVOS DE LA LISTA ARCHIVOSAREDUCIR
 		}
 	}
 
 
 	return 0;
+}
+
+
+
+t_archivoAReducir* nuevoArchReduce(int ip, int puerto, char* nombre){
+	t_archivoAReducir* unArch = malloc(sizeof(t_archivoAReducir));
+	unArch->ipNodo=ip;
+	unArch->puertoNodo=puerto;
+	unArch->nombreArch=strdup(nombre);
+	return unArch;
 }

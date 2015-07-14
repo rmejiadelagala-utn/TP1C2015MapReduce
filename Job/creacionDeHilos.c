@@ -179,8 +179,8 @@ int enviarReduceANodo(int sockNodo,char* codigoReduce, int cantArchivos,
 	t_buffer* buffer = crearBufferConProtocolo(ORDER_REDUCE);
     bufferAgregarString(buffer,codigoReduce,strlen(codigoReduce)+1);
     bufferAgregarInt(buffer,cantArchivos);
-    int i=0;
-    while(i < cantArchivos){
+    int i;
+    for(i=0;i < cantArchivos;i++){
     	bufferAgregarInt(buffer,nodosArchTmp[i]->ip_nodo);
     	bufferAgregarInt(buffer,nodosArchTmp[i]->puerto_nodo);
     	bufferAgregarString(buffer,nodosArchTmp[i]->archTmp,strlen(nodosArchTmp[i]->archTmp)+1);
@@ -213,7 +213,7 @@ void* hilo_reduce (void* arg_thread){
 		printf("No se pudo conectar al ip_nodo %d\n",ordenReduce.ip_nodo);
 		fflush(stdout);
 		void* buffer = crearBufferConProtocolo(NODO_NOT_FOUND);
-		//En mapper enviava el id_nodo, ahora no tengo ese dato mando ip_nodo
+		//En mapper enviaba el id_nodo, ahora no tengo ese dato mando ip_nodo
 		bufferAgregarInt(buffer,ordenReduce.ip_nodo);
 		enviarBuffer(buffer,sockMarta);
 		return -1;
@@ -250,7 +250,7 @@ void crearHiloReduce(int sockMarta, char* pathReduce) {
 	arg_thread->sockMarta=sockMarta;
 	arg_thread->pathReduce=strdup(pathReduce);
 	arg_thread->ordenReduce=ordenReduce;
-	pthread_create (&thread_reduce, NULL, &hilo_reduce,(void*)arg_thread);
+	pthread_create (&thread_reduce, NULL, hilo_reduce,(void*)arg_thread);
 	//free(ordenReduce); No puedo liberar aca sino me va a liberar antes de
 	//free(arg_thread);  que termine el hilo, muy malo!!!!
 	//capaz tenga que hacer un join_pthread. Averiguar!!!
