@@ -41,6 +41,8 @@
 
 int numeroDeMap;
 pthread_mutex_t numeroMap;
+int numeroDeReduce;
+pthread_mutex_t numeroReduce;
 
 
 

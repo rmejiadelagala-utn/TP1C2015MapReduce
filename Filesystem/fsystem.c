@@ -774,7 +774,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 		printf("Error.");
 	}
 //free(unRegistro);
-	pthread_exit(NULL);
+
 	close(socket);
 	return 0;
 }

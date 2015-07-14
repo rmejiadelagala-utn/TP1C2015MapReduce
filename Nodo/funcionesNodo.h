@@ -22,7 +22,7 @@ int obtener_cant_elem_array(char **);
 char* obtenerNombreArchivo(char*);
 char* getFileContent(char*, char *);
 void crearScriptMapper(const char*,char*);
-void crearScriptReduce(const char*);
+void crearScriptReduce(const char*,char*);
 void ejecutarMapper(char*, char*, char*);
 void ejecutarReduce(char*, char*, char*);
 int redireccionar_stdin_stdout_mapper(char*,char*,char*);

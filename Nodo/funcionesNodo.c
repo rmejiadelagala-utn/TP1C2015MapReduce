@@ -197,11 +197,12 @@ void crearScriptMapper(const char* codigo_script, char* nombre){
 
 	system(permisosCommand);
 	fclose(scriptMapper);
+	free(permisosCommand);
 
 	return;
 }
 
-void crearScriptReduce(const char* codigo_script){
+void crearScriptReduce(const char* codigo_script, char* nombre){
 
 //	FILE* fd;
 	FILE* scriptReduce;
@@ -218,7 +219,7 @@ void crearScriptReduce(const char* codigo_script){
 //	}
 
 
-	if((scriptReduce=fopen("/tmp/reduce.pl","w+"))==NULL){
+	if((scriptReduce=fopen(nombre,"w+"))==NULL){
 		perror("Error al crear el script del Reduce");
 		exit(1);
 	}
@@ -233,10 +234,11 @@ void crearScriptReduce(const char* codigo_script){
 	char *permisosCommand = string_new();
 
 	string_append(&permisosCommand, "chmod u+x ");
-	string_append(&permisosCommand,"/tmp/reduce.pl");
+	string_append(&permisosCommand,nombre);
 
 	system(permisosCommand);
 	fclose(scriptReduce);
+	free(permisosCommand);
 
 	return;
 }

@@ -12,8 +12,15 @@
 #include "nodo.h"
 #include <socketes/envioDeMensajes.h>
 
+typedef struct {
+	int ipNodo;
+	int puertoNodo;
+	char* nombreArch;
+}t_archivoAReducir;
+
 void* conexionFS(void*);
 void* conexionJobs(void*);
+t_archivoAReducir* nuevoArchReduce(int ip, int puerto, char* nombre);
 //void* conexionNodos(void*);
 
 #endif /* INTERFACES_H_ */

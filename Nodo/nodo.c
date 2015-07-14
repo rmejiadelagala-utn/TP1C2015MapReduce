@@ -14,6 +14,7 @@ int main() {
 
 	t_config_nodo* arch_config;
 	pthread_mutex_init(&numeroMap,NULL);
+	pthread_mutex_init(&numeroReduce,NULL);
 
 	printf("Cargando archivo de Configuracion\n");
     arch_config= malloc(sizeof(t_config_nodo));
