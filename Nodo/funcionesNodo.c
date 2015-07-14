@@ -197,6 +197,7 @@ void crearScriptMapper(const char* codigo_script, char* nombre){
 
 	system(permisosCommand);
 	fclose(scriptMapper);
+	free(permisosCommand);
 
 	return;
 }
@@ -237,6 +238,7 @@ void crearScriptReduce(const char* codigo_script, char* nombre){
 
 	system(permisosCommand);
 	fclose(scriptReduce);
+	free(permisosCommand);
 
 	return;
 }

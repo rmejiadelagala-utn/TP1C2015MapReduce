@@ -69,6 +69,8 @@ void* conexionFS(void* arg){
 
 void* conexionJobs(void* sockJobNodo){
 
+	pthread_detach(pthread_self());
+
 	int sock_in = *(int*)sockJobNodo;
 	int recibido;
 	int i;
@@ -114,6 +116,7 @@ void* conexionJobs(void* sockJobNodo){
 			free(dataAUX);
 			free(nombreScript);
 			free(nomArchSalida);
+			free(archivoSalida);
 			protocolo=RES_MAP;
 			sendall(sock_in,&protocolo,sizeof(int));
 			protocolo=OK_MAP; //TODO responder NOTOOK_MAP si hubo algun error
