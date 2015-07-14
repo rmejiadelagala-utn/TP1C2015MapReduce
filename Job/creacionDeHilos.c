@@ -21,7 +21,7 @@ int recibirResultadoFromNodo(int sockNodo){
 		if((recibido=recvall(sockNodo,&protocolo,sizeof(uint32_t)))<0){
 			return -1;
 		}
-		if(protocolo==RES_MAP || RES_REDUCE){
+		if(protocolo==RES_MAP || protocolo==RES_REDUCE){
 			recvall(sockNodo,&rptaNodoAJob,sizeof(uint32_t));
 		}else {
 			//printf("PROTOCOLO RECIBIDO: %d\n",protocolo);
