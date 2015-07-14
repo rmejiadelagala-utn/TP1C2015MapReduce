@@ -47,17 +47,24 @@ t_nodo *nuevoNodo(int id, int tamanio) {
 	unNodo->id = id;
 	unNodo->tamanio = tamanio;
 	unNodo->cantidadBloquesOcupados = 0; //SE SUPONE QUE SI EL NODO ES NUEVO NO TIENE BLOQUES ESCRITOS
-	unNodo->activo = 1; //SE SUPONE QUE SI EL NODO SE ESTA CONECTANDO, ENTONCES ESTA ACTIVO
+	unNodo->activo = 0; //POR DEFECTO LOS NODOS SE CONECTAN ESTANDO DESACTIVADOS
 	unNodo->bloquesLiberados = queue_create();
 	//devuelvo la estructura
 	return unNodo;
 }
 
-void activarNodo(t_nodo *unNodo) {
+void activarNodo(t_nodo *unNodo,int socketMarta) {
+	if(unNodo->activo==0){
 	unNodo->activo = 1;
+	t_registro_id_ipPuerto* unRegistro = buscarRegistroPorId(unNodo->id);
+	actualizarIdIpPuertoEnMarta(socketMarta,unRegistro);
+	}
 }
-void desactivarNodo(t_nodo *unNodo) {
+void desactivarNodo(t_nodo *unNodo,int socketMarta) {
+	if(unNodo->activo==1){
 	unNodo->activo = 0;
+	martaSeCayoUnNodo(socketMarta, unNodo->id);
+	}
 }
 
 t_nodo* string_to_nodo(char* infoDeNodo,int socket){
@@ -115,8 +122,11 @@ void liberarDirectorio(t_directorio *unDirectorio) {
 
 //Funciones para mostrar estructuras por pantalla
 
-void mostrarRegistro(t_registro_id_ipPuerto *registro) {
+/*void mostrarRegistro(t_registro_id_ipPuerto *registro) {
 	printf("\tId del Nodo: %d\n", registro->id);
+}*/
+void mostrarRegistro(t_registro_id_ipPuerto* unRegistro){
+	printf("ID: %d.--------------IP: %s. Puerto: %d\n",unRegistro->id,inet_ntoa(unRegistro->ip),unRegistro->puerto);
 }
 
 void mostrarBloqueEnNodo(t_bloqueEnNodo *bloqueEnNodo) {

@@ -53,6 +53,11 @@ void* conexionFS(void* arg){
 		 case GET_BLOQUE:
 
 			  resultado = getBloqueParaFileSystem(socket,DATOS,BLKSIZE);
+			  break;
+
+		 case NODO_ESTAS:
+			 resultado=recibirInt(socket);
+			 break;
 
 		}
 

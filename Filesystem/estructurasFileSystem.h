@@ -117,13 +117,13 @@ t_nodo *nuevoNodo(int id, int tamanio);
  * @NAME: activarNodo
  * @DESC: activa un nodo
  */
-void activarNodo(t_nodo *unNodo);
+void activarNodo(t_nodo *unNodo, int socketMarta);
 
 /**
  * @NAME: desactivarNodo
  * @DESC: desactiva un nodo
  */
-void desactivarNodo(t_nodo *unNodo);
+void desactivarNodo(t_nodo *unNodo, int socketMarta);
 
 /**
  * @NAME: desactivarNodo
@@ -184,7 +184,7 @@ void liberarDirectorio(t_directorio *unDirectorio);
 /**
  * @NAME: mostrarRegistro
  * @DESC: muestra la estructura registro
- */
+*/
 void mostrarRegistro(t_registro_id_ipPuerto *registro);
 /**
  * @NAME: mostrarBloqueEnNodo

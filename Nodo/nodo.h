@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <commons/config.h>
+#include <commons/collections/list.h>
 #include <commons/string.h>
 #include "socketes/servidor.h"
 #include "socketes/servidorMultihilo.h"

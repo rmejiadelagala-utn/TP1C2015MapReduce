@@ -6,6 +6,7 @@
  */
 
 # include "job.h"
+#include <commons/string.h>
 
 t_config_job* leer_archivo_configuracion(char* arch){
 	t_config *config;
@@ -123,8 +124,9 @@ void serializer_y_send_solicitud(int sock, t_solicitud* solicitud) {
 
 t_solicitud cargarEstructuraSolicitud(t_config_job* info_config){
 	t_solicitud solicitud;
-	solicitud.archivos=info_config->archivos;
-	solicitud.archivo_resultado=info_config->archivo_resultado;
+	solicitud.archivos = info_config->archivos;
+	//solicitud.archivos=info_config->archivos;
+	solicitud.archivo_resultado=strdup(info_config->archivo_resultado);
 	if (!strcmp(info_config->COMBINER,"NO")){
 		solicitud.combiner=0;
 	} else {

@@ -68,6 +68,7 @@ enum entrada {
 	SALIR,
 	CD,
 	LS,
+	VER_NODOS,
 	COMANDO_INVALIDO,
 	FALTA_PARAMETRO
 };

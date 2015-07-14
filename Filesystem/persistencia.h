@@ -21,7 +21,7 @@ void guardarBloqueEnNodo(t_bloqueEnNodo *bloqueEnNodo) ;
  * @NAME: cargarBloqueEnNodo
  * @DESC: carga un bloqueEnNodo desde el archivo apuntado por fpArch
  */
-void cargarBloqueEnNodo();
+t_bloqueEnNodo *cargarBloqueEnNodo();
 
 /**
  * @NAME: guardarNodo
@@ -47,9 +47,24 @@ void guardarDirectorio(t_directorio *unDir) ;
  */
 t_directorio *cargarDirectorio();
 
+
+
+
 void guardarListaDirectorios();
 void cargarListaDirectorios();
 void guardarListaNodos();
 void cargarListaNodos();
+void guardarListaArchivos();
+void cargarListaArchivos();
+void guardarBloqueDeArch(t_bloqueArch *unBloqueDeArch);
+void guardarArchivo(t_archivo *unArchivo);
+t_bloqueArch *cargarBloqueDeArch();
+t_archivo *cargarArchivo();
+
+void guardarRegistroIDIP(t_registro_id_ipPuerto *unReg);
+t_registro_id_ipPuerto *cargarRegistroIDIP();
+void guardarListaRegistrosIDIP();
+void cargarListaRegistrosIDIP();
+
 
 #endif /* PERSISTENCIA_H_ */

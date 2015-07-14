@@ -30,5 +30,6 @@ int redireccionar_stdin_stdout_reduce(char*,char*,char*);
 char* aparear_registros(char*);
 void guardarEnDisco(t_archivoTemporal* unArchivo);
 void liberarArchivoTemporal(t_archivoTemporal* unArchivo);
+t_RegistroArch* apareoDeRegistros(t_list*);
 
 #endif /* FUNCIONESNODO_H_ */

@@ -193,6 +193,12 @@ t_archivo *buscarArchPorPadre(int padre);
 void disminuirNodo(t_bloqueEnNodo *copia);
 
 /**
+ * @NAME: nodoEstas
+ * @DESC: le envia un mensaje al nodo para ver si esta conectado al FS
+ */
+int nodoEstas(int socket);
+
+/**
  * @NAME: dameUnSubdir
  * @DESC: devuelve un subdirectorio del directorio enviado por parametro o NULL si no existe
  */
@@ -270,5 +276,7 @@ t_archivo *buscarArchPorPadreYNombre(int padre,char *nombre);
  * @DESC: separa un ipPuerto enviado por parametro en una ip retornada y un puerto modificado
  */
 char* separarIpPuerto(char* ipPuerto,int * puerto);
+
+int nodoID(t_nodo *unNodo);
 
 #endif /* FUNCIONESFILESYSTEM_H_ */

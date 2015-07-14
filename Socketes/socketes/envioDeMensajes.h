@@ -69,7 +69,7 @@ enum protocolos {
 	NODO_NOT_FOUND, ORDER_MAP, MARTA_ACTUALIZA_EL_REGISTRO, ENVIO_BLOQUEARCH_A_MARTA,
 	MARTA_SE_CAYO_UN_NODO,ORDER_REDUCE, FIN_OPERACION,CONEXION_JOB_A_NODO,RES_MAP,RES_REDUCE,
 	OK_MAP,OK_REDUCE, NOTOK_MAP,NOTOK_REDUCE,COPIAR_ARCHIVO_A_FS_LOCAL,VER_BLOQUE_NODO,
-	COPIAR_BLOQUE_NODO, DAME_LISTA_DE_ARCHIVOS_FS, ENVIO_ARCHIVOS_NODO_NODO
+	COPIAR_BLOQUE_NODO, DAME_LISTA_DE_ARCHIVOS_FS, ENVIO_ARCHIVOS_NODO_NODO, NODO_ESTAS
 };
 
 //Primitivas
@@ -88,7 +88,11 @@ void bufferAgregarString(t_buffer* buffer,char* unString, int tamanio);
 
 char* recibirString(int socket);
 
+void recibirStringEn(int socket, char** stringReceptor);
+
 int recibirInt(int socket);
+
+void enviarError(int socket);
 
 int recibirIntEnOrden(int socket, uint32_t *numero);
 
@@ -161,5 +165,5 @@ int enviarBuffer(t_buffer* buffer, int socket);
  	//De Filesystem
  	t_registro_id_ipPuerto* recibirRegistroNodo(int socket);
 
- 	void recibirBloqueArchFS(int socketAuxiliar,t_list* copiasDeBloque);
+ 	int recibirBloqueArchFS(int socketAuxiliar,t_list* copiasDeBloque);
 #endif

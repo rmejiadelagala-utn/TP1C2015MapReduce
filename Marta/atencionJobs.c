@@ -7,13 +7,6 @@
 
 #include"atencionJobs.h"
 
-typedef char* t_filename;
-
-typedef struct {
-	t_filename* archivos;
-	t_filename  archivo_resultado;
-	uint32_t   combiner;
-} t_solicitud;
 
 void deserealizar(char* buffer, int sockCliente) {
 	char* payload;
