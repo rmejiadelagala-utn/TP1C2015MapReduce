@@ -29,6 +29,8 @@ void *interaccionJobs(void* sock_ptr) {
 
 	list_iterate(listaTemporal, (void*) mostrarListaTemporal);
 
+	planificarTodosLosReduce(info_job, listaTemporal, sockCliente);
+
 	close(sockCliente);
 
 	return NULL;

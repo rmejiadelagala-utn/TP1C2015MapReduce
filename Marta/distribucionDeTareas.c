@@ -435,29 +435,20 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 }
 
 int ipDeNodo(int idNodo) {
-	t_registro_id_ipPuerto* registroIpPuerto = malloc(
-			sizeof(t_registro_id_ipPuerto));
 
-	//XXX ver warning. No lo entiendo bien
-	registroIpPuerto = buscarRegistroPorId(idNodo);
+	t_registro_id_ipPuerto* registroIpPuerto  = buscarRegistroPorId(idNodo);
 
 	int ipDelNodo = registroIpPuerto->ip.s_addr;
-
-	free(registroIpPuerto);
 
 	return ipDelNodo;
 }
 
 int puertoDeNodo(int idNodo) {
-	t_registro_id_ipPuerto* registroIpPuerto = malloc(
-			sizeof(t_registro_id_ipPuerto));
 
 	//XXX ver warning. No lo entiendo bien
-	registroIpPuerto = buscarRegistroPorId(idNodo);
+	t_registro_id_ipPuerto* registroIpPuerto = buscarRegistroPorId(idNodo);
 
 	int puertoDelNodo = registroIpPuerto->puerto;
-
-	free(registroIpPuerto);
 
 	return puertoDelNodo;
 }
