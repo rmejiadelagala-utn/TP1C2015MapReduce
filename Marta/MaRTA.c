@@ -19,9 +19,9 @@ int main(/*int argc, char *argv[]*/) {
 	pthread_t thr_fs;
 	sem_init(&funcionesMarta,0,0);
 	sem_init(&interaccionFS,0,0);
-	pthread_mutex_init(&contadorJobs,NULL);
-	pthread_mutex_init(&conexionFS,NULL);
-	pthread_mutex_init(&planificarMapMutex,NULL);
+	pthread_mutex_init(&contadorJobs,0);
+	pthread_mutex_init(&conexionFS,0);
+	pthread_mutex_init(&planificarMapMutex,0);
 	listaTemporal = list_create();
 	contadorDeIdJob=0;
 
@@ -39,10 +39,6 @@ int main(/*int argc, char *argv[]*/) {
 	//pthread_create(&thr, NULL, atencionJobs, (void*) &serv ); con select
 	pthread_create(&thr_fs, NULL, interaccionMartaFS, (void*) &socketDeFS );
 	crearServerMultiHilo(config_get_int_value(config,"PORT"),interaccionJobs);
-
-
-
-	testear();
 
 	pthread_join(thr,NULL);
 	pthread_join(thr_fs,NULL);

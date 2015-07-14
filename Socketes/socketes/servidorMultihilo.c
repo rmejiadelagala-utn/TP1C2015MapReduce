@@ -50,8 +50,6 @@ int crearServerMultiHilo(uint16_t puerto, void* funcion_hilo)
                     }
 
         //puts("Nodo conectado");
-
-
     }
 
     if (client_sock < 0)

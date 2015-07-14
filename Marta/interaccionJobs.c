@@ -2,7 +2,6 @@
 
 void *interaccionJobs(void* sock_ptr) {
 
-	pthread_mutex_lock(&conexionFS);
 
 	int sockCliente = *(int*) sock_ptr;
 
@@ -29,8 +28,15 @@ void *interaccionJobs(void* sock_ptr) {
 
 	list_iterate(listaTemporal, (void*) mostrarListaTemporal);
 
-	close(sockCliente);
+	sleep(2);
 
+	close(sockCliente);
+	printf("Cerre al job\n");
+	fflush(stdout);
+	sleep(3);
+	printf("Cerre al job\n");
+	fflush(stdout);
+	sleep(3);
 	return NULL;
 
 }
@@ -45,15 +51,20 @@ t_solicitud deserealizarSolicitudDeJob(int sockCliente){
 		t_solicitud solicitud;
 		solicitud.cantArchivos = recibirInt(sockCliente);
 
+		printf("La cantidad de archivos recibidos es de %d",solicitud.cantArchivos);
+		fflush(stdout);
+
+		solicitud.archivos = malloc(sizeof(int) * solicitud.cantArchivos);
 
 		for (i = 0; i < solicitud.cantArchivos; i++) {
 
-			recibirStringEn(sockCliente,&solicitud.archivos[i]);
+			printf("Entro al ciclo por vez numero %d",i);
+			fflush(stdout);
+			solicitud.archivos[i] = recibirString(sockCliente);
 
 		}
 
-
-		recibirStringEn(sockCliente,&solicitud.archivo_resultado);
+		solicitud.archivo_resultado=recibirString(sockCliente);
 		solicitud.combiner = recibirInt(sockCliente);
 
 		printf("Mostrare los datos del paquete deserealizados\n");
@@ -62,6 +73,7 @@ t_solicitud deserealizarSolicitudDeJob(int sockCliente){
 		for(i=0;i<solicitud.cantArchivos;i++) printf("Archivo a trabajar: %s\n", solicitud.archivos[i]);
 		printf("Archivo resultado: %s\n", solicitud.archivo_resultado);
 
+		fflush(stdout);
 		return solicitud;
 }
 

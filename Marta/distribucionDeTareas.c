@@ -310,7 +310,7 @@ void borrarMapPendiente(t_list* mapsPendientes, uint32_t idMap,
 //la función que planifica todos los map de un job determinado.
 int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 		t_list* ListaTemporal, int sockjob) {
-
+	pthread_mutex_lock(&conexionFS);
 
 	t_list* listaMapsPendientes = list_create();
 	t_MapPendiente* mapPendiente;
