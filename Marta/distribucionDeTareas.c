@@ -60,7 +60,8 @@ t_CopiaDeBloque* elegirMejorNodoParaMap(t_list* copiasDeBloque) {
 		idNodoBloqueEvaluado = bloqueSiguiente->id_nodo;
 		cargaNodoOtroBloque = list_find(cargaNodos, (void *) encuentraNodoDeId);
 
-		if((!cargaNodo) || (!cargaNodoOtroBloque)) return -1;
+		if ((!cargaNodo) || (!cargaNodoOtroBloque))
+			return -1;
 
 		return cargaNodo->cantidadOperacionesEnCurso
 				< cargaNodoOtroBloque->cantidadOperacionesEnCurso;
@@ -76,7 +77,8 @@ t_CopiaDeBloque* elegirMejorNodoParaMap(t_list* copiasDeBloque) {
 	pthread_mutex_unlock(&mutexListaNodo);
 	int i;
 	t_CopiaDeBloque* copiaElegida;
-	for(i=0;(copiaElegida= list_get(copiasDeBloque, i))==NULL;i++);
+	for (i = 0; (copiaElegida = list_get(copiasDeBloque, i)) == NULL; i++)
+		;
 
 	//elijo la primera de las copias de la lista ordena por menor carga.
 	//t_CopiaDeBloque* copiaElegida = list_get(copiasDeBloque, 0);
@@ -88,12 +90,10 @@ t_CopiaDeBloque* elegirMejorNodoParaMap(t_list* copiasDeBloque) {
 int buscarBloquesEnFS(t_InfoJob infoDeJob, uint32_t idArchivo,
 		uint32_t numeroDeBloque, t_list *copiasDeBloque) {
 
-
 	printf("El id del archivo es %d\n", idArchivo);
 	printf("El nombre del archivo es %s\n",
 			infoDeJob.pathsDeArchivos[idArchivo]);
 	printf("El numero de bloque es %d\n", numeroDeBloque);
-
 
 	dameBloqueArchFS(socketDeFS, infoDeJob.pathsDeArchivos[idArchivo], 1,
 			numeroDeBloque);
@@ -101,7 +101,8 @@ int buscarBloquesEnFS(t_InfoJob infoDeJob, uint32_t idArchivo,
 	sem_wait(&funcionesMarta);
 	printf("Me desperte.\n");
 	t_list* copias = list_create();
-	if(recibirBloqueArchFS(socketDeFS, copias)<0) return -1;
+	if (recibirBloqueArchFS(socketDeFS, copias) < 0)
+		return -1;
 	void deBloqueEnNodoACopiaDeBloque(t_bloqueEnNodo* bloqueEnNodo) {
 		t_CopiaDeBloque* copiaDeBloque = malloc(sizeof(t_CopiaDeBloque));
 		copiaDeBloque->block = bloqueEnNodo->numeroDeBloqueEnNodo;
@@ -127,7 +128,6 @@ int buscarBloquesEnFS(t_InfoJob infoDeJob, uint32_t idArchivo,
 t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 		uint32_t numeroDeBloque, uint32_t* ultimoIDMap) {
 
-
 	t_CopiaDeBloque* copiaSeleccionada;
 	t_DestinoMap* self;
 
@@ -149,7 +149,8 @@ t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 	t_registro_id_ipPuerto* unRegistro = buscarRegistroPorId(
 			copiaSeleccionada->id_nodo);
 
-	if(!unRegistro) return NULL;
+	if (!unRegistro)
+		return NULL;
 
 	self = malloc(sizeof(t_DestinoMap));
 	self->id_map = ++(*ultimoIDMap);
@@ -164,7 +165,6 @@ t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 			(void *) liberarCopiaDeBloque);
 
 	fflush(stdout);
-
 
 	return self;
 
@@ -310,7 +310,6 @@ void borrarMapPendiente(t_list* mapsPendientes, uint32_t idMap,
 int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 		t_list* ListaTemporal, int sockjob) {
 
-
 	t_list* listaMapsPendientes = list_create();
 	t_MapPendiente* mapPendiente;
 	t_DestinoMap* destinoMap;
@@ -335,16 +334,14 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 			destinoMap = planificarMap(info_job, infoArchivo->idArchivo, j,
 					&ultimoIDMap);
 
-
 			//Si obtiene un destino, le ordena al job realizar el map en ese destino
 			if (destinoMap) {
 				resultado = ordenarMapAJob(destinoMap, sockjob);
-			} else{
-				int error =-1;
-				sendall(sockjob,&error,sizeof(int));
+			} else {
+				int error = -1;
+				sendall(sockjob, &error, sizeof(int));
 				return -2;
 			}
-
 
 			if (resultado > 0) {
 				//agrega a la lista de maps pendientes ese map, con la info
@@ -364,11 +361,9 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 		}
 	}
 
-
 	printf("\nEnvie todos los pedidos\n");
 	fflush(stdout);
 	pthread_mutex_unlock(&conexionFS);
-
 
 	t_ResultadoMap resultadoDeMap;
 
@@ -407,7 +402,6 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 						mapPendiente->file->idArchivo, mapPendiente->block,
 						&ultimoIDMap);
 				pthread_mutex_unlock(&planificarMapMutex);
-
 
 				resultado =
 						(mapPendiente->map_dest != NULL) ?
@@ -468,7 +462,6 @@ int puertoDeNodo(int idNodo) {
 	return puertoDelNodo;
 }
 
-
 int ordenarReduceAJob(t_DestinoReduce* destinoReduce, t_list* origenesDeReduce,
 		int sockJob) {
 
@@ -504,10 +497,57 @@ int ordenarReduceAJob(t_DestinoReduce* destinoReduce, t_list* origenesDeReduce,
 	return resultado;
 }
 
-int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
+int recibirResultadoDeReduce(int sockjob, t_ResultadoReduce* resultadoReduce) {
+
+	resultadoReduce->prot = recibirInt(sockjob);
+
+	switch (resultadoReduce->prot) {
+	case OK_REDUCE:
+		printf("Reduce realizado con exito");
+		break;
+
+	case NODO_NOT_FOUND:
+		printf("No se encontró el nodo donde hacer reduce");
+		break;
+
+	case 0:
+		printf("Job se desconectó de forma inesperada");
+		return -1;
+		break;
+
+	case -1:
+		printf("No se pudo recibir el resultado del Reduce");
+		return -1;
+		break;
+
+	default:
+		printf("Protocolo Inesperado %i", resultadoReduce->prot);
+		return -1;
+		break;
+	}
+
+	resultadoReduce->id_reduce = recibirInt(sockjob);
+	return 1;
+}
+
+void agregarReducePendiente(t_list* reducePendientes,
+		t_DestinoReduce* destinoReduce) {
+
+	t_ReducePendiente* reducePendiente;
+
+	reducePendiente = malloc(sizeof(t_ReducePendiente));
+	reducePendiente->numeroDeReducePendiente = destinoReduce->id_reduce;
+	reducePendiente->map_dest = destinoReduce;
+
+	list_add(reducePendientes, reducePendiente);
+
+}
+
+int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
+		int sockJob) {
 
 	int idJobAlQueAplica = infoJob.idJob;
-	int sockJob = 0;
+	uint32_t ultimoIDReduce = 0;
 
 	t_list* listaIdNodosDondeAplicarReduce;
 
@@ -605,6 +645,7 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 		//distintos idNodo que estan involucrados en este reduce combiner
 		list_iterate(mapsTemporalesDeLosArchivosDelJob, (void*) tomarIdsNodo);
 
+		t_list* listaReducePendientes = list_create();
 		t_list* destinosIntermedios = list_create();
 		int idNodoDondeAplicarReduceFinal;
 
@@ -634,6 +675,7 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 					sizeof(t_DestinoReduce));
 
 			//XXX el nombre del reduce no se si siempre será único. supuestamente si
+			destinoIntermedioReduce->id_reduce = ++(ultimoIDReduce);
 			destinoIntermedioReduce->id_nodo = idAux->idNodo;
 			destinoIntermedioReduce->ip_nodo = ipDeNodo(idAux->idNodo);
 			destinoIntermedioReduce->puerto_nodo = puertoDeNodo(idAux->idNodo);
@@ -643,15 +685,12 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 			resReduceEnNodo = ordenarReduceAJob(destinoIntermedioReduce,
 					origenesReduceEnNodo, sockJob);
 
-			//todo hacer que reciba que ordeno bien, y luego que si se hizo
-			//exitosamente el reduce o no (espera a la respuesta del job) similar a map
-			//si sale bien continúa guardando los temp de los reduce
-			//, sino borra todo y cancela job
-			//si salio bien
-
 			if (resReduceEnNodo > 0) {
 				printf("");
 			}
+
+			agregarReducePendiente(listaReducePendientes,
+					destinoIntermedioReduce);
 
 			list_add(destinosIntermedios, destinoIntermedioReduce);
 
@@ -667,6 +706,50 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 			list_remove_and_destroy_element(listaIdNodosDondeAplicarReduce, 0,
 					(void*) destruirTIdNodo);
 
+		}
+		printf("\nEnvie todos las ordenes de reduce intermedios\n");
+		fflush(stdout);
+		//ojo acá: pthread_mutex_unlock(&conexionFS);
+
+		t_ResultadoReduce resultadoDeReduce;
+		int resultado;
+
+		bool encuentraReducePendiente(t_DestinoReduce* unDestinoReduce) {
+			return unDestinoReduce->id_reduce == resultadoDeReduce.id_reduce;
+		}
+
+		void eliminarReducePendiente(t_DestinoReduce* unDestinoReduce) {
+			free(unDestinoReduce);
+		}
+
+		//aca recibir resultado de reduce intermedios que se van haciendo
+		while (!list_is_empty(listaReducePendientes)) {
+
+			resultado = recibirResultadoDeReduce(sockJob, &resultadoDeReduce);
+			fflush(stdout);
+
+			//En base al resultado, realiza las tareas que le corresponden
+			if (resultado > 0) {
+				switch (resultadoDeReduce.prot) {
+				case OK_REDUCE:
+
+					list_remove_and_destroy_by_condition(listaReducePendientes,
+							(void*) encuentraReducePendiente,
+							(void*) eliminarReducePendiente);
+					break;
+				case NODO_NOT_FOUND:
+					printf("\nNO SE ENCONTRO UN NODO\n");
+					printf("CANCELO TODO EL JOB\n");
+					fflush(stdout);
+
+					break;
+				}
+
+			} else {
+				list_destroy_and_destroy_elements(listaReducePendientes,
+						(void *) eliminarReducePendiente);
+				return -1;
+			}
 		}
 
 		//Una vez realizados todos los reduce intermedios en los nodos
@@ -687,9 +770,45 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 		resultadoReduceFinal = ordenarReduceAJob(destinoFinalReduce,
 				destinosIntermedios, sockJob);
 
+		if (resultadoReduceFinal > 0) {
+			printf("Reduce con combiner enviado exitosamente\n");
+		} else {
+			printf("falló envío de la orden de reduce. Cancelo job\n");
+			//todo mandar a borrar cosas y eso. No se bien que hacer acá
+		}
+
+		//recibir el resultado del reduce final
+		printf(
+				"Supuestamente, hice todos los reduce intermedios y mande a hacer el final/n");
+
+		t_ResultadoReduce resultadoFinal;
+
+		resultado = recibirResultadoDeReduce(sockJob, &resultadoFinal);
+
+		//En base al resultado, realiza las tareas que le corresponden
+		if (resultado > 0) {
+			switch (resultadoFinal.prot) {
+			case OK_REDUCE:
+
+				break;
+			case NODO_NOT_FOUND:
+				printf("\nNO SE ENCONTRO UN NODO\n");
+				printf("CANCELO TODO EL JOB. LASTIMA ERA EL FINAL\n");
+				fflush(stdout);
+
+				break;
+			}
+
+		} else {
+			free(destinoFinalReduce);
+			return -1;
+		}
+
 		void destruirDestinoReduce(t_DestinoReduce* unDestinoReduce) {
 			free(unDestinoReduce);
 		}
+
+		free(destinoFinalReduce);
 
 		list_destroy_and_destroy_elements(destinosIntermedios,
 				(void*) destruirDestinoReduce);
@@ -711,6 +830,7 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 		t_DestinoReduce* destinoReduce = malloc(sizeof(t_DestinoReduce));
 
 		//XXX el nombre del reduce no se si siempre será único. supuestamente si
+		destinoReduce->id_reduce = ++(ultimoIDReduce);
 		destinoReduce->id_nodo = idNodoDondeAplicarReduce;
 		destinoReduce->ip_nodo = ipDeNodo(idNodoDondeAplicarReduce);
 		destinoReduce->puerto_nodo = puertoDeNodo(idNodoDondeAplicarReduce);
@@ -727,10 +847,32 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales) {
 			//todo mandar a borrar cosas y eso. No se bien que hacer acá
 		}
 
-		//todo funcion que reciba resultado de reduce por parte del job
+		//recibir el resultado del reduce final
+		printf(
+				"Supuestamente, hice todos los reduce intermedios y mande a hacer el final/n");
 
-		//todo guardar la info del reduce que voy a necesitar luego de que se hizo correctamente
-		//Si salió bien, libero las variables internas
+		t_ResultadoReduce resultadoFinal;
+
+		resultado = recibirResultadoDeReduce(sockJob, &resultadoFinal);
+
+		//En base al resultado, realiza las tareas que le corresponden
+		if (resultado > 0) {
+			switch (resultadoFinal.prot) {
+			case OK_REDUCE:
+
+				break;
+			case NODO_NOT_FOUND:
+				printf("\nNO SE ENCONTRO UN NODO\n");
+				printf("CANCELO TODO EL JOB.\n");
+				fflush(stdout);
+
+				break;
+			}
+
+		} else {
+			free(destinoReduce);
+			return -1;
+		}
 
 		//todo mandar a guardar el resultado del reduce al MDFS
 

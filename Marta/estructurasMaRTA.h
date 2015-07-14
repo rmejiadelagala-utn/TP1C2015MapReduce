@@ -76,6 +76,7 @@ typedef struct {
 } t_DestinoMap;
 
 typedef struct {
+	uint32_t id_reduce;
 	int id_nodo;
 	char* temp_file_name;
 } t_OrigenReduce;
@@ -84,6 +85,7 @@ typedef struct {
 //por ahora lo dejo así, porque OrigenReduce no se si ponerle ip-puerto o no
 
 typedef struct {
+	uint32_t id_reduce;
 	int id_nodo;
 	int ip_nodo;
 	int puerto_nodo;
@@ -98,9 +100,19 @@ typedef struct {
 } t_MapPendiente;
 
 typedef struct {
+	uint32_t numeroDeReducePendiente;
+	t_DestinoReduce* map_dest;
+} t_ReducePendiente;
+
+typedef struct {
 	uint32_t prot;
 	uint32_t id_map;
 } t_ResultadoMap;
+
+typedef struct {
+	uint32_t prot;
+	uint32_t id_reduce;
+} t_ResultadoReduce;
 
 typedef struct {
 	uint32_t idMapTemporal;
