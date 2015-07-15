@@ -21,6 +21,15 @@ mkdir Nodo5/Debug
 mkdir Nodo6/Debug
 mkdir Nodo7/Debug
 
+# Crear directorios Debug
+mkdir Nodo1/Debug/tmp
+mkdir Nodo2/Debug/tmp
+mkdir Nodo3/Debug/tmp
+mkdir Nodo4/Debug/tmp
+mkdir Nodo5/Debug/tmp
+mkdir Nodo6/Debug/tmp
+mkdir Nodo7/Debug/tmp
+
 # Crear directorios ArchivosVarios
 mkdir Nodo1/ArchivosVarios
 mkdir Nodo2/ArchivosVarios

@@ -51,8 +51,10 @@ void* conexionFS(void* arg){
 			  break;
 
 		 case GET_BLOQUE:
-
+			 printf("me pidieron un bloque\n");
+			 fflush(stdout);
 			  resultado = getBloqueParaFileSystem(socket,DATOS,BLKSIZE);
+
 			  break;
 
 		 case NODO_ESTAS:
