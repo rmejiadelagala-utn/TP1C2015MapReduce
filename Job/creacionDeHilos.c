@@ -163,6 +163,7 @@ t_ordenReduce* recibirOrdenReduceDeMarta(int sockMarta){
 		//reservo la cantidad necesaria de punteros t_nodoArchTmp
 		ordenReduce->nodosArchTmp=(t_nodoArchTmp*)malloc(sizeof(t_nodoArchTmp*)*(ordenReduce->cantArchAreducir));
 		while (i < (ordenReduce->cantArchAreducir)) {
+			ordenReduce->nodosArchTmp[i]=malloc(sizeof(t_nodoArchTmp));
 			recvall(sockMarta,&(ordenReduce->nodosArchTmp[i]->ip_nodo),sizeof(uint32_t));
 			recvall(sockMarta,&(ordenReduce->nodosArchTmp[i]->puerto_nodo),sizeof(uint32_t));
 			recvall(sockMarta,&(tamanioArch),sizeof(uint32_t));
@@ -177,7 +178,7 @@ t_ordenReduce* recibirOrdenReduceDeMarta(int sockMarta){
 int enviarReduceANodo(int sockNodo,char* codigoReduce, int cantArchivos,
 					  t_nodoArchTmp** nodosArchTmp,char* archResultado){
 	t_buffer* buffer = crearBufferConProtocolo(ORDER_REDUCE);
-    bufferAgregarString(buffer,codigoReduce,strlen(codigoReduce)+1);
+    bufferAgregarString(buffer,codigoReduce,strlen(codigoReduce)+1); //FIX si esto fuese un binario, no funcionaria
     bufferAgregarInt(buffer,cantArchivos);
     int i;
     for(i=0;i < cantArchivos;i++){
