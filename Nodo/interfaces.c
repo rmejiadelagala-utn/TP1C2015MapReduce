@@ -49,6 +49,13 @@ void* conexionFS(void* arg){
 			  printf("Almacené la informacion en el bloque numero %d correctamente.\n",nroBloqueRecibido);
 			  fflush(stdout);
 			  break;
+		  case SET_ULTIMO_BLOQUE:
+			  nroBloqueRecibido = setUltimoBloqueDeFileSystem(socket, DATOS, BLKSIZE);//Si devuelve 0 es porque recibio todo
+			  msync(ptr->ARCH_BIN,strlen(DATOS),MS_SYNC);
+			  respuestaSetBloque(socket,nroBloqueRecibido);
+			  printf("Almacené la informacion en el bloque numero %d correctamente.\n",nroBloqueRecibido);
+			  fflush(stdout);
+			  break;
 
 		 case GET_BLOQUE:
 			 printf("me pidieron un bloque\n");

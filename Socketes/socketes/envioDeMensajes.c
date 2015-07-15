@@ -337,8 +337,20 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		int tamanioEnKB = tamanio/1024;
 		printf("Recibo un bloque de tamaño %d",tamanioEnKB);
 		recvall(socket,dataBin+(block_size*nroBloque),tamanio);
-		//memset(dataBin+(block_size*nroBloque)+tamanio,'\n',1);
+		memset(dataBin+(block_size*nroBloque)+tamanio,'\n',1);
 		memset(dataBin+(block_size*nroBloque)+tamanio,'\0'+1,1);
+		return nroBloque;
+	}
+	int setUltimoBloqueDeFileSystem(int socket, char* dataBin, int block_size){
+		int tamanio;
+		int nroBloque;
+		recvall(socket,&nroBloque,4);
+		recvall(socket,&tamanio,4);
+		int tamanioEnKB = tamanio/1024;
+		printf("Recibo un bloque de tamaño %d",tamanioEnKB);
+		recvall(socket,dataBin+(block_size*nroBloque),tamanio);
+		//memset(dataBin+(block_size*nroBloque)+tamanio,'\n',1);
+		//memset(dataBin+(block_size*nroBloque)+tamanio,'\0'+1,1);
 		return nroBloque;
 	}
 	int respuestaSetBloque(int socket, int resultado){
