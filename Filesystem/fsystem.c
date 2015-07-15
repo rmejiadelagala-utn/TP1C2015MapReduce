@@ -65,6 +65,8 @@ int main() {
 	t_registro_id_ipPuerto* registroVacio = malloc(sizeof(t_registro_id_ipPuerto));
 	sem_init(&consola_sem,0,0);
 	sem_init(&escuchar_sem,0,0);
+	pthread_mutex_init(&listaDeNodos,NULL);
+	pthread_mutex_init(&listaDeRegistros,NULL);
 
 
 	//Para probar la persistencia en sus inicios
@@ -620,7 +622,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 	int tamanioBloqueRecibido;
 
 	int tamanioPosta;
-
+	int esMarta=0;
 	int socket = *(int*) sock_ptr;
 	int protocolo;
 	int recibido;
@@ -648,31 +650,41 @@ void *interaccionFSNodo(void* sock_ptr) {
 
 			case NODO_NUEVO_Y_NO_TENGO_SU_ID:
 				nodo = nuevoNodo(id, (infoNodo->CANT_BLOQUES) * BLOCK_SIZE);
+				pthread_mutex_lock(&listaDeNodos);
 				list_add(listaNodos, nodo);
+				pthread_mutex_unlock(&listaDeNodos);
 				unRegistro->id = id;
 				unRegistro->ip = infoNodo->IP_NODO;
 				unRegistro->puerto = infoNodo->PUERTO_NODO;
+				pthread_mutex_lock(&listaDeRegistros);
 				list_add(listaRegistrosIDIP, unRegistro);
 				actualizarRegistro(unRegistro, infoNodo->IP_NODO, infoNodo->PUERTO_NODO);
+				pthread_mutex_unlock(&listaDeRegistros);
 				break;
 
 			case NODO_NUEVO_Y_TENGO_SU_ID:
 
 				nodo = nuevoNodo(id, (infoNodo->CANT_BLOQUES) * BLOCK_SIZE);
 				nodoViejo = buscarNodoPorId(id, listaNodos);
+				pthread_mutex_lock(&listaDeRegistros);
 				unRegistro = buscarRegistroPorId(id);
 				actualizarRegistro(unRegistro, infoNodo->IP_NODO, infoNodo->PUERTO_NODO);
+				pthread_mutex_unlock(&listaDeRegistros);
 				eliminarNodoYReferencias(nodoViejo, listaNodos, listaArchivos);
+				pthread_mutex_lock(&listaDeNodos);
 				list_add(listaNodos, nodo);
+				pthread_mutex_unlock(&listaDeNodos);
 				break;
 			case NODO_VIEJO_Y_NO_TENGO_SU_ID:
 				printf("Error, no se conocía a este nodo.\n");
 				fflush(stdout);
 				break;
 			case NODO_VIEJO_Y_TENGO_SU_ID:
+				pthread_mutex_lock(&listaDeRegistros);
 				if (!verificarRegistro(unRegistro, infoNodo->IP_NODO, infoNodo->PUERTO_NODO)) {	//Cambió su IP o Puerto
 					actualizarRegistro(unRegistro, infoNodo->IP_NODO, infoNodo->PUERTO_NODO);
 				}
+				pthread_mutex_unlock(&listaDeRegistros);
 				break;
 			}
 
@@ -682,9 +694,12 @@ void *interaccionFSNodo(void* sock_ptr) {
 			break;
 		case RTA_SET_BLOQUE:
 			if (recvall(socket, &respuestaSetBloque, 4) <= 0)
-				printf("Hubo un problema al escribir el archivo.");
-			if (respuestaSetBloque <= 0)
-				printf("Hubo un problema al escribir el archivo.");
+				printf("Hubo un problema al escribir el archivo.\n");
+			else if (respuestaSetBloque <= 0)
+				printf("Hubo un problema al escribir el archivo.\n");
+			else {
+				printf("Se mandó un bloque correctamente.\n");
+			}
 			break;
 		case GET_BLOQUE:
 			recibido = recvall(socket, &protocolo, 4);
@@ -715,15 +730,18 @@ void *interaccionFSNodo(void* sock_ptr) {
 				}
 			break;
 		case CONEXION_MARTA_A_FS:
+			esMarta=1;
 			printf("Hola Marta!\n");
 
 			socketDeMarta = socket;
 			void actualizarAMarta(t_registro_id_ipPuerto* unRegistro) {
 				actualizarIdIpPuertoEnMarta(socketDeMarta, unRegistro);
 			}
+			pthread_mutex_lock(&listaDeRegistros);
 			t_list* registrosActivos = list_filter(listaRegistrosIDIP, (void*) nodoEstaActivo);
 			list_iterate(registrosActivos, (void*) actualizarAMarta);
 			list_destroy(registrosActivos);
+			pthread_mutex_unlock(&listaDeRegistros);
 			//TODO esta bien
 			break;
 		case ENVIO_BLOQUEARCH_A_MARTA:
@@ -766,7 +784,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 			printf("Nodo desconectado.\n");
 			martaSeCayoUnNodo(socketDeMarta, id);
 		}
-		else{
+		else if(esMarta){
 			printf("Marta desconectada.\n");
 		}
 	}

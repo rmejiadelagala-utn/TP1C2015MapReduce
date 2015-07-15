@@ -113,7 +113,7 @@ int enviarBuffer(t_buffer* buffer, int socket);
 //FileSystem
 	//A Nodo
 
-	int enviarBloqueANodo(int socket, int numeroDeBloque, char* dataBloque,int comienzoBloque, int tamanio);
+	int enviarBloqueANodo(int socket, int numeroDeBloque, char* dataBloque,uint32_t comienzoBloque, uint32_t tamanio);
 
 	int pedirBloqueANodo(int socket, int numeroDeBloque, int protocoloDeRegreso);
 

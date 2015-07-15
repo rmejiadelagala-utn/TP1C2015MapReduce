@@ -192,7 +192,7 @@ int enviarBuffer(t_buffer* buffer, int socket){
 
 //FileSystem
 	//A Nodo
-	int enviarBloqueANodo(int socket, int numeroDeBloque, char* dataBloque,int comienzoBloque, int tamanio){
+	int enviarBloqueANodo(int socket, int numeroDeBloque, char* dataBloque,uint32_t comienzoBloque, uint32_t tamanio){
 		t_buffer* buffer = crearBufferConProtocolo(SET_BLOQUE);
 		bufferAgregarInt(buffer,numeroDeBloque);
 		bufferAgregarString(buffer,dataBloque+comienzoBloque,tamanio);
@@ -326,6 +326,8 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		int nroBloque;
 		recvall(socket,&nroBloque,4);
 		recvall(socket,&tamanio,4);
+		int tamanioEnKB = tamanio/1024;
+		printf("Recibo un bloque de tamaño %d",tamanioEnKB);
 		recvall(socket,dataBin+(block_size*nroBloque),tamanio);
 		memset(dataBin+(block_size*nroBloque)+tamanio,'\n',1);
 		memset(dataBin+(block_size*nroBloque)+tamanio+1,'\0',1);

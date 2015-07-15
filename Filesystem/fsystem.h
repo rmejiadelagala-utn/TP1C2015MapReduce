@@ -58,6 +58,8 @@ t_list *listaRegistrosIDIP;
 sem_t semaforo;
 sem_t consola_sem;
 sem_t escuchar_sem;
+pthread_mutex_t listaDeNodos;
+pthread_mutex_t listaDeRegistros;
 FILE *archivoReconstruido;
 int socketDeMarta;
 FILE *fpArch;
