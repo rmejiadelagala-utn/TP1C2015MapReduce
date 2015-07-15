@@ -7,7 +7,7 @@
 
 #ifndef FUNCIONESFILESYSTEM_H_
 #define FUNCIONESFILESYSTEM_H_
-#define BLOCK_SIZE 150 //2* 1024 * 1024;//Probar con menos
+#define BLOCK_SIZE 150//20971520 //20* 1024 * 1024;//Probar con menos
 #include"estructurasFileSystem.h"
 #include "fsystem.h"
 
@@ -26,7 +26,7 @@ void enviarCantBloquesDeArch(char* unArchivo,int socket);
  * @NAME: setBloque
  * @DESC: envia el dataBloque al nodo para que lo almacene, se le pasa el tamanio del bloque y en donde comienza (por si el bloque es solo una parte de un archivo mapeado a memoria. Luego, guarda el archivo en la lista de copias del bloque de archivo.
  */
-int setBloque(t_nodo* nodo, char* dataBloque, int tamanio, int comienzoDeBloque,t_list *copias);
+int setBloque(t_nodo* nodo, char* dataBloque, uint32_t tamanio, uint32_t comienzoDeBloque,t_list *copias);
 
 /*
  * @NAME: formatear

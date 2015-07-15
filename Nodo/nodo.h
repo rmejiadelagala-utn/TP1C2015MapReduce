@@ -35,7 +35,9 @@
 #include <pthread.h>
 
 //#define BLKSIZE 1024*1024*20
+
 #define BLKSIZE 150//20971520 //Ejemplo para probar el data.bin
+
 
 
 

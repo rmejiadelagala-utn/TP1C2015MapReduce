@@ -93,15 +93,15 @@ int mandarBloquesANodos(char* data, int* cantidadBloquesEnviados,
 
 		t_list** listaDeBloques) {
 
-	int i, fin = 0;
-	int comienzoDeBloque = 0, finDeBloque;
+	uint32_t i, fin = 0;
+	uint32_t comienzoDeBloque = 0, finDeBloque;
 	t_bloqueArch *bloqueDeArchivo;
 //	t_list *nodosOrdenados = list_create();
 	t_nodo *nodoActual;
-	int ultimoIndiceDelData = string_length(data)-1;//Juanchi dice que -1 no va
+	uint32_t ultimoIndiceDelData = string_length(data)-1;//Juanchi dice que -1 no va
 
 	*cantidadBloquesEnviados = 0;
-	int cant=0;
+	uint32_t cant=0;
 	while (!fin) {
 
 
@@ -125,7 +125,9 @@ int mandarBloquesANodos(char* data, int* cantidadBloquesEnviados,
 
 		//ordenar lista nodo por cantidad de bloques usados-->sale nodosOrdenados
 		t_list *nodosOrdenados = list_create();
+		pthread_mutex_lock(&listaDeNodos);
 		list_add_all(nodosOrdenados, listaNodos);//Agrega todos los elementos de la segunda lista en la primera
+		pthread_mutex_unlock(&listaDeNodos);
 		list_sort(nodosOrdenados, (void*) ordenarPorMenorUso);
 		int k = 0;
 		//Acá distribuye las copias dado el algoritmo de dstribucion
@@ -170,7 +172,7 @@ void enviarCantBloquesDeArch(char* nombreArchivo, int socket) {
 
 
 
-int setBloque(t_nodo* nodo, char* dataBloque, int tamanio, int comienzoDeBloque,t_list *copias){
+int setBloque(t_nodo* nodo, char* dataBloque, uint32_t tamanio, uint32_t comienzoDeBloque,t_list *copias){
 	int posicionEnNodo;
 	int *aux;
 	t_bloqueEnNodo *bloqueEnNodo;
@@ -190,7 +192,10 @@ int setBloque(t_nodo* nodo, char* dataBloque, int tamanio, int comienzoDeBloque,
 
 	//termino de agregar a la lista de archivos, la info nueva del bloque
 
-	if (resultado==(-1)) return resultado; //ERROR
+	if (resultado==(-1)){
+		printf("No se pudo enviar el bloque correctamente al nodo. Error en funcion SET BLOQUE.\n");
+		return resultado; //ERROR
+	}
 
 	list_add(copias, bloqueEnNodo);//algo malo puede pasar
 	return resultado;
