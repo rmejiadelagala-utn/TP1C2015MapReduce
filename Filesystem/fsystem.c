@@ -763,7 +763,6 @@ void *interaccionFSNodo(void* sock_ptr) {
 				}
 				enviarCopiasAMarta(socket,list_filter(copias,suNodoEstaActivo));
 			}
-			//TODO completar esta funcion
 
 			break;
 		case DAME_LISTA_DE_ARCHIVOS_FS:
