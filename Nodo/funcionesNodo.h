@@ -8,6 +8,7 @@
 #ifndef FUNCIONESNODO_H_
 #define FUNCIONESNODO_H_
 
+#define _FILE_OFFSET_BITS 64
 #include "estructurasNodo.h"
 #include "nodo.h"
 #include <string.h>

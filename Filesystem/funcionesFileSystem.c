@@ -93,15 +93,15 @@ int mandarBloquesANodos(char* data, int* cantidadBloquesEnviados,
 
 		t_list** listaDeBloques) {
 
-	int i, fin = 0;
-	int comienzoDeBloque = 0, finDeBloque;
+	uint32_t i, fin = 0;
+	uint32_t comienzoDeBloque = 0, finDeBloque;
 	t_bloqueArch *bloqueDeArchivo;
 //	t_list *nodosOrdenados = list_create();
 	t_nodo *nodoActual;
-	int ultimoIndiceDelData = string_length(data)-1;//Juanchi dice que -1 no va
+	uint32_t ultimoIndiceDelData = string_length(data)-1;//Juanchi dice que -1 no va
 
 	*cantidadBloquesEnviados = 0;
-	int cant=0;
+	uint32_t cant=0;
 	while (!fin) {
 
 

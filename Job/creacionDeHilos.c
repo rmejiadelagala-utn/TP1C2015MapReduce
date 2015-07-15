@@ -126,6 +126,7 @@ void crearHiloMapper(int sockMarta, char* pathMapper) {
 	arg_thread->ordenMapper=ordenMapper;
 
 	pthread_create (&thread_map, NULL, hilo_mapper, (void*)arg_thread);
+	pthread_detach(thread_map);
 	return ;
 }
 
@@ -166,9 +167,7 @@ t_ordenReduce* recibirOrdenReduceDeMarta(int sockMarta){
 			ordenReduce->nodosArchTmp[i]=malloc(sizeof(t_nodoArchTmp));
 			recvall(sockMarta,&(ordenReduce->nodosArchTmp[i]->ip_nodo),sizeof(uint32_t));
 			recvall(sockMarta,&(ordenReduce->nodosArchTmp[i]->puerto_nodo),sizeof(uint32_t));
-			recvall(sockMarta,&(tamanioArch),sizeof(uint32_t));
-			(ordenReduce->nodosArchTmp[i]->archTmp)=(char*)malloc(tamanioArch+1);
-			recvall(sockMarta,(ordenReduce->nodosArchTmp[i]->archTmp),tamanioArch);
+			ordenReduce->nodosArchTmp[i]->archTmp=recibirString(sockMarta);
 			i++;
 		}
 		return ordenReduce;

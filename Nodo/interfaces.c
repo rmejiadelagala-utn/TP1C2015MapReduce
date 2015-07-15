@@ -56,7 +56,6 @@ void* conexionFS(void* arg){
 			  break;
 
 		 case NODO_ESTAS:
-			 resultado=recibirInt(socket);
 			 break;
 
 		}
