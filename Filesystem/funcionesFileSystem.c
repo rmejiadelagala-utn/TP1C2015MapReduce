@@ -112,12 +112,12 @@ int mandarBloquesANodos(char* data, int* cantidadBloquesEnviados,
 
 		if (finDeBloque > ultimoIndiceDelData) {
 
-			finDeBloque = ultimoIndiceDelData;
+			finDeBloque = ultimoIndiceDelData+1;
 			fin = 1;
 		}	//Sale si ya no hay bloques
 
 
-		while (data[finDeBloque] != '\n'){
+		while (data[finDeBloque] != '\n' && (!fin)){
 			finDeBloque--;
 		}
 
@@ -138,7 +138,8 @@ int mandarBloquesANodos(char* data, int* cantidadBloquesEnviados,
 			if (nodoElegido(nodosOrdenados, &nodoActual,&k) != -1) {
 				//salio bien el elegir nodo, estando en nodoActual
 				int tamanio = finDeBloque-comienzoDeBloque;
-				setBloque(nodoActual,data,tamanio,comienzoDeBloque, bloqueDeArchivo->copiasDeBloque);
+				if(fin) setUltimoBloque(nodoActual,data,tamanio,comienzoDeBloque,bloqueDeArchivo->copiasDeBloque);
+				else setBloque(nodoActual,data,tamanio,comienzoDeBloque, bloqueDeArchivo->copiasDeBloque);
 
 			} else {
 				printf("No hay nodos disponibles\n");
@@ -170,7 +171,36 @@ void enviarCantBloquesDeArch(char* nombreArchivo, int socket) {
 
 }
 
+int setUltimoBloque(t_nodo* nodo, char* dataBloque, uint32_t tamanio, uint32_t comienzoDeBloque,t_list *copias){
+	int posicionEnNodo;
+	int *aux;
+	t_bloqueEnNodo *bloqueEnNodo;
+	//cargarEnListaArchivoElNodo(nodoElegido);
+	if (queue_is_empty(nodo->bloquesLiberados)) {
+		posicionEnNodo = nodo->cantidadBloquesOcupados +1 ; //TODO tratar de hacer que empiece desde 0
+	} else {
+		aux = queue_pop(nodo->bloquesLiberados);
+		posicionEnNodo = *aux;
+		free(aux);
+	}
+	nodo->cantidadBloquesOcupados++;
+	bloqueEnNodo = nuevoBloqueEnNodo(nodo->id,
+							posicionEnNodo);
 
+	int resultado = enviarUltimoBloqueANodo(nodo->socket, bloqueEnNodo->numeroDeBloqueEnNodo, dataBloque,comienzoDeBloque,tamanio);
+
+	if(resultado==0) printf("Problema al enviar\n");
+
+	//termino de agregar a la lista de archivos, la info nueva del bloque
+
+	if (resultado==(-1)){
+		printf("No se pudo enviar el bloque correctamente al nodo. Error en funcion SET BLOQUE.\n");
+		return resultado; //ERROR
+	}
+
+	list_add(copias, bloqueEnNodo);//algo malo puede pasar
+	return resultado;
+}
 
 int setBloque(t_nodo* nodo, char* dataBloque, uint32_t tamanio, uint32_t comienzoDeBloque,t_list *copias){
 	int posicionEnNodo;
@@ -189,6 +219,8 @@ int setBloque(t_nodo* nodo, char* dataBloque, uint32_t tamanio, uint32_t comienz
 							posicionEnNodo);
 
 	int resultado = enviarBloqueANodo(nodo->socket, bloqueEnNodo->numeroDeBloqueEnNodo, dataBloque,comienzoDeBloque,tamanio);
+
+	if(resultado==0) printf("Problema al enviar\n");
 
 	//termino de agregar a la lista de archivos, la info nueva del bloque
 
@@ -719,13 +751,18 @@ int obtenerArchivo(t_archivo *archivo) {
 
 	int obtenerBloque(t_bloqueArch *bloqueDeArchivo) {
 
-			if(huboError) return -1;
+			if(huboError){
+				printf("Hubo un error\n");
+				return -1;
+			}
 
 			huboError =	detectarError(bloqueDeArchivo->copiasDeBloque, list_is_empty,
 							"El archivo no está disponible. Faltan las copias de alguno de sus bloques en los nodos.\n");
 
-			if(huboError) return -1;
-
+			if(huboError){
+				printf("Hubo un error\n");
+				return -1;
+			}
 			t_bloqueEnNodo *bloque = encontrarBloqueDisponible(bloqueDeArchivo->copiasDeBloque);
 
 			if(!bloque) {
