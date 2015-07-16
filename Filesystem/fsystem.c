@@ -57,16 +57,23 @@
 void *interaccionFSNodo(void*);
 
 int main() {
+	/*
 	//Posiblemente vayan en la funcion persistir los list_create()
 	listaArchivos = list_create();
 	listaNodos = list_create();
 	listaDirectorios = list_create();
-	listaRegistrosIDIP = list_create();
+	listaRegistrosIDIP = list_create();*/
 	t_registro_id_ipPuerto* registroVacio = malloc(sizeof(t_registro_id_ipPuerto));
 	sem_init(&consola_sem,0,0);
 	sem_init(&escuchar_sem,0,0);
 	pthread_mutex_init(&listaDeNodos,NULL);
 	pthread_mutex_init(&listaDeRegistros,NULL);
+
+	cargarPersistencia();
+	 // Register signal and signal handler
+	signal(SIGINT, signal_callback_handler);
+	signal(SIGTSTP, signal_callback_handler);//posiblemente al pedo
+	signal(SIGSEGV, signal_callback_handler);//posiblemente al pedo
 
 
 	//Para probar la persistencia en sus inicios
@@ -740,6 +747,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 			list_destroy(registrosActivos);
 			pthread_mutex_unlock(&listaDeRegistros);
 			//TODO esta bien
+			//Qué bien, me alegro entonces!!!
 			break;
 		case ENVIO_BLOQUEARCH_A_MARTA:
 			infoBloquePedido = recibirPedidoDeBloqueArch(socket);
@@ -758,7 +766,11 @@ void *interaccionFSNodo(void* sock_ptr) {
 					t_nodo* unNodo = buscarNodoPorId(copiaDeBloque->id,listaNodos);
 					return unNodo->activo;
 				}
-				enviarCopiasAMarta(socket,list_filter(copias,suNodoEstaActivo));
+				t_list * copiasConNodoActivo = list_filter(copias,(void*)suNodoEstaActivo);
+				enviarCopiasAMarta(socket,copiasConNodoActivo);
+				list_destroy_and_destroy_elements(copias,(void*)liberarBloqueEnNodo);
+				list_destroy_and_destroy_elements(copiasConNodoActivo,(void*)liberarBloqueEnNodo);
+
 			}
 
 			break;
@@ -768,7 +780,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 			void mandarCantidadDeBloquesDeArchivo(char* unArchivo){
 				enviarCantBloquesDeArch(unArchivo,socket);
 			}
-			list_iterate(listaArchivosPedidos,mandarCantidadDeBloquesDeArchivo);
+			list_iterate(listaArchivosPedidos,(void*)mandarCantidadDeBloquesDeArchivo);
 			list_destroy_and_destroy_elements(listaArchivosPedidos,free);
 			break;
 		}

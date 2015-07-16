@@ -50,8 +50,6 @@ void guardarBloqueDeArch(t_bloqueArch *unBloqueDeArch) {
 void guardarArchivo(t_archivo *unArchivo){
 	fwrite(&unArchivo->estado, sizeof(unArchivo->estado), 1, fpArch);
 	fwrite_str(unArchivo->nombre,fpArch);
-	printf("nombre arch: %s\n",unArchivo->nombre);
-	fflush(stdout);
 	fwrite(&unArchivo->padre, sizeof(unArchivo->padre), 1, fpArch);
 	fwrite(&unArchivo->tamanio, sizeof(unArchivo->tamanio), 1, fpArch);
 	fwrite_list(unArchivo->bloquesDeArch,fpArch,(void*)guardarBloqueDeArch);
@@ -81,14 +79,8 @@ t_bloqueArch *cargarBloqueDeArch() {
 t_archivo *cargarArchivo(){
 
 	t_archivo *unArchivo = malloc(sizeof(t_archivo));
-	printf("cargarArchivo\n");
-	fflush(stdout);
 	fread(&unArchivo->estado, sizeof(unArchivo->estado), 1, fpArch);
-	printf("cargarArchivo estado %d\n",unArchivo->estado);
-	fflush(stdout);
 	unArchivo->nombre = fread_str(fpArch);
-	printf("nombre :%s!!!!!!!!!!!!!!!\n",unArchivo->nombre);
-	fflush(stdout);
 	fread(&unArchivo->padre, sizeof(unArchivo->padre), 1, fpArch);
 	fread(&unArchivo->tamanio, sizeof(unArchivo->tamanio), 1, fpArch);
 	unArchivo->bloquesDeArch = fread_list(fpArch,(void*)cargarBloqueDeArch);
@@ -236,6 +228,27 @@ void cargarPersistenciacfg() {
 	fclose(fpDir);
 }
 //Funciones genéricas
+void cargarPersistencia() {
+	cargarListaArchivos();
+	cargarListaDirectorios();
+	cargarListaNodos();
+	cargarListaRegistrosIDIP();
+}
+
+void guardarPersistencia() {
+	guardarListaArchivos();
+	guardarListaDirectorios();
+	guardarListaNodos();
+	guardarListaRegistrosIDIP();
+}
+void signal_callback_handler(int signum) {
+
+   printf("\t Caught signal %d\n",signum);
+   guardarPersistencia();
+   exit(signum);
+
+}
+
 /**********************************************************************/
 /*********************** PRIVATE FUNCTIONS ****************************/
 /**********************************************************************/
@@ -258,18 +271,12 @@ static t_list* fread_list(FILE *fp,void*(*struct_reader)()) {
 		list_add(list, unElemento);
 		length--;
 	}
-	 //mostrarLista(copiasBloqueA1, (void*) mostrarBloqueEnNodo);
-	 //mostrarLista(copiasBloqueA2, (void*) mostrarBloqueEnNodo);
-	 //	mostrarLista(copiasBloqueA3, (void*) mostrarBloqueEnNodo);
-
 	return list;
 }
 
 static void escribirCola(t_queue *cola, FILE * fp){
 	int tamanioCola;
 	void escribirEntero(int *entero){
-		printf("%d\n",*entero);
-		fflush(stdout);
 		fwrite(entero, sizeof(int), 1, fp);
 	}
 	tamanioCola = queue_size(cola);

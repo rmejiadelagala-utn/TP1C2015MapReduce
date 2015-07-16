@@ -195,7 +195,7 @@ void formatearMDFS() {
 	//Actualizo el string que dice donde estoy parado
 	free(direccion);
 	direccion = string_duplicate(directorioActual->nombre);
-
+	guardarPersistencia();
 	printf("El file system ha sido formateado.\n");
 }
 

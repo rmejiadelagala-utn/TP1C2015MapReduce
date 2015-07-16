@@ -9,7 +9,7 @@
 #define PERSISTENCIA_H_
 
 #include "fsystem.h"
-
+#include <signal.h>
 
 /**
  * @NAME: guardarBloqueEnNodo
@@ -66,5 +66,9 @@ t_registro_id_ipPuerto *cargarRegistroIDIP();
 void guardarListaRegistrosIDIP();
 void cargarListaRegistrosIDIP();
 
+
+void cargarPersistencia();
+void guardarPersistencia();
+void signal_callback_handler(int signum);
 
 #endif /* PERSISTENCIA_H_ */
