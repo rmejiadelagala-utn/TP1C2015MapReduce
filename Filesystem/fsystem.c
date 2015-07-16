@@ -736,7 +736,8 @@ void *interaccionFSNodo(void* sock_ptr) {
 		case CONEXION_MARTA_A_FS:
 			esMarta=1;
 			printf("Hola Marta!\n");
-
+			protocolo=MARTA_ACTUALIZA_EL_REGISTRO;
+			fflush(stdout);
 			socketDeMarta = socket;
 			void actualizarAMarta(t_registro_id_ipPuerto* unRegistro) {
 				actualizarIdIpPuertoEnMarta(socketDeMarta, unRegistro);

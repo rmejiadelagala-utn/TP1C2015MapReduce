@@ -12,7 +12,7 @@
 
 
 typedef struct {
-	int tamanio;
+	uint32_t tamanio;
 	char* data;
 
 }t_buffer;
@@ -20,7 +20,7 @@ typedef struct {
 typedef struct {
 	int id;
 	int numeroDeBloqueEnNodo;
-	int tamanioBloque;
+	uint32_t tamanioBloque;
 }__attribute__ ((__packed__)) t_bloqueEnNodo;
 
 //Estructuras del Nodo
@@ -53,6 +53,7 @@ typedef struct {
  	uint32_t puerto_nodo;
  	uint32_t block;
  	char* temp_file_name;
+ 	uint32_t block_size;
  } t_ordenMap;
 
 
@@ -84,7 +85,7 @@ void bufferAgregarInt(t_buffer* buffer, int unInt);
 
 void bufferAgregarChar(t_buffer* buffer, char unChar);
 
-void bufferAgregarString(t_buffer* buffer,char* unString, int tamanio);
+void bufferAgregarString(t_buffer* buffer,char* unString, uint32_t tamanio);
 
 char* recibirString(int socket);
 
@@ -134,7 +135,7 @@ int enviarBuffer(t_buffer* buffer, int socket);
 
 //Job
 	//A Nodo
-	int enviarMapperANodo(int socket, char* mapper, int nroDeBloqueNodo, char* nombreArchivoTmp );
+	int enviarMapperANodo(int socket, char* mapper, int nroDeBloqueNodo, uint32_t block_size, char* nombreArchivoTmp );
 
 //Deserializar mensajes
 

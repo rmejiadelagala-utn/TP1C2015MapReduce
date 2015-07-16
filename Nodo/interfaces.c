@@ -86,6 +86,8 @@ void* conexionJobs(void* sockJobNodo){
 	char* nomArchSalida;
 	int cantArchReduce;
 	t_list* archivosAReducir;
+	uint32_t tamanioBloque;
+	FILE* bloqueAMapear;
 	while((recibido=recvall(sock_in,&protocolo,sizeof(int)))>1){
 		switch(protocolo){
 		case ORDER_MAP:
@@ -94,7 +96,8 @@ void* conexionJobs(void* sockJobNodo){
 			printf("Recibi una orden de map, esta todo OK.\n");
 			fflush(stdout);
 			script=recibirString(sock_in);
-			recvall(sock_in,&nroBloque,sizeof(int));
+			nroBloque=recibirInt(sock_in);
+			tamanioBloque=recibirInt(sock_in);
 			archivoSalida=strdup("/tmp/");
 			nomArchSalida=recibirString(sock_in);
 			string_append(&archivoSalida,nomArchSalida);
@@ -109,8 +112,12 @@ void* conexionJobs(void* sockJobNodo){
 			crearScriptMapper(script,nombreScript);
 			numeroDeMap++;
 			pthread_mutex_unlock(&numeroMap);
-			char* dataAUX = malloc(strlen(DATOS+(nroBloque*BLKSIZE))-1);
-			memcpy(dataAUX,DATOS+(nroBloque*BLKSIZE),strlen(DATOS+(nroBloque*BLKSIZE))-1);
+			char* dataAUX = malloc(tamanioBloque);
+			memcpy(dataAUX,DATOS+(nroBloque*BLKSIZE),tamanioBloque);
+			bloqueAMapear = fopen("bloqueAMapear","w");
+			write(fileno(bloqueAMapear),dataAUX,tamanioBloque);
+			fclose(bloqueAMapear);
+			system("sh tmp/mapper1.sh bloqueAMapear");
 			ejecutarMapper(nombreScript,archivoSalida,dataAUX);
 			free(script);
 			free(dataAUX);
@@ -120,6 +127,8 @@ void* conexionJobs(void* sockJobNodo){
 			protocolo=RES_MAP;
 			sendall(sock_in,&protocolo,sizeof(int));
 			protocolo=OK_MAP; //TODO responder NOTOOK_MAP si hubo algun error
+			printf("Le digo que salio bien con el protocolo %d\n",protocolo);
+			fflush(stdout);
 			sendall(sock_in,&protocolo,sizeof(int));
 			pthread_exit(NULL);
 			break;
