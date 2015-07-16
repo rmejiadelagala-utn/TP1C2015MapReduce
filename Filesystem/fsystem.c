@@ -68,13 +68,9 @@ int main() {
 	sem_init(&escuchar_sem,0,0);
 	pthread_mutex_init(&listaDeNodos,NULL);
 	pthread_mutex_init(&listaDeRegistros,NULL);
-
 	cargarPersistencia();
 	 // Register signal and signal handler
 	signal(SIGINT, signal_callback_handler);
-	signal(SIGTSTP, signal_callback_handler);//posiblemente al pedo
-	signal(SIGSEGV, signal_callback_handler);//posiblemente al pedo
-
 
 	//Para probar la persistencia en sus inicios
 	/*

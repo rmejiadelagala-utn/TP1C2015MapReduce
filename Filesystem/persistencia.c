@@ -220,12 +220,14 @@ void cargarListaRegistrosIDIP() {
 //
 
 void cargarPersistenciacfg() {
-	fpNodos = fopen("nodos", "r");
-	fclose(fpNodos);
-	fpArch = fopen("archivos", "r");
+	fpArch = fopen("archivos", "w");
 	fclose(fpArch);
-	fpDir = fopen("directorios", "r");
+	fpDir = fopen("directorios", "w");
 	fclose(fpDir);
+	fpNodos = fopen("nodos", "w");
+	fclose(fpNodos);
+	fpReg = fopen("registrosIDIP", "w");
+	fclose(fpReg);
 }
 //Funciones genéricas
 void cargarPersistencia() {
@@ -262,14 +264,18 @@ static void fwrite_list(t_list *list, FILE *fp,void(*struct_writer)(void*)) {
 	list_iterate(list,struct_writer);//quizas (void*) struct_writer/
 }
 
-static t_list* fread_list(FILE *fp,void*(*struct_reader)()) {
+static t_list* fread_list(FILE *fp, void*(*struct_reader)()) {
 	t_list* list = list_create();
 	int length;
-	fread(&length, sizeof(int), 1, fp);
-	while(length) {
-		void *unElemento = struct_reader();//o *struct_writer();
-		list_add(list, unElemento);
-		length--;
+	fseek(fp, 0, SEEK_END);
+	if (ftell(fp) != 0) {//Si el archivo no esta vacio
+		rewind(fp);
+		fread(&length, sizeof(int), 1, fp);
+		while (length) {
+			void *unElemento = struct_reader();			 //o *struct_writer();
+			list_add(list, unElemento);
+			length--;
+		}
 	}
 	return list;
 }

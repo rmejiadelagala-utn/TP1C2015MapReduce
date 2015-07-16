@@ -117,8 +117,10 @@ void* conexionJobs(void* sockJobNodo){
 			bloqueAMapear = fopen("bloqueAMapear","w");
 			write(fileno(bloqueAMapear),dataAUX,tamanioBloque);
 			fclose(bloqueAMapear);
-			system("sh tmp/mapper1.sh bloqueAMapear");
+			system("sh tmp/mapper1.sh bloqueAMapear");//XXX Full stack hardcoding mapper1.sh probablemente debería ser variable
 			ejecutarMapper(nombreScript,archivoSalida,dataAUX);
+			printf("ejecute %s",nombreScript);
+			fflush(stdout);
 			free(script);
 			free(dataAUX);
 			free(nombreScript);

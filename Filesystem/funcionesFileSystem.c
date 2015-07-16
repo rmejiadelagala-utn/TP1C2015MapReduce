@@ -78,8 +78,11 @@ static bool tieneLugar(t_nodo *unNodo);
 
 int nodoEstaActivo (t_registro_id_ipPuerto* unRegistro){
 	t_nodo* unNodo = buscarNodoPorId(unRegistro->id,listaNodos);
+	if(unNodo != NULL) {
 	int activo = unNodo->activo;
 	return activo;
+	}
+	return 0;
 }
 
 /*
@@ -165,7 +168,7 @@ void enviarCantBloquesDeArch(char* nombreArchivo, int socket) {
 		sendall(socket, &cantidad, sizeof(int));
 		return;
 	}
-	validarArchivoYEjecutar("temperaturas1.txt", (void*) enviarBloquesDeArchivo);
+	validarArchivoYEjecutar("201301hourly.txt", (void*) enviarBloquesDeArchivo);//FIXME hardcodeada
 	int error=-1;
 	sendall(socket,&error,sizeof(int));
 
