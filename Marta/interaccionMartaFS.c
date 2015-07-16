@@ -57,7 +57,9 @@ void* interaccionMartaFS(void* sock){
 			break;
 		case ENVIO_BLOQUEARCH_A_MARTA:
 			sem_post(&funcionesMarta);
+			printf("El protocolo es %d",protocolo);
 			printf("Despertate marta.\n");
+			fflush(stdout);
 			sem_wait(&interaccionFS);
 			break;
 		case DAME_LISTA_DE_ARCHIVOS_FS:

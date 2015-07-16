@@ -165,7 +165,7 @@ void enviarCantBloquesDeArch(char* nombreArchivo, int socket) {
 		sendall(socket, &cantidad, sizeof(int));
 		return;
 	}
-	validarArchivoYEjecutar(nombreArchivo, (void*) enviarBloquesDeArchivo);
+	validarArchivoYEjecutar("temperaturas1.txt", (void*) enviarBloquesDeArchivo);
 	int error=-1;
 	sendall(socket,&error,sizeof(int));
 
@@ -218,7 +218,7 @@ int setBloque(t_nodo* nodo, char* dataBloque, uint32_t tamanio, uint32_t comienz
 	bloqueEnNodo = nuevoBloqueEnNodo(nodo->id,
 							posicionEnNodo);
 	bloqueEnNodo->tamanioBloque = tamanio;
-	int resultado = enviarBloqueANodo(nodo->socket, bloqueEnNodo->numeroDeBloqueEnNodo, dataBloque,comienzoDeBloque,tamanio);
+	uint32_t resultado = enviarBloqueANodo(nodo->socket, bloqueEnNodo->numeroDeBloqueEnNodo, dataBloque,comienzoDeBloque,tamanio);
 
 	if(resultado==0) printf("Problema al enviar\n");
 

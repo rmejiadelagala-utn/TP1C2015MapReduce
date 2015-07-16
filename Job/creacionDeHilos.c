@@ -61,12 +61,14 @@ void* hilo_mapper (void* arg_thread){
 	char* tmp_file_name;
 	char* codigoMapper;
 	char* ip_nodo_char;
+	int block_size;
 	sockMarta=ordenToNodo.sockMarta;
 	printf("El path del codigo mapper es %s\n",ordenToNodo.pathMapper);
 	codigoMapper=subirCodigoFromPathToBuffer(ordenToNodo.pathMapper);
 	ordenMapper=*(ordenToNodo.ordenMapper);
 	tmp_file_name=strdup(ordenMapper.temp_file_name);
 	block=ordenMapper.block;
+	block_size=ordenMapper.block_size;
 	puerto_nodo=ordenMapper.puerto_nodo;
 	struct in_addr addr;
 	addr.s_addr=ordenMapper.ip_nodo;
@@ -82,7 +84,7 @@ void* hilo_mapper (void* arg_thread){
 	}
 	//Enviamos rutina mapper a Nodo
 
-	res=enviarMapperANodo(sockNodo,codigoMapper,block,tmp_file_name);
+	res=enviarMapperANodo(sockNodo,codigoMapper,block,block_size,tmp_file_name);
 	if(res<0){
 		printf("todo mal, no pude enviar mapper a Nodo: %d", ip_nodo_char);
 	}
@@ -113,6 +115,7 @@ void crearHiloMapper(int sockMarta, char* pathMapper) {
 	printf("id_map:%d\n",ordenMapper->id_map);
 	printf("id_nodo:%d\n",ordenMapper->id_nodo);
 	printf("ip_nodo:%d\n",ordenMapper->ip_nodo);
+	fflush(stdout);
 	struct in_addr addr;
 	addr.s_addr=ordenMapper->ip_nodo;
 	printf("muestro ip en formato de numeros y puntos: %s\n",inet_ntoa(addr));

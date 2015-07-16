@@ -73,6 +73,7 @@ typedef struct {
 	uint32_t puerto_nodo;
 	uint32_t block;
 	char* temp_file_name;
+	uint32_t block_size;
 } t_DestinoMap;
 
 typedef struct {
@@ -129,6 +130,7 @@ typedef struct {
 	uint32_t ip_nodo;
 	uint32_t puerto_nodo;
 	uint32_t block;
+	uint32_t size;
 } t_CopiaDeBloque;
 
 typedef struct {

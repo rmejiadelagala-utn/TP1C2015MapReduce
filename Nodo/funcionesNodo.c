@@ -255,7 +255,7 @@ int redireccionar_stdin_stdout_mapper(char *pathPrograma,char *pathArchivoSalida
 
 	if (stdin != NULL){
 
-		fprintf(stdin, "%s\n",data_bloque);
+		fprintf(stdin, "%s",data_bloque);
 
 		pclose (stdin);
 		free(comando);
@@ -281,7 +281,7 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma,char *pathArchivoSalida
 
 	if (stdin != NULL){
 
-		fprintf(stdin, "%s\n",data_bloque);
+		fprintf(stdin, "%s",data_bloque);
 
 		pclose (stdin);
 		free(comando);

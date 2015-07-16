@@ -91,11 +91,11 @@ void bufferAgregarChar(t_buffer* buffer, char unChar){
 	memcpy(buffer->data + tamanioAnterior,&unChar,sizeof(char));
 }
 
-void bufferAgregarString(t_buffer* buffer,char* unString, int tamanio){
+void bufferAgregarString(t_buffer* buffer,char* unString, uint32_t tamanio){
 	int largoString = tamanio;
 	bufferAgregarInt(buffer,largoString);
 
-	int tamanioAnterior=buffer->tamanio;
+	uint32_t tamanioAnterior=buffer->tamanio;
 
 	buffer->tamanio+= largoString;
 	buffer->data = realloc(buffer->data,buffer->tamanio);
@@ -270,18 +270,23 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		t_buffer* buffer = crearBufferConProtocolo(DAME_LISTA_DE_ARCHIVOS_FS);
 		bufferAgregarInt(buffer,cantArchivos);
 		int i;
-		for(i=0;i<cantArchivos;i++) bufferAgregarString(buffer,archivos[i],strlen(archivos[i]));
+		for(i=0;i<cantArchivos;i++){
+			printf("Pido el archivo %s",archivos[i]);
+			bufferAgregarString(buffer,archivos[i],strlen(archivos[i]));
+		}
+
 		int resultado = enviarBuffer(buffer,socket);
 		return resultado;
 	}
 //Job
 	//A Nodo
-	int enviarMapperANodo(int socket, char* mapper, int nroDeBloqueNodo, char* nombreArchivoTmp ){
+	int enviarMapperANodo(int socket, char* mapper, int nroDeBloqueNodo, uint32_t tamanioBloque, char* nombreArchivoTmp ){
 		//t_buffer* buffer = crearBufferConProtocolo(CONEXION_JOB_A_NODO);
 		//bufferAgregarInt(buffer,ORDER_MAP);
 		t_buffer* buffer = crearBufferConProtocolo(ORDER_MAP);
         bufferAgregarString(buffer,mapper,strlen(mapper)+1);
 		bufferAgregarInt(buffer,nroDeBloqueNodo);
+		bufferAgregarInt(buffer,tamanioBloque);
         bufferAgregarString(buffer,nombreArchivoTmp,strlen(nombreArchivoTmp)+1);
 		int resultado = enviarBuffer(buffer,socket);
 		return resultado;
@@ -388,6 +393,7 @@ int enviarBuffer(t_buffer* buffer, int socket){
 		recvall(sockMarta,&(ordenMap->ip_nodo),sizeof(uint32_t));
 		recvall(sockMarta,&(ordenMap->puerto_nodo),sizeof(uint32_t));
 		recvall(sockMarta,&(ordenMap->block),sizeof(uint32_t));
+		recvall(sockMarta,&(ordenMap->block_size),sizeof(uint32_t));
 		recvall(sockMarta,&temp_file_len,sizeof(uint32_t));
 		ordenMap->temp_file_name= malloc(temp_file_len);
 		recvall(sockMarta,ordenMap->temp_file_name,temp_file_len);

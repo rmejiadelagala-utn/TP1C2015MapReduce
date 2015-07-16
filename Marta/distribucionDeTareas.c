@@ -107,6 +107,7 @@ int buscarBloquesEnFS(t_InfoJob infoDeJob, uint32_t idArchivo,
 		t_CopiaDeBloque* copiaDeBloque = malloc(sizeof(t_CopiaDeBloque));
 		copiaDeBloque->block = bloqueEnNodo->numeroDeBloqueEnNodo;
 		copiaDeBloque->id_nodo = bloqueEnNodo->id;
+		copiaDeBloque->size = bloqueEnNodo->tamanioBloque;
 		list_add(copiasDeBloque, copiaDeBloque);
 	}
 	list_iterate(copias, (void*) deBloqueEnNodoACopiaDeBloque);
@@ -160,6 +161,7 @@ t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 	self->block = copiaSeleccionada->block;
 	self->temp_file_name = string_from_format("map_%i_%i.temp", infoDeJob.idJob,
 			self->block);
+	self->block_size = copiaSeleccionada->size;
 
 	list_destroy_and_destroy_elements(copiasDeBloque,
 			(void *) liberarCopiaDeBloque);
@@ -182,6 +184,7 @@ int ordenarMapAJob(t_DestinoMap* destinoDeMap, int socket) {
 	bufferAgregarInt(map_order, destinoDeMap->ip_nodo);
 	bufferAgregarInt(map_order, destinoDeMap->puerto_nodo);
 	bufferAgregarInt(map_order, destinoDeMap->block);
+	bufferAgregarInt(map_order, destinoDeMap->block_size);
 	bufferAgregarString(map_order, destinoDeMap->temp_file_name,
 			strlen(destinoDeMap->temp_file_name) + 1);
 
