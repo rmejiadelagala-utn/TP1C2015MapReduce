@@ -697,23 +697,20 @@ void *interaccionFSNodo(void* sock_ptr) {
 				printf("Hubo un problema al escribir el archivo.\n");
 			else if (respuestaSetBloque <= 0)
 				printf("Hubo un problema al escribir el archivo.\n");
-			else {
-				printf("Se mandó un bloque correctamente.\n");
-			}
 			break;
 		case GET_BLOQUE:
 			recibido = recvall(socket, &protocolo, 4);
 				switch(protocolo){
 				case COPIAR_ARCHIVO_A_FS_LOCAL:
 					tamanioBloqueRecibido = recibirBloqueDeNodo(socket, (void*) &buffer);
-					tamanioPosta =  strlen(buffer);
+					/*tamanioPosta =  strlen(buffer);
 
 					printf("El tamaño calculado es de %d, pero en realidad guardo %d\n",tamanioBloqueRecibido,tamanioPosta);
 
 					tamanioBloqueRecibido-=tamanioPosta;
-					printf("La diferencia entre ambos es %d\n",tamanioBloqueRecibido);
+					printf("La diferencia entre ambos es %d\n",tamanioBloqueRecibido);*/
 
-					write(fileno(archivoReconstruido), buffer, tamanioPosta);
+					write(fileno(archivoReconstruido), buffer, tamanioBloqueRecibido);
 					free(buffer);
 					sem_post(&semaforo);
 					break;

@@ -584,7 +584,7 @@ int verBloqueDeArchivo(t_archivo *unArchivo, int nroBloque){
 
 		if (detectarError(nodoEncontrado,(void*)esNull,"Nodo no encontrado.\n")) return -1;
 
-		pedirBloqueANodo(nodoEncontrado->socket,bloqueEnNodo->numeroDeBloqueEnNodo,VER_BLOQUE_NODO);
+		pedirBloqueANodo(nodoEncontrado->socket,bloqueEnNodo->numeroDeBloqueEnNodo,VER_BLOQUE_NODO,bloqueEnNodo->tamanioBloque);
 
 		sem_wait(&consola_sem);
 
@@ -629,7 +629,7 @@ int funcionCopiarBloque(t_archivo *unArchivo, int nroBloque, int id){
 
 	if(detectarError(nodoAlQueEnvioBloque,esNull,"Nodo no encontrado.\n")) return -1;
 
-	pedirBloqueANodo(nodoAlQuePidoBloque->socket,bloqueEnNodo->numeroDeBloqueEnNodo,COPIAR_BLOQUE_NODO);
+	pedirBloqueANodo(nodoAlQuePidoBloque->socket,bloqueEnNodo->numeroDeBloqueEnNodo,COPIAR_BLOQUE_NODO,bloqueEnNodo->tamanioBloque);
 
 	sem_wait(&consola_sem);
 

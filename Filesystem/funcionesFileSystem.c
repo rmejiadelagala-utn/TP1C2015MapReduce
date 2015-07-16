@@ -112,7 +112,7 @@ int mandarBloquesANodos(char* data, int* cantidadBloquesEnviados,
 
 		if (finDeBloque > ultimoIndiceDelData) {
 
-			finDeBloque = ultimoIndiceDelData+1;
+			finDeBloque = ultimoIndiceDelData;
 			fin = 1;
 		}	//Sale si ya no hay bloques
 
@@ -137,9 +137,9 @@ int mandarBloquesANodos(char* data, int* cantidadBloquesEnviados,
 			//nodoActual = nodoElegdoYConLugar(nodosOrdenados);
 			if (nodoElegido(nodosOrdenados, &nodoActual,&k) != -1) {
 				//salio bien el elegir nodo, estando en nodoActual
-				int tamanio = finDeBloque-comienzoDeBloque;
-				if(fin) setUltimoBloque(nodoActual,data,tamanio,comienzoDeBloque,bloqueDeArchivo->copiasDeBloque);
-				else setBloque(nodoActual,data,tamanio,comienzoDeBloque, bloqueDeArchivo->copiasDeBloque);
+				int tamanio = 1+finDeBloque-comienzoDeBloque;
+				/*if(fin) setUltimoBloque(nodoActual,data,tamanio,comienzoDeBloque,bloqueDeArchivo->copiasDeBloque);
+				else*/ setBloque(nodoActual,data,tamanio,comienzoDeBloque, bloqueDeArchivo->copiasDeBloque);
 
 			} else {
 				printf("No hay nodos disponibles\n");
@@ -217,7 +217,7 @@ int setBloque(t_nodo* nodo, char* dataBloque, uint32_t tamanio, uint32_t comienz
 	nodo->cantidadBloquesOcupados++;
 	bloqueEnNodo = nuevoBloqueEnNodo(nodo->id,
 							posicionEnNodo);
-
+	bloqueEnNodo->tamanioBloque = tamanio;
 	int resultado = enviarBloqueANodo(nodo->socket, bloqueEnNodo->numeroDeBloqueEnNodo, dataBloque,comienzoDeBloque,tamanio);
 
 	if(resultado==0) printf("Problema al enviar\n");
@@ -775,7 +775,7 @@ int obtenerArchivo(t_archivo *archivo) {
 			if (!nodoEncontrado) return -1;
 
 			pedirBloqueANodo(nodoEncontrado->socket, bloque->numeroDeBloqueEnNodo,
-					COPIAR_ARCHIVO_A_FS_LOCAL);
+					COPIAR_ARCHIVO_A_FS_LOCAL,bloque->tamanioBloque);
 
 			sem_wait(&semaforo);
 

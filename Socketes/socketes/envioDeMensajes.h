@@ -20,7 +20,7 @@ typedef struct {
 typedef struct {
 	int id;
 	int numeroDeBloqueEnNodo;
-
+	int tamanioBloque;
 }__attribute__ ((__packed__)) t_bloqueEnNodo;
 
 //Estructuras del Nodo
@@ -108,14 +108,14 @@ int enviarBuffer(t_buffer* buffer, int socket);
 	//A FileSystem
 	int presentarseAlFileSystem(t_nodoParaFS* infoNodo, int socket);
 
-	int enviarBloqueAFileSystem(int socket, char* dataBin, int funcionARealizar);
+	int enviarBloqueAFileSystem(int socket, char* dataBin, int funcionARealizar, int tamanioBloque);
 
 //FileSystem
 	//A Nodo
 
 	int enviarBloqueANodo(int socket, int numeroDeBloque, char* dataBloque,uint32_t comienzoBloque, uint32_t tamanio);
 
-	int pedirBloqueANodo(int socket, int numeroDeBloque, int protocoloDeRegreso);
+	int pedirBloqueANodo(int socket, int numeroDeBloque, int protocoloDeRegreso, int tamanioBloque);
 
 	//A Marta
 	int enviarCopiasAMarta(int socket, t_list* copias);
