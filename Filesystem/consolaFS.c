@@ -512,8 +512,10 @@ void validarArchivoYEjecutar(char* unArch,void (*funcion)(void*)){
 	t_archivo *archivoObjetivo = buscarArchPorNombre(unArch,archivosVisibles);
 	list_destroy(archivosVisibles);
 	if(archivoObjetivo!=NULL) funcion(archivoObjetivo);
-	else printf("Archivo %s no encontrado.\nEl tamaño del archivo pedido es %d",unArch,strlen(unArch));
-	fflush(stdout);
+	else {
+		printf("Archivo %s no encontrado.\nEl tamaño del archivo pedido es %d",unArch,strlen(unArch));
+		fflush(stdout);
+	}
 }
 
 void validarDirectorioYEjecutar(char* unDirectorio, void (*funcion)(void*)){

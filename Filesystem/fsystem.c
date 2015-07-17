@@ -639,7 +639,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 	t_bloqueDeArchPedido* infoBloquePedido;
 	t_registro_id_ipPuerto* unRegistro = malloc(sizeof(t_registro_id_ipPuerto));
 	int condicionDeConexionNodo;
-	t_list *copias;
+	t_list* copias;
 	t_list* listaArchivosPedidos;
 	while ((recibido = recvall(socket, &protocolo, 4)) > 0) {
 		switch (protocolo) {
@@ -749,6 +749,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 		case ENVIO_BLOQUEARCH_A_MARTA:
 			infoBloquePedido = recibirPedidoDeBloqueArch(socket);
 			copias = list_create();
+			printf("nombreArch: %s",infoBloquePedido->nombreArch);
 			resultado = encontrarCopias(infoBloquePedido->nombreArch, infoBloquePedido->padre,
 					infoBloquePedido->numeroDeBloqueArch, &copias);
 			if (resultado == -1) {
