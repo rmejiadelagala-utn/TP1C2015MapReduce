@@ -9,27 +9,27 @@
 uint32_t TAMANIODISCO, TAMANIOARCHIVO;
 int fd = -1, fd_a;
 
-void guardarEnDisco(t_archivoTemporal* unArchivo){
-	FILE *archivoEnDisco = fopen(unArchivo->pathDestino,"w");
+void guardarEnDisco(t_archivoTemporal* unArchivo) {
+	FILE *archivoEnDisco = fopen(unArchivo->pathDestino, "w");
 	write(fileno(archivoEnDisco), unArchivo->data, unArchivo->tamanio);
 	free(archivoEnDisco);
 	liberarArchivoTemporal(unArchivo);
 }
 
-void liberarArchivoTemporal(t_archivoTemporal* unArchivo){
+void liberarArchivoTemporal(t_archivoTemporal* unArchivo) {
 	free(unArchivo->data);
 	free(unArchivo->pathDestino);
 	free(unArchivo);
 }
 
-void recibirArchivo (int socket){
-	t_archivoTemporal *unArchivo= malloc(sizeof(t_archivoTemporal));
-	unArchivo->tamanio=recibirInt(socket);
-	unArchivo->pathDestino=strdup(recibirString(socket));
-	unArchivo->data=strdup(recibirString(socket));
+void recibirArchivo(int socket) {
+	t_archivoTemporal *unArchivo = malloc(sizeof(t_archivoTemporal));
+	unArchivo->tamanio = recibirInt(socket);
+	unArchivo->pathDestino = strdup(recibirString(socket));
+	unArchivo->data = strdup(recibirString(socket));
 }
 
-t_config_nodo* leerArchivoConfig(char *path_config){
+t_config_nodo* leerArchivoConfig(char *path_config) {
 
 	t_config *config;
 	t_config_nodo* configNodo = malloc(sizeof(t_config_nodo));
@@ -42,14 +42,14 @@ t_config_nodo* leerArchivoConfig(char *path_config){
 		exit(-1);
 	}
 
-	configNodo->IP_FS     = strdup(config_get_string_value(config, "IP_FS"));
+	configNodo->IP_FS = strdup(config_get_string_value(config, "IP_FS"));
 	configNodo->PUERTO_FS = config_get_int_value(config, "PUERTO_FS");
-	configNodo->ARCH_BIN  = strdup(config_get_string_value(config, "ARCHIVO_BIN"));
-	configNodo->DIR_TEMP  = strdup(config_get_string_value(config, "DIR_TEMP"));
-	configNodo->NODO_NEW  = (config_get_string_value(config, "NODO_NUEVO"))[0];
-	configNodo->IP_NODO   = strdup(config_get_string_value(config, "IP_NODO"));
+	configNodo->ARCH_BIN = strdup(config_get_string_value(config, "ARCHIVO_BIN"));
+	configNodo->DIR_TEMP = strdup(config_get_string_value(config, "DIR_TEMP"));
+	configNodo->NODO_NEW = (config_get_string_value(config, "NODO_NUEVO"))[0];
+	configNodo->IP_NODO = strdup(config_get_string_value(config, "IP_NODO"));
 	configNodo->PUERTO_NODO = config_get_int_value(config, "PUERTO_NODO");
-	configNodo->ID     = config_get_int_value(config, "ID");
+	configNodo->ID = config_get_int_value(config, "ID");
 
 	printf("Conectando a IP: %s\n", config_get_string_value(config, "IP_FS"));
 	printf("Puerto: %d\n", config_get_int_value(config, "PUERTO_FS"));
@@ -61,14 +61,13 @@ t_config_nodo* leerArchivoConfig(char *path_config){
 	printf("Hola, soy el nodo %d\n", config_get_int_value(config, "ID"));
 
 	/* Una vez que se levantaron los datos del archivo de configuracion
-	   puedo destruir la estructura config. */
+	 puedo destruir la estructura config. */
 	config_destroy(config);
 
 	return configNodo;
 }
 
-
-char* mapeo_archivo(char* path){
+char* mapeo_archivo(char* path) {
 
 	char* data_archivo;
 //	uint32_t TAMANIOARCHIVO;
@@ -81,7 +80,7 @@ char* mapeo_archivo(char* path){
 	stat(path, &bufa);
 	TAMANIOARCHIVO = bufa.st_size;
 
-	if ((data_archivo = mmap(0, TAMANIOARCHIVO, PROT_READ, MAP_SHARED, fd_a, 0)) == MAP_FAILED){
+	if ((data_archivo = mmap(0, TAMANIOARCHIVO, PROT_READ, MAP_SHARED, fd_a, 0)) == MAP_FAILED) {
 		printf("Error al iniciar el mapeo de disco %s. '%s' ", obtenerNombreArchivo(path), strerror(errno));
 		close(fd_a);
 		exit(1);
@@ -90,53 +89,53 @@ char* mapeo_archivo(char* path){
 	return data_archivo;
 }
 
-char* mapeo_disco(char* path){
+char* mapeo_disco(char* path) {
 
 	char* data_disco;
 	//uint32_t TAMANIODISCO;
 
 	TAMANIODISCO = obtener_tamanio_disco(path);
 
-	if ((data_disco = mmap(NULL, TAMANIODISCO, PROT_READ|PROT_WRITE, MAP_FILE|MAP_SHARED, fd, 0))== MAP_FAILED){;
+	if ((data_disco = mmap(NULL, TAMANIODISCO, PROT_READ | PROT_WRITE, MAP_FILE | MAP_SHARED, fd, 0)) == MAP_FAILED) {
+		;
 		printf("Error al iniciar el mapeo de disco %s. '%s' ", obtenerNombreArchivo(path), strerror(errno));
 		close(fd);
-	    exit(1);
+		exit(1);
 	}
-	 return data_disco;
+	return data_disco;
 }
 
-
-uint32_t obtenerDirBloque(uint32_t nroBloque){
+uint32_t obtenerDirBloque(uint32_t nroBloque) {
 	nroBloque = nroBloque * BLKSIZE;
 	return nroBloque;
 }
 
-uint32_t obtener_tamanio_disco(char* path){
+uint32_t obtener_tamanio_disco(char* path) {
 
 	uint32_t tamanio_disco;
 
 	if ((fd = open(path, O_RDWR)) == -1)
 		err(1, "Nodo: Error al abrir midata1.bin (open)");
 
-		struct stat buf;
-		stat(path, &buf);
-		tamanio_disco = buf.st_size;
+	struct stat buf;
+	stat(path, &buf);
+	tamanio_disco = buf.st_size;
 
 	return tamanio_disco;
 }
 
-int obtener_cant_elem_array(char **array){
+int obtener_cant_elem_array(char **array) {
 
 	int elem = 0;
 
-	while(array[elem]!=NULL){
+	while (array[elem] != NULL) {
 		elem++;
 	}
 
-  return elem;
+	return elem;
 }
 
-char* obtenerNombreArchivo(char* ruta){
+char* obtenerNombreArchivo(char* ruta) {
 
 	char* file_name;
 	char** array_path;
@@ -144,56 +143,54 @@ char* obtenerNombreArchivo(char* ruta){
 
 	array_path = string_split(ruta, "/");
 	cant_elem = obtener_cant_elem_array(array_path);
-    file_name = array_path[cant_elem-1];
+	file_name = array_path[cant_elem - 1];
 
 	return file_name;
 }
 
-char* getFileContent(char* nombreFile, char * ruta_archivo){
+char* getFileContent(char* nombreFile, char * ruta_archivo) {
 
 	char* path;
 	char* fileMaped;
 	int fd_a;
 
 	struct stat buff;
-	path=strdup("");
+	path = strdup("");
 
-	strcpy(path,ruta_archivo);
-	strcat(path,"/");
-	strcat(path,nombreFile);
+	strcpy(path, ruta_archivo);
+	strcat(path, "/");
+	strcat(path, nombreFile);
 
-	fd_a = open(path,O_RDWR);
+	fd_a = open(path, O_RDWR);
 	stat(path, &buff);
 
-	fileMaped=mmap(NULL,buff.st_size,PROT_READ|PROT_WRITE,MAP_FILE|MAP_SHARED,fd_a,0);
+	fileMaped = mmap(NULL, buff.st_size, PROT_READ | PROT_WRITE, MAP_FILE | MAP_SHARED, fd_a, 0);
 
-		if (fileMaped==MAP_FAILED){
-			perror("mmap");
-			printf("Falló el mapeo para el archivo solicitado\n");
-			exit(-1);
-		}
+	if (fileMaped == MAP_FAILED) {
+		perror("mmap");
+		printf("Falló el mapeo para el archivo solicitado\n");
+		exit(-1);
+	}
 	close(fd_a); //Cierro el archivo
 
 	return fileMaped;
 }
 
-void crearScriptMapper(const char* codigo_script, char* nombre){
+void crearScriptMapper(const char* codigo_script, char* nombre) {
 
 	FILE* scriptMapper;
 
-
-
-	if((scriptMapper=fopen(nombre,"w+"))==NULL){
+	if ((scriptMapper = fopen(nombre, "w+")) == NULL) {
 		perror("Error al crear el script del mapper");
 		exit(1);
 	}
 
-	fputs(codigo_script,scriptMapper);
-	
+	fputs(codigo_script, scriptMapper);
+
 	char *permisosCommand = string_new();
 
 	string_append(&permisosCommand, "chmod a+x ");
-	string_append(&permisosCommand,nombre);
+	string_append(&permisosCommand, nombre);
 
 	system(permisosCommand);
 	fclose(scriptMapper);
@@ -202,7 +199,7 @@ void crearScriptMapper(const char* codigo_script, char* nombre){
 	return;
 }
 
-void crearScriptReduce(const char* codigo_script, char* nombre){
+void crearScriptReduce(const char* codigo_script, char* nombre) {
 
 //	FILE* fd;
 	FILE* scriptReduce;
@@ -218,8 +215,7 @@ void crearScriptReduce(const char* codigo_script, char* nombre){
 //		printf( "%s",texto );
 //	}
 
-
-	if((scriptReduce=fopen(nombre,"w+"))==NULL){
+	if ((scriptReduce = fopen(nombre, "w+")) == NULL) {
 		perror("Error al crear el script del Reduce");
 		exit(1);
 	}
@@ -229,12 +225,12 @@ void crearScriptReduce(const char* codigo_script, char* nombre){
 //		fputs(texto,scriptReduce);
 //	}
 
-	fputs(codigo_script,scriptReduce);
-	
+	fputs(codigo_script, scriptReduce);
+
 	char *permisosCommand = string_new();
 
 	string_append(&permisosCommand, "chmod u+x ");
-	string_append(&permisosCommand,nombre);
+	string_append(&permisosCommand, nombre);
 
 	system(permisosCommand);
 	fclose(scriptReduce);
@@ -243,24 +239,27 @@ void crearScriptReduce(const char* codigo_script, char* nombre){
 	return;
 }
 
-int redireccionar_stdin_stdout_mapper(char *pathPrograma,char *pathArchivoSalida,char* data_bloque)
-{
+int redireccionar_stdin_stdout_mapper(char *pathPrograma, char *pathArchivoSalida, char* data_bloque) {
 	FILE *stdin = NULL;
 
-	char *comando = malloc(strlen(pathPrograma)+11+strlen(pathArchivoSalida));
+	char *comando = malloc(strlen(pathPrograma) + 11 + strlen(pathArchivoSalida));
 
-	sprintf(comando,"%s | sort > %s",pathPrograma, pathArchivoSalida);	
-
-	stdin = popen (comando,"w");
-
-	if (stdin != NULL){
-
-		fprintf(stdin, "%s",data_bloque);
-
-		pclose (stdin);
-		free(comando);
+	if (sprintf(comando, "%s | sort > %s", pathPrograma, pathArchivoSalida) < 0) {
+		printf("Error de sprintf\n");
+		fflush(stdout);
 	}
-	else{
+
+	stdin = popen(comando, "w");
+
+	if (stdin != NULL) {
+		if (fprintf(stdin, "%s", data_bloque) < 0) {
+			printf("Error de fprintf\n");
+			fflush(stdout);
+		}
+
+		pclose(stdin);
+		free(comando);
+	} else {
 
 		printf("No se pudo ejecutar el programa!");
 		return -1;
@@ -269,24 +268,22 @@ int redireccionar_stdin_stdout_mapper(char *pathPrograma,char *pathArchivoSalida
 	return 0;
 }
 
-int redireccionar_stdin_stdout_reduce(char *pathPrograma,char *pathArchivoSalida,char* data_bloque)
-{
+//TODO hacer esto de forma correcta, obteniendo los path de los de reducir y apareando
+int redireccionar_stdin_stdout_reduce(char *pathPrograma, char *pathArchivoSalida, t_list* archivosAReducir) {
 	FILE *stdin = NULL;
 
-	char *comando = malloc(strlen(pathPrograma)+12+strlen(pathArchivoSalida));
+	char *comando = malloc(strlen(pathPrograma) + 12 + strlen(pathArchivoSalida));
 
-	sprintf(comando,"%s | sort >> %s",pathPrograma, pathArchivoSalida);	
+	sprintf(comando, "%s | sort >> %s", pathPrograma, pathArchivoSalida);
 
-	stdin = popen (comando,"w");
+	stdin = popen(comando, "w");
 
-	if (stdin != NULL){
+	if (stdin != NULL) {
+		//XXX poner la funcion de apareo acá
 
-		fprintf(stdin, "%s",data_bloque);
-
-		pclose (stdin);
+		pclose(stdin);
 		free(comando);
-	}
-	else{
+	} else {
 
 		printf("No se pudo ejecutar el programa!");
 		return -1;
@@ -295,22 +292,37 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma,char *pathArchivoSalida
 	return 0;
 }
 
-void ejecutarMapper(char * path_s, char* path_tmp, char* datos_bloque){
+void ejecutarMapper(char * path_s, char* path_tmp, char* datos_bloque) {
 
 	if ((redireccionar_stdin_stdout_mapper(path_s, path_tmp, datos_bloque)) < 0)
 		printf("Error al ejecutar Mapper");
 
 }
 
-void ejecutarReduce(char * path_s, char* path_tmp, char* datos_bloque){
+void ejecutarReduce(char * path_s, char* path_tmp, char* datos_bloque) {
 
 	if ((redireccionar_stdin_stdout_reduce(path_s, path_tmp, datos_bloque)) < 0)
 		printf("Error al ejecutar Reduce");
 
 }
 
+//Intentando entender que hace esta función para luego ejecutarla en el redirec.
+//Toma una lista de elementos t_RegistroArch
+//Devulve un elemento t_RegistroArch
+//Para cada elemento de la lista Lista_reg, ejecuta realizoApareo
+//Dentro de la misma, se compara cada uno de esos registros con otro copiar_datos
+//Si al compararlo es menor, asigna a datosReg el valor del registro y a su vez lo
+//copia a copiar_datos.
+//luego de todas las pasadas, se queda con el registro que salió de comparar con los
+//demás y dar <=0 Sea lo que sea esto.
 
-t_RegistroArch* apareoDeRegistros(t_list* Lista_reg){
+//Se me ocurre a mi, que esto debe hacerse para todos los registros de todos los
+//archivos a reducir. A medida que te vas quedando con esos datosReg, vas agarrando
+//el siguiente registro del archivo que tenía ese registro seleccionado.
+//Todos esos registros seleccionados irían concatenados y formarían parte del archivo
+//total a reducir.
+
+t_RegistroArch* apareoDeRegistros(t_list* Lista_reg) {
 
 	t_RegistroArch* datosReg = malloc(sizeof(t_RegistroArch));
 	t_RegistroArch* infoRegArch;
@@ -325,8 +337,8 @@ t_RegistroArch* apareoDeRegistros(t_list* Lista_reg){
 
 	void realizoApareo(t_RegistroArch* unRegistro) {
 
-		if ((strcmp(unRegistro->registro,copiar_datos)) <= 0){
-			copiar_datos = malloc (BLKSIZE);
+		if ((strcmp(unRegistro->registro, copiar_datos)) <= 0) {
+			copiar_datos = malloc(BLKSIZE);
 
 			strcpy(copiar_datos, unRegistro->registro);
 			datosReg->registro = strdup(copiar_datos);
@@ -336,32 +348,31 @@ t_RegistroArch* apareoDeRegistros(t_list* Lista_reg){
 
 	}
 
-	list_iterate(Lista_reg, (void*)realizoApareo);
+	list_iterate(Lista_reg, (void*) realizoApareo);
 
 	return datosReg;
-
 }
 
 /*char* aparear_registros(char* datos_archivo){
 
-	char** reg_archivo;
-	char* copiar_datos;
-	int i;
+ char** reg_archivo;
+ char* copiar_datos;
+ int i;
 
-	reg_archivo = string_split(datos_archivo, "\n");
-	copiar_datos = malloc (BLKSIZE);
+ reg_archivo = string_split(datos_archivo, "\n");
+ copiar_datos = malloc (BLKSIZE);
 
-	strcpy(copiar_datos, reg_archivo[0]);
+ strcpy(copiar_datos, reg_archivo[0]);
 
-	for(i = 0; reg_archivo[i]!= NULL; i++){
+ for(i = 0; reg_archivo[i]!= NULL; i++){
 
-		if ((strcmp(reg_archivo[i],copiar_datos)) <= 0){
-			copiar_datos = malloc (BLKSIZE);
-            		strcpy(copiar_datos, reg_archivo[i]);
-		}
+ if ((strcmp(reg_archivo[i],copiar_datos)) <= 0){
+ copiar_datos = malloc (BLKSIZE);
+ strcpy(copiar_datos, reg_archivo[i]);
+ }
 
-	}
-    strcat(copiar_datos, "\n");
-    return copiar_datos;
-    
-}*/
+ }
+ strcat(copiar_datos, "\n");
+ return copiar_datos;
+
+ }*/
