@@ -192,7 +192,10 @@ void crearScriptMapper(const char* codigo_script, char* nombre) {
 	string_append(&permisosCommand, "chmod a+x ");
 	string_append(&permisosCommand, nombre);
 
-	system(permisosCommand);
+	if(system(permisosCommand)<0){
+		printf("Error al ejecutar system(permisosComand)\n");
+		fflush(stdout);
+	}
 	if(fclose(scriptMapper)!=0){
 		printf("\n\n\n\nHubo un error al cerrar el archivo\n\n\n\n");
 		fflush(stdout);
@@ -239,6 +242,9 @@ void crearScriptReduce(const char* codigo_script, char* nombre) {
 	fclose(scriptReduce);
 	free(permisosCommand);
 
+	printf("\n\n\n\n\n\nFILE DESCRIPTOR: %d\n\n\n\n\n\n");
+	fflush(stdout);
+
 	return;
 }
 
@@ -250,8 +256,10 @@ int redireccionar_stdin_stdout_mapper(char *pathPrograma, char *pathArchivoSalid
 
 	char *comando = malloc(tamanioComando);
 
-	sprintf(comando,"%s | sort > %s",pathPrograma, pathArchivoSalida);
+	snprintf(comando,tamanioComando,"%s | sort > %s",pathPrograma, pathArchivoSalida);
 
+
+	stdin = popen(comando, "w");
 
 	if (sprintf(comando, "%s | sort > %s", pathPrograma, pathArchivoSalida) < 0) {
 		printf("Error de sprintf\n");
@@ -268,7 +276,7 @@ int redireccionar_stdin_stdout_mapper(char *pathPrograma, char *pathArchivoSalid
 		free(comando);
 	} else {
 
-		printf("No se pudo ejecutar el programa!");
+		printf("No se pudo ejecutar el programa!\n");
 		return -1;
 	}
 
@@ -302,14 +310,14 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma, char *pathArchivoSalid
 void ejecutarMapper(char * path_s, char* path_tmp, char* datos_bloque) {
 
 	if ((redireccionar_stdin_stdout_mapper(path_s, path_tmp, datos_bloque)) < 0)
-		printf("Error al ejecutar Mapper");
+		printf("Error al ejecutar Mapper\n");
 
 }
 
 void ejecutarReduce(char * path_s, char* path_tmp, char* datos_bloque) {
 
 	if ((redireccionar_stdin_stdout_reduce(path_s, path_tmp, datos_bloque)) < 0)
-		printf("Error al ejecutar Reduce");
+		printf("Error al ejecutar Reduce\n");
 
 }
 
