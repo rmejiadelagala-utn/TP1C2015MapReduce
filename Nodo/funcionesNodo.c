@@ -196,7 +196,10 @@ void crearScriptMapper(const char* codigo_script, char* nombre){
 	string_append(&permisosCommand,nombre);
 
 	system(permisosCommand);
-	fclose(scriptMapper);
+	if(fclose(scriptMapper)!=0){
+		printf("\n\n\n\nHubo un error al cerrar el archivo\n\n\n\n");
+		fflush(stdout);
+	}
 	free(permisosCommand);
 
 	return;
@@ -247,15 +250,19 @@ int redireccionar_stdin_stdout_mapper(char *pathPrograma,char *pathArchivoSalida
 {
 	FILE *stdin = NULL;
 
-	char *comando = malloc(strlen(pathPrograma)+11+strlen(pathArchivoSalida));
+	size_t tamanioComando = strlen(pathPrograma)+11+strlen(pathArchivoSalida);
 
-	sprintf(comando,"%s | sort > %s",pathPrograma, pathArchivoSalida);	
+	char *comando = malloc(tamanioComando);
+
+	sprintf(comando,"%s | sort > %s",pathPrograma, pathArchivoSalida);
 
 	stdin = popen (comando,"w");
 
+
 	if (stdin != NULL){
 
-		fprintf(stdin, "%s",data_bloque);
+		//fputs(data_bloque,stdin);
+		if(fprintf(stdin, "%s",data_bloque)<0) printf("Hubo un error");
 
 		pclose (stdin);
 		free(comando);

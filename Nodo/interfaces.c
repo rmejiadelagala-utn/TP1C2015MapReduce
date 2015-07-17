@@ -114,14 +114,14 @@ void* conexionJobs(void* sockJobNodo){
 			pthread_mutex_unlock(&numeroMap);
 			char* dataAUX = malloc(tamanioBloque);
 			memcpy(dataAUX,DATOS+(nroBloque*BLKSIZE),tamanioBloque);
-			bloqueAMapear = fopen("bloqueAMapear","w");
-			write(fileno(bloqueAMapear),dataAUX,tamanioBloque);
-			fclose(bloqueAMapear);
-			printf("antes de la llamada a al sistema\n");
+			//bloqueAMapear = fopen("bloqueAMapear","w");
+			//write(fileno(bloqueAMapear),dataAUX,tamanioBloque);
+			//fclose(bloqueAMapear);
+			//printf("antes de la llamada a al sistema\n");
 			fflush(stdout);
-			system("sh tmp/mapper1.sh bloqueAMapear");//XXX Full stack hardcoding mapper1.sh probablemente debería ser variable
-			printf("antes de ejecutar %s\n", nombreScript);
-			fflush(stdout);
+			//system("sh tmp/mapper1.sh bloqueAMapear");//XXX Full stack hardcoding mapper1.sh probablemente debería ser variable
+			//printf("antes de ejecutar %s\n", nombreScript);
+			//fflush(stdout);
 			ejecutarMapper(nombreScript,archivoSalida,dataAUX);
 			printf("ejecute %s",nombreScript);
 			fflush(stdout);
