@@ -108,11 +108,11 @@ void* conexionJobs(void* sockJobNodo) {
 			numeroMapActual = numeroDeMap;
 			crearScriptMapper(script, nombreScript);
 			numeroDeMap++;
+			pthread_mutex_unlock(&numeroMap);
 			char* dataAUX = malloc(tamanioBloque);
 			memcpy(dataAUX, DATOS + (nroBloque * BLKSIZE), tamanioBloque);
 			printf("antes de ejecutar %s\n", nombreScript);
 			fflush(stdout);
-			pthread_mutex_lock(&unMutex);
 			ejecutarMapper(nombreScript, archivoSalida, dataAUX);
 			printf("ejecute %s\n", nombreScript);
 			fflush(stdout);
@@ -127,7 +127,6 @@ void* conexionJobs(void* sockJobNodo) {
 			printf("Le digo que salio bien con el protocolo %d\n", protocolo);
 			fflush(stdout);
 			sendall(sock_in, &protocolo, sizeof(int));
-			pthread_exit(NULL);
 			break;
 
 		case ENVIO_ARCHIVOS_NODO_NODO:
@@ -139,11 +138,15 @@ void* conexionJobs(void* sockJobNodo) {
 			break;
 
 		case ORDER_REDUCE:
+			printf("Me llego una orden reduce\n");
 			archivosAReducir = list_create();
 			script = recibirString(sock_in);
 			cantArchReduce = recibirInt(sock_in);
 			archivoSalida = strdup("/tmp/");
+			printf("Voy a recibir una lista de archivos\n");
+			fflush(stdout);
 			for (i = 0; i < cantArchReduce; i++) {
+				printf("Agrego un archivo a la lista\n");
 				list_add(archivosAReducir, nuevoArchReduce(recibirInt(sock_in), recibirInt(sock_in), recibirString(sock_in)));
 			}
 			nomArchSalida = recibirString(sock_in);
@@ -160,7 +163,7 @@ void* conexionJobs(void* sockJobNodo) {
 			pthread_mutex_unlock(&numeroReduce);
 			//TODO APAREAR ARCHIVOS DE LA LISTA ARCHIVOSAREDUCIR
 
-
+			//aparearArchivosDeLaListaArchivosAReducir(archivosAReducir);
 
 			ejecutarReduce(nombreScript, archivoSalida, archivosAReducir);
 
