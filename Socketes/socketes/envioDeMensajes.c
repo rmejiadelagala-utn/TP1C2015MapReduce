@@ -108,7 +108,7 @@ char* recibirString(int socket){
 	int tamanioString;
 	recvall(socket,&tamanioString,sizeof(int));
 	char* string;
-	string =malloc(sizeof(char)+tamanioString);
+	string =malloc(sizeof(char)*tamanioString);
 	recvall(socket,string,tamanioString);
 	return string;
 }
