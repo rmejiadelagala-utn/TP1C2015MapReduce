@@ -165,7 +165,7 @@ void* conexionJobs(void* sockJobNodo) {
 			pthread_mutex_unlock(&numeroReduce);
 			//TODO APAREAR ARCHIVOS DE LA LISTA ARCHIVOSAREDUCIR
 
-
+			//aparearArchivosDeLaListaArchivosAReducir(archivosAReducir);
 
 			ejecutarReduce(nombreScript, archivoSalida, archivosAReducir);
 

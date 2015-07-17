@@ -394,6 +394,7 @@ t_RegistroArch* apareoDeRegistros(t_list* Lista_reg) { //deprecated
 	}
 
 	list_iterate(Lista_reg, (void*) realizoApareo);
+	free(copiar_datos);
 
 	return datosReg;
 }
