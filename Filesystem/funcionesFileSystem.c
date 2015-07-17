@@ -168,7 +168,7 @@ void enviarCantBloquesDeArch(char* nombreArchivo, int socket) {
 		sendall(socket, &cantidad, sizeof(int));
 		return;
 	}
-	validarArchivoYEjecutar("201301hourly.txt", (void*) enviarBloquesDeArchivo);//FIXME hardcodeada
+	validarArchivoYEjecutar(nombreArchivo, (void*) enviarBloquesDeArchivo);//FIXME hardcodeada
 	int error=-1;
 	sendall(socket,&error,sizeof(int));
 
