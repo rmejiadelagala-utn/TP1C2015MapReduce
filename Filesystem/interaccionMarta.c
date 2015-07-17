@@ -28,6 +28,7 @@ int encontrarCopias(char* nombre,int directorioIndex, int numeroDeBloqueEnArchiv
 			return -2;
 		}
 		else{
+			printf("encontro las copias\n");
 			*copias = UnbloqueArch->copiasDeBloque;
 			return 0;
 		}

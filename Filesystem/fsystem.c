@@ -661,17 +661,19 @@ void *interaccionFSNodo(void* sock_ptr) {
 				unRegistro->puerto = infoNodo->PUERTO_NODO;
 				pthread_mutex_lock(&listaDeRegistros);
 				list_add(listaRegistrosIDIP, unRegistro);
-				actualizarRegistro(unRegistro, infoNodo->IP_NODO, infoNodo->PUERTO_NODO);
+			//	actualizarRegistro(unRegistro, infoNodo->IP_NODO, infoNodo->PUERTO_NODO);
 				pthread_mutex_unlock(&listaDeRegistros);
 				break;
 
 			case NODO_NUEVO_Y_TENGO_SU_ID:
-
+				free(unRegistro);
 				nodo = nuevoNodo(id, (infoNodo->CANT_BLOQUES) * BLOCK_SIZE);
 				nodoViejo = buscarNodoPorId(id, listaNodos);
 				pthread_mutex_lock(&listaDeRegistros);
 				unRegistro = buscarRegistroPorId(id);
-				actualizarRegistro(unRegistro, infoNodo->IP_NODO, infoNodo->PUERTO_NODO);
+			//	actualizarRegistro(unRegistro, infoNodo->IP_NODO, infoNodo->PUERTO_NODO);
+				unRegistro->ip = infoNodo->IP_NODO;
+				unRegistro->puerto = infoNodo->PUERTO_NODO;
 				pthread_mutex_unlock(&listaDeRegistros);
 				eliminarNodoYReferencias(nodoViejo, listaNodos, listaArchivos);
 				pthread_mutex_lock(&listaDeNodos);
@@ -679,14 +681,19 @@ void *interaccionFSNodo(void* sock_ptr) {
 				pthread_mutex_unlock(&listaDeNodos);
 				break;
 			case NODO_VIEJO_Y_NO_TENGO_SU_ID:
+				free(unRegistro);
 				printf("Error, no se conocía a este nodo.\n");
 				fflush(stdout);
 				break;
 			case NODO_VIEJO_Y_TENGO_SU_ID:
+				free(unRegistro);
 				pthread_mutex_lock(&listaDeRegistros);
-				if (!verificarRegistro(unRegistro, infoNodo->IP_NODO, infoNodo->PUERTO_NODO)) {	//Cambió su IP o Puerto
-					actualizarRegistro(unRegistro, infoNodo->IP_NODO, infoNodo->PUERTO_NODO);
-				}
+				unRegistro = buscarRegistroPorId(id);
+				//if (!verificarRegistro(unRegistro, infoNodo->IP_NODO, infoNodo->PUERTO_NODO)) {	//Cambió su IP o Puerto
+				//	actualizarRegistro(unRegistro, infoNodo->IP_NODO, infoNodo->PUERTO_NODO);
+					unRegistro->ip = infoNodo->IP_NODO;
+					unRegistro->puerto = infoNodo->PUERTO_NODO;
+			//	}
 				pthread_mutex_unlock(&listaDeRegistros);
 				break;
 			}
@@ -748,8 +755,8 @@ void *interaccionFSNodo(void* sock_ptr) {
 			break;
 		case ENVIO_BLOQUEARCH_A_MARTA:
 			infoBloquePedido = recibirPedidoDeBloqueArch(socket);
-			copias = list_create();
-			printf("nombreArch: %s",infoBloquePedido->nombreArch);
+		//	copias = list_create();
+			printf("nombreArch: %s\n",infoBloquePedido->nombreArch);
 			resultado = encontrarCopias(infoBloquePedido->nombreArch, infoBloquePedido->padre,
 					infoBloquePedido->numeroDeBloqueArch, &copias);
 			if (resultado == -1) {
@@ -766,8 +773,11 @@ void *interaccionFSNodo(void* sock_ptr) {
 				}
 				t_list * copiasConNodoActivo = list_filter(copias,(void*)suNodoEstaActivo);
 				enviarCopiasAMarta(socket,copiasConNodoActivo);
-				list_destroy_and_destroy_elements(copias,(void*)liberarBloqueEnNodo);
-				list_destroy_and_destroy_elements(copiasConNodoActivo,(void*)liberarBloqueEnNodo);
+			//	list_destroy_and_destroy_elements(copias,(void*)liberarBloqueEnNodo);
+			//	free(copias);
+			//	list_destroy_and_destroy_elements(copiasConNodoActivo,(void*)liberarBloqueEnNodo);
+				free(copiasConNodoActivo);
+
 
 			}
 
