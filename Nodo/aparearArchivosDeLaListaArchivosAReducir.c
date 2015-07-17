@@ -82,9 +82,13 @@ t_RegistroArch* getRegistroDeArchivo(int fd){
 void actualizarListaDeRegistros(t_list* Lista_reg){
 	t_RegistroArch* nuevoRegistro, regYaProcesado;
 	//pedir el registro siguiente del archivo, del regYaProcesado->socket
-	nuevoRegistro=getRegistroDeArchivo(regYaProcesado->socket);
+/*	nuevoRegistro=getRegistroDeArchivo(regYaProcesado->socket);
+	* explota porque regYaProcesado no tiene informacion, no esta inicilizado ni malloceado y
+	* estas queriendo entrar a una estructura sin mallocear y sin valor
+	*/
 	//eliminar de la lista el regYaProcesado, que siempre es el primero
 	regYaProcesado=list_remove(Lista_reg, 0);
+
 	//insertar el nuevo registro obtenido en la lista de registros.
 	if(nuevoRegistro != NULL) {
 		list_add(Lista_reg,nuevoRegistro);
@@ -93,7 +97,7 @@ void actualizarListaDeRegistros(t_list* Lista_reg){
 		close(regYaProcesado->socket);
 	}
 	destruir_RegistroArch(regYaProcesado);
-	return;
+//	return;
 }
 
 /* *************************************************************************************
