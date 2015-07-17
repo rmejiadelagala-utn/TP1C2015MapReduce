@@ -364,6 +364,7 @@ t_RegistroArch* apareoDeRegistros(t_list* Lista_reg) {
 	}
 
 	list_iterate(Lista_reg, (void*) realizoApareo);
+	free(copiar_datos);
 
 	return datosReg;
 }
