@@ -44,14 +44,12 @@ void *interaccionJobs(void* sock_ptr) {
 t_solicitud deserealizarSolicitudDeJob(int sockCliente){
 	int i;
 
-		int tamanioDeDatosRecibidos = recibirInt(sockCliente); //Este dato ahora es inutil
-
 		t_solicitud solicitud;
 		solicitud.cantArchivos = recibirInt(sockCliente);
 
 		log_info(marta_logger,"La cantidad de archivos recibidos es de %d",solicitud.cantArchivos);
 
-		solicitud.archivos = malloc(sizeof(int) * solicitud.cantArchivos);
+		solicitud.archivos = malloc(solicitud.cantArchivos);
 
 		for (i = 0; i < solicitud.cantArchivos; i++) {
 

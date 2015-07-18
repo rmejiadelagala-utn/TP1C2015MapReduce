@@ -694,6 +694,15 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 			fflush(stdout);
 			list_add(destinosIntermedios, destinoIntermedioReduce);
 
+			void mostrar(t_DestinoReduce* unDestino){
+				printf("ID REDUCE: %d\n",unDestino->id_reduce);
+				printf("ID NODO: %d\n",unDestino->id_nodo);
+				printf("TEMP FILE NAME: %s\n",unDestino->temp_file_name);
+				fflush(stdout);
+			}
+
+			list_iterate(destinosIntermedios,mostrar);
+
 			//asigno como responsable del reduce final a aquel nodo que sea el útlimo
 			//que aplicó un reduce intermedio. Esto es así porque es más probable
 			//que si ese acaba de ser exitoso, siga activo ¿?

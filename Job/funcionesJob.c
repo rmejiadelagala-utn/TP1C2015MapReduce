@@ -87,8 +87,24 @@ void serializer_y_send_solicitud(int sock, t_solicitud* solicitud) {
  |<--uint32_t-->|<-----------------------tam_paquete -------------------------------------->|
  *
  */
+	void* buffer = crearBuffer();
 
-	char* payload;
+	int cantArchivos=cantidadArchivosToProcesar(solicitud);
+
+	bufferAgregarInt(buffer,cantArchivos);
+
+	int i;
+
+	for(i=0;i<cantArchivos;i++)
+		bufferAgregarString(buffer,solicitud->archivos[i],strlen(solicitud->archivos[i])+1);
+
+	bufferAgregarString(buffer,solicitud->archivo_resultado,strlen(solicitud->archivo_resultado)+1);
+
+	bufferAgregarInt(buffer,solicitud->combiner);
+
+	enviarBuffer(buffer,sock);
+
+	/*char* payload;
 	uint32_t long_arch, cursor, i, nbytes;
 	uint32_t tam_paquete;
 
@@ -102,24 +118,26 @@ void serializer_y_send_solicitud(int sock, t_solicitud* solicitud) {
 	cursor=2*sizeof(uint32_t);
 	while (solicitud->archivos[i] != 0){
 			long_arch=strlen(solicitud->archivos[i]);
+			printf("Cargo el archivo %s\n",solicitud->archivos[i]);
 			memcpy(payload + cursor, &long_arch	, sizeof(uint32_t));
 			cursor+=sizeof(uint32_t);
 			memcpy(payload + cursor , solicitud->archivos[i], long_arch);
 			cursor+=long_arch;
 			i++;
 		}
-	long_arch=strlen(solicitud->archivo_resultado);
+	long_arch=strlen(solicitud->archivo_resultado);//
 	memcpy(payload + cursor,&long_arch ,sizeof(uint32_t));
 	cursor+=sizeof(uint32_t);
+	printf("Cargo el archivo %s\n",solicitud->archivo_resultado);
 	memcpy(payload + cursor, solicitud->archivo_resultado,strlen(solicitud->archivo_resultado) );
-	cursor+=strlen(solicitud->archivo_resultado);
+	cursor+=strlen(solicitud->archivo_resultado);//
 	memcpy(payload + cursor, &solicitud->combiner, sizeof(uint32_t));
 
 	if ((nbytes=sendall(sock, payload,tam_paquete+sizeof(uint32_t))) < 0) {
 					perror("error en el send del paquete a MaRTA");
 					exit(1);
 	}
-	free(payload);
+	free(payload);*/
 }
 
 t_solicitud cargarEstructuraSolicitud(t_config_job* info_config){
