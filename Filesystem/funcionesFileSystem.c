@@ -97,6 +97,7 @@ void copiarResultadoAFS(int socket) {
 	} else {
 		log_error(mdfs_logger, "error al enviar a nodos.");
 	}
+}
 
 
 
