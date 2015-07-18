@@ -131,7 +131,8 @@ void mostrarRegistro(t_registro_id_ipPuerto* unRegistro){
 
 void mostrarBloqueEnNodo(t_bloqueEnNodo *bloqueEnNodo) {
 	printf("\tId del Nodo: %d\n", bloqueEnNodo->id);
-	printf("\tNumeroDeBloqueEnNodo %d\n\n", bloqueEnNodo->numeroDeBloqueEnNodo);
+	printf("\tNumeroDeBloqueEnNodo %d\n", bloqueEnNodo->numeroDeBloqueEnNodo);
+	printf("\tamanioBloque %d\n\n", bloqueEnNodo->tamanioBloque);
 }
 
 void mostrarBloqueArch(t_bloqueArch *bloqueArch) {
