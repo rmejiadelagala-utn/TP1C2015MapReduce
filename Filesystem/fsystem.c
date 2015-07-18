@@ -66,6 +66,8 @@ int main() {
 	t_registro_id_ipPuerto* registroVacio = malloc(sizeof(t_registro_id_ipPuerto));
 	sem_init(&consola_sem, 0, 0);
 	sem_init(&escuchar_sem, 0, 0);
+	sem_init(&resultadoJob_sem, 0, 0);
+	sem_init(&escuchar_sem2, 0, 0);
 	pthread_mutex_init(&listaDeNodos, NULL);
 	pthread_mutex_init(&listaDeRegistros, NULL);
 	mdfs_logger = log_create("filesystem.log", "MDFS", 1, log_level_from_string("TRACE"));
@@ -577,6 +579,21 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* nombreArchi
 	t_list* listaDeBloques = list_create();
 	t_archivo *archivoNuevo;
 
+	pthread_mutex_lock(&listaDeNodos);
+	int estaActivo(t_nodo* unNodo){
+		return unNodo->activo;
+	}
+	t_list* nodosActivos = list_filter(listaNodos,estaActivo);
+	int esMenorA3(t_list* nodosActivos){
+		return list_size(nodosActivos)<3;
+	}
+	if(detectarError(nodosActivos,esMenorA3,"No hay suficientesNodos activos\n")){
+		pthread_mutex_unlock(&listaDeNodos);
+		return;
+	}
+	pthread_mutex_unlock(&listaDeNodos);
+
+
 	if (pathLocal != NULL) {
 		if ((local_fd = open(pathLocal, O_RDONLY)) != -1) {
 
@@ -642,6 +659,8 @@ void *interaccionFSNodo(void* sock_ptr) {
 	int condicionDeConexionNodo;
 	t_list* copias;
 	t_list* listaArchivosPedidos;
+	char* archivoFinal;
+	int nodoArchivoFinal;
 	while ((recibido = recvall(socket, &protocolo, 4)) > 0) {
 		switch (protocolo) {
 		case CONEXION_NODO_A_FS:
@@ -757,6 +776,15 @@ void *interaccionFSNodo(void* sock_ptr) {
 			//TODO esta bien
 			//Qué bien, me alegro entonces!!!
 			break;
+		case COPIATE_RESULTADO:
+			printf("Me piden que guarde el ultimo archivo\n");
+			fflush(stdout);
+			copiarResultadoAFS(socket);
+			break;
+		case NODO_DAME_ARCHIVO_A_FS:
+			sem_post(&resultadoJob_sem);
+			sem_wait(&escuchar_sem);
+			break;
 		case ENVIO_BLOQUEARCH_A_MARTA:
 			infoBloquePedido = recibirPedidoDeBloqueArch(socket);
 			//	copias = list_create();
@@ -818,4 +846,5 @@ void *interaccionFSNodo(void* sock_ptr) {
 	close(socket);
 	return 0;
 }
+
 

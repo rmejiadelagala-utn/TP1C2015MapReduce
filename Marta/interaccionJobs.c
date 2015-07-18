@@ -2,6 +2,8 @@
 
 void *interaccionJobs(void* sock_ptr) {
 
+
+
 	pthread_mutex_lock(&conexionFS);
 	int sockCliente = *(int*) sock_ptr;
 
@@ -29,9 +31,16 @@ void *interaccionJobs(void* sock_ptr) {
 
 	list_iterate(listaTemporal, (void*) mostrarListaTemporal);
 
+	char* archivoResultado;
+
+	if(archivoResultado=planificarTodosLosReduce(info_job, listaTemporal, sockCliente)){
+		printf("Envio el archivo %s al filesystem",archivoResultado);
+		fflush(stdout);
+		copiarAMDFS(archivoResultado,socketDeFS);
+
+	}
 
 
-	planificarTodosLosReduce(info_job, listaTemporal, sockCliente);
 
 	close(sockCliente);
 
@@ -96,4 +105,21 @@ t_InfoJob adaptarSolicitudAInfoJob(t_solicitud solicitud) {
 	}
 
 	return info_job;
+}
+
+
+int copiarAMDFS(char* elArchivo, int socket) {
+	t_buffer* buffer = crearBufferConProtocolo(COPIATE_RESULTADO);
+
+	char** nombreArchivoSeparadoPorGuionBajo;
+
+	nombreArchivoSeparadoPorGuionBajo = string_split(elArchivo, "_");
+
+	char* stringIdNodo = nombreArchivoSeparadoPorGuionBajo[3];
+
+	int idNodo = atoi(stringIdNodo);
+
+	bufferAgregarString(buffer, elArchivo, strlen(elArchivo)+1);
+	bufferAgregarInt(buffer, idNodo);
+	return enviarBuffer(buffer,socket);
 }

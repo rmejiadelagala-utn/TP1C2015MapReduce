@@ -74,6 +74,32 @@ static bool tieneLugar(t_nodo *unNodo);
  }
  */
 
+void copiarResultadoAFS(int socket) {
+	char* archivoFinal = recibirString(socket);
+	int idNodo = recibirInt(socket);
+	t_nodo* nodo = buscarNodoPorId(idNodo, listaNodos);
+	t_buffer* buffer = crearBufferConProtocolo(NODO_DAME_ARCHIVO_A_FS);
+	bufferAgregarString(buffer,archivoFinal,strlen(archivoFinal)+1);
+	enviarBuffer(buffer, nodo->socket);
+	sem_wait(&resultadoJob_sem);
+	int cantidadBolquesEnviados = 0;
+	t_list* listaDeBloques = list_create();
+	char* data = recibirString(nodo->socket);
+	sem_post(&escuchar_sem);
+	printf("Voy a distribuir el archivo en los nodos\n");
+	int resultado = mandarBloquesANodos(data, &cantidadBolquesEnviados, &listaDeBloques);
+	if (resultado != -1) {
+		t_archivo* archivoNuevo = nuevoArchivo(archivoFinal, 1, string_length(data), listaDeBloques,
+				1);
+
+		list_add(listaArchivos, archivoNuevo);
+		log_info(mdfs_logger, "El archivo %s fue copiado correctamente.", archivoFinal);
+		//	printf("El archivo %s fue copiado correctamente.\n", nombreArchivo);
+	} else {
+		log_error(mdfs_logger, "error al enviar a nodos.");
+	}
+}
+
 
 
 int nodoEstaActivo (t_registro_id_ipPuerto* unRegistro){

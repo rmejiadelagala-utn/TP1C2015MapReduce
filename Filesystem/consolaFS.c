@@ -266,16 +266,19 @@ void moverDirectorio(char *directorio, char* padreString) {
 	}
 }
 void copiarAMDFS(char *archivoDestino, char *archivoACopiar) {
-	if(!strcmp(archivoDestino,"temperaturas")){ //Hardcodeando como un campeon
-		copiarAMDFS("temperaturas1.txt","fuenteOvejuna");
-		copiarAMDFS("temperaturas2.txt","fuenteOvejuna");
-		copiarAMDFS("temperaturas3.txt","fuenteOvejuna");
+	t_list *archivosVisibles  = archivosVisiblesDesdeActual();
+	int seLlamaIgual(t_archivo* unArchivo){
+		return !strcmp(unArchivo->nombre,archivoDestino);
+	}
+	if(list_find(archivosVisibles,seLlamaIgual)){
+	printf("Ya existe un archivo con ese nombre en el File System\n");
 	}
 	else{
 	char* path = strdup("../Archivos/");
 	string_append(&path,archivoACopiar);
 	levantarArchivoAMemoriaYDistribuirANodos(path, archivoDestino, directorioActual->index);
 	}
+	list_destroy(archivosVisibles);
 }
 
 void copiarAFS(char *archivo) {
