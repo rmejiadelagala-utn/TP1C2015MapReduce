@@ -178,6 +178,9 @@ char* getFileContent(char* nombreFile, char * ruta_archivo) {
 
 void crearScriptMapper(const char* codigo_script, char* nombre) {
 
+	printf("1.Aca no hay text busy\n");
+	fflush(stdout);
+
 	FILE* scriptMapper;
 
 	if ((scriptMapper = fopen(nombre, "w+")) == NULL) {
@@ -185,18 +188,31 @@ void crearScriptMapper(const char* codigo_script, char* nombre) {
 		exit(1);
 	}
 
+
+
 	fputs(codigo_script, scriptMapper);
+
+	int fileDes = fileno(scriptMapper);
 
 	char *permisosCommand = string_new();
 
 	string_append(&permisosCommand, "chmod a+x ");
 	string_append(&permisosCommand, nombre);
 
-	if(system(permisosCommand)<0){
-		printf("Error al ejecutar system(permisosComand)\n");
-		fflush(stdout);
-	}
-	if(fclose(scriptMapper)!=0){
+
+
+	if (fchmod(fileDes, 0755)) {
+			fclose(scriptMapper);
+			printf("Hubo algun error en el fchmod\n");
+			fflush(stdout);
+			return;
+		}
+
+	fflush(scriptMapper);
+	printf("2.Aca no hay text busy\n");
+	fflush(stdout);
+	int resultado = fclose(scriptMapper);
+	if(resultado<0){
 		printf("\n\n\n\nHubo un error al cerrar el archivo\n\n\n\n");
 		fflush(stdout);
 	}
@@ -249,32 +265,34 @@ void crearScriptReduce(const char* codigo_script, char* nombre) {
 
 int redireccionar_stdin_stdout_mapper(char *pathPrograma, char *pathArchivoSalida, char* data_bloque) {
 	FILE *stdin = NULL;
-
-
+	int length;
+	printf("1.Aca no hay text busy\n");
+	fflush(stdout);
 	size_t tamanioComando = strlen(pathPrograma)+11+strlen(pathArchivoSalida);
 
 	char *comando = malloc(tamanioComando);
 
-	snprintf(comando,tamanioComando,"%s | sort > %s",pathPrograma, pathArchivoSalida);
+	fflush(stdout);
+	length = snprintf(comando,tamanioComando,"%s | sort > %s",pathPrograma, pathArchivoSalida)+1;
 
 
+	fflush(stdout);
 	stdin = popen(comando, "w");
 
-	if (sprintf(comando, "%s | sort > %s", pathPrograma, pathArchivoSalida) < 0) {
-		printf("Error de sprintf\n");
+	fflush(stdout);
+	if (length!= tamanioComando) {
 		fflush(stdout);
 		return -1;
 	}
 
 
+	fflush(stdout);
 	if (stdin != NULL) {
-		if (fprintf(stdin, "%s", data_bloque) < 0) {
-			printf("Error de fprintf\n");
+		if (fputs(data_bloque,stdin) < 0) {
 			fflush(stdout);
 			return -1;
 		}
 		if(pclose(stdin)<0){
-			printf("Error al cerrar con pclose\n");
 			fflush(stdout);
 			return -1;
 		}
@@ -298,6 +316,17 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma, char *pathArchivoSalid
 	sprintf(comando, "%s | sort >> %s", pathPrograma, pathArchivoSalida);
 
 	stdin = popen(comando, "w");
+
+	printf("Voy a vaciar el archivo truncado\n");
+	char* archivoATruncar=string_new();
+	fflush(stdout);
+	string_append(&archivoATruncar,pathArchivoSalida);
+	printf("Arme el nombre del archivo\n");
+	char* comandoParaTruncar = string_new();
+	string_append(&comandoParaTruncar,"truncate -s 0 ");
+	string_append(&comandoParaTruncar,archivoATruncar);
+	system(comandoParaTruncar);
+	fflush(stdout);
 
 	if (stdin != NULL) {
 		//XXX poner la funcion de apareo acá
@@ -371,19 +400,42 @@ int ejecutarReduce(char * path_s, char* path_tmp, t_list* archivosAReducir) {
 //Todos esos registros seleccionados irían concatenados y formarían parte del archivo
 //total a reducir.
 
-void aparear(t_list* archivosAReducir){
+void aparear(t_list* archivosAReducir) {
 	char* comando = strdup("cat ");
-	//t_config_nodo* arch_config = leerArchivoConfig("../ArchivosVarios/ConfigNodo.txt");
-	void concatenar(t_archivoAReducir* unArchivo){
-		/*printf("Mi ip es %d, la ip de este archivo es %d",unArchivo->ipNodo,inet_addr(arch_config->IP_NODO));
-		fflush(stdout);
-		if(unArchivo->ipNodo == inet_addr(arch_config->IP_NODO)){*/
-			printf("Voy a abrir el archivo %s\n",unArchivo->nombreArch);
-			fflush(stdout);
-			string_append_with_format(&comando,"/tmp/%s ",unArchivo->nombreArch);
+	t_config_nodo* arch_config = leerArchivoConfig("../ArchivosVarios/ConfigNodo.txt");
+	//printf("Mi ip es %d, la ip de este archivo es %d",unArchivo->ipNodo,inet_addr(arch_config->IP_NODO));
+	int noLoTengo(t_archivoAReducir* unArchivo) {
+		return (unArchivo->ipNodo != inet_addr(arch_config->IP_NODO))
+				|| (unArchivo->puertoNodo != arch_config->PUERTO_NODO);
 	}
-	list_iterate(archivosAReducir,(void*)concatenar);
-	string_append_with_format(&comando,"|sort > /tmp/archivoApareado");
+	t_list* archivosQueMeFaltan = list_filter(archivosAReducir, (void*) noLoTengo);
+	void conseguirArchivo(t_archivoAReducir* unArchivo) {
+		//string_append_with_format(&(unArchivo->nombreArch), "/tmp/%s ", unArchivo->nombreArch);
+		char* nombreDeArchivoAPedir = strdup("/tmp/");
+		string_append(&nombreDeArchivoAPedir,unArchivo->nombreArch);
+		struct in_addr ipaddr;
+		ipaddr.s_addr = unArchivo->ipNodo;
+		int socketDeNodo = crearCliente(inet_ntoa(ipaddr), unArchivo->puertoNodo);
+		void* mensaje = crearBufferConProtocolo(ENVIO_ARCHIVOS_NODO_NODO);
+		bufferAgregarString(mensaje,nombreDeArchivoAPedir,strlen(nombreDeArchivoAPedir)+1);
+		enviarBuffer(mensaje, socketDeNodo);
+		char* archivoData;
+		if((archivoData = recibirString(socketDeNodo))<0) return;
+		fflush(stdout);
+		FILE* fileArchivo = fopen(nombreDeArchivoAPedir, "w");
+		fputs(archivoData, fileArchivo);
+		fclose(fileArchivo);
+		close(socketDeNodo);
+	}
+
+	list_iterate(archivosQueMeFaltan, conseguirArchivo);
+
+	void concatenar(t_archivoAReducir* unArchivo) {
+		fflush(stdout);
+		string_append_with_format(&comando, "/tmp/%s ", unArchivo->nombreArch);
+	}
+	list_iterate(archivosAReducir, (void*) concatenar);
+	string_append_with_format(&comando, "|sort > /tmp/archivoApareado");
 	system(comando);
 	printf("Salgo\n");
 }

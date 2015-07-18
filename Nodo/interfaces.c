@@ -86,7 +86,13 @@ void* conexionJobs(void* sockJobNodo) {
 	t_list* archivosAReducir;
 	uint32_t tamanioBloque;
 	FILE* bloqueAMapear;
+	char* archivoPedido;
+	struct stat datosArch;
 	t_archivoAReducir* archivoRecibido;
+	FILE* fileArchivoPedido;
+	char* dataArchivoPedido;
+	void* buffer;
+
 	while ((recibido = recvall(sock_in, &protocolo, sizeof(int))) > 1) {
 		switch (protocolo) {
 		case ORDER_MAP:
@@ -118,7 +124,7 @@ void* conexionJobs(void* sockJobNodo) {
 
 				printf("%dtext busy encontrado\n", signum);
 				fflush(stdout);
-				exit(11);
+				return;
 
 			}
 			signal(ETXTBSY,signal_callback_handler);
@@ -139,14 +145,28 @@ void* conexionJobs(void* sockJobNodo) {
 			printf("Le digo que salio bien con el protocolo %d\n", protocolo);
 			fflush(stdout);
 			sendall(sock_in, &protocolo, sizeof(int));
+
 			break;
 
 		case ENVIO_ARCHIVOS_NODO_NODO:
-			archivosRecibidos = list_create();
-			cantArchivosRecibidos = recibirInt(sock_in);
-			for (i = 0; i < cantArchivosRecibidos; i++) {
-				guardarEnDisco(recibirArchivo(sock_in));
-			}
+			archivoPedido=recibirString(sock_in);
+			int fileArchivoPedido = open(archivoPedido, O_RDONLY);
+			//FILE* fileArchivoPedido = fopen(archivoPedido,"a+");
+			stat(archivoPedido,&datosArch);
+
+
+
+			if ((dataArchivoPedido = (char *) mmap(0, datosArch.st_size, PROT_READ, MAP_PRIVATE, fileArchivoPedido, 0)) == MAP_FAILED) {
+					;
+					printf("Error al iniciar el mapeo de disco. '%s' ", strerror(errno));
+					close(fileArchivoPedido);
+					exit(1);
+				}
+
+			buffer = crearBuffer();
+			fflush(stdout);
+			bufferAgregarString(buffer,dataArchivoPedido,datosArch.st_size);
+			enviarBuffer(buffer,sock_in);
 			break;
 
 		case ORDER_REDUCE:
