@@ -34,8 +34,7 @@ void liberarCopiaDeBloque(t_CopiaDeBloque* self) {
 }
 
 t_CopiaDeBloque* elegirMejorNodoParaMap(t_list* copiasDeBloque) {
-	printf("La lista que me llego tiene tamanio: %d\n",
-			list_size(copiasDeBloque));
+//	printf("La lista que me llego tiene tamanio: %d\n",
 
 	t_CargaNodo* cargaNodo;
 	t_CargaNodo* cargaNodoOtroBloque;
@@ -70,8 +69,8 @@ t_CopiaDeBloque* elegirMejorNodoParaMap(t_list* copiasDeBloque) {
 	//ordena las copiasDeBloque por los nodos que menos están trabajando
 	pthread_mutex_lock(&mutexListaNodo);
 
-	printf("Voy a ordenar las copias de bloque\n");
-	fflush(stdout);
+//	printf("Voy a ordenar las copias de bloque\n");
+//	fflush(stdout);
 	list_sort(copiasDeBloque, (void*) compararNodosPorMenorCarga);
 
 	pthread_mutex_unlock(&mutexListaNodo);
@@ -82,24 +81,23 @@ t_CopiaDeBloque* elegirMejorNodoParaMap(t_list* copiasDeBloque) {
 
 	//elijo la primera de las copias de la lista ordena por menor carga.
 	//t_CopiaDeBloque* copiaElegida = list_get(copiasDeBloque, 0);
-	printf("La copia elegida tiene id %d\n", copiaElegida->id_nodo);
-	fflush(stdout);
+	log_info(marta_logger,"La copia elegida tiene id %d\n", copiaElegida->id_nodo);
 	return list_get(copiasDeBloque, 0);
 }
 
 int buscarBloquesEnFS(t_InfoJob infoDeJob, uint32_t idArchivo,
 		uint32_t numeroDeBloque, t_list *copiasDeBloque) {
 
-	printf("El id del archivo es %d\n", idArchivo);
-	printf("El nombre del archivo es %s\n",
-			infoDeJob.pathsDeArchivos[idArchivo]);
-	printf("El numero de bloque es %d\n", numeroDeBloque);
+//	printf("El id del archivo es %d\n", idArchivo);
+//	printf("El nombre del archivo es %s\n",
+//			infoDeJob.pathsDeArchivos[idArchivo]);
+//	printf("El numero de bloque es %d\n", numeroDeBloque);
 
 	dameBloqueArchFS(socketDeFS, infoDeJob.pathsDeArchivos[idArchivo], 1,
 			numeroDeBloque);
-	printf("Me pongo a esperar en el semaforo.\n");
+	log_info(marta_logger,"Me pongo a esperar en el semaforo.");
 	sem_wait(&funcionesMarta);
-	printf("Me desperte.\n");
+	log_info(marta_logger,"Me desperte.");
 	t_list* copias = list_create();
 	if (recibirBloqueArchFS(socketDeFS, copias) < 0)
 		return -1;
@@ -113,13 +111,12 @@ int buscarBloquesEnFS(t_InfoJob infoDeJob, uint32_t idArchivo,
 	list_iterate(copias, (void*) deBloqueEnNodoACopiaDeBloque);
 	//copiasDeBloque = list_map(copias,deBloqueEnNodoACopiaDeBloque);
 	void mostrarBloque(t_CopiaDeBloque* unBloque) {
-		printf("ID bloque:%d\nNumero de bloque:%d\n", unBloque->id_nodo,
+		log_info(marta_logger,"ID bloque:%d\nNumero de bloque:%d", unBloque->id_nodo,
 				unBloque->block);
-		fflush(stdout);
 	}
 	list_iterate(copiasDeBloque, (void*) mostrarBloque);
-	printf("El tamaño de la lista es %d\n", list_size(copiasDeBloque));
-	fflush(stdout);
+//	printf("El tamaño de la lista es %d\n", list_size(copiasDeBloque));
+//	fflush(stdout);
 	list_destroy_and_destroy_elements(copias, free);
 	sem_post(&interaccionFS);
 
@@ -136,13 +133,13 @@ t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 
 	if (buscarBloquesEnFS(infoDeJob, idArchivo, numeroDeBloque, copiasDeBloque)
 			<= 0) {
-		printf("No se encontraron las copias del Archivo: %i, Bloque: %i",
+		log_warning(marta_logger,"No se encontraron las copias del Archivo: %i, Bloque: %i",
 				idArchivo, numeroDeBloque);
 		list_destroy_and_destroy_elements(copiasDeBloque,
 				(void *) liberarCopiaDeBloque);
 		return NULL;
 	}
-	printf("Voy a buscar la mejor copia\n");
+	log_info(marta_logger,"Voy a buscar la mejor copia\n");
 	//Selecciona la copia de bloque que está en el nodo que menos trabajo tiene
 	copiaSeleccionada = elegirMejorNodoParaMap(copiasDeBloque);
 
@@ -191,9 +188,9 @@ int ordenarMapAJob(t_DestinoMap* destinoDeMap, int socket) {
 	result = enviarBuffer(map_order, socket);
 
 	if (result < 0) {
-		printf("No se Pudo enviar la Orden de Map al Job\n");
+		log_warning(marta_logger,"No se Pudo enviar la Orden de Map al Job");
 	} else {
-		printf("Le mandé la orden al job\n");
+		log_info(marta_logger,"Le mandé la orden al job");
 	}
 	return result;
 }
@@ -204,25 +201,25 @@ int recibirResultadoDeMap(int sockjob, t_ResultadoMap* resultadoMap) {
 
 	switch (resultadoMap->prot) {
 	case OK_MAP:
-		printf("Map realizado con exito");
+		log_info(marta_logger,"Map realizado con exito");
 		break;
 
 	case NODO_NOT_FOUND:
-		printf("No se encontró el nodo donde mapear");
+		log_warning(marta_logger,"No se encontró el nodo donde mapear");
 		break;
 
 	case 0:
-		printf("Job se desconectó de forma inesperada");
+		log_warning(marta_logger,"Job se desconectó de forma inesperada");
 		return -1;
 		break;
 
 	case -1:
-		printf("No se pudo recibir el resultado del Map");
+		log_warning(marta_logger,"No se pudo recibir el resultado del Map");
 		return -1;
 		break;
 
 	default:
-		printf("Protocolo Inesperado %i", resultadoMap->prot);
+		log_warning(marta_logger,"Protocolo Inesperado %i", resultadoMap->prot);
 		return -1;
 		break;
 	}
@@ -364,8 +361,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 		}
 	}
 
-	printf("\nEnvie todos los pedidos\n");
-	fflush(stdout);
+	log_info(marta_logger,"Envie todos los pedidos");
 	pthread_mutex_unlock(&conexionFS);
 
 	t_ResultadoMap resultadoDeMap;
@@ -392,14 +388,14 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 				break;
 
 			case NODO_NOT_FOUND:
-				printf("\n\n\n\n\nNO SE ENCONTRO UN NODO\n\n\n\n\n");
+				log_warning(marta_logger,"NO SE ENCONTRO UN NODO");
 				fflush(stdout);
 				mapPendiente = list_find(listaMapsPendientes,
 						(void *) encuentreMapPendiente);
 				if (mapPendiente)
-					printf("El resultado del map no es null\n");
+					log_info(marta_logger,"El resultado del map no es null");
 				else
-					printf("El resultado del map es null\n");
+					log_warning(marta_logger,"El resultado del map es null");
 				liberarDestinoMap(mapPendiente->map_dest);
 				mapPendiente->map_dest = planificarMap(info_job,
 						mapPendiente->file->idArchivo, mapPendiente->block,
@@ -413,8 +409,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 								-2;
 
 				if (resultado <= 0) {
-					printf(
-							"\n\n\n VOY A DESTRUIR TODOS LOS MAPS PENDIENTES\n\n\n");
+					log_info(marta_logger," VOY A DESTRUIR TODOS LOS MAPS PENDIENTES");
 					fflush(stdout);
 					list_destroy_and_destroy_elements(listaMapsPendientes,
 							(void *) liberarMapPendiente);
@@ -474,9 +469,9 @@ int ordenarReduceAJob(t_DestinoReduce* destinoReduce, t_list* origenesDeReduce,
 
 	void bufferAgregarOrigenesReduce(t_OrigenReduce* unOrigenReduce) {
 
-		printf("el id de nodo es %i\n", unOrigenReduce->id_nodo);
-		printf("y el nombre del archivo es %s", unOrigenReduce->temp_file_name);
-		fflush(stdout);
+	//	printf("el id de nodo es %i\n", unOrigenReduce->id_nodo);
+	//	printf("y el nombre del archivo es %s", unOrigenReduce->temp_file_name);
+	//	fflush(stdout);
 
 		bufferAgregarInt(reduce_order, puertoDeNodo(unOrigenReduce->id_nodo));
 		bufferAgregarInt(reduce_order, ipDeNodo(unOrigenReduce->id_nodo));
@@ -489,9 +484,9 @@ int ordenarReduceAJob(t_DestinoReduce* destinoReduce, t_list* origenesDeReduce,
 	resultado = enviarBuffer(reduce_order, sockJob);
 
 	if (resultado < 0) {
-		printf("No se Pudo enviar la Orden de Reduce al Job\n");
+		log_warning(marta_logger,"No se Pudo enviar la Orden de Reduce al Job");
 	} else {
-		printf("Le mandé la orden de Reduce al job\n");
+		log_warning(marta_logger,"Le mandé la orden de Reduce al job");
 	}
 	return resultado;
 }
@@ -502,25 +497,25 @@ int recibirResultadoDeReduce(int sockjob, t_ResultadoReduce* resultadoReduce) {
 
 	switch (resultadoReduce->prot) {
 	case OK_REDUCE:
-		printf("Reduce realizado con exito");
+		log_info(marta_logger,"Reduce realizado con exito");
 		break;
 
 	case NODO_NOT_FOUND:
-		printf("No se encontró el nodo donde hacer reduce");
+		log_info(marta_logger,"No se encontró el nodo donde hacer reduce");
 		break;
 
 	case 0:
-		printf("Job se desconectó de forma inesperada");
+		log_warning(marta_logger,"Job se desconectó de forma inesperada");
 		return -1;
 		break;
 
 	case -1:
-		printf("No se pudo recibir el resultado del Reduce");
+		log_warning(marta_logger,"No se pudo recibir el resultado del Reduce");
 		return -1;
 		break;
 
 	default:
-		printf("Protocolo Inesperado %i", resultadoReduce->prot);
+		log_warning(marta_logger,"Protocolo Inesperado %i", resultadoReduce->prot);
 		return -1;
 		break;
 	}
@@ -749,17 +744,14 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 				switch (resultadoDeReduce.prot) {
 				case OK_REDUCE:
 
-					printf("Resultado de reduce: %i\n", resultadoDeReduce.id_reduce);
-					fflush(stdout);
+					log_info(marta_logger,"Resultado de reduce: %i", resultadoDeReduce.id_reduce);
 
 					list_remove_by_condition(listaReducePendientes,
 							(void*) encuentraReducePendiente);
 					break;
 				case NODO_NOT_FOUND:
-					printf("\nNO SE ENCONTRO UN NODO\n");
-					printf("CANCELO TODO EL JOB\n");
-					fflush(stdout);
-
+					log_info(marta_logger,"NO SE ENCONTRO UN NODO");
+					log_info(marta_logger,"CANCELO TODO EL JOB");
 					break;
 				}
 
@@ -790,15 +782,14 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 				destinosIntermedios, sockJob);
 
 		if (resultadoReduceFinal > 0) {
-			printf("Reduce con combiner enviado exitosamente\n");
+			log_info(marta_logger,"Reduce con combiner enviado exitosamente");
 		} else {
-			printf("falló envío de la orden de reduce. Cancelo job\n");
+			log_info(marta_logger,"falló envío de la orden de reduce. Cancelo job");
 			//todo mandar a borrar cosas y eso. No se bien que hacer acá
 		}
 
 		//recibir el resultado del reduce final
-		printf(
-				"Supuestamente, hice todos los reduce intermedios y mande a hacer el final/n");
+		log_info(marta_logger,"Supuestamente, hice todos los reduce intermedios y mande a hacer el final");
 
 		t_ResultadoReduce resultadoFinal;
 
@@ -860,15 +851,14 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 				sockJob/*sockJob de la conexion aun no hecha*/);
 
 		if (resultado > 0) {
-			printf("Reduce sin combiner enviado exitosamente\n");
+			log_info(marta_logger,"Reduce sin combiner enviado exitosamente");
 		} else {
-			printf("falló envío de la orden de reduce. Cancelo job\n");
+			log_info(marta_logger,"falló envío de la orden de reduce. Cancelo job");
 			//todo mandar a borrar cosas y eso. No se bien que hacer acá
 		}
 
 		//recibir el resultado del reduce final
-		printf(
-				"Supuestamente, hice todos los reduce intermedios y mande a hacer el final/n");
+		log_info(marta_logger,"Supuestamente, hice todos los reduce intermedios y mande a hacer el final");
 
 		t_ResultadoReduce resultadoFinal;
 
@@ -881,10 +871,8 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 
 				break;
 			case NODO_NOT_FOUND:
-				printf("\nNO SE ENCONTRO UN NODO\n");
-				printf("CANCELO TODO EL JOB.\n");
-				fflush(stdout);
-
+				log_info(marta_logger,"NO SE ENCONTRO UN NODO");
+				log_info(marta_logger,"CANCELO TODO EL JOB.");
 				break;
 			}
 
