@@ -24,7 +24,7 @@ t_config_job* leer_archivo_configuracion(char* arch){
 	info_config->REDUCE=config_get_string_value(config,"REDUCE");
 	printf("Este es el reduce:  %s\n",info_config->REDUCE);
 	info_config->COMBINER=strdup(config_get_string_value(config,"COMBINER"));
-	printf("Soprta Combiner?:  %s\n",info_config->COMBINER);
+	printf("Soporta Combiner?:  %s\n",info_config->COMBINER);
 	info_config->archivo_resultado=strdup(config_get_string_value(config,"RESULTADO"));
 	printf("Este es el archivo resultado:  %s\n",info_config->archivo_resultado);
 //	char** archivos = config_get_array_value(config,"ARCHIVOS");

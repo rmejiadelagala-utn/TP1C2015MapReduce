@@ -543,7 +543,7 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 	int idJobAlQueAplica = infoJob.idJob;
 	uint32_t ultimoIDReduce = 0;
 
-	t_list* listaIdNodosDondeAplicarReduce;
+	t_list* listaIdNodosDondeAplicarReduce = list_create();
 
 	//FIXME esto es inecesario, pero queria usar el t_list y con esto lo soluciono por ahora
 	typedef struct {
@@ -656,7 +656,7 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 				return unMapTemporal->id_nodo == idAux->idNodo;
 			}
 
-			mapsTemporalesDondeHacerReduceEnNodo = list_find(
+			mapsTemporalesDondeHacerReduceEnNodo = list_filter(
 					mapsTemporalesDeLosArchivosDelJob,
 					(void*) destinosDelNodoAAplicarReduceLocal);
 
@@ -674,7 +674,7 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 			destinoIntermedioReduce->ip_nodo = ipDeNodo(idAux->idNodo);
 			destinoIntermedioReduce->puerto_nodo = puertoDeNodo(idAux->idNodo);
 			destinoIntermedioReduce->temp_file_name = string_from_format(
-					"reduce_intermedio_%i.temp", infoJob.idJob);
+					"reduce_intermedio_%i_%i.temp", infoJob.idJob, destinoIntermedioReduce->id_reduce);
 
 			resReduceEnNodo = ordenarReduceAJob(destinoIntermedioReduce,
 					origenesReduceEnNodo, sockJob);
