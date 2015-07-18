@@ -66,6 +66,7 @@ int main() {
 	t_registro_id_ipPuerto* registroVacio = malloc(sizeof(t_registro_id_ipPuerto));
 	sem_init(&consola_sem, 0, 0);
 	sem_init(&escuchar_sem, 0, 0);
+	sem_init(&resultadoJob_sem, 0, 0);
 	pthread_mutex_init(&listaDeNodos, NULL);
 	pthread_mutex_init(&listaDeRegistros, NULL);
 	mdfs_logger = log_create("filesystem.log", "MDFS", 1, log_level_from_string("TRACE"));
@@ -657,6 +658,8 @@ void *interaccionFSNodo(void* sock_ptr) {
 	int condicionDeConexionNodo;
 	t_list* copias;
 	t_list* listaArchivosPedidos;
+	char* archivoFinal;
+	int nodoArchivoFinal;
 	while ((recibido = recvall(socket, &protocolo, 4)) > 0) {
 		switch (protocolo) {
 		case CONEXION_NODO_A_FS:
@@ -772,6 +775,13 @@ void *interaccionFSNodo(void* sock_ptr) {
 			//TODO esta bien
 			//Qué bien, me alegro entonces!!!
 			break;
+		case COPIATE_RESULTADO:
+			copiarResultadoAFS(socket);
+			break;
+		case NODO_DAME_ARCHIVO_A_FS:
+			sem_wait(&escuchar_sem);
+			sem_post(&resultadoJob_sem);
+			break;
 		case ENVIO_BLOQUEARCH_A_MARTA:
 			infoBloquePedido = recibirPedidoDeBloqueArch(socket);
 			//	copias = list_create();
@@ -833,4 +843,5 @@ void *interaccionFSNodo(void* sock_ptr) {
 	close(socket);
 	return 0;
 }
+
 

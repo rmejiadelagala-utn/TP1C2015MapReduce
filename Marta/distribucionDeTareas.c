@@ -557,8 +557,8 @@ void agregarReducePendiente(t_list* reducePendientes, t_DestinoReduce* destinoRe
 
 }
 
-int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales, int sockJob) {
-
+char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales, int sockJob) {
+	char* archivoFinal;
 	int idJobAlQueAplica = infoJob.idJob;
 	uint32_t ultimoIDReduce = 0;
 
@@ -771,7 +771,7 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales, int
 			} else {
 				/*list_destroy_and_destroy_elements(listaReducePendientes,
 				 (void *) eliminarReducePendiente);*/
-				return -1;
+				return NULL;
 			}
 		}
 
@@ -798,8 +798,8 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales, int
 		destinoFinalReduce->id_nodo = idNodoDondeAplicarReduceFinal;
 		destinoFinalReduce->ip_nodo = ipDeNodo(idNodoDondeAplicarReduceFinal);
 		destinoFinalReduce->puerto_nodo = puertoDeNodo(idNodoDondeAplicarReduceFinal);
-		destinoFinalReduce->temp_file_name = string_from_format("reduce_final_%i.temp",
-				infoJob.idJob);
+		destinoFinalReduce->temp_file_name = string_from_format("reduce_final_%i_%i.temp",
+				infoJob.idJob,destinoFinalReduce->id_nodo);
 
 		resultadoReduceFinal = ordenarUltimoReduceAJob(destinoFinalReduce, destinosIntermedios, sockJob);
 
@@ -834,17 +834,17 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales, int
 
 		} else {
 			free(destinoFinalReduce);
-			return -1;
+			return NULL;
 		}
 
 		void destruirDestinoReduce(t_DestinoReduce* unDestinoReduce) {
 			free(unDestinoReduce);
 		}
-
+		char* archivoFinal=strdup(destinoFinalReduce->temp_file_name);
 		free(destinoFinalReduce);
 
 		list_destroy_and_destroy_elements(destinosIntermedios, (void*) destruirDestinoReduce);
-
+		return archivoFinal;
 	} else //Sin combiner
 	{
 		int idNodoDondeAplicarReduce = mejorNodoDondeAplicarReduceSinCombiner(
@@ -866,7 +866,7 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales, int
 		destinoReduce->id_nodo = idNodoDondeAplicarReduce;
 		destinoReduce->ip_nodo = ipDeNodo(idNodoDondeAplicarReduce);
 		destinoReduce->puerto_nodo = puertoDeNodo(idNodoDondeAplicarReduce);
-		destinoReduce->temp_file_name = string_from_format("reduce_final_%i.temp", infoJob.idJob);
+		destinoReduce->temp_file_name = string_from_format("reduce_final_%i_%i.temp", infoJob.idJob,destinoReduce->id_nodo);
 
 		resultado = ordenarReduceAJob(destinoReduce, origenesDeReduce,
 				sockJob/*sockJob de la conexion aun no hecha*/);
@@ -900,16 +900,16 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales, int
 
 		} else {
 			free(destinoReduce);
-			return -1;
+			return NULL;
 		}
 
 		//todo mandar a guardar el resultado del reduce al MDFS
-
+		archivoFinal = strdup(destinoReduce->temp_file_name);
 		free(destinoReduce);
 		list_destroy_and_destroy_elements(origenesDeReduce, (void*) free);
 	}
 
 	list_destroy_and_destroy_elements(mapsTemporalesDeLosArchivosDelJob, (void*) free);
-	return 1;
+	return archivoFinal;
 }
 

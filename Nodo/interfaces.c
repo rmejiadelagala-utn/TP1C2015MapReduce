@@ -37,7 +37,7 @@ void* conexionFS(void* arg) {
 	int recibido;
 	int nroBloqueRecibido;
 	int resultado;
-
+	char* archivoFinal;
 	while ((recibido = recvall(ptr->socket, &protocolo, 4)) > 0) {
 
 		switch (protocolo) {
@@ -55,6 +55,11 @@ void* conexionFS(void* arg) {
 			break;
 
 		case NODO_ESTAS:
+			break;
+
+		case NODO_DAME_ARCHIVO_A_FS:
+			archivoFinal=recibirString(socket);
+			if(enviarArchivoPedido(archivoFinal,socket)<0) printf("Hubo un error al enviar el archivo\n");
 			break;
 
 		}
@@ -207,4 +212,27 @@ t_archivoAReducir* recibirArchReduce(int socket) {
 	unArch->nombreArch = recibirString(socket);
 	printf("Recibo nombre archivo:%s\n",unArch->nombreArch);
 	return unArch;
+}
+
+int enviarArchivoPedido(char* archivoPedido, int sock_in) {
+	char* dataArchivoPedido;
+	t_buffer* buffer;
+
+	struct stat datosArch;
+	int fileArchivoPedido = open(archivoPedido, O_RDONLY);
+	//FILE* fileArchivoPedido = fopen(archivoPedido,"a+");
+	stat(archivoPedido, &datosArch);
+
+	if ((dataArchivoPedido = (char *) mmap(0, datosArch.st_size, PROT_READ, MAP_PRIVATE,
+			fileArchivoPedido, 0)) == MAP_FAILED) {
+		;
+		log_error(nodo_logger, "Error al iniciar el mapeo de disco. '%s' ", strerror(errno));
+		close(fileArchivoPedido);
+		exit(1);
+	}
+
+	buffer = crearBuffer();
+	fflush(stdout);
+	bufferAgregarString(buffer, dataArchivoPedido, datosArch.st_size);
+	return enviarBuffer(buffer, sock_in);
 }
