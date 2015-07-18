@@ -15,7 +15,7 @@ void* conexionFS(void* arg) {
 	t_hilofs* ptr;
 	ptr = (t_hilofs*) arg;
 	int socket = ptr->socket;
-	printf("Nodo Conectado al Filesystem\n");
+	log_info(nodo_logger,"Nodo Conectado al Filesystem");
 
 	tam_disco = obtener_tamanio_disco(ptr->ARCH_BIN);
 	int cant_bloques = tam_disco / BLKSIZE;
@@ -49,8 +49,7 @@ void* conexionFS(void* arg) {
 			break;
 
 		case GET_BLOQUE:
-			printf("me pidieron un bloque\n");
-			fflush(stdout);
+			log_info(nodo_logger,"me pidieron un bloque");
 			resultado = getBloqueParaFileSystem(socket, DATOS, BLKSIZE);
 
 			break;
@@ -99,16 +98,14 @@ void* conexionJobs(void* sockJobNodo) {
 		case ORDER_MAP:
 			//Dejo que el nodo conteste que todo esta bien por ahora, despues hay que hacer el map aca
 
-			printf("Recibi una orden de map, esta todo OK.\n");
-			fflush(stdout);
+			log_info(nodo_logger,"Recibi una orden de map, esta todo OK.");
 			script = recibirString(sock_in);
 			nroBloque = recibirInt(sock_in);
 			tamanioBloque = recibirInt(sock_in);
 			archivoSalida = strdup("/tmp/");
 			nomArchSalida = recibirString(sock_in);
 			string_append(&archivoSalida, nomArchSalida);
-			printf("El archivo de salida recibido es %s\n", archivoSalida);
-			fflush(stdout);
+			log_info(nodo_logger,"El archivo de salida recibido es %s", archivoSalida);
 			pthread_mutex_lock(&numeroMap);
 			nombreScript = strdup("tmp/mapper");
 			string_append(&nombreScript, string_itoa(numeroDeMap));
@@ -119,19 +116,9 @@ void* conexionJobs(void* sockJobNodo) {
 			pthread_mutex_unlock(&numeroMap);
 			char* dataAUX = malloc(tamanioBloque);
 			memcpy(dataAUX, DATOS + (nroBloque * BLKSIZE), tamanioBloque);
-			printf("antes de ejecutar %s\n", nombreScript);
-			fflush(stdout);
-			void signal_callback_handler(int signum) {
-
-				printf("%dtext busy encontrado\n", signum);
-				fflush(stdout);
-				return;
-
-			}
-			signal(ETXTBSY,signal_callback_handler);
+			log_info(nodo_logger,"antes de ejecutar %s", nombreScript);
 			resultado=ejecutarMapper(nombreScript, archivoSalida, dataAUX);
-			printf("ejecute %s\n", nombreScript);
-			fflush(stdout);
+			log_info(nodo_logger,"ejecute %s", nombreScript);
 			free(script);
 			free(dataAUX);
 			free(nombreScript);
@@ -140,10 +127,7 @@ void* conexionJobs(void* sockJobNodo) {
 			enviarProtocolo(RES_MAP,sock_in);
 			if(resultado>0)	enviarProtocolo(OK_MAP,sock_in);
 			else enviarProtocolo(NOTOK_MAP,sock_in);
-			printf("Le digo que salio bien con el protocolo %d\n", protocolo);
-			fflush(stdout);
-			sendall(sock_in, &protocolo, sizeof(int));
-
+			log_info(nodo_logger,"Le digo que salio bien con el protocolo %d", protocolo);
 			break;
 
 		case ENVIO_ARCHIVOS_NODO_NODO:
@@ -156,7 +140,7 @@ void* conexionJobs(void* sockJobNodo) {
 
 			if ((dataArchivoPedido = (char *) mmap(0, datosArch.st_size, PROT_READ, MAP_PRIVATE, fileArchivoPedido, 0)) == MAP_FAILED) {
 					;
-					printf("Error al iniciar el mapeo de disco. '%s' ", strerror(errno));
+					log_error(nodo_logger,"Error al iniciar el mapeo de disco. '%s' ", strerror(errno));
 					close(fileArchivoPedido);
 					exit(1);
 				}
@@ -168,20 +152,19 @@ void* conexionJobs(void* sockJobNodo) {
 			break;
 
 		case ORDER_REDUCE:
-			printf("Me llego una orden reduce\n");
+			log_info(nodo_logger,"Me llego una orden reduce");
 			archivosAReducir = list_create();
 			script = recibirString(sock_in);
 			cantArchReduce = recibirInt(sock_in);
 			archivoSalida = strdup("/tmp/");
-			printf("Voy a recibir una lista de archivos de tamaño %d\n",cantArchReduce);
-			fflush(stdout);
+			log_info(nodo_logger,"Voy a recibir una lista de archivos de tamaño %d",cantArchReduce);
 			for (i = 0; i < cantArchReduce; i++) {
-				printf("Agrego un archivo a la lista\n");
 				list_add(archivosAReducir,recibirArchReduce(sock_in) );
 			}
+			log_info(nodo_logger,"Recibi la lista de archivos.");
 			nomArchSalida = recibirString(sock_in);
-			printf("El script recibido es %s\n", script);
-			printf("El archivo de salida recibido es %s\n", nomArchSalida);
+			log_info(nodo_logger,"El script recibido es %s\n", script);
+			log_info(nodo_logger,"El archivo de salida recibido es %s\n", nomArchSalida);
 			fflush(stdout);
 			pthread_mutex_lock(&numeroReduce);
 			nombreScript = strdup("tmp/reduce");
@@ -207,7 +190,6 @@ void* conexionJobs(void* sockJobNodo) {
 }
 
 t_archivoAReducir* nuevoArchReduce(int ip, int puerto, char* nombre) {
-	printf("Entro a la funcion nuevoArchReduce\n");
 	t_archivoAReducir* unArch = malloc(sizeof(t_archivoAReducir));
 	unArch->ipNodo = ip;
 	unArch->puertoNodo = puerto;
@@ -216,7 +198,6 @@ t_archivoAReducir* nuevoArchReduce(int ip, int puerto, char* nombre) {
 }
 
 t_archivoAReducir* recibirArchReduce(int socket) {
-	printf("Entro a la funcion nuevoArchReduce\n");
 	t_archivoAReducir* unArch = malloc(sizeof(t_archivoAReducir));
 	printf("Recibo puerto nodo\n");
 	unArch->puertoNodo = recibirInt(socket);

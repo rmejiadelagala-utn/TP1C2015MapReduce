@@ -33,6 +33,7 @@
 #include "funcionesNodo.h"
 #include "estructurasNodo.h"
 #include <pthread.h>
+#include <commons/log.h>
 
 //#define BLKSIZE 1024*1024*20
 
@@ -46,7 +47,7 @@ pthread_mutex_t numeroMap;
 int numeroDeReduce;
 pthread_mutex_t numeroReduce;
 pthread_mutex_t unMutex;
-
+t_log* nodo_logger;
 
 
 
