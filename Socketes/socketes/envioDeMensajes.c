@@ -171,6 +171,12 @@ int enviarBuffer(t_buffer* buffer, int socket){
 	return resultado;
 }
 
+int enviarProtocolo(int protocolo,int socket){
+	void* buffer = crearBuffer();
+	bufferAgregarInt(buffer,protocolo);
+	return enviarBuffer(buffer,socket);
+}
+
 //Serializar mensajes
 
 //Nodo

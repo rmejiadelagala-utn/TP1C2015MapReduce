@@ -103,6 +103,8 @@ uint32_t recibirProtocoloEnOrden(int socket);
 
 int enviarBuffer(t_buffer* buffer, int socket);
 
+int enviarProtocolo(int protocolo,int socket);
+
 //Serializar mensajes
 
 //Nodo
