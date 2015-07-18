@@ -473,6 +473,11 @@ int ordenarReduceAJob(t_DestinoReduce* destinoReduce, t_list* origenesDeReduce,
 	bufferAgregarInt(reduce_order, list_size(origenesDeReduce));
 
 	void bufferAgregarOrigenesReduce(t_OrigenReduce* unOrigenReduce) {
+
+		printf("el id de nodo es %i\n", unOrigenReduce->id_nodo);
+		printf("y el nombre del archivo es %s", unOrigenReduce->temp_file_name);
+		fflush(stdout);
+
 		bufferAgregarInt(reduce_order, puertoDeNodo(unOrigenReduce->id_nodo));
 		bufferAgregarInt(reduce_order, ipDeNodo(unOrigenReduce->id_nodo));
 		bufferAgregarString(reduce_order, unOrigenReduce->temp_file_name,
@@ -686,6 +691,7 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 			agregarReducePendiente(listaReducePendientes,
 					destinoIntermedioReduce);
 
+			fflush(stdout);
 			list_add(destinosIntermedios, destinoIntermedioReduce);
 
 			//asigno como responsable del reduce final a aquel nodo que sea el útlimo
@@ -737,9 +743,8 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 					printf("Resultado de reduce: %i\n", resultadoDeReduce.id_reduce);
 					fflush(stdout);
 
-					list_remove_and_destroy_by_condition(listaReducePendientes,
-							(void*) encuentraReducePendiente,
-							(void*) eliminarReducePendiente);
+					list_remove_by_condition(listaReducePendientes,
+							(void*) encuentraReducePendiente);
 					break;
 				case NODO_NOT_FOUND:
 					printf("\nNO SE ENCONTRO UN NODO\n");
@@ -764,6 +769,7 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 		t_DestinoReduce* destinoFinalReduce = malloc(sizeof(t_DestinoReduce));
 
 		//XXX el nombre del reduce no se si siempre será único. supuestamente si
+		destinoFinalReduce->id_reduce = ++(ultimoIDReduce);
 		destinoFinalReduce->id_nodo = idNodoDondeAplicarReduceFinal;
 		destinoFinalReduce->ip_nodo = ipDeNodo(idNodoDondeAplicarReduceFinal);
 		destinoFinalReduce->puerto_nodo = puertoDeNodo(
