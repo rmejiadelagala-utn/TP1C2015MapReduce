@@ -201,7 +201,6 @@ void crearScriptMapper(const char* codigo_script, char* nombre) {
 		fflush(stdout);
 	}
 	free(permisosCommand);
-	printf("\n\n\n\n\n\nFILE DESCRIPTOR: %d\n\n\n\n\n\n",fileno(scriptMapper));
 	return;
 }
 
@@ -264,6 +263,7 @@ int redireccionar_stdin_stdout_mapper(char *pathPrograma, char *pathArchivoSalid
 	if (sprintf(comando, "%s | sort > %s", pathPrograma, pathArchivoSalida) < 0) {
 		printf("Error de sprintf\n");
 		fflush(stdout);
+		return -1;
 	}
 
 
@@ -271,16 +271,22 @@ int redireccionar_stdin_stdout_mapper(char *pathPrograma, char *pathArchivoSalid
 		if (fprintf(stdin, "%s", data_bloque) < 0) {
 			printf("Error de fprintf\n");
 			fflush(stdout);
+			return -1;
 		}
-		pclose(stdin);
+		if(pclose(stdin)<0){
+			printf("Error al cerrar con pclose\n");
+			fflush(stdout);
+			return -1;
+		}
 		free(comando);
 	} else {
 
 		printf("No se pudo ejecutar el programa!\n");
+		fflush(stdout);
 		return -1;
 	}
 
-	return 0;
+	return 1;
 }
 
 //TODO hacer esto de forma correcta, obteniendo los path de los de reducir y apareando
@@ -295,33 +301,57 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma, char *pathArchivoSalid
 
 	if (stdin != NULL) {
 		//XXX poner la funcion de apareo acá
-		char* data = aparear(archivosAReducir);
-		if (fprintf(stdin, "%s", data) < 0) {
+		aparear(archivosAReducir);
+		FILE* archivoAReducir = fopen("/tmp/archivoApareado","r");
+		struct stat datosArch;
+		stat("/tmp/archivoApareado",&datosArch);
+		printf("El tamaño del archivo es %d\n",datosArch.st_size);
+		char* dataArchivoAReducir = mmap((caddr_t) 0, datosArch.st_size, PROT_READ, MAP_SHARED, fileno(archivoAReducir), 0);
+		printf("Los primeros 20 bytes son:\n");
+		char* imprimirPorPantalla = malloc(20);
+		snprintf(imprimirPorPantalla,20,"%s",dataArchivoAReducir);
+		printf(imprimirPorPantalla);
+		fflush(stdout);
+		if (fprintf(stdin, "%s", dataArchivoAReducir) < 0) {
 			printf("Error de fprintf\n");
 			fflush(stdout);
 		}
-		pclose(stdin);
+		if(pclose(stdin)<0){
+			printf("Error al cerrar con pclose\n");
+			fflush(stdout);
+			return -1;
+		}
 		free(comando);
 	} else {
 
-		printf("No se pudo ejecutar el programa!");
+		printf("No se pudo ejecutar el programa!\n");
+		fflush(stdout);
 		return -1;
 	}
 
-	return 0;
+	return 1;
 }
 
-void ejecutarMapper(char * path_s, char* path_tmp, char* datos_bloque) {
 
-	if ((redireccionar_stdin_stdout_mapper(path_s, path_tmp, datos_bloque)) < 0)
+int ejecutarMapper(char * path_s, char* path_tmp, char* datos_bloque) {
+
+	if ((redireccionar_stdin_stdout_mapper(path_s, path_tmp, datos_bloque)) < 0){
+
 		printf("Error al ejecutar Mapper\n");
+		return -1;
+	}
+
+
 
 }
 
-void ejecutarReduce(char * path_s, char* path_tmp, t_list* archivosAReducir) {
+int ejecutarReduce(char * path_s, char* path_tmp, t_list* archivosAReducir) {
 
-	if ((redireccionar_stdin_stdout_reduce(path_s, path_tmp, archivosAReducir)) < 0)
+	if ((redireccionar_stdin_stdout_reduce(path_s, path_tmp, archivosAReducir)) < 0){
 		printf("Error al ejecutar Reduce\n");
+		return -1;
+	}
+
 
 }
 
@@ -341,33 +371,26 @@ void ejecutarReduce(char * path_s, char* path_tmp, t_list* archivosAReducir) {
 //Todos esos registros seleccionados irían concatenados y formarían parte del archivo
 //total a reducir.
 
-char* aparear(t_list* archivosAReducir){
-	char* data=crearBuffer();
-	t_config_nodo* arch_config = leerArchivoConfig("../ArchivosVarios/ConfigNodo.txt");
+void aparear(t_list* archivosAReducir){
+	char* comando = strdup("cat ");
+	//t_config_nodo* arch_config = leerArchivoConfig("../ArchivosVarios/ConfigNodo.txt");
 	void concatenar(t_archivoAReducir* unArchivo){
 		/*printf("Mi ip es %d, la ip de este archivo es %d",unArchivo->ipNodo,inet_addr(arch_config->IP_NODO));
 		fflush(stdout);
 		if(unArchivo->ipNodo == inet_addr(arch_config->IP_NODO)){*/
-			printf("Voy a abrir un archivo\n");
+			printf("Voy a abrir el archivo %s\n",unArchivo->nombreArch);
 			fflush(stdout);
-			int arch =open(unArchivo->nombreArch,"r");
-			struct stat datosArch;
-			fflush(stdout);
-			stat(unArchivo->nombreArch, &datosArch);
-			int tamArch = datosArch.st_size;
-			void *arch_mapeado = mmap(0, tamArch , PROT_READ, MAP_PRIVATE, arch, 0);
-			bufferAgregarString((char*)data,arch_mapeado,tamArch);
-			printf("Agregue el string\n");
-		//}
+			string_append_with_format(&comando,"/tmp/%s ",unArchivo->nombreArch);
 	}
-	list_iterate(archivosAReducir,concatenar);
+	list_iterate(archivosAReducir,(void*)concatenar);
+	string_append_with_format(&comando,"|sort > /tmp/archivoApareado");
+	system(comando);
 	printf("Salgo\n");
-	return data;
 }
 
 
-//@ignore
-t_RegistroArch* apareoDeRegistros(t_list* Lista_reg) { //deprecated
+
+t_RegistroArch* apareoDeRegistros(t_list* Lista_reg) {
 
 	t_RegistroArch* datosReg = malloc(sizeof(t_RegistroArch));
 	t_RegistroArch* infoRegArch;

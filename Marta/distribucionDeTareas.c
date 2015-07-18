@@ -476,7 +476,7 @@ int ordenarReduceAJob(t_DestinoReduce* destinoReduce, t_list* origenesDeReduce,
 		bufferAgregarInt(reduce_order, puertoDeNodo(unOrigenReduce->id_nodo));
 		bufferAgregarInt(reduce_order, ipDeNodo(unOrigenReduce->id_nodo));
 		bufferAgregarString(reduce_order, unOrigenReduce->temp_file_name,
-				strlen(unOrigenReduce->temp_file_name));
+				strlen(unOrigenReduce->temp_file_name)+1);
 	}
 
 	list_iterate(origenesDeReduce, (void*) bufferAgregarOrigenesReduce);

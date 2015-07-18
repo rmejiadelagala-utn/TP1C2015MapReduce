@@ -114,7 +114,18 @@ void* conexionJobs(void* sockJobNodo) {
 			memcpy(dataAUX, DATOS + (nroBloque * BLKSIZE), tamanioBloque);
 			printf("antes de ejecutar %s\n", nombreScript);
 			fflush(stdout);
-			ejecutarMapper(nombreScript, archivoSalida, dataAUX);
+			void signal_callback_handler(int signum) {
+
+				printf("%dtext busy encontrado\n", signum);
+				fflush(stdout);
+				exit(11);
+
+			}
+			signal(ETXTBSY,signal_callback_handler);
+			if(ejecutarMapper(nombreScript, archivoSalida, dataAUX)<0){
+				printf("ERROR\n");
+				return NULL;
+			}
 			printf("ejecute %s\n", nombreScript);
 			fflush(stdout);
 			free(script);

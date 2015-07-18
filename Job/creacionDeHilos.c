@@ -171,6 +171,7 @@ t_ordenReduce* recibirOrdenReduceDeMarta(int sockMarta){
 			recvall(sockMarta,&(ordenReduce->nodosArchTmp[i]->ip_nodo),sizeof(uint32_t));
 			recvall(sockMarta,&(ordenReduce->nodosArchTmp[i]->puerto_nodo),sizeof(uint32_t));
 			ordenReduce->nodosArchTmp[i]->archTmp=recibirString(sockMarta);
+			printf("\n\n\nRecibi un arch temporal de nombre: %s\n\n\n\n",ordenReduce->nodosArchTmp[i]->archTmp);
 			i++;
 		}
 		return ordenReduce;
