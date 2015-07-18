@@ -184,10 +184,18 @@ int enviarReduceANodo(int sockNodo,char* codigoReduce, int cantArchivos,
     bufferAgregarInt(buffer,cantArchivos);
     int i;
     for(i=0;i < cantArchivos;i++){
+    	printf("Agrego ip nodo\n");
+    	fflush(stdout);
     	bufferAgregarInt(buffer,nodosArchTmp[i]->ip_nodo);
+    	printf("Agrego puerto nodo\n");
+    	    	fflush(stdout);
     	bufferAgregarInt(buffer,nodosArchTmp[i]->puerto_nodo);
+    	    	    	fflush(stdout);
     	bufferAgregarString(buffer,nodosArchTmp[i]->archTmp,strlen(nodosArchTmp[i]->archTmp)+1);
+    	printf("Agrego nombre archivo temporal:%s\n",nodosArchTmp[i]->archTmp);
     }
+    printf("Agrego nombre archivo resultado\n");
+    fflush(stdout);
     bufferAgregarString(buffer,archResultado,strlen(archResultado)+1);
 	int resultado = enviarBuffer(buffer,sockNodo);
 	return resultado;

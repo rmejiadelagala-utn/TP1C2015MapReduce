@@ -295,7 +295,11 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma, char *pathArchivoSalid
 
 	if (stdin != NULL) {
 		//XXX poner la funcion de apareo acá
-
+		char* data = aparear(archivosAReducir);
+		if (fprintf(stdin, "%s", data) < 0) {
+			printf("Error de fprintf\n");
+			fflush(stdout);
+		}
 		pclose(stdin);
 		free(comando);
 	} else {
@@ -314,9 +318,9 @@ void ejecutarMapper(char * path_s, char* path_tmp, char* datos_bloque) {
 
 }
 
-void ejecutarReduce(char * path_s, char* path_tmp, char* datos_bloque) {
+void ejecutarReduce(char * path_s, char* path_tmp, t_list* archivosAReducir) {
 
-	if ((redireccionar_stdin_stdout_reduce(path_s, path_tmp, datos_bloque)) < 0)
+	if ((redireccionar_stdin_stdout_reduce(path_s, path_tmp, archivosAReducir)) < 0)
 		printf("Error al ejecutar Reduce\n");
 
 }
@@ -337,7 +341,33 @@ void ejecutarReduce(char * path_s, char* path_tmp, char* datos_bloque) {
 //Todos esos registros seleccionados irían concatenados y formarían parte del archivo
 //total a reducir.
 
-t_RegistroArch* apareoDeRegistros(t_list* Lista_reg) {
+char* aparear(t_list* archivosAReducir){
+	char* data=crearBuffer();
+	t_config_nodo* arch_config = leerArchivoConfig("../ArchivosVarios/ConfigNodo.txt");
+	void concatenar(t_archivoAReducir* unArchivo){
+		/*printf("Mi ip es %d, la ip de este archivo es %d",unArchivo->ipNodo,inet_addr(arch_config->IP_NODO));
+		fflush(stdout);
+		if(unArchivo->ipNodo == inet_addr(arch_config->IP_NODO)){*/
+			printf("Voy a abrir un archivo\n");
+			fflush(stdout);
+			int arch =open(unArchivo->nombreArch,"r");
+			struct stat datosArch;
+			fflush(stdout);
+			stat(unArchivo->nombreArch, &datosArch);
+			int tamArch = datosArch.st_size;
+			void *arch_mapeado = mmap(0, tamArch , PROT_READ, MAP_PRIVATE, arch, 0);
+			bufferAgregarString((char*)data,arch_mapeado,tamArch);
+			printf("Agregue el string\n");
+		//}
+	}
+	list_iterate(archivosAReducir,concatenar);
+	printf("Salgo\n");
+	return data;
+}
+
+
+//@ignore
+t_RegistroArch* apareoDeRegistros(t_list* Lista_reg) { //deprecated
 
 	t_RegistroArch* datosReg = malloc(sizeof(t_RegistroArch));
 	t_RegistroArch* infoRegArch;

@@ -25,12 +25,13 @@ char* getFileContent(char*, char *);
 void crearScriptMapper(const char*,char*);
 void crearScriptReduce(const char*,char*);
 void ejecutarMapper(char*, char*, char*);
-void ejecutarReduce(char*, char*, char*);
+void ejecutarReduce(char*, char*, t_list*);
 int redireccionar_stdin_stdout_mapper(char*,char*,char*);
 int redireccionar_stdin_stdout_reduce(char*,char*,t_list*);//XXX ojota acá
 char* aparear_registros(char*);
 void guardarEnDisco(t_archivoTemporal* unArchivo);
 void liberarArchivoTemporal(t_archivoTemporal* unArchivo);
 t_RegistroArch* apareoDeRegistros(t_list*);
+char* aparear(t_list* archivosAReducir);
 
 #endif /* FUNCIONESNODO_H_ */

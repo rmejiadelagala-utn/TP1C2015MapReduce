@@ -86,6 +86,7 @@ void* conexionJobs(void* sockJobNodo) {
 	t_list* archivosAReducir;
 	uint32_t tamanioBloque;
 	FILE* bloqueAMapear;
+	t_archivoAReducir* archivoRecibido;
 	while ((recibido = recvall(sock_in, &protocolo, sizeof(int))) > 1) {
 		switch (protocolo) {
 		case ORDER_MAP:
@@ -143,20 +144,21 @@ void* conexionJobs(void* sockJobNodo) {
 			script = recibirString(sock_in);
 			cantArchReduce = recibirInt(sock_in);
 			archivoSalida = strdup("/tmp/");
-			printf("Voy a recibir una lista de archivos\n");
+			printf("Voy a recibir una lista de archivos de tamaño %d\n",cantArchReduce);
 			fflush(stdout);
 			for (i = 0; i < cantArchReduce; i++) {
 				printf("Agrego un archivo a la lista\n");
-				list_add(archivosAReducir, nuevoArchReduce(recibirInt(sock_in), recibirInt(sock_in), recibirString(sock_in)));
+				list_add(archivosAReducir,recibirArchReduce(sock_in) );
 			}
 			nomArchSalida = recibirString(sock_in);
 			printf("El script recibido es %s\n", script);
-			printf("El archivo de salida recibido es %s\n", archivoSalida);
+			printf("El archivo de salida recibido es %s\n", nomArchSalida);
 			fflush(stdout);
 			pthread_mutex_lock(&numeroReduce);
 			nombreScript = strdup("tmp/reduce");
 			string_append(&nombreScript, string_itoa(numeroDeReduce));
 			string_append(&nombreScript, ".sh");
+			string_append(&archivoSalida, nomArchSalida);
 			numeroReduceActual = numeroDeReduce;
 			crearScriptReduce(script, nombreScript);
 			numeroDeReduce++;
@@ -174,9 +176,23 @@ void* conexionJobs(void* sockJobNodo) {
 }
 
 t_archivoAReducir* nuevoArchReduce(int ip, int puerto, char* nombre) {
+	printf("Entro a la funcion nuevoArchReduce\n");
 	t_archivoAReducir* unArch = malloc(sizeof(t_archivoAReducir));
 	unArch->ipNodo = ip;
 	unArch->puertoNodo = puerto;
 	unArch->nombreArch = strdup(nombre);
+	return unArch;
+}
+
+t_archivoAReducir* recibirArchReduce(int socket) {
+	printf("Entro a la funcion nuevoArchReduce\n");
+	t_archivoAReducir* unArch = malloc(sizeof(t_archivoAReducir));
+	printf("Recibo puerto nodo\n");
+	unArch->puertoNodo = recibirInt(socket);
+	printf("Recibo ip nodo\n");
+	unArch->ipNodo = recibirInt(socket);
+
+	unArch->nombreArch = recibirString(socket);
+	printf("Recibo nombre archivo:%s\n",unArch->nombreArch);
 	return unArch;
 }
