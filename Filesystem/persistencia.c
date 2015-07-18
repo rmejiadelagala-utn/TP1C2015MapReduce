@@ -45,6 +45,7 @@ void guardarBloqueEnNodo(t_bloqueEnNodo *bloqueEnNodo) {
 	fwrite(&bloqueEnNodo->numeroDeBloqueEnNodo, sizeof(bloqueEnNodo->numeroDeBloqueEnNodo), 1, fpArch);
 	printf("termina a guardar un bloqueEnNodo\n");
 	fflush(stdout);
+	fwrite(&bloqueEnNodo->tamanioBloque, sizeof(bloqueEnNodo->tamanioBloque), 1, fpArch);
 }
 
 void guardarBloqueDeArch(t_bloqueArch *unBloqueDeArch) {
@@ -84,6 +85,7 @@ t_bloqueEnNodo *cargarBloqueEnNodo() {
 	t_bloqueEnNodo *unBloqueEnNodo = malloc(sizeof(t_bloqueEnNodo)); //nueva estructura
 	fread(&unBloqueEnNodo->id, sizeof(unBloqueEnNodo->id), 1, fpArch);
 	fread(&unBloqueEnNodo->numeroDeBloqueEnNodo, sizeof(unBloqueEnNodo->numeroDeBloqueEnNodo), 1, fpArch);
+	fread(&unBloqueEnNodo->tamanioBloque, sizeof(unBloqueEnNodo->tamanioBloque), 1, fpArch);
 	return unBloqueEnNodo;
 }
 
