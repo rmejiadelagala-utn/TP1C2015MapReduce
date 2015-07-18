@@ -146,7 +146,7 @@ void guardarNodo(t_nodo *unNodo) {
 	fwrite(&unNodo->tamanio, sizeof(unNodo->tamanio), 1, fpNodos);
 	fwrite(&unNodo->socket, sizeof(unNodo->socket), 1, fpNodos);
 	fwrite(&unNodo->cantidadBloquesOcupados, sizeof(unNodo->cantidadBloquesOcupados), 1, fpNodos);
-	fwrite(&unNodo->activo, sizeof(unNodo->activo), 1, fpNodos);
+//	fwrite(&unNodo->activo, sizeof(unNodo->activo), 1, fpNodos);
 	escribirCola(unNodo->bloquesLiberados, fpNodos);
 }
 
@@ -157,7 +157,8 @@ t_nodo *cargarNodo() {
 	fread(&unNodo->tamanio, sizeof(unNodo->tamanio), 1, fpNodos);
 	fread(&unNodo->socket, sizeof(unNodo->socket), 1, fpNodos);
 	fread(&unNodo->cantidadBloquesOcupados, sizeof(unNodo->cantidadBloquesOcupados), 1, fpNodos);
-	fread(&unNodo->activo, sizeof(unNodo->activo), 1, fpNodos);
+//	fread(&unNodo->activo, sizeof(unNodo->activo), 1, fpNodos);
+	unNodo->activo = 0;
 	leerCola(&unNodo->bloquesLiberados, fpNodos);
 	return unNodo;
 
