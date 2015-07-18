@@ -224,7 +224,12 @@ void moverArchivo(char *archivo, char* padreString) {
 
 void crearDirectorio(char *nomDirectorio) {
 
+	if(){
+
+	}
+	else{
 		crearDirectorioDadoPadreYNom(nomDirectorio, directorioActual->index, listaDirectorios);
+	}
 
 }
 

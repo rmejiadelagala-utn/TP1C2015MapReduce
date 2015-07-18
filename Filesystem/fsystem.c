@@ -577,6 +577,21 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* nombreArchi
 	t_list* listaDeBloques = list_create();
 	t_archivo *archivoNuevo;
 
+	pthread_mutex_lock(&listaDeNodos);
+	int estaActivo(t_nodo* unNodo){
+		return unNodo->activo;
+	}
+	t_list* nodosActivos = list_filter(listaNodos,estaActivo);
+	int esMenorA3(t_list* nodosActivos){
+		return list_size(nodosActivos)<3;
+	}
+	if(detectarError(nodosActivos,esMenorA3,"No hay suficientesNodos activos\n")){
+		pthread_mutex_unlock(&listaDeNodos);
+		return;
+	}
+	pthread_mutex_unlock(&listaDeNodos);
+
+
 	if (pathLocal != NULL) {
 		if ((local_fd = open(pathLocal, O_RDONLY)) != -1) {
 
