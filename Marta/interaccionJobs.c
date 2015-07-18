@@ -14,7 +14,7 @@ void *interaccionJobs(void* sock_ptr) {
 
 	if(!listaDeArchivos){
 		enviarError(sockCliente);
-		printf("Se produjo un error con el job\n");
+		log_error(marta_logger,"Se produjo un error con el job");
 		close(sockCliente);
 		return NULL;
 	}
@@ -22,7 +22,7 @@ void *interaccionJobs(void* sock_ptr) {
 	planificarTodosLosMaps(info_job, listaDeArchivos, listaTemporal, sockCliente);
 
 	void mostrarListaTemporal(t_MapTemporal* unMapTemporal) {
-		printf("bloqueOrigen: %d; idArchivoOrigen: %d; idMapTemporal: %d; idNodo: %d; path:%s \n",
+		log_info(marta_logger,"bloqueOrigen: %d; idArchivoOrigen: %d; idMapTemporal: %d; idNodo: %d; path:%s \n",
 				unMapTemporal->bloqueOrigen, unMapTemporal->idArchivoOrigen,
 				unMapTemporal->idMapTemporal, unMapTemporal->id_nodo, unMapTemporal->path);
 	}
@@ -49,8 +49,7 @@ t_solicitud deserealizarSolicitudDeJob(int sockCliente){
 		t_solicitud solicitud;
 		solicitud.cantArchivos = recibirInt(sockCliente);
 
-		printf("La cantidad de archivos recibidos es de %d\n",solicitud.cantArchivos);
-		fflush(stdout);
+		log_info(marta_logger,"La cantidad de archivos recibidos es de %d",solicitud.cantArchivos);
 
 		solicitud.archivos = malloc(sizeof(int) * solicitud.cantArchivos);
 
@@ -63,13 +62,12 @@ t_solicitud deserealizarSolicitudDeJob(int sockCliente){
 		solicitud.archivo_resultado=recibirString(sockCliente);
 		solicitud.combiner = recibirInt(sockCliente);
 
-		printf("Mostrare los datos del paquete deserealizados\n");
-		printf("Combiner: %d\n",solicitud.combiner);
-		printf("Cantidad de archivos: %d\n", solicitud.cantArchivos);
-		for(i=0;i<solicitud.cantArchivos;i++) printf("Archivo a trabajar: %s\n", solicitud.archivos[i]);
-		printf("Archivo resultado: %s\n", solicitud.archivo_resultado);
+		log_info(marta_logger,"Mostrare los datos del paquete deserealizados\n");
+		log_info(marta_logger,"Combiner: %d",solicitud.combiner);
+		log_info(marta_logger,"Cantidad de archivos: %d", solicitud.cantArchivos);
+		for(i=0;i<solicitud.cantArchivos;i++) log_info(marta_logger,"Archivo a trabajar: %s\n", solicitud.archivos[i]);
+		log_info(marta_logger,"Archivo resultado: %s", solicitud.archivo_resultado);
 
-		fflush(stdout);
 		return solicitud;
 }
 

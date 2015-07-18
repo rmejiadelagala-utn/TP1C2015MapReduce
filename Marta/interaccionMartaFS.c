@@ -15,17 +15,16 @@ void* interaccionMartaFS(void* sock){
 		return unRegistro->id == id;
 	}
 	void mostrarCargaNodo(t_CargaNodo* cargaNodo){
-		printf("ID del Nodo: %d. Su carga actual es: %d\n",cargaNodo->id_nodo, cargaNodo->cantidadOperacionesEnCurso);
+		log_info(marta_logger,"ID del Nodo: %d. Su carga actual es: %d\n",cargaNodo->id_nodo, cargaNodo->cantidadOperacionesEnCurso);
 	}
 	void mostrarRegistro(t_registro_id_ipPuerto* unRegistro){
-		printf("ID: %d.--------------IP: %s. Puerto: %d\n",unRegistro->id,inet_ntoa(unRegistro->ip),unRegistro->puerto);
+		log_info(marta_logger,"ID: %d.--------------IP: %s. Puerto: %d",unRegistro->id,inet_ntoa(unRegistro->ip),unRegistro->puerto);
 	}
 	while ((recibido=recvall(socket,&protocolo,4))>0) {
 		switch (protocolo) {
 
 		case MARTA_ACTUALIZA_EL_REGISTRO:
-			printf("Se recibio el mensaje.\n");
-			fflush(stdout);
+			log_info(marta_logger,"Se recibio el mensaje para actualizar registroIDIP");
 			registroRecibido = recibirRegistroNodo(socket);
 			id=registroRecibido->id;
 			list_add(listaRegistrosIDIP,registroRecibido);
@@ -33,11 +32,10 @@ void* interaccionMartaFS(void* sock){
 			cargaNodo->id_nodo = id;
 			cargaNodo->cantidadOperacionesEnCurso = 0;
 			list_add(cargaNodos,cargaNodo);
-			printf("\nNodos:\n");
-			list_iterate(cargaNodos,(void*)mostrarCargaNodo);
+	//		printf("\nNodos:\n");
+	//		list_iterate(cargaNodos,(void*)mostrarCargaNodo);
 			printf("\nTabla de nodos:\n");
 			list_iterate(listaRegistrosIDIP,(void*)mostrarRegistro);
-			fflush(stdout);
 			break;
 		case MARTA_SE_CAYO_UN_NODO:
 			recvall(socket,&id,sizeof(int));
@@ -49,17 +47,15 @@ void* interaccionMartaFS(void* sock){
 			pthread_mutex_unlock(&mutexListaNodo);
 
 			list_remove_and_destroy_by_condition(listaRegistrosIDIP,(void*)coincideIDRegistro,(void*)free);
-			printf("Nodos:\n");
-			list_iterate(cargaNodos,(void*)mostrarCargaNodo);
+//			printf("Nodos:\n");
+//			list_iterate(cargaNodos,(void*)mostrarCargaNodo);
 			printf("Tabla de nodos:\n");
 			list_iterate(listaRegistrosIDIP,(void*)mostrarRegistro);
-			fflush(stdout);
 			break;
 		case ENVIO_BLOQUEARCH_A_MARTA:
 			sem_post(&funcionesMarta);
-			printf("El protocolo es %d",protocolo);
-			printf("Despertate marta.\n");
-			fflush(stdout);
+			log_info(marta_logger,"El protocolo es %d",protocolo);
+			log_info(marta_logger,"Despertate marta.\n");
 			sem_wait(&interaccionFS);
 			break;
 		case DAME_LISTA_DE_ARCHIVOS_FS:
