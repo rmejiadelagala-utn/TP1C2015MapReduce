@@ -92,6 +92,7 @@ void* conexionJobs(void* sockJobNodo) {
 	FILE* fileArchivoPedido;
 	char* dataArchivoPedido;
 	void* buffer;
+	int resultado;
 
 	while ((recibido = recvall(sock_in, &protocolo, sizeof(int))) > 1) {
 		switch (protocolo) {
@@ -128,10 +129,7 @@ void* conexionJobs(void* sockJobNodo) {
 
 			}
 			signal(ETXTBSY,signal_callback_handler);
-			if(ejecutarMapper(nombreScript, archivoSalida, dataAUX)<0){
-				printf("ERROR\n");
-				return NULL;
-			}
+			resultado=ejecutarMapper(nombreScript, archivoSalida, dataAUX);
 			printf("ejecute %s\n", nombreScript);
 			fflush(stdout);
 			free(script);
@@ -139,9 +137,9 @@ void* conexionJobs(void* sockJobNodo) {
 			free(nombreScript);
 			free(nomArchSalida);
 			free(archivoSalida);
-			protocolo = RES_MAP;
-			sendall(sock_in, &protocolo, sizeof(int));
-			protocolo = OK_MAP; //TODO responder NOTOOK_MAP si hubo algun error
+			enviarProtocolo(RES_MAP,sock_in);
+			if(resultado>0)	enviarProtocolo(OK_MAP,sock_in);
+			else enviarProtocolo(NOTOK_MAP,sock_in);
 			printf("Le digo que salio bien con el protocolo %d\n", protocolo);
 			fflush(stdout);
 			sendall(sock_in, &protocolo, sizeof(int));
@@ -194,11 +192,13 @@ void* conexionJobs(void* sockJobNodo) {
 			crearScriptReduce(script, nombreScript);
 			numeroDeReduce++;
 			pthread_mutex_unlock(&numeroReduce);
-			//TODO APAREAR ARCHIVOS DE LA LISTA ARCHIVOSAREDUCIR
 
-			//aparearArchivosDeLaListaArchivosAReducir(archivosAReducir);
+			resultado = ejecutarReduce(nombreScript, archivoSalida, archivosAReducir);
 
-			ejecutarReduce(nombreScript, archivoSalida, archivosAReducir);
+			enviarProtocolo(RES_REDUCE,sock_in);
+			if(resultado>0)	enviarProtocolo(OK_REDUCE,sock_in);
+			else enviarProtocolo(NOTOK_REDUCE,sock_in);
+			break;
 
 		}
 	}

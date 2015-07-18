@@ -69,7 +69,7 @@ typedef struct {
 } t_nodoArchTmp;
 
 typedef struct {
-//	uint32_t id_reduce;
+	uint32_t id_reduce;
 	uint32_t ip_nodo;
 	uint32_t puerto_nodo;
 	uint32_t cantArchAreducir;

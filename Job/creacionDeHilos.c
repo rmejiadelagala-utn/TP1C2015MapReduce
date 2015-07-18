@@ -146,7 +146,7 @@ int responderOrdenReduceAMarta(int sockMarta,t_ordenReduce ordenReduce, int resO
 		bufferAgregarInt(buffer,OK_REDUCE);
 	} else
 		bufferAgregarInt(buffer,NODO_NOT_FOUND);
-	bufferAgregarInt(buffer,ordenReduce.ip_nodo);
+	bufferAgregarInt(buffer,ordenReduce.id_reduce);
 	//bufferAgregarInt(buffer,ordenMapper.id_nodo);
 	result_envio=enviarBuffer(buffer,sockMarta);
 	return result_envio;
@@ -157,7 +157,7 @@ t_ordenReduce* recibirOrdenReduceDeMarta(int sockMarta){
 		uint32_t cantArchAreducir;
 		int i=0;
 		uint32_t tamanioArch=0;
-		//recvall(sockMarta,&(ordenReduce->id_reduce),sizeof(uint32_t)); Se decicidio que no se usaba
+		recvall(sockMarta,&(ordenReduce->id_reduce),sizeof(uint32_t));
 		recvall(sockMarta,&(ordenReduce->ip_nodo),sizeof(uint32_t));
 		recvall(sockMarta,&(ordenReduce->puerto_nodo),sizeof(uint32_t));
 		recvall(sockMarta,&(tamanioArch),sizeof(uint32_t));
@@ -226,7 +226,7 @@ void* hilo_reduce (void* arg_thread){
 		fflush(stdout);
 		void* buffer = crearBufferConProtocolo(NODO_NOT_FOUND);
 		//En mapper enviaba el id_nodo, ahora no tengo ese dato mando ip_nodo
-		bufferAgregarInt(buffer,ordenReduce.ip_nodo);
+		bufferAgregarInt(buffer,ordenReduce.id_reduce);
 		enviarBuffer(buffer,sockMarta);
 		return -1;
 	}

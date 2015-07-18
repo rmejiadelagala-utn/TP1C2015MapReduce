@@ -465,7 +465,7 @@ int ordenarReduceAJob(t_DestinoReduce* destinoReduce, t_list* origenesDeReduce,
 	t_buffer* reduce_order = crearBufferConProtocolo(ORDER_REDUCE);
 
 	//XXX decir si sse mandaono id_Reduce
-	///XXX puede ir o no esto. bufferAgregarInt(reduce_order, destinoReduce->id_nodo);
+	bufferAgregarInt(reduce_order, destinoReduce->id_reduce);
 	bufferAgregarInt(reduce_order, destinoReduce->ip_nodo);
 	bufferAgregarInt(reduce_order, destinoReduce->puerto_nodo);
 	bufferAgregarString(reduce_order, destinoReduce->temp_file_name,
@@ -716,16 +716,26 @@ int planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 			free(unDestinoReduce);
 		}
 
+		void mostrarReducePendientes(t_ReducePendiente* reducePendiente){
+			printf("\nReduce pendiente: %i \n", reducePendiente->numeroDeReducePendiente);
+			fflush(stdout);
+		}
+
 		//aca recibir resultado de reduce intermedios que se van haciendo
 		while (!list_is_empty(listaReducePendientes)) {
 
 			resultado = recibirResultadoDeReduce(sockJob, &resultadoDeReduce);
+
+			list_iterate(listaReducePendientes, (void*)mostrarReducePendientes);
 			fflush(stdout);
 
 			//En base al resultado, realiza las tareas que le corresponden
 			if (resultado > 0) {
 				switch (resultadoDeReduce.prot) {
 				case OK_REDUCE:
+
+					printf("Resultado de reduce: %i\n", resultadoDeReduce.id_reduce);
+					fflush(stdout);
 
 					list_remove_and_destroy_by_condition(listaReducePendientes,
 							(void*) encuentraReducePendiente,

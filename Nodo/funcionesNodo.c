@@ -369,7 +369,7 @@ int ejecutarMapper(char * path_s, char* path_tmp, char* datos_bloque) {
 		printf("Error al ejecutar Mapper\n");
 		return -1;
 	}
-
+	return 1;
 
 
 }
@@ -380,7 +380,7 @@ int ejecutarReduce(char * path_s, char* path_tmp, t_list* archivosAReducir) {
 		printf("Error al ejecutar Reduce\n");
 		return -1;
 	}
-
+	return 1;
 
 }
 
