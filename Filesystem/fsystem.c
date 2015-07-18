@@ -67,6 +67,7 @@ int main() {
 	sem_init(&consola_sem, 0, 0);
 	sem_init(&escuchar_sem, 0, 0);
 	sem_init(&resultadoJob_sem, 0, 0);
+	sem_init(&escuchar_sem2, 0, 0);
 	pthread_mutex_init(&listaDeNodos, NULL);
 	pthread_mutex_init(&listaDeRegistros, NULL);
 	mdfs_logger = log_create("filesystem.log", "MDFS", 1, log_level_from_string("TRACE"));
@@ -776,11 +777,13 @@ void *interaccionFSNodo(void* sock_ptr) {
 			//Qué bien, me alegro entonces!!!
 			break;
 		case COPIATE_RESULTADO:
+			printf("Me piden que guarde el ultimo archivo\n");
+			fflush(stdout);
 			copiarResultadoAFS(socket);
 			break;
 		case NODO_DAME_ARCHIVO_A_FS:
-			sem_wait(&escuchar_sem);
 			sem_post(&resultadoJob_sem);
+			sem_wait(&escuchar_sem);
 			break;
 		case ENVIO_BLOQUEARCH_A_MARTA:
 			infoBloquePedido = recibirPedidoDeBloqueArch(socket);

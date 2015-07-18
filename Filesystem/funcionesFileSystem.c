@@ -86,6 +86,7 @@ void copiarResultadoAFS(int socket) {
 	t_list* listaDeBloques = list_create();
 	char* data = recibirString(nodo->socket);
 	sem_post(&escuchar_sem);
+	printf("Voy a distribuir el archivo en los nodos\n");
 	int resultado = mandarBloquesANodos(data, &cantidadBolquesEnviados, &listaDeBloques);
 	if (resultado != -1) {
 		t_archivo* archivoNuevo = nuevoArchivo(archivoFinal, 1, string_length(data), listaDeBloques,

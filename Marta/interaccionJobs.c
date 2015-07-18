@@ -34,7 +34,8 @@ void *interaccionJobs(void* sock_ptr) {
 	char* archivoResultado;
 
 	if(archivoResultado=planificarTodosLosReduce(info_job, listaTemporal, sockCliente)){
-
+		printf("Envio el archivo %s al filesystem",archivoResultado);
+		fflush(stdout);
 		copiarAMDFS(archivoResultado,socketDeFS);
 
 	}
@@ -120,6 +121,5 @@ int copiarAMDFS(char* elArchivo, int socket) {
 
 	bufferAgregarString(buffer, elArchivo, strlen(elArchivo)+1);
 	bufferAgregarInt(buffer, idNodo);
-
-	return 1;
+	return enviarBuffer(buffer,socket);
 }

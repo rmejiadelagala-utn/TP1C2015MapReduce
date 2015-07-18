@@ -178,7 +178,6 @@ char* getFileContent(char* nombreFile, char * ruta_archivo) {
 
 void crearScriptMapper(const char* codigo_script, char* nombre) {
 
-	printf("1.Aca no hay text busy\n");
 	fflush(stdout);
 
 	FILE* scriptMapper;
@@ -203,13 +202,13 @@ void crearScriptMapper(const char* codigo_script, char* nombre) {
 
 	if (fchmod(fileDes, 0755)) {
 			fclose(scriptMapper);
+			fsync(fileDes);
 			printf("Hubo algun error en el fchmod\n");
 			fflush(stdout);
 			return;
 		}
 
 	fflush(scriptMapper);
-	printf("2.Aca no hay text busy\n");
 	fflush(stdout);
 	int resultado = fclose(scriptMapper);
 	if(resultado<0){
@@ -265,7 +264,7 @@ void crearScriptReduce(const char* codigo_script, char* nombre) {
 int redireccionar_stdin_stdout_mapper(char *pathPrograma, char *pathArchivoSalida, char* data_bloque) {
 	FILE *stdin = NULL;
 	int length;
-	printf("1.Aca no hay text busy\n");
+
 	fflush(stdout);
 	size_t tamanioComando = strlen(pathPrograma)+11+strlen(pathArchivoSalida);
 

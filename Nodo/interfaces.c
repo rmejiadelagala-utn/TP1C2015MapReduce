@@ -58,8 +58,10 @@ void* conexionFS(void* arg) {
 			break;
 
 		case NODO_DAME_ARCHIVO_A_FS:
+			printf("Me piden el archivo\n");
 			archivoFinal=recibirString(socket);
 			if(enviarArchivoPedido(archivoFinal,socket)<0) printf("Hubo un error al enviar el archivo\n");
+			printf("Envie el archivo\n");
 			break;
 
 		}
@@ -214,15 +216,23 @@ t_archivoAReducir* recibirArchReduce(int socket) {
 	return unArch;
 }
 
-int enviarArchivoPedido(char* archivoPedido, int sock_in) {
-	char* dataArchivoPedido;
+int enviarArchivoPedido(char* archivo, int sock_in) {
+	char* archivoPedido=strdup("/tmp/");
+	string_append(&archivoPedido,archivo);
 	t_buffer* buffer;
+	char* dataArchivoPedido;
 
 	struct stat datosArch;
+
+	printf("Voy a abrir el archivo\n");
+	fflush(stdout);
+
 	int fileArchivoPedido = open(archivoPedido, O_RDONLY);
 	//FILE* fileArchivoPedido = fopen(archivoPedido,"a+");
 	stat(archivoPedido, &datosArch);
 
+	printf("Mapeo el archivo\n");
+	fflush(stdout);
 	if ((dataArchivoPedido = (char *) mmap(0, datosArch.st_size, PROT_READ, MAP_PRIVATE,
 			fileArchivoPedido, 0)) == MAP_FAILED) {
 		;
@@ -230,8 +240,10 @@ int enviarArchivoPedido(char* archivoPedido, int sock_in) {
 		close(fileArchivoPedido);
 		exit(1);
 	}
+	printf("Creo el buffer\n");
+	fflush(stdout);
 
-	buffer = crearBuffer();
+	buffer = crearBufferConProtocolo(NODO_DAME_ARCHIVO_A_FS);
 	fflush(stdout);
 	bufferAgregarString(buffer, dataArchivoPedido, datosArch.st_size);
 	return enviarBuffer(buffer, sock_in);
