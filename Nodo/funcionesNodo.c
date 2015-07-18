@@ -37,7 +37,7 @@ t_config_nodo* leerArchivoConfig(char *path_config) {
 	config = config_create(path_config);
 
 	if (config->properties->elements_amount == 0) {
-		printf("\nERROR AL LEER ARCHIVO DE CONFIGURACION %s \n", path_config);
+	log_error(nodo_logger,"ERROR AL LEER ARCHIVO DE CONFIGURACION %s ", path_config);
 		config_destroy(config);
 		exit(-1);
 	}
@@ -50,15 +50,15 @@ t_config_nodo* leerArchivoConfig(char *path_config) {
 	configNodo->IP_NODO = strdup(config_get_string_value(config, "IP_NODO"));
 	configNodo->PUERTO_NODO = config_get_int_value(config, "PUERTO_NODO");
 	configNodo->ID = config_get_int_value(config, "ID");
-
-	printf("Conectando a IP: %s\n", config_get_string_value(config, "IP_FS"));
-	printf("Puerto: %d\n", config_get_int_value(config, "PUERTO_FS"));
-	printf("Archivo_bin: %s\n", config_get_string_value(config, "ARCHIVO_BIN"));
-	printf("Directorio Temporal: %s\n", config_get_string_value(config, "DIR_TEMP"));
-	printf("Nodo Nuevo: %c\n", (config_get_string_value(config, "NODO_NUEVO"))[0]);
-	printf("IP Nodo: %s\n", config_get_string_value(config, "IP_NODO"));
-	printf("Puerto Nodo: %d\n", config_get_int_value(config, "PUERTO_NODO"));
-	printf("Hola, soy el nodo %d\n", config_get_int_value(config, "ID"));
+	log_info(nodo_logger,"Nodo en la espera de conexiones de JOBs y otros Nodos.");
+	log_info(nodo_logger,"Conectando a IP: %s", config_get_string_value(config, "IP_FS"));
+	log_info(nodo_logger,"Puerto: %d", config_get_int_value(config, "PUERTO_FS"));
+	log_info(nodo_logger,"Archivo_bin: %s", config_get_string_value(config, "ARCHIVO_BIN"));
+	log_info(nodo_logger,"Directorio Temporal: %s", config_get_string_value(config, "DIR_TEMP"));
+	log_info(nodo_logger,"Nodo Nuevo: %c", (config_get_string_value(config, "NODO_NUEVO"))[0]);
+	log_info(nodo_logger,"IP Nodo: %s", config_get_string_value(config, "IP_NODO"));
+	log_info(nodo_logger,"Puerto Nodo: %d", config_get_int_value(config, "PUERTO_NODO"));
+	log_info(nodo_logger,"Hola, soy el nodo %d", config_get_int_value(config, "ID"));
 
 	/* Una vez que se levantaron los datos del archivo de configuracion
 	 puedo destruir la estructura config. */
@@ -81,7 +81,7 @@ char* mapeo_archivo(char* path) {
 	TAMANIOARCHIVO = bufa.st_size;
 
 	if ((data_archivo = mmap(0, TAMANIOARCHIVO, PROT_READ, MAP_SHARED, fd_a, 0)) == MAP_FAILED) {
-		printf("Error al iniciar el mapeo de disco %s. '%s' ", obtenerNombreArchivo(path), strerror(errno));
+		log_error(nodo_logger,"Error al iniciar el mapeo de disco %s. '%s' ", obtenerNombreArchivo(path), strerror(errno));
 		close(fd_a);
 		exit(1);
 	}
@@ -98,7 +98,7 @@ char* mapeo_disco(char* path) {
 
 	if ((data_disco = mmap(NULL, TAMANIODISCO, PROT_READ | PROT_WRITE, MAP_FILE | MAP_SHARED, fd, 0)) == MAP_FAILED) {
 		;
-		printf("Error al iniciar el mapeo de disco %s. '%s' ", obtenerNombreArchivo(path), strerror(errno));
+		log_error(nodo_logger,"Error al iniciar el mapeo de disco %s. '%s' ", obtenerNombreArchivo(path), strerror(errno));
 		close(fd);
 		exit(1);
 	}
@@ -168,7 +168,7 @@ char* getFileContent(char* nombreFile, char * ruta_archivo) {
 
 	if (fileMaped == MAP_FAILED) {
 		perror("mmap");
-		printf("Falló el mapeo para el archivo solicitado\n");
+		log_error(nodo_logger,"Falló el mapeo para el archivo solicitado: %s",nombreFile);
 		exit(-1);
 	}
 	close(fd_a); //Cierro el archivo
@@ -213,8 +213,7 @@ void crearScriptMapper(const char* codigo_script, char* nombre) {
 	fflush(stdout);
 	int resultado = fclose(scriptMapper);
 	if(resultado<0){
-		printf("\n\n\n\nHubo un error al cerrar el archivo\n\n\n\n");
-		fflush(stdout);
+		log_error(nodo_logger,"Hubo un error al cerrar el archivo");
 	}
 	free(permisosCommand);
 	return;
@@ -299,8 +298,7 @@ int redireccionar_stdin_stdout_mapper(char *pathPrograma, char *pathArchivoSalid
 		free(comando);
 	} else {
 
-		printf("No se pudo ejecutar el programa!\n");
-		fflush(stdout);
+		log_error(nodo_logger,"No se pudo ejecutar el programa!");
 		return -1;
 	}
 
@@ -317,11 +315,11 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma, char *pathArchivoSalid
 
 	stdin = popen(comando, "w");
 
-	printf("Voy a vaciar el archivo truncado\n");
+	log_info(nodo_logger,"Voy a vaciar el archivo truncado");
 	char* archivoATruncar=string_new();
 	fflush(stdout);
 	string_append(&archivoATruncar,pathArchivoSalida);
-	printf("Arme el nombre del archivo\n");
+	log_info(nodo_logger,"Arme el nombre del archivo");
 	char* comandoParaTruncar = string_new();
 	string_append(&comandoParaTruncar,"truncate -s 0 ");
 	string_append(&comandoParaTruncar,archivoATruncar);
@@ -329,21 +327,14 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma, char *pathArchivoSalid
 	fflush(stdout);
 
 	if (stdin != NULL) {
-		//XXX poner la funcion de apareo acá
 		aparear(archivosAReducir);
 		FILE* archivoAReducir = fopen("/tmp/archivoApareado","r");
 		struct stat datosArch;
 		stat("/tmp/archivoApareado",&datosArch);
-		printf("El tamaño del archivo es %d\n",datosArch.st_size);
+		log_info(nodo_logger,"El tamaño del archivo es %d",datosArch.st_size);
 		char* dataArchivoAReducir = mmap((caddr_t) 0, datosArch.st_size, PROT_READ, MAP_SHARED, fileno(archivoAReducir), 0);
-		printf("Los primeros 20 bytes son:\n");
-		char* imprimirPorPantalla = malloc(20);
-		snprintf(imprimirPorPantalla,20,"%s",dataArchivoAReducir);
-		printf(imprimirPorPantalla);
-		fflush(stdout);
 		if (fprintf(stdin, "%s", dataArchivoAReducir) < 0) {
-			printf("Error de fprintf\n");
-			fflush(stdout);
+			log_error(nodo_logger,"Error al enviar archivo al reduce");
 		}
 		if(pclose(stdin)<0){
 			printf("Error al cerrar con pclose\n");
@@ -353,8 +344,7 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma, char *pathArchivoSalid
 		free(comando);
 	} else {
 
-		printf("No se pudo ejecutar el programa!\n");
-		fflush(stdout);
+		log_error(nodo_logger,"No se pudo ejecutar el programa!");
 		return -1;
 	}
 
@@ -366,7 +356,7 @@ int ejecutarMapper(char * path_s, char* path_tmp, char* datos_bloque) {
 
 	if ((redireccionar_stdin_stdout_mapper(path_s, path_tmp, datos_bloque)) < 0){
 
-		printf("Error al ejecutar Mapper\n");
+		log_info(nodo_logger,"Error al ejecutar Mapper");
 		return -1;
 	}
 
@@ -377,7 +367,7 @@ int ejecutarMapper(char * path_s, char* path_tmp, char* datos_bloque) {
 int ejecutarReduce(char * path_s, char* path_tmp, t_list* archivosAReducir) {
 
 	if ((redireccionar_stdin_stdout_reduce(path_s, path_tmp, archivosAReducir)) < 0){
-		printf("Error al ejecutar Reduce\n");
+		log_info(nodo_logger,"Error al ejecutar Reduce");
 		return -1;
 	}
 
@@ -437,7 +427,7 @@ void aparear(t_list* archivosAReducir) {
 	list_iterate(archivosAReducir, (void*) concatenar);
 	string_append_with_format(&comando, "|sort > /tmp/archivoApareado");
 	system(comando);
-	printf("Salgo\n");
+	log_info(nodo_logger,"Concatenacion correcta");
 }
 
 

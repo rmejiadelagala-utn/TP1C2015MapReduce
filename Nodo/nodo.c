@@ -15,8 +15,8 @@ int main() {
 	pthread_mutex_init(&numeroMap,NULL);
 	pthread_mutex_init(&numeroReduce,NULL);
 	pthread_mutex_init(&unMutex,NULL);
-
-	printf("Cargando archivo de Configuracion\n");
+	nodo_logger = log_create("filesystem.log", "MDFS", 1, log_level_from_string("TRACE"));
+	log_info(nodo_logger,"Cargando archivo de Configuracion");
     arch_config= malloc(sizeof(t_config_nodo));
 	arch_config = leerArchivoConfig(ARCHIVO_CONFIG);
 
@@ -40,7 +40,7 @@ int main() {
 	pthread_create(&hiloFS, NULL, (void*)conexionFS, (void*) &paramHiloFS);
 //	pthread_create(&hiloJobs, NULL, (void*)conexionJobs, (void*) &arch_config->PUERTO_NODO);
 	if (crearServerMultiHilo(arch_config->PUERTO_NODO,(void*)conexionJobs) == 0)
-		printf("Nodo en la espera de conexiones de JOBs y otros Nodos\n");
+		log_info(nodo_logger,"Nodo en la espera de conexiones de JOBs y otros Nodos.");
 
 //	pthread_create(&hiloNodos, NULL, (void*)conexionNodos, (void*) &arch_config->PUERTO_NODO);
 

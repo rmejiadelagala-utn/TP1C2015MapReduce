@@ -290,7 +290,6 @@ void cargarPersistenciacfg() {
 }
 //Funciones genéricas
 void cargarPersistencia() {
-	mdfs_logger = log_create("filesystem.log", "MDFS", 1, log_level_from_string("TRACE"));
 	cargarListaArchivos();
 	cargarListaDirectorios();
 	cargarListaNodos();
