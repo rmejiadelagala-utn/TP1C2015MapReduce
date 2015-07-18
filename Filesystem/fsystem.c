@@ -58,136 +58,136 @@ void *interaccionFSNodo(void*);
 
 int main() {
 	/*
-	//Posiblemente vayan en la funcion persistir los list_create()
-	listaArchivos = list_create();
-	listaNodos = list_create();
-	listaDirectorios = list_create();
-	listaRegistrosIDIP = list_create();*/
+	 //Posiblemente vayan en la funcion persistir los list_create()
+	 listaArchivos = list_create();
+	 listaNodos = list_create();
+	 listaDirectorios = list_create();
+	 listaRegistrosIDIP = list_create();*/
 	t_registro_id_ipPuerto* registroVacio = malloc(sizeof(t_registro_id_ipPuerto));
-	sem_init(&consola_sem,0,0);
-	sem_init(&escuchar_sem,0,0);
-	pthread_mutex_init(&listaDeNodos,NULL);
-	pthread_mutex_init(&listaDeRegistros,NULL);
+	sem_init(&consola_sem, 0, 0);
+	sem_init(&escuchar_sem, 0, 0);
+	pthread_mutex_init(&listaDeNodos, NULL);
+	pthread_mutex_init(&listaDeRegistros, NULL);
 	cargarPersistencia();
-	 // Register signal and signal handler
+	// Register signal and signal handler
 	signal(SIGINT, signal_callback_handler);
 
 	//Para probar la persistencia en sus inicios
 	/*
-		fpArch = fopen("archivos.bin", "wb+");
-		 t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo(1, 11);
-		 guardarBloqueEnNodo(copiaBloqueA1C1);
-		 fseek(fpArch, SEEK_SET, 0);
-		 cargarBloqueEnNodo();
-		 fclose(fpArch);
-	*/
+	 fpArch = fopen("archivos.bin", "wb+");
+	 t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo(1, 11);
+	 guardarBloqueEnNodo(copiaBloqueA1C1);
+	 fseek(fpArch, SEEK_SET, 0);
+	 cargarBloqueEnNodo();
+	 fclose(fpArch);
+	 */
 	//Pruebas persistir Nodos
-		/*
-	fpNodos = fopen("nodos.bin", "wb+");
+	/*
+	 fpNodos = fopen("nodos.bin", "wb+");
 	 t_nodo *nodoA = nuevoNodo(2,50);
 	 guardarNodo(nodoA);
 	 fseek(fpNodos, SEEK_SET, 0);
 	 cargarNodo();
 	 fclose(fpNodos);
-	*/
+	 */
 	/*
-	t_nodo *nodoA = nuevoNodo(2, 10);
-	t_nodo *nodoB = nuevoNodo(3, 20);
-	t_nodo *nodoC = nuevoNodo(4, 60);
+	 t_nodo *nodoA = nuevoNodo(2, 10);
+	 t_nodo *nodoB = nuevoNodo(3, 20);
+	 t_nodo *nodoC = nuevoNodo(4, 60);
 
-	nodoA->cantidadBloquesOcupados = 1;
-	int *a = malloc(sizeof(int));
-	*a = 1;
-	queue_push(nodoA->bloquesLiberados, a);
-	int *b = malloc(sizeof(int));
-	*b = 2;
-	queue_push(nodoA->bloquesLiberados, b);
-	printf("%d\n", queue_size(nodoA->bloquesLiberados) );
-	list_add(listaNodos, nodoA);
-	list_add(listaNodos, nodoB);
-	list_add(listaNodos, nodoC);
+	 nodoA->cantidadBloquesOcupados = 1;
+	 int *a = malloc(sizeof(int));
+	 *a = 1;
+	 queue_push(nodoA->bloquesLiberados, a);
+	 int *b = malloc(sizeof(int));
+	 *b = 2;
+	 queue_push(nodoA->bloquesLiberados, b);
+	 printf("%d\n", queue_size(nodoA->bloquesLiberados) );
+	 list_add(listaNodos, nodoA);
+	 list_add(listaNodos, nodoB);
+	 list_add(listaNodos, nodoC);
 
-	mostrarLista(listaNodos,(void*) mostrarNodo);
-	guardarListaNodos();
-	list_destroy_and_destroy_elements(listaNodos, (void*) liberarNodo);
-	listaNodos = list_create();
-	cargarListaNodos();
-	mostrarLista(listaNodos,(void*) mostrarNodo);
-	printf("termino\n");
-	*/
-/*Pruebas persistir directorios
-		fpDir = fopen("directorios.bin", "wb+");
-		t_directorio *dirA = nuevoDirectorio(2,"pepito",0);
-		mostrarDirectorio(dirA);
-		guardarDirectorio(dirA);
-		fseek(fpDir, SEEK_SET, 0);
-		dirA = cargarDirectorio();
-		mostrarDirectorio(dirA);
-		fclose(fpDir);
-*/
+	 mostrarLista(listaNodos,(void*) mostrarNodo);
+	 guardarListaNodos();
+	 list_destroy_and_destroy_elements(listaNodos, (void*) liberarNodo);
+	 listaNodos = list_create();
+	 cargarListaNodos();
+	 mostrarLista(listaNodos,(void*) mostrarNodo);
+	 printf("termino\n");
+	 */
+	/*Pruebas persistir directorios
+	 fpDir = fopen("directorios.bin", "wb+");
+	 t_directorio *dirA = nuevoDirectorio(2,"pepito",0);
+	 mostrarDirectorio(dirA);
+	 guardarDirectorio(dirA);
+	 fseek(fpDir, SEEK_SET, 0);
+	 dirA = cargarDirectorio();
+	 mostrarDirectorio(dirA);
+	 fclose(fpDir);
+	 */
 	/*
-	t_directorio *directorioRoot = nuevoDirectorio(1, "Root", 0);
-	t_directorio *directorioHome = nuevoDirectorio(3, "home", 1);
-	t_directorio *directorioMedia = nuevoDirectorio(2, "media", 1);
-	t_directorio *directorioFotos = nuevoDirectorio(10, "fotos", 2);
+	 t_directorio *directorioRoot = nuevoDirectorio(1, "Root", 0);
+	 t_directorio *directorioHome = nuevoDirectorio(3, "home", 1);
+	 t_directorio *directorioMedia = nuevoDirectorio(2, "media", 1);
+	 t_directorio *directorioFotos = nuevoDirectorio(10, "fotos", 2);
 
-	list_add(listaDirectorios, directorioRoot);
-	list_add(listaDirectorios, directorioHome);
-	list_add(listaDirectorios, directorioMedia);
-	list_add(listaDirectorios, directorioFotos);
-	mostrarLista(listaDirectorios,(void*) mostrarDirectorio);
-	guardarListaDirectorios();
-	list_destroy_and_destroy_elements(listaDirectorios, (void*) liberarDirectorio);
-	listaDirectorios = list_create();
-	cargarListaDirectorios();
-	mostrarLista(listaDirectorios,(void*) mostrarDirectorio);
-	printf("termino\n");
-*/
+	 list_add(listaDirectorios, directorioRoot);
+	 list_add(listaDirectorios, directorioHome);
+	 list_add(listaDirectorios, directorioMedia);
+	 list_add(listaDirectorios, directorioFotos);
+	 mostrarLista(listaDirectorios,(void*) mostrarDirectorio);
+	 guardarListaDirectorios();
+	 list_destroy_and_destroy_elements(listaDirectorios, (void*) liberarDirectorio);
+	 listaDirectorios = list_create();
+	 cargarListaDirectorios();
+	 mostrarLista(listaDirectorios,(void*) mostrarDirectorio);
+	 printf("termino\n");
+	 */
 //pruebas de persistencia 2.0
-/*	t_nodo *nodoA = nuevoNodo(2, 10);
-	t_nodo *nodoB = nuevoNodo(3, 20);
-	t_nodo *nodoC = nuevoNodo(4, 60);
+	/*	t_nodo *nodoA = nuevoNodo(2, 10);
+	 t_nodo *nodoB = nuevoNodo(3, 20);
+	 t_nodo *nodoC = nuevoNodo(4, 60);
 
-	nodoA->cantidadBloquesOcupados = 1;
-	int *a = malloc(sizeof(int));
-	*a = 1;
-	queue_push(nodoA->bloquesLiberados, a);
-	int *b = malloc(sizeof(int));
-	*b = 2;
-	queue_push(nodoA->bloquesLiberados, b);
-	printf("%d\n", queue_size(nodoA->bloquesLiberados) );
-	list_add(listaNodos, nodoA);
-	list_add(listaNodos, nodoB);
-	list_add(listaNodos, nodoC);
+	 nodoA->cantidadBloquesOcupados = 1;
+	 int *a = malloc(sizeof(int));
+	 *a = 1;
+	 queue_push(nodoA->bloquesLiberados, a);
+	 int *b = malloc(sizeof(int));
+	 *b = 2;
+	 queue_push(nodoA->bloquesLiberados, b);
+	 printf("%d\n", queue_size(nodoA->bloquesLiberados) );
+	 list_add(listaNodos, nodoA);
+	 list_add(listaNodos, nodoB);
+	 list_add(listaNodos, nodoC);
 
-	mostrarLista(listaNodos,(void*) mostrarNodo);
-	guardarListaNodos();
-	list_destroy_and_destroy_elements(listaNodos, (void*) liberarNodo);
-	listaNodos = list_create();
-	cargarListaNodos();
-	mostrarLista(listaNodos,(void*) mostrarNodo);
-	printf("termino\n");
+	 mostrarLista(listaNodos,(void*) mostrarNodo);
+	 guardarListaNodos();
+	 list_destroy_and_destroy_elements(listaNodos, (void*) liberarNodo);
+	 listaNodos = list_create();
+	 cargarListaNodos();
+	 mostrarLista(listaNodos,(void*) mostrarNodo);
+	 printf("termino\n");
 
-	t_directorio *directorioRoot = nuevoDirectorio(1, "Root", 0);
-	t_directorio *directorioHome = nuevoDirectorio(3, "home", 1);
-	t_directorio *directorioMedia = nuevoDirectorio(2, "media", 1);
-	t_directorio *directorioFotos = nuevoDirectorio(10, "fotos", 2);
+	 t_directorio *directorioRoot = nuevoDirectorio(1, "Root", 0);
+	 t_directorio *directorioHome = nuevoDirectorio(3, "home", 1);
+	 t_directorio *directorioMedia = nuevoDirectorio(2, "media", 1);
+	 t_directorio *directorioFotos = nuevoDirectorio(10, "fotos", 2);
 
-	list_add(listaDirectorios, directorioRoot);
-	list_add(listaDirectorios, directorioHome);
-	list_add(listaDirectorios, directorioMedia);
-	list_add(listaDirectorios, directorioFotos);
-	mostrarLista(listaDirectorios,(void*) mostrarDirectorio);
-	guardarListaDirectorios();
-	list_destroy_and_destroy_elements(listaDirectorios, (void*) liberarDirectorio);
-	listaDirectorios = list_create();
-	cargarListaDirectorios();
-	mostrarLista(listaDirectorios,(void*) mostrarDirectorio);
-	printf("termino\n");
+	 list_add(listaDirectorios, directorioRoot);
+	 list_add(listaDirectorios, directorioHome);
+	 list_add(listaDirectorios, directorioMedia);
+	 list_add(listaDirectorios, directorioFotos);
+	 mostrarLista(listaDirectorios,(void*) mostrarDirectorio);
+	 guardarListaDirectorios();
+	 list_destroy_and_destroy_elements(listaDirectorios, (void*) liberarDirectorio);
+	 listaDirectorios = list_create();
+	 cargarListaDirectorios();
+	 mostrarLista(listaDirectorios,(void*) mostrarDirectorio);
+	 printf("termino\n");
 
 
 
-	t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo(2, 11);
+	 t_bloqueEnNodo *copiaBloqueA1C1 = nuevoBloqueEnNodo(2, 11);
 	 t_bloqueEnNodo *copiaBloqueA1C2 = nuevoBloqueEnNodo(3, 12);
 	 t_bloqueEnNodo *copiaBloqueA1C3 = nuevoBloqueEnNodo(4, 13);
 	 t_list *copiasBloqueA1 = list_create();
@@ -253,21 +253,21 @@ int main() {
 	 mostrarArchivo(archivoA);
 	 fpArch = fopen("archivos","r");
 	 archivoA = cargarArchivo();
-//	 archivoA->nombre = "archivoA";
-//	 archivoA->bloquesDeArch = bloquesDeArchivoA;
+	 //	 archivoA->nombre = "archivoA";
+	 //	 archivoA->bloquesDeArch = bloquesDeArchivoA;
 	 mostrarArchivo(archivoA);
 	 fclose(fpArch);
 
-	mostrarLista(listaArchivos,(void*) mostrarArchivo);
-	guardarListaArchivos();
-	list_destroy_and_destroy_elements(listaArchivos, (void*) liberarArchivo);
-	listaArchivos = list_create();
-	cargarListaArchivos();
-	mostrarLista(listaArchivos,(void*) mostrarArchivo);
-	printf("termino\n");*/
+	 mostrarLista(listaArchivos,(void*) mostrarArchivo);
+	 guardarListaArchivos();
+	 list_destroy_and_destroy_elements(listaArchivos, (void*) liberarArchivo);
+	 listaArchivos = list_create();
+	 cargarListaArchivos();
+	 mostrarLista(listaArchivos,(void*) mostrarArchivo);
+	 printf("termino\n");*/
 	//persistir registros
 	/*
-	registroVacio->id=0;
+	 registroVacio->id=0;
 	 registroVacio->ip.s_addr=inet_addr("0.0.0.0");
 	 registroVacio->puerto=0;
 	 list_add(listaRegistrosIDIP,registroVacio);
@@ -275,9 +275,8 @@ int main() {
 	 mostrarLista(listaRegistrosIDIP,(void*)mostrarRegistro);
 	 cargarListaRegistrosIDIP();
 	 mostrarLista(listaRegistrosIDIP,(void*)mostrarRegistro);
-	*/
+	 */
 //fin de prueba de persistencia
-
 	/*//probando funcion de mostrar listas
 
 	 t_directorio *directorioRoot = nuevoDirectorio(1, "Root", 0);
@@ -387,9 +386,9 @@ int main() {
 
 
 
-*/
-	 //160 lugar de trabajo de juanchi
-	 /*
+	 */
+	//160 lugar de trabajo de juanchi
+	/*
 	 t_list *copiasbloques1 = list_create();
 	 t_list * copiasbloques2 = list_create();
 	 t_list * copiasbloques3 = list_create();
@@ -448,8 +447,8 @@ int main() {
 	 printf("malNombre %d\n",malNombre);
 	 //free(copias);
 
-	  */
-	 /*
+	 */
+	/*
 	 mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
 	 mostrarLista(listaArchivos, (void*) mostrarArchivo);
 	 mostrarLista(listaNodos, (void*) mostrarNodo);
@@ -589,8 +588,7 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* nombreArchi
 			}
 
 			//Acá se pone a mandar bloques de arch a nodos y demás
-			envioNodoCorrectamente = mandarBloquesANodos(data, &cantidadBolquesEnviados,
-					&listaDeBloques);
+			envioNodoCorrectamente = mandarBloquesANodos(data, &cantidadBolquesEnviados, &listaDeBloques);
 
 			if (close(local_fd) == -1)
 				perror("close");
@@ -600,23 +598,25 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* nombreArchi
 				//con su correspondiente listaDeBloques, nombre, padre, tamanio,
 				//y estado. (Esto es a las estructuras lógicas)
 
-				archivoNuevo = nuevoArchivo(nombreArchivo, padre, string_length(data),
-						listaDeBloques, 1);
+				archivoNuevo = nuevoArchivo(nombreArchivo, padre, string_length(data), listaDeBloques, 1);
 
 				list_add(listaArchivos, archivoNuevo);
-
-				printf("El archivo %s fue copiado correctamente.\n", nombreArchivo);
+				log_info(mdfs_logger,"El archivo %s fue copiado correctamente.", nombreArchivo);
+			//	printf("El archivo %s fue copiado correctamente.\n", nombreArchivo);
 			} else {
-				printf("error al enviar a nodos\n");
+				log_error(mdfs_logger,"error al enviar a nodos.");
+		//		printf("error al enviar a nodos\n");
 			}
 
 			munmap(data, file_stat.st_size);
 
 		} else {
-			printf("Error al abrir el archivo\n");
+			log_error(mdfs_logger,"Error al abrir el archivo.");
+		//	printf("Error al abrir el archivo\n");
 		}
 	} else {
-		printf("upload: falta un operando\n");
+		log_warning(mdfs_logger,"upload: falta un operando.");
+	//	printf("upload: falta un operando\n");
 	}
 }
 
@@ -625,7 +625,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 	int tamanioBloqueRecibido;
 
 	int tamanioPosta;
-	int esMarta=0;
+	int esMarta = 0;
 	int socket = *(int*) sock_ptr;
 	int protocolo;
 	int recibido;
@@ -647,8 +647,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 			infoNodo = conocerAlNodo(socket);
 			//ipPuerto = strdup(strcat(strcat(inet_ntoa(infoNodo->IP_NODO),":"),string_itoa(infoNodo->PUERTO_NODO)));
 			id = infoNodo->ID;
-			condicionDeConexionNodo = infoNodo->NODO_NEW
-					+ 2 * ((nodo = buscarNodoPorId(id, listaNodos)) != NULL);
+			condicionDeConexionNodo = infoNodo->NODO_NEW + 2 * ((nodo = buscarNodoPorId(id, listaNodos)) != NULL);
 			switch (condicionDeConexionNodo) {
 
 			case NODO_NUEVO_Y_NO_TENGO_SU_ID:
@@ -661,7 +660,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 				unRegistro->puerto = infoNodo->PUERTO_NODO;
 				pthread_mutex_lock(&listaDeRegistros);
 				list_add(listaRegistrosIDIP, unRegistro);
-			//	actualizarRegistro(unRegistro, infoNodo->IP_NODO, infoNodo->PUERTO_NODO);
+				//	actualizarRegistro(unRegistro, infoNodo->IP_NODO, infoNodo->PUERTO_NODO);
 				pthread_mutex_unlock(&listaDeRegistros);
 				break;
 
@@ -671,7 +670,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 				nodoViejo = buscarNodoPorId(id, listaNodos);
 				pthread_mutex_lock(&listaDeRegistros);
 				unRegistro = buscarRegistroPorId(id);
-			//	actualizarRegistro(unRegistro, infoNodo->IP_NODO, infoNodo->PUERTO_NODO);
+				//	actualizarRegistro(unRegistro, infoNodo->IP_NODO, infoNodo->PUERTO_NODO);
 				unRegistro->ip = infoNodo->IP_NODO;
 				unRegistro->puerto = infoNodo->PUERTO_NODO;
 				pthread_mutex_unlock(&listaDeRegistros);
@@ -682,8 +681,9 @@ void *interaccionFSNodo(void* sock_ptr) {
 				break;
 			case NODO_VIEJO_Y_NO_TENGO_SU_ID:
 				free(unRegistro);
-				printf("Error, no se conocía a este nodo.\n");
-				fflush(stdout);
+				log_error(mdfs_logger, "Error, no se conocía a este nodo");
+				//	printf("Error, no se conocía a este nodo.\n");
+				//	fflush(stdout);
 				break;
 			case NODO_VIEJO_Y_TENGO_SU_ID:
 				free(unRegistro);
@@ -691,9 +691,9 @@ void *interaccionFSNodo(void* sock_ptr) {
 				unRegistro = buscarRegistroPorId(id);
 				//if (!verificarRegistro(unRegistro, infoNodo->IP_NODO, infoNodo->PUERTO_NODO)) {	//Cambió su IP o Puerto
 				//	actualizarRegistro(unRegistro, infoNodo->IP_NODO, infoNodo->PUERTO_NODO);
-					unRegistro->ip = infoNodo->IP_NODO;
-					unRegistro->puerto = infoNodo->PUERTO_NODO;
-			//	}
+				unRegistro->ip = infoNodo->IP_NODO;
+				unRegistro->puerto = infoNodo->PUERTO_NODO;
+				//	}
 				pthread_mutex_unlock(&listaDeRegistros);
 				break;
 			}
@@ -704,42 +704,45 @@ void *interaccionFSNodo(void* sock_ptr) {
 			break;
 		case RTA_SET_BLOQUE:
 			if (recvall(socket, &respuestaSetBloque, 4) <= 0)
-				printf("Hubo un problema al escribir el archivo.\n");
+				log_error(mdfs_logger, "Hubo un problema al escribir el archivo.");
+			//		printf("Hubo un problema al escribir el archivo.\n");
 			else if (respuestaSetBloque <= 0)
-				printf("Hubo un problema al escribir el archivo.\n");
+				log_error(mdfs_logger, "Hubo un problema al escribir el archivo.");
+			//	printf("Hubo un problema al escribir el archivo.\n");
 			break;
 		case GET_BLOQUE:
 			recibido = recvall(socket, &protocolo, 4);
-				switch(protocolo){
-				case COPIAR_ARCHIVO_A_FS_LOCAL:
-					tamanioBloqueRecibido = recibirBloqueDeNodo(socket, (void*) &buffer);
-					/*tamanioPosta =  strlen(buffer);
+			switch (protocolo) {
+			case COPIAR_ARCHIVO_A_FS_LOCAL:
+				tamanioBloqueRecibido = recibirBloqueDeNodo(socket, (void*) &buffer);
+				/*tamanioPosta =  strlen(buffer);
 
-					printf("El tamaño calculado es de %d, pero en realidad guardo %d\n",tamanioBloqueRecibido,tamanioPosta);
+				 printf("El tamaño calculado es de %d, pero en realidad guardo %d\n",tamanioBloqueRecibido,tamanioPosta);
 
-					tamanioBloqueRecibido-=tamanioPosta;
-					printf("La diferencia entre ambos es %d\n",tamanioBloqueRecibido);*/
+				 tamanioBloqueRecibido-=tamanioPosta;
+				 printf("La diferencia entre ambos es %d\n",tamanioBloqueRecibido);*/
 
-					write(fileno(archivoReconstruido), buffer, tamanioBloqueRecibido);
-					free(buffer);
-					sem_post(&semaforo);
-					break;
-				case VER_BLOQUE_NODO:
-					sem_post(&consola_sem);
-					//La consola se encarga del resto
-					sem_wait(&escuchar_sem);
-					break;
-				case COPIAR_BLOQUE_NODO:
-					sem_post(&consola_sem);
-					//La consola se encarga del resto
-					sem_wait(&escuchar_sem);
-					break;
-				}
+				write(fileno(archivoReconstruido), buffer, tamanioBloqueRecibido);
+				free(buffer);
+				sem_post(&semaforo);
+				break;
+			case VER_BLOQUE_NODO:
+				sem_post(&consola_sem);
+				//La consola se encarga del resto
+				sem_wait(&escuchar_sem);
+				break;
+			case COPIAR_BLOQUE_NODO:
+				sem_post(&consola_sem);
+				//La consola se encarga del resto
+				sem_wait(&escuchar_sem);
+				break;
+			}
 			break;
 		case CONEXION_MARTA_A_FS:
-			esMarta=1;
-			printf("Hola Marta!\n");
-			protocolo=MARTA_ACTUALIZA_EL_REGISTRO;
+			esMarta = 1;
+			log_info(mdfs_logger, "Hola Marta");
+//			printf("Hola Marta!\n");
+			protocolo = MARTA_ACTUALIZA_EL_REGISTRO;
 			fflush(stdout);
 			socketDeMarta = socket;
 			void actualizarAMarta(t_registro_id_ipPuerto* unRegistro) {
@@ -755,57 +758,59 @@ void *interaccionFSNodo(void* sock_ptr) {
 			break;
 		case ENVIO_BLOQUEARCH_A_MARTA:
 			infoBloquePedido = recibirPedidoDeBloqueArch(socket);
-		//	copias = list_create();
-			printf("nombreArch: %s\n",infoBloquePedido->nombreArch);
-			resultado = encontrarCopias(infoBloquePedido->nombreArch, infoBloquePedido->padre,
-					infoBloquePedido->numeroDeBloqueArch, &copias);
+			//	copias = list_create();
+			log_info(mdfs_logger, "nombreArch: %s\n", infoBloquePedido->nombreArch);
+			resultado = encontrarCopias(infoBloquePedido->nombreArch, infoBloquePedido->padre, infoBloquePedido->numeroDeBloqueArch,
+					&copias);
 			if (resultado == -1) {
-				printf("No existe un Arch con ese Padre Y Nombre \n");
-			}
-			else if(resultado == -2) {
-				printf("No existe ese numero De Bloque En Archivo \n");
-			}
-			else {
-				printf("Voy a entrar a enviar copia al socket %d\n",socket);
-				int suNodoEstaActivo(t_bloqueEnNodo* copiaDeBloque){
-					t_nodo* unNodo = buscarNodoPorId(copiaDeBloque->id,listaNodos);
+				log_warning(mdfs_logger, "No existe un Arch con ese Padre Y Nombre");
+				//		("No existe un Arch con ese Padre Y Nombre \n");
+			} else if (resultado == -2) {
+				log_warning(mdfs_logger, "No existe ese numero De Bloque En Archivo");
+				//		printf("No existe ese numero De Bloque En Archivo \n");
+			} else {
+				log_info(mdfs_logger, "Voy a entrar a enviar copia al socket %d\n", socket);
+				//	printf("Voy a entrar a enviar copia al socket %d\n",socket);
+				int suNodoEstaActivo(t_bloqueEnNodo* copiaDeBloque) {
+					t_nodo* unNodo = buscarNodoPorId(copiaDeBloque->id, listaNodos);
 					return unNodo->activo;
 				}
-				t_list * copiasConNodoActivo = list_filter(copias,(void*)suNodoEstaActivo);
-				enviarCopiasAMarta(socket,copiasConNodoActivo);
-			//	list_destroy_and_destroy_elements(copias,(void*)liberarBloqueEnNodo);
-			//	free(copias);
-			//	list_destroy_and_destroy_elements(copiasConNodoActivo,(void*)liberarBloqueEnNodo);
+				t_list * copiasConNodoActivo = list_filter(copias, (void*) suNodoEstaActivo);
+				enviarCopiasAMarta(socket, copiasConNodoActivo);
+				//	list_destroy_and_destroy_elements(copias,(void*)liberarBloqueEnNodo);
+				//	free(copias);
+				//	list_destroy_and_destroy_elements(copiasConNodoActivo,(void*)liberarBloqueEnNodo);
 				free(copiasConNodoActivo);
-
 
 			}
 
 			break;
 		case DAME_LISTA_DE_ARCHIVOS_FS:
-			sendall(socket,&protocolo,sizeof(int)); //Le respondo con el mismo protocolo
+			sendall(socket, &protocolo, sizeof(int)); //Le respondo con el mismo protocolo
 			listaArchivosPedidos = recibirPedidoListaArchivos(socket); //IRA UN MALLOC ANTES DE ESTO?
-			void mandarCantidadDeBloquesDeArchivo(char* unArchivo){
-				enviarCantBloquesDeArch(unArchivo,socket);
+			void mandarCantidadDeBloquesDeArchivo(char* unArchivo) {
+				enviarCantBloquesDeArch(unArchivo, socket);
 			}
-			list_iterate(listaArchivosPedidos,(void*)mandarCantidadDeBloquesDeArchivo);
-			list_destroy_and_destroy_elements(listaArchivosPedidos,free);
+			list_iterate(listaArchivosPedidos, (void*) mandarCantidadDeBloquesDeArchivo);
+			list_destroy_and_destroy_elements(listaArchivosPedidos, free);
 			break;
 		}
 	}
 
 	if (recibido == 0) {
-		if(nodo){
+		if (nodo) {
 			nodo->activo = 0;
-			printf("Nodo desconectado.\n");
+			log_info(mdfs_logger, "Nodo desconectado.");
+			//		printf("Nodo desconectado.\n");
 			martaSeCayoUnNodo(socketDeMarta, id);
-		}
-		else if(esMarta){
-			printf("Marta desconectada.\n");
+		} else if (esMarta) {
+			log_info(mdfs_logger, "Marta no esta, Marta se fue");
+			//	printf("Marta desconectada.\n");
 		}
 	}
 	if (recibido < 0) {
-		printf("Error.");
+		//	printf("Error.");
+		log_error(mdfs_logger, "Error al comunicarse con el FileSytem");
 	}
 //free(unRegistro);
 

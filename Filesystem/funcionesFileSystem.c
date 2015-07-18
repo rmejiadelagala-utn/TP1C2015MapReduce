@@ -501,6 +501,7 @@ void eliminarReferencias(t_nodo *nodoAEliminar, t_list *archivos) { //probada
 void formatear(t_list **listaNodos, t_list **listaArchivos,	//probada
 		t_list **listaDirectorios) {
 	//FIXME no destruir los nodos quizas
+	log_info(mdfs_logger, "Format FS.");
 	list_destroy_and_destroy_elements(*listaArchivos, (void*) liberarArchivo);
 	list_destroy_and_destroy_elements(*listaNodos, (void*) liberarNodo);
 	list_destroy_and_destroy_elements(*listaDirectorios,

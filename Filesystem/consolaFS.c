@@ -196,7 +196,7 @@ void formatearMDFS() {
 	free(direccion);
 	direccion = string_duplicate(directorioActual->nombre);
 	guardarPersistencia();
-	printf("El file system ha sido formateado.\n");
+//	printf("El file system ha sido formateado.\n");
 }
 
 void eliminarArchivo(char *archivo) {
@@ -281,8 +281,8 @@ void copiarAMDFS(char *archivoDestino, char *archivoACopiar) {
 void copiarAFS(char *archivo) {
 	void copiarArchAFS(t_archivo *unArchivo){
 		int resultado = descargarArchivo(unArchivo);
-		if(resultado>0) printf("El archivo fue copiado al FileSystem local.\n");
-		else printf("Error al copiar el archivo al FileSystem local.\n");
+		if(resultado>0) log_info(mdfs_logger,"El archivo fue copiado al FileSystem local.");
+		else log_error(mdfs_logger,"Error al copiar el archivo al FileSystem local.");
 }
 	validarArchivoYEjecutar(archivo, (void*)copiarArchAFS);
 
@@ -296,7 +296,7 @@ void solicitarMD5(char *archivo) {
 			system("md5sum  ../archivoReconstruido");
 			remove("../archivoReconstruido");
 		}
-		else	printf("Error al copiar el archivo al FileSystem local.\n");
+		else	log_error(mdfs_logger,"Error al copiar el archivo al FileSystem local.");
 }
 	validarArchivoYEjecutar(archivo, (void*)pedirMD5);
 }
@@ -356,7 +356,7 @@ void levantarNodo(char *nodo) {
 
 	void activarUnNodo(t_nodo* unNodo){
 		activarNodo(unNodo,socketDeMarta);
-		printf("Se activo el nodo de id %d\n",unNodo->id);
+		log_info(mdfs_logger,"Se activo el nodo de id %d",unNodo->id);
 	}
 
 	char* nodoIDComoString(t_nodo* unNodo){
@@ -379,7 +379,7 @@ void eliminarNodo(char *nodo) {
 			/*eliminarNodoYReferencias(unNodo,listaNodos,listaArchivos); XXX habria que eliminarlo o desactivarlo?
 			printf("Se elimino nodo de id %d.\n",unNodo->id);*/
 			desactivarNodo(unNodo,socketDeMarta);
-			printf("Se desactivo nodo de id %d\n",unNodo->id);
+			log_info(mdfs_logger,"Se desactivo nodo de id %d",unNodo->id);
 		}
 		validarNodoYEjecutar(nodo,(void*)eliminarNod);
 }
