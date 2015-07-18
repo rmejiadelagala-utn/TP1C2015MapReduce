@@ -162,7 +162,7 @@ int consola(void* unListaNodo) {
 
 void leerComando(char *lectura, int maximoLargo) {
 
-	fgets(lectura, maximoLargo, vstdin);
+	fgets(lectura, maximoLargo, stdin);
 	//Reemplazo \n por \0
 	if ((strlen(lectura)>0)&&(lectura[strlen(lectura)-1]=='\n')) lectura[strlen(lectura)-1]=0;
 	//Borro los ultimos espacios;

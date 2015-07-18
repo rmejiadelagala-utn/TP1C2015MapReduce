@@ -40,6 +40,7 @@ static int archPadre(t_archivo *unArch);
 static void lista_remove_and_destroy_by_condition(t_list *self,
 bool (*condition)(void*), void (*element_destroyer)(void*));
 static bool tieneLugar(t_nodo *unNodo);
+static int hayLugarEnLosNodos(t_list* nodosOrdenados) ;
 //
 /*
  void darFormatoAlArchivo(char* path) {
@@ -88,15 +89,18 @@ void copiarResultadoAFS(int socket) {
 	sem_post(&escuchar_sem);
 	printf("Voy a distribuir el archivo en los nodos\n");
 	int resultado = mandarBloquesANodos(data, &cantidadBolquesEnviados, &listaDeBloques);
-	if (resultado != -1) {
+	if (resultado == 0) {
 		t_archivo* archivoNuevo = nuevoArchivo(archivoFinal, 1, string_length(data), listaDeBloques,
 				1);
 
 		list_add(listaArchivos, archivoNuevo);
 		log_info(mdfs_logger, "El archivo %s fue copiado correctamente.", archivoFinal);
 		//	printf("El archivo %s fue copiado correctamente.\n", nombreArchivo);
-	} else {
+	} else if(resultado == -1) {
 		log_error(mdfs_logger, "error al enviar a nodos.");
+	}
+	else {
+		log_error(mdfs_logger, "No hay lugar suficiente");
 	}
 }
 
@@ -157,6 +161,16 @@ int mandarBloquesANodos(char* data, int* cantidadBloquesEnviados,
 		pthread_mutex_lock(&listaDeNodos);
 		list_add_all(nodosOrdenados, listaNodos);//Agrega todos los elementos de la segunda lista en la primera
 		pthread_mutex_unlock(&listaDeNodos);
+		int lugarNodos = hayLugarEnLosNodos(nodosOrdenados);
+		printf("\n RESULTADO lugarNodos %d\n\n", lugarNodos);
+		fflush(stdout);
+		if (lugarNodos == -1) {
+
+			return -13;//creo que se explota porque el nodo se queda esperando bloque en nodo y nadie le avisa que se termino la conexion
+		}
+		else {
+
+
 		list_sort(nodosOrdenados, (void*) ordenarPorMenorUso);
 		int k = 0;
 		//Acá distribuye las copias dado el algoritmo de dstribucion
@@ -181,8 +195,10 @@ int mandarBloquesANodos(char* data, int* cantidadBloquesEnviados,
 		(*cantidadBloquesEnviados)++;
 		comienzoDeBloque = finDeBloque + 1;
 		list_destroy(nodosOrdenados);
+	}//fin de else
 	}
 	return 1;
+
 }
 
 void enviarCantBloquesDeArch(char* nombreArchivo, int socket) {
@@ -838,4 +854,33 @@ static void recorrerCopiasDeUnArch(t_archivo *unArchivo,
 
 static bool tieneLugar(t_nodo *unNodo) {
 	return unNodo->tamanio / BLOCK_SIZE >= unNodo->cantidadBloquesOcupados;
+}
+
+static int hayLugarEnLosNodos(t_list* nodosOrdenados) {
+	int iaux;
+	int modificado = 0;
+	t_nodo *unNodo;
+	for (iaux = 0; iaux < 3; iaux++) {
+		unNodo = list_get(nodosOrdenados, iaux);
+		printf("%d%d hay lugar en el nodo%d\n", queue_is_empty(unNodo->bloquesLiberados),
+				((unNodo->cantidadBloquesOcupados * BLOCK_SIZE) >= (unNodo->tamanio)), unNodo->id);
+		fflush(stdout);
+		if (queue_is_empty(unNodo->bloquesLiberados) && ((unNodo->cantidadBloquesOcupados * BLOCK_SIZE) >= (unNodo->tamanio))) {
+			list_remove(nodosOrdenados, iaux);
+			printf("modifica: %d\n", modificado);
+			fflush(stdout);
+			modificado = 1;
+		}
+	}
+	printf("tamanio de lista %d\n", list_size(nodosOrdenados));
+	if (list_size(nodosOrdenados) < 3) {
+		log_warning(mdfs_logger, "hay menos de 3 nodos disponibles con lugar\n");
+		return -1;
+	} else if (modificado == 1) {
+		printf("recursividad\n");
+		fflush(stdout);
+		return hayLugarEnLosNodos(nodosOrdenados);
+	} else {
+		return 0;
+	}
 }
