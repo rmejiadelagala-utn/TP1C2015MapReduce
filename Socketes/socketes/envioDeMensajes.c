@@ -278,7 +278,7 @@ int enviarProtocolo(int protocolo,int socket){
 		int i;
 		for(i=0;i<cantArchivos;i++){
 			printf("Pido el archivo %s",archivos[i]);
-			bufferAgregarString(buffer,archivos[i],strlen(archivos[i]));
+			bufferAgregarString(buffer,archivos[i],strlen(archivos[i])+1);
 		}
 
 		int resultado = enviarBuffer(buffer,socket);
