@@ -159,7 +159,7 @@ t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 	self->puerto_nodo = unRegistro->puerto;
 	self->block = copiaSeleccionada->block;
 	self->temp_file_name = string_from_format("map_%i_%i.temp", infoDeJob.idJob,
-			self->block);
+			numeroDeBloque);
 	self->block_size = copiaSeleccionada->size;
 
 	list_destroy_and_destroy_elements(copiasDeBloque,
@@ -446,7 +446,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 						ListaTemporal, &ultimoIDTemporal);
 				break;
 
-			case NOTOK_MAP:		//este sería el NOTOK_MAP
+			case NODO_NOT_FOUND:		//este sería el NOTOK_MAP
 				log_warning(marta_logger, "ERROR AL REALIZAR UN MAP");
 				fflush(stdout);
 
@@ -482,7 +482,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 				}
 				break;
 
-			case NODO_NOT_FOUND:
+			case NOTOK_MAP:
 
 				log_warning(marta_logger, "NO SE ENCONTRO UN NODO");
 				fflush(stdout);
