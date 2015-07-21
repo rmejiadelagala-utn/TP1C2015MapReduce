@@ -41,7 +41,8 @@
 
 
 
-
+char* ARCHIVO_CONFIG;
+t_config_nodo* arch_config;
 int numeroDeMap;
 pthread_mutex_t numeroMap;
 int numeroDeReduce;

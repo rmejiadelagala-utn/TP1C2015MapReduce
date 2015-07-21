@@ -7,7 +7,6 @@
 #include "nodo.h"
 
 //Ruta donde se encuentra el archivo de configuración
-char* ARCHIVO_CONFIG;
 
 int main(int argc,char *argv[]) {
 	if(argc!=2){
@@ -21,7 +20,7 @@ int main(int argc,char *argv[]) {
 	string_append(&ARCHIVO_CONFIG,".txt");
 
 	printf("***************HOLA SOY UN PROCESO NODO\n****************");
-	t_config_nodo* arch_config;
+
 	pthread_mutex_init(&numeroMap,NULL);
 	pthread_mutex_init(&numeroReduce,NULL);
 	pthread_mutex_init(&unMutex,NULL);

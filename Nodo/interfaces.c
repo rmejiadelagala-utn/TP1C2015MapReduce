@@ -115,7 +115,9 @@ void* conexionJobs(void* sockJobNodo) {
 			string_append(&archivoSalida, nomArchSalida);
 			log_info(nodo_logger,"El archivo de salida recibido es %s", archivoSalida);
 			pthread_mutex_lock(&numeroMap);
-			nombreScript = strdup("tmp/mapper");
+			nombreScript = strdup("tmp/");
+			string_append(&nombreScript,string_itoa(arch_config->ID));
+			string_append(&nombreScript,"mapper");
 			string_append(&nombreScript, string_itoa(numeroDeMap));
 			string_append(&nombreScript, ".sh");
 			numeroMapActual = numeroDeMap;

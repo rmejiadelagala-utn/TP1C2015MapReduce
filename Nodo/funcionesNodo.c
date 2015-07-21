@@ -381,7 +381,6 @@ int ejecutarReduce(char * path_s, char* path_tmp, t_list* archivosAReducir) {
 
 void aparear(t_list* archivosAReducir) {
 	char* comando = strdup("cat ");
-	t_config_nodo* arch_config = leerArchivoConfig("../ArchivosVarios/ConfigNodo.txt");
 	//printf("Mi ip es %d, la ip de este archivo es %d",unArchivo->ipNodo,inet_addr(arch_config->IP_NODO));
 	int noLoTengo(t_archivoAReducir* unArchivo) {
 		return (unArchivo->ipNodo != inet_addr(arch_config->IP_NODO))
