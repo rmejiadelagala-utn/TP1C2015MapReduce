@@ -832,6 +832,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 
 	if (recibido == 0) {
 		if (nodo) {
+			nodo->socket = -1;
 			nodo->activo = 0;
 			log_info(mdfs_logger, "Nodo desconectado.");
 			//		printf("Nodo desconectado.\n");
