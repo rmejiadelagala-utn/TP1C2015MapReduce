@@ -7,6 +7,8 @@ ip_default=$ip_cfg
 puerto_default=$puerto_cfg
 tam_databin_default=$tam_databin_cfg
 
+mkdir Nodo/Archivos 2>log
+
 function crearDataBin {
 	dd if=/dev/zero of=Nodo/Archivos/data$1.bin  bs=1024  count=$2K
 }
