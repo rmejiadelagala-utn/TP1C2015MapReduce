@@ -89,7 +89,7 @@ void bufferAgregarString(t_buffer* buffer,char* unString, uint32_t tamanio);
 
 char* recibirString(int socket);
 
-int recibirStringEn(int socket, char** stringReceptor);
+void recibirStringEn(int socket, char** stringReceptor);
 
 int recibirInt(int socket);
 

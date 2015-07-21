@@ -113,17 +113,15 @@ char* recibirString(int socket){
 	return string;
 }
 
-int recibirStringEn(int socket, char** stringReceptor){
+void recibirStringEn(int socket, char** stringReceptor){
 
 	int tamanioString;
 
-	if((tamanioString=recibirInt(socket))<1) return -1;
+	tamanioString=recibirInt(socket);
 
 	*stringReceptor = malloc(tamanioString);
 
-	if(recvall(socket,*stringReceptor,tamanioString)<1) return -1;
-
-	return 1;
+	recvall(socket,*stringReceptor,tamanioString);
 
 }
 
