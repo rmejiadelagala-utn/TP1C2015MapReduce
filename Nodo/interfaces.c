@@ -179,11 +179,12 @@ void* conexionJobs(void* sockJobNodo) {
 			}
 			log_info(nodo_logger,"Recibi la lista de archivos.");
 			nomArchSalida = recibirString(sock_in);
-			log_info(nodo_logger,"El script recibido es %s\n", script);
 			log_info(nodo_logger,"El archivo de salida recibido es %s\n", nomArchSalida);
 			fflush(stdout);
 			pthread_mutex_lock(&numeroReduce);
-			nombreScript = strdup("tmp/reduce");
+			nombreScript = strdup("tmp/");
+			string_append(&nombreScript,string_itoa(arch_config->ID));
+			string_append(&nombreScript,"reduce");
 			string_append(&nombreScript, string_itoa(numeroDeReduce));
 			string_append(&nombreScript, ".sh");
 			string_append(&archivoSalida, nomArchSalida);

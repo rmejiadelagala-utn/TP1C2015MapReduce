@@ -155,7 +155,10 @@ int mandarBloquesANodos(char* data, int* cantidadBloquesEnviados,
 		//ordenar lista nodo por cantidad de bloques usados-->sale nodosOrdenados
 		t_list *nodosOrdenados = list_create();
 		pthread_mutex_lock(&listaDeNodos);
-		list_add_all(nodosOrdenados, listaNodos);//Agrega todos los elementos de la segunda lista en la primera
+		int estaActivo(t_nodo* unNodo){
+			return unNodo->activo;
+		}
+		nodosOrdenados = list_filter(listaNodos, estaActivo);//Agrega todos los elementos de la segunda lista en la primera
 		pthread_mutex_unlock(&listaDeNodos);
 		list_sort(nodosOrdenados, (void*) ordenarPorMenorUso);
 		int k = 0;
