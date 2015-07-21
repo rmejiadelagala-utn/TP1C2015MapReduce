@@ -36,48 +36,48 @@ static t_list* fread_list(FILE *fp, void*(*struct_reader)());
  }*/
 
 void guardarBloqueEnNodo(t_bloqueEnNodo *bloqueEnNodo) {
-//	printf("empieza a guardar un bloqueEnNodo\n");
-//	printf("bloqueEnNodo id:%d \t bloqueEnNodo numero:%d",bloqueEnNodo->id,bloqueEnNodo->numeroDeBloqueEnNodo);
-//	fflush(stdout);
+	printf("empieza a guardar un bloqueEnNodo\n");
+	printf("bloqueEnNodo id:%d \t bloqueEnNodo numero:%d",bloqueEnNodo->id,bloqueEnNodo->numeroDeBloqueEnNodo);
+	fflush(stdout);
 	fwrite(&bloqueEnNodo->id, sizeof(bloqueEnNodo->id), 1, fpArch);
-//	printf("en el medio di operazione\n");
+	printf("en el medio di operazione\n");
 	fflush(stdout);
 	fwrite(&bloqueEnNodo->numeroDeBloqueEnNodo, sizeof(bloqueEnNodo->numeroDeBloqueEnNodo), 1, fpArch);
-//	printf("termina a guardar un bloqueEnNodo\n");
-//	fflush(stdout);
+	printf("termina a guardar un bloqueEnNodo\n");
+	fflush(stdout);
 	fwrite(&bloqueEnNodo->tamanioBloque, sizeof(bloqueEnNodo->tamanioBloque), 1, fpArch);
 }
 
 void guardarBloqueDeArch(t_bloqueArch *unBloqueDeArch) {
-//	printf("empieza a guardar un bloqueDearchivo\n");
-//	fflush(stdout);
+	printf("empieza a guardar un bloqueDearchivo\n");
+	fflush(stdout);
 	fwrite_list(unBloqueDeArch->copiasDeBloque, fpArch, (void*) guardarBloqueEnNodo);
-//	printf("termina de guardar un bloqueDearchivo\n");
-//	fflush(stdout);
+	printf("termina de guardar un bloqueDearchivo\n");
+	fflush(stdout);
 }
 
 void guardarArchivo(t_archivo *unArchivo) {
-//	printf("empieza a guardar un archivo\n");
-//	fflush(stdout);
+	printf("empieza a guardar un archivo\n");
+	fflush(stdout);
 	fwrite(&unArchivo->estado, sizeof(unArchivo->estado), 1, fpArch);
 	fwrite_str(unArchivo->nombre, fpArch);
-//	printf("nombre del archivo %s\n", unArchivo->nombre);
-//	fflush(stdout);
+	printf("nombre del archivo %s\n", unArchivo->nombre);
+	fflush(stdout);
 	fwrite(&unArchivo->padre, sizeof(unArchivo->padre), 1, fpArch);
 	fwrite(&unArchivo->tamanio, sizeof(unArchivo->tamanio), 1, fpArch);
 	fwrite_list(unArchivo->bloquesDeArch, fpArch, (void*) guardarBloqueDeArch);
-//	printf("termina de guardar un archivo\n");
-//	fflush(stdout);
+	printf("termina de guardar un archivo\n");
+	fflush(stdout);
 }
 
 void guardarListaArchivos() {
 	fpArch = fopen("archivos", "w");
-//	printf("empieza a guardar archivos\n");
-//	printf("fparch: %d\n",fpArch);
-//	fflush(stdout);
+	printf("empieza a guardar archivos\n");
+	printf("fparch: %d\n",fpArch);
+	fflush(stdout);
 	fwrite_list(listaArchivos, fpArch, (void*) guardarArchivo);
-//	printf("termina de guardar archivos\n");
-//	fflush(stdout);
+	printf("termina de guardar archivos\n");
+	fflush(stdout);
 	fclose(fpArch);
 }
 
@@ -297,10 +297,10 @@ void cargarPersistencia() {
 }
 
 void guardarPersistencia() {
-//	mostrarLista(listaRegistrosIDIP,(void*)mostrarRegistro);
-//	 mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
-//	 mostrarLista(listaNodos, (void*) mostrarNodo);
-//	 mostrarLista(listaArchivos, (void*) mostrarArchivo);
+	mostrarLista(listaRegistrosIDIP,(void*)mostrarRegistro);
+	 mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
+	 mostrarLista(listaNodos, (void*) mostrarNodo);
+	 mostrarLista(listaArchivos, (void*) mostrarArchivo);
 
 	guardarListaArchivos();
 	printf("guarde lista de archivos\n");

@@ -607,12 +607,11 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* nombreArchi
 
 			//Acá se pone a mandar bloques de arch a nodos y demás
 			envioNodoCorrectamente = mandarBloquesANodos(data, &cantidadBolquesEnviados, &listaDeBloques);
-			printf("resultado mandarBloquesANodos %d\n",envioNodoCorrectamente);
-			fflush(stdout);
+
 			if (close(local_fd) == -1)
 				perror("close");
 
-			if (envioNodoCorrectamente == 1) {	//si se mando correctamente
+			if (envioNodoCorrectamente != -1) {	//si se mando correctamente
 				//agregar a la lista de archivos global el archivo nuevo,
 				//con su correspondiente listaDeBloques, nombre, padre, tamanio,
 				//y estado. (Esto es a las estructuras lógicas)
@@ -622,14 +621,7 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* nombreArchi
 				list_add(listaArchivos, archivoNuevo);
 				log_info(mdfs_logger,"El archivo %s fue copiado correctamente.", nombreArchivo);
 			//	printf("El archivo %s fue copiado correctamente.\n", nombreArchivo);
-			} else if(envioNodoCorrectamente == -13) {
-				archivoNuevo = nuevoArchivo(nombreArchivo, padre, string_length(data), listaDeBloques, 1);
-				list_add(listaArchivos, archivoNuevo);
-				eliminarArchivoYreferencias(archivoNuevo,listaArchivos,listaNodos);
-				log_error(mdfs_logger, "No hay lugar suficiente");
-			}
-
-			else {
+			} else {
 				log_error(mdfs_logger,"error al enviar a nodos.");
 		//		printf("error al enviar a nodos\n");
 			}
