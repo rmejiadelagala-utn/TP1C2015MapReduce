@@ -106,30 +106,28 @@ void bufferAgregarString(t_buffer* buffer,char* unString, uint32_t tamanio){
 
 char* recibirString(int socket){
 	int tamanioString;
-	if(recvall(socket,&tamanioString,sizeof(int))<1) return NULL;
+	recvall(socket,&tamanioString,sizeof(int));
 	char* string;
 	string =malloc(sizeof(char)*tamanioString);
-	if(recvall(socket,string,tamanioString)<1) return NULL;
+	recvall(socket,string,tamanioString);
 	return string;
 }
 
-int recibirStringEn(int socket, char** stringReceptor){
+void recibirStringEn(int socket, char** stringReceptor){
 
 	int tamanioString;
 
-	if((tamanioString=recibirInt(socket))<1) return -1;
+	tamanioString=recibirInt(socket);
 
 	*stringReceptor = malloc(tamanioString);
 
-	if(recvall(socket,*stringReceptor,tamanioString)<1) return -1;
-
-	return 1;
+	recvall(socket,*stringReceptor,tamanioString);
 
 }
 
 int recibirInt(int socket){
 	int entero;
-	if(recvall(socket,&entero,sizeof(int))<1) return -1;
+	recvall(socket,&entero,sizeof(int));
 	return entero;
 }
 
@@ -306,18 +304,14 @@ int enviarProtocolo(int protocolo,int socket){
 	//De Nodo
 	t_nodoParaFS* conocerAlNodo(int socket){
 		t_nodoParaFS* unNodo = malloc(sizeof(t_nodoParaFS));
-		if(recvall(socket, unNodo, sizeof(t_nodoParaFS))<1){
-			free(unNodo);
-			return NULL;
-		}
+		recvall(socket, unNodo, sizeof(t_nodoParaFS));
 		return unNodo;
 	}
 	int recibirBloqueDeNodo(int socket, void* buffer){
 		int tamanio;
-		if(recvall(socket,&tamanio,4)<1) return -1;
+		recvall(socket,&tamanio,4);
 		*(char**)buffer = malloc(tamanio);
 		int resultado = recvall(socket,*(char**)buffer,tamanio);
-		if(resultado<1) return -1;
 		return tamanio;
 
 	}
@@ -327,27 +321,20 @@ int enviarProtocolo(int protocolo,int socket){
 		int tamanio;
 		int padre;
 		int numeroBloqueArch;
-		if(recvall(socket, &tamanio,sizeof(int))<1) return NULL;
+		recvall(socket, &tamanio,sizeof(int));
 		bloque->nombreArch = malloc(tamanio);
-		if(recvall(socket,bloque->nombreArch,tamanio)<1){
-			free(bloque->nombreArch);
-			return NULL;
-		}
-		if(recvall(socket,&bloque->padre,sizeof(int))<1) return NULL;
-		if(recvall(socket,&bloque->numeroDeBloqueArch,sizeof(int))<1) return NULL;
+		recvall(socket,bloque->nombreArch,tamanio);
+		recvall(socket,&bloque->padre,sizeof(int));
+		recvall(socket,&bloque->numeroDeBloqueArch,sizeof(int));
 		return bloque;
 	}
 	t_list* recibirPedidoListaArchivos(int socket){
-		char* archivoPedido;
 		int cantArchivos;
-		if(recvall(socket,&cantArchivos,sizeof(int))<1) return NULL;
+		recvall(socket,&cantArchivos,sizeof(int));
 		int i;
 		t_list* archivosPedidos=list_create();
 		for(i=0;i<cantArchivos;i++){
-			if(( archivoPedido = recibirString(socket))==NULL){
-				list_destroy_and_destroy_elements(archivosPedidos,free);
-				return NULL;
-			}
+			char* archivoPedido = recibirString(socket);
 			list_add(archivosPedidos,archivoPedido);
 		}
 		return archivosPedidos;
@@ -357,8 +344,8 @@ int enviarProtocolo(int protocolo,int socket){
 	int setBloqueDeFileSystem(int socket, char* dataBin, int block_size){
 		int tamanio;
 		int nroBloque;
-		if(recvall(socket,&nroBloque,4)<1) return -1;
-		if(recvall(socket,&tamanio,4)<1) return -1;
+		recvall(socket,&nroBloque,4);
+		recvall(socket,&tamanio,4);
 		int tamanioEnKB = tamanio/1024;
 		printf("Recibo un bloque de %dKiB\n",tamanioEnKB);
 		return recvall(socket,dataBin+(block_size*nroBloque),tamanio);
@@ -372,33 +359,30 @@ int enviarProtocolo(int protocolo,int socket){
 	}
 	int getBloqueParaFileSystem(int socket,char* dataBin, int block_size){
 		int protocoloDeRegreso;
-		if(recvall(socket,&protocoloDeRegreso,4)<1) return -1;
+		recvall(socket,&protocoloDeRegreso,4);
 		int nroBloque;
-		if(recvall(socket,&nroBloque,4)<1) return -1;
+		recvall(socket,&nroBloque,4);
 		int tamanioBloque;
-		if(recvall(socket,&tamanioBloque,4)<1) return -1;
+		recvall(socket,&tamanioBloque,4);
 		return enviarBloqueAFileSystem(socket, dataBin+(nroBloque*block_size),protocoloDeRegreso,tamanioBloque);
 	}
 //Marta
 	//De Filesystem
 	t_registro_id_ipPuerto* recibirRegistroNodo(int socket){
 		t_registro_id_ipPuerto* unRegistro = malloc(sizeof(t_registro_id_ipPuerto));
-		if(recvall(socket, unRegistro, sizeof(t_registro_id_ipPuerto))<1){
-			free(unRegistro);
-			return NULL;
-		}
+		recvall(socket, unRegistro, sizeof(t_registro_id_ipPuerto));
 		return unRegistro;
 	}
 	int recibirBloqueArchFS(int socketAuxiliar,t_list* copiasDeBloque){ //TODO retornar un resultado
 		int cantidadDeCopias;
-		if(recvall(socketAuxiliar,&cantidadDeCopias,sizeof(int))<1) return -1;
+		recvall(socketAuxiliar,&cantidadDeCopias,sizeof(int));
 		if(cantidadDeCopias==-1) return -1;
 		printf("\n\nCantidad de copias: %d\n\n",cantidadDeCopias);
 		fflush(stdout);
 		int i;
 		for(i=0;i<cantidadDeCopias;i++){
 			t_bloqueEnNodo* copiaDeBloque=malloc(sizeof(t_bloqueEnNodo));
-			if(recvall(socketAuxiliar,copiaDeBloque,sizeof(t_bloqueEnNodo))<1)return -1;
+			recvall(socketAuxiliar,copiaDeBloque,sizeof(t_bloqueEnNodo));
 			printf("ID de copia: %d\n",copiaDeBloque->id);
 			fflush(stdout);
 			list_add(copiasDeBloque,copiaDeBloque);
@@ -410,19 +394,15 @@ int enviarProtocolo(int protocolo,int socket){
 	t_ordenMap* recibirOrdenMapDeMarta(int sockMarta){
 		t_ordenMap* ordenMap = malloc(sizeof(t_ordenMap));
 		uint32_t temp_file_len;
-		int r1 = recvall(sockMarta,&(ordenMap->id_map),sizeof(uint32_t));
-		int r2 = recvall(sockMarta,&(ordenMap->id_nodo),sizeof(uint32_t));
-		int r3 = recvall(sockMarta,&(ordenMap->ip_nodo),sizeof(uint32_t));
-		int r4 = recvall(sockMarta,&(ordenMap->puerto_nodo),sizeof(uint32_t));
-		int r5 = recvall(sockMarta,&(ordenMap->block),sizeof(uint32_t));
-		int r6 = recvall(sockMarta,&(ordenMap->block_size),sizeof(uint32_t));
-		int r7 = recvall(sockMarta,&temp_file_len,sizeof(uint32_t));
+		recvall(sockMarta,&(ordenMap->id_map),sizeof(uint32_t));
+		recvall(sockMarta,&(ordenMap->id_nodo),sizeof(uint32_t));
+		recvall(sockMarta,&(ordenMap->ip_nodo),sizeof(uint32_t));
+		recvall(sockMarta,&(ordenMap->puerto_nodo),sizeof(uint32_t));
+		recvall(sockMarta,&(ordenMap->block),sizeof(uint32_t));
+		recvall(sockMarta,&(ordenMap->block_size),sizeof(uint32_t));
+		recvall(sockMarta,&temp_file_len,sizeof(uint32_t));
 		ordenMap->temp_file_name= malloc(temp_file_len);
-		int r8 = recvall(sockMarta,ordenMap->temp_file_name,temp_file_len);
+		recvall(sockMarta,ordenMap->temp_file_name,temp_file_len);
 		ordenMap->temp_file_name[temp_file_len]='\0';//cierro el string
-		if((r1<1)||(r2<1)||(r3<1)||(r4<1)||(r5<1)||(r6<1)||(r7<1)||(r8<1)){
-			free(ordenMap);
-			return NULL;
-		}
 		return ordenMap;
 	}

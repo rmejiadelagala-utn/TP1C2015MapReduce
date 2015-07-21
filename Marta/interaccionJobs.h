@@ -21,7 +21,7 @@ typedef struct {
 
 void *interaccionJobs(void* sock_ptr);
 
-t_solicitud* deserealizarSolicitudDeJob(int sockCliente);
+t_solicitud deserealizarSolicitudDeJob(int sockCliente);
 t_InfoJob adaptarSolicitudAInfoJob(t_solicitud solicitud);
 
 #endif /* INTERACCIONJOBS_H_ */

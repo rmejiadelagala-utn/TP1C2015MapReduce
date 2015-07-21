@@ -217,11 +217,11 @@ int rePlanificarMapsDeNodoMuerto(int idNodoMuerto, t_InfoJob infoJob,
 int ordenarARealizarLosRePlanificados(
 		t_list* nuevosDestinosDeMapsReplanificados, int socketJob) {
 
-	void ordenarMap(t_DestinoMap* unDestino){
+	void ordenarMap(t_DestinoMap* unDestino) {
 		ordenarMapAJob(unDestino, socketJob);
 	}
 
-	list_iterate(nuevosDestinosDeMapsReplanificados, (void*)ordenarMap);
+	list_iterate(nuevosDestinosDeMapsReplanificados, (void*) ordenarMap);
 
 	return 1;
 }
@@ -494,6 +494,20 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 					log_info(marta_logger, "El resultado del map no es null");
 				else
 					log_warning(marta_logger, "El resultado del map es null");
+
+				int tomarIDNodoDadoElIDMap(t_list* listaMapsPendientes,
+						int idMap) {
+
+					bool elIdMapDeSuMapDestEsidMap(t_MapPendiente* mapPendiente) {
+						return mapPendiente->map_dest->id_map == idMap;
+					}
+
+					t_MapPendiente* mapPendienteAux = list_find(
+							listaMapsPendientes,
+							(void*)elIdMapDeSuMapDestEsidMap);
+
+					return mapPendienteAux->map_dest->id_nodo;
+				}
 
 				int idNodoMuerto = tomarIDNodoDadoElIDMap(listaMapsPendientes,
 						resultadoDeMap.id_map);
