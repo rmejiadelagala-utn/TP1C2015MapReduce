@@ -6,6 +6,7 @@
  */
 #include "interfaces.h"
 
+
 #include <socketes/paquetesNodo.h>
 char *DATOS;
 
@@ -132,9 +133,15 @@ void* conexionJobs(void* sockJobNodo) {
 			free(nomArchSalida);
 			free(archivoSalida);
 			enviarProtocolo(RES_MAP,sock_in);
-			if(resultado>0)	enviarProtocolo(OK_MAP,sock_in);
-			else enviarProtocolo(NOTOK_MAP,sock_in);
-			log_info(nodo_logger,"Le digo que salio bien con el protocolo %d", protocolo);
+			if(resultado>0){
+				log_info(nodo_logger,"El map nº %d fue exitoso.", numeroMapActual);
+				enviarProtocolo(OK_MAP,sock_in);
+			}
+			else{
+				log_info(nodo_logger,"El map nº %d tuvo un error.", numeroMapActual);
+				enviarProtocolo(NOTOK_MAP,sock_in);
+			}
+			pthread_exit(NULL);
 			break;
 
 		case ENVIO_ARCHIVOS_NODO_NODO:

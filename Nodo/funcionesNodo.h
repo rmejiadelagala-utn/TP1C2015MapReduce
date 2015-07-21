@@ -13,7 +13,7 @@
 #include "nodo.h"
 #include <string.h>
 #include <stdio.h>
-
+#include <signal.h>
 t_config_nodo* leerArchivoConfig(char *);
 char* mapeo_archivo(char*);
 char* mapeo_disco(char*);

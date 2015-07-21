@@ -18,6 +18,7 @@ void *interaccionJobs(void* sock_ptr) {
 		enviarError(sockCliente);
 		log_error(marta_logger,"Se produjo un error con el job");
 		close(sockCliente);
+		pthread_mutex_unlock(&conexionFS);
 		return NULL;
 	}
 

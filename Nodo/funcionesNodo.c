@@ -85,7 +85,7 @@ char* mapeo_archivo(char* path) {
 		close(fd_a);
 		exit(1);
 	}
-
+	close(fd_a);
 	return data_archivo;
 }
 
@@ -193,28 +193,19 @@ void crearScriptMapper(const char* codigo_script, char* nombre) {
 
 	int fileDes = fileno(scriptMapper);
 
-	char *permisosCommand = string_new();
-
-	string_append(&permisosCommand, "chmod a+x ");
-	string_append(&permisosCommand, nombre);
-
-
-
 	if (fchmod(fileDes, 0755)) {
 			fclose(scriptMapper);
-			fsync(fileDes);
 			printf("Hubo algun error en el fchmod\n");
 			fflush(stdout);
 			return;
 		}
 
-	fflush(scriptMapper);
 	fflush(stdout);
 	int resultado = fclose(scriptMapper);
 	if(resultado<0){
 		log_error(nodo_logger,"Hubo un error al cerrar el archivo");
 	}
-	free(permisosCommand);
+
 	return;
 }
 
@@ -261,47 +252,44 @@ void crearScriptReduce(const char* codigo_script, char* nombre) {
 	return;
 }
 
-int redireccionar_stdin_stdout_mapper(char *pathPrograma, char *pathArchivoSalida, char* data_bloque) {
-	FILE *stdin = NULL;
-	int length;
+int redireccionar_stdin_stdout_mapper(char *pathPrograma, char *pathArchivoSalida,
+		char* data_bloque) {
 
-	fflush(stdout);
-	size_t tamanioComando = strlen(pathPrograma)+11+strlen(pathArchivoSalida);
+	int mapFallido = 0;
+
+	FILE *pipeMapper = NULL;
+
+	size_t tamanioComando = strlen(pathPrograma) + 11 + strlen(pathArchivoSalida);
 
 	char *comando = malloc(tamanioComando);
 
 	fflush(stdout);
-	length = snprintf(comando,tamanioComando,"%s | sort > %s",pathPrograma, pathArchivoSalida)+1;
+	snprintf(comando, tamanioComando, "%s | sort > %s", pathPrograma, pathArchivoSalida);
 
+	void signal_callback_handler(int signal) {
+		mapFallido = 1;
+	}
 
+	signal(SIGPIPE, signal_callback_handler);
+
+	pipeMapper = popen(comando, "w");
+
+	if (!pipeMapper)
+		printf("Error al popenear\n");
 	fflush(stdout);
-	stdin = popen(comando, "w");
 
-	fflush(stdout);
-	if (length!= tamanioComando) {
+	fputs(data_bloque, pipeMapper);
+	int closear = pclose(pipeMapper);
+	if (closear < 0) {
+		printf("No se pudo peclosear bien\n");
 		fflush(stdout);
 		return -1;
 	}
 
-
-	fflush(stdout);
-	if (stdin != NULL) {
-		if (fputs(data_bloque,stdin) < 0) {
-			fflush(stdout);
-			return -1;
-		}
-		if(pclose(stdin)<0){
-			fflush(stdout);
-			return -1;
-		}
-		free(comando);
-	} else {
-
-		log_error(nodo_logger,"No se pudo ejecutar el programa!");
+	if (mapFallido)
 		return -1;
-	}
-
-	return 1;
+	else
+		return 1;
 }
 
 //TODO hacer esto de forma correcta, obteniendo los path de los de reducir y apareando
@@ -353,7 +341,7 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma, char *pathArchivoSalid
 
 int ejecutarMapper(char * path_s, char* path_tmp, char* datos_bloque) {
 
-	if ((redireccionar_stdin_stdout_mapper(path_s, path_tmp, datos_bloque)) < 0){
+	if ((redireccionar_stdin_stdout_mapper(path_s, path_tmp, datos_bloque)) < 1){
 
 		log_info(nodo_logger,"Error al ejecutar Mapper");
 		return -1;
@@ -365,7 +353,7 @@ int ejecutarMapper(char * path_s, char* path_tmp, char* datos_bloque) {
 
 int ejecutarReduce(char * path_s, char* path_tmp, t_list* archivosAReducir) {
 
-	if ((redireccionar_stdin_stdout_reduce(path_s, path_tmp, archivosAReducir)) < 0){
+	if ((redireccionar_stdin_stdout_reduce(path_s, path_tmp, archivosAReducir)) < 1){
 		log_info(nodo_logger,"Error al ejecutar Reduce");
 		return -1;
 	}
