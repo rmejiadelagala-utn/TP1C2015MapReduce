@@ -113,7 +113,6 @@ void* conexionJobs(void* sockJobNodo) {
 			nomArchSalida = recibirString(sock_in);
 			string_append(&archivoSalida, nomArchSalida);
 			log_info(nodo_logger,"El archivo de salida recibido es %s", archivoSalida);
-
 			pthread_mutex_lock(&numeroMap);
 			nombreScript = strdup("tmp/mapper");
 			string_append(&nombreScript, string_itoa(numeroDeMap));
@@ -122,13 +121,9 @@ void* conexionJobs(void* sockJobNodo) {
 			crearScriptMapper(script, nombreScript);
 			numeroDeMap++;
 			pthread_mutex_unlock(&numeroMap);
-
-			//char *filename = strdup("/tmp/mapper-raro-XXXXXX");
-
-			//mkstemp(filename);
-			crearScriptMapper(script, nombreScript);
 			char* dataAUX = malloc(tamanioBloque);
 			memcpy(dataAUX, DATOS + (nroBloque * BLKSIZE), tamanioBloque);
+			log_info(nodo_logger,"antes de ejecutar %s", nombreScript);
 			resultado=ejecutarMapper(nombreScript, archivoSalida, dataAUX);
 			log_info(nodo_logger,"ejecute %s", nombreScript);
 			free(script);

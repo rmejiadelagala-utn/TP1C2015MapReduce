@@ -232,7 +232,7 @@ int main() {
 	 list_add(bloquesDeArchivoB, bloqueArchivoB1);
 
 	 t_archivo *archivoA = nuevoArchivo("ArchivoA", 2, 3000, bloquesDeArchivoA,
-	 1);interaccionFSNodo
+	 1);
 	 t_archivo *archivoB = nuevoArchivo("ArchivoB", 3, 3000, bloquesDeArchivoB,
 	 1);
 
@@ -829,7 +829,7 @@ void *interaccionFSNodo(void* sock_ptr) {
 				enviarCantBloquesDeArch(unArchivo, socket);
 			}
 			list_iterate(listaArchivosPedidos, (void*) mandarCantidadDeBloquesDeArchivo);
-			list_destroy_and_destroy_elements(listaArchivosPedidos,free);
+			list_destroy_and_destroy_elements(listaArchivosPedidos, free);
 			break;
 		}
 	}

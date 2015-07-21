@@ -83,10 +83,9 @@ char* mapeo_archivo(char* path) {
 	if ((data_archivo = mmap(0, TAMANIOARCHIVO, PROT_READ, MAP_SHARED, fd_a, 0)) == MAP_FAILED) {
 		log_error(nodo_logger,"Error al iniciar el mapeo de disco %s. '%s' ", obtenerNombreArchivo(path), strerror(errno));
 		close(fd_a);
-//		exit(1);
-		return NULL;
+		exit(1);
 	}
-	close(fd_a);
+
 	return data_archivo;
 }
 
@@ -178,31 +177,44 @@ char* getFileContent(char* nombreFile, char * ruta_archivo) {
 }
 
 void crearScriptMapper(const char* codigo_script, char* nombre) {
-//	signal(ETXTBSY, signal_callback_handler_tbf);
-//	fflush(stdout);
+
+	fflush(stdout);
 
 	FILE* scriptMapper;
 
 	if ((scriptMapper = fopen(nombre, "w+")) == NULL) {
 		perror("Error al crear el script del mapper");
-//		exit(1);
-		fflush(stdout);
-		return;
+		exit(1);
 	}
+
 
 
 	fputs(codigo_script, scriptMapper);
 
 	int fileDes = fileno(scriptMapper);
 
+	char *permisosCommand = string_new();
+
+	string_append(&permisosCommand, "chmod a+x ");
+	string_append(&permisosCommand, nombre);
+
+
+
+	if (fchmod(fileDes, 0755)) {
+			fclose(scriptMapper);
+			fsync(fileDes);
+			printf("Hubo algun error en el fchmod\n");
+			fflush(stdout);
+			return;
+		}
+
 	fflush(scriptMapper);
 	fflush(stdout);
-	fsync(fileDes);
 	int resultado = fclose(scriptMapper);
-	fsync(fileDes);
 	if(resultado<0){
 		log_error(nodo_logger,"Hubo un error al cerrar el archivo");
 	}
+	free(permisosCommand);
 	return;
 }
 
@@ -224,7 +236,7 @@ void crearScriptReduce(const char* codigo_script, char* nombre) {
 
 	if ((scriptReduce = fopen(nombre, "w+")) == NULL) {
 		perror("Error al crear el script del Reduce");
-		return;
+		exit(1);
 	}
 
 //	while (feof(fd) == 0) {
@@ -250,34 +262,36 @@ void crearScriptReduce(const char* codigo_script, char* nombre) {
 }
 
 int redireccionar_stdin_stdout_mapper(char *pathPrograma, char *pathArchivoSalida, char* data_bloque) {
-	FILE *vstdin = NULL;
+	FILE *stdin = NULL;
 	int length;
 
-	size_t tamanioComando = strlen(pathPrograma)+13+strlen(pathArchivoSalida);
+	fflush(stdout);
+	size_t tamanioComando = strlen(pathPrograma)+11+strlen(pathArchivoSalida);
 
 	char *comando = malloc(tamanioComando);
 
-	length = snprintf(comando,tamanioComando,"sh %s | sort > %s",pathPrograma, pathArchivoSalida)+1;
+	fflush(stdout);
+	length = snprintf(comando,tamanioComando,"%s | sort > %s",pathPrograma, pathArchivoSalida)+1;
 
 
-	//system("ls -l /proc/$$/fd >> /home/utnso/fdsss");
-	//system("ls -l /proc/$PPID/fd  >> /home/utnso/fdsss");
-	vstdin = popen(comando, "w");
+	fflush(stdout);
+	stdin = popen(comando, "w");
 
-	/*fflush(stdout);
+	fflush(stdout);
 	if (length!= tamanioComando) {
 		fflush(stdout);
 		return -1;
-	}*/
+	}
 
 
-
-	fflush(vstdin);
-	if (vstdin != NULL) {
-		if (fputs(data_bloque,vstdin) < 0) {
+	fflush(stdout);
+	if (stdin != NULL) {
+		if (fputs(data_bloque,stdin) < 0) {
+			fflush(stdout);
 			return -1;
 		}
-		if(pclose(vstdin)<0){
+		if(pclose(stdin)<0){
+			fflush(stdout);
 			return -1;
 		}
 		free(comando);
@@ -292,13 +306,13 @@ int redireccionar_stdin_stdout_mapper(char *pathPrograma, char *pathArchivoSalid
 
 //TODO hacer esto de forma correcta, obteniendo los path de los de reducir y apareando
 int redireccionar_stdin_stdout_reduce(char *pathPrograma, char *pathArchivoSalida, t_list* archivosAReducir) {
-	FILE *vstdin = NULL;
+	FILE *stdin = NULL;
 
 	char *comando = malloc(strlen(pathPrograma) + 12 + strlen(pathArchivoSalida));
 
 	sprintf(comando, "%s | sort >> %s", pathPrograma, pathArchivoSalida);
 
-	vstdin = popen(comando, "w");
+	stdin = popen(comando, "w");
 
 	log_info(nodo_logger,"Voy a vaciar el archivo truncado");
 	char* archivoATruncar=string_new();
@@ -311,17 +325,17 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma, char *pathArchivoSalid
 	system(comandoParaTruncar);
 	fflush(stdout);
 
-	if (vstdin != NULL) {
+	if (stdin != NULL) {
 		aparear(archivosAReducir);
 		FILE* archivoAReducir = fopen("/tmp/archivoApareado","r");
 		struct stat datosArch;
 		stat("/tmp/archivoApareado",&datosArch);
 		log_info(nodo_logger,"El tamaño del archivo es %d",datosArch.st_size);
 		char* dataArchivoAReducir = mmap((caddr_t) 0, datosArch.st_size, PROT_READ, MAP_SHARED, fileno(archivoAReducir), 0);
-		if (fprintf(vstdin, "%s", dataArchivoAReducir) < 0) {
+		if (fprintf(stdin, "%s", dataArchivoAReducir) < 0) {
 			log_error(nodo_logger,"Error al enviar archivo al reduce");
 		}
-		if(pclose(vstdin)<0){
+		if(pclose(stdin)<0){
 			printf("Error al cerrar con pclose\n");
 			fflush(stdout);
 			return -1;
@@ -341,7 +355,7 @@ int ejecutarMapper(char * path_s, char* path_tmp, char* datos_bloque) {
 
 	if ((redireccionar_stdin_stdout_mapper(path_s, path_tmp, datos_bloque)) < 0){
 
-		log_error(nodo_logger,"Error al ejecutar Mapper");
+		log_info(nodo_logger,"Error al ejecutar Mapper");
 		return -1;
 	}
 	return 1;

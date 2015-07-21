@@ -278,7 +278,7 @@ int enviarProtocolo(int protocolo,int socket){
 		int i;
 		for(i=0;i<cantArchivos;i++){
 			printf("Pido el archivo %s",archivos[i]);
-			bufferAgregarString(buffer,archivos[i],strlen(archivos[i])+1);
+			bufferAgregarString(buffer,archivos[i],strlen(archivos[i]));
 		}
 
 		int resultado = enviarBuffer(buffer,socket);
@@ -334,10 +334,7 @@ int enviarProtocolo(int protocolo,int socket){
 		int i;
 		t_list* archivosPedidos=list_create();
 		for(i=0;i<cantArchivos;i++){
-			int tamArch;
-			recvall(socket,&tamArch,sizeof(int));
-			char* archivoPedido = malloc(tamArch);
-			recvall(socket,archivoPedido,tamArch);
+			char* archivoPedido = recibirString(socket);
 			list_add(archivosPedidos,archivoPedido);
 		}
 		return archivosPedidos;

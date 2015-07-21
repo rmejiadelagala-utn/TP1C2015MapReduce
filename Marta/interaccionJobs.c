@@ -18,7 +18,6 @@ void *interaccionJobs(void* sock_ptr) {
 		enviarError(sockCliente);
 		log_error(marta_logger,"Se produjo un error con el job");
 		close(sockCliente);
-		pthread_mutex_unlock(&conexionFS);
 		return NULL;
 	}
 
@@ -63,11 +62,11 @@ t_solicitud deserealizarSolicitudDeJob(int sockCliente){
 
 		for (i = 0; i < solicitud.cantArchivos; i++) {
 
-			solicitud.archivos[i] = strdup(recibirString(sockCliente));
+			solicitud.archivos[i] = recibirString(sockCliente);
 
 		}
 
-		solicitud.archivo_resultado=strdup(recibirString(sockCliente));
+		solicitud.archivo_resultado=recibirString(sockCliente);
 		solicitud.combiner = recibirInt(sockCliente);
 
 		log_info(marta_logger,"Mostrare los datos del paquete deserealizados\n");
