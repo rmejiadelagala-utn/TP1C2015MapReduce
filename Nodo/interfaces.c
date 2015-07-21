@@ -155,7 +155,6 @@ void* conexionJobs(void* sockJobNodo) {
 
 
 			if ((dataArchivoPedido = (char *) mmap(0, datosArch.st_size, PROT_READ, MAP_PRIVATE, fileArchivoPedido, 0)) == MAP_FAILED) {
-					;
 					log_error(nodo_logger,"Error al iniciar el mapeo de disco. '%s' ", strerror(errno));
 					close(fileArchivoPedido);
 					exit(1);

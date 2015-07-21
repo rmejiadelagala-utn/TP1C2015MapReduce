@@ -9,7 +9,9 @@ void *interaccionJobs(void* sock_ptr) {
 
 	t_solicitud solicitud = deserealizarSolicitudDeJob(sockCliente);
 
+
 	t_InfoJob info_job = adaptarSolicitudAInfoJob(solicitud);
+
 
 	t_list* listaDeArchivos = obtenerIDyCantBloquesDeArchivosDelFS(info_job.pathsDeArchivos,
 			info_job.cantArchivos);
@@ -51,7 +53,6 @@ void *interaccionJobs(void* sock_ptr) {
 
 
 
-
 t_solicitud deserealizarSolicitudDeJob(int sockCliente){
 	int i;
 
@@ -59,6 +60,7 @@ t_solicitud deserealizarSolicitudDeJob(int sockCliente){
 		solicitud.cantArchivos = recibirInt(sockCliente);
 
 		log_info(marta_logger,"La cantidad de archivos recibidos es de %d",solicitud.cantArchivos);
+
 
 		solicitud.archivos = malloc(solicitud.cantArchivos);
 
@@ -70,7 +72,6 @@ t_solicitud deserealizarSolicitudDeJob(int sockCliente){
 
 		solicitud.archivo_resultado=recibirString(sockCliente);
 		solicitud.combiner = recibirInt(sockCliente);
-
 
 		log_info(marta_logger,"Mostrare los datos del paquete deserealizados\n");
 		log_info(marta_logger,"Combiner: %d",solicitud.combiner);

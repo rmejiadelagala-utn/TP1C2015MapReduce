@@ -538,7 +538,7 @@ void validarNodoYEjecutar(char* unNodo, void (*funcion)(void*)) {
 	t_nodo *nodoObjetivo = buscarNodoPorId(idNodo, listaNodos);
 
 	if ((nodoObjetivo != NULL)) {
-		if (nodoEstas(nodoObjetivo->socket)) {
+		if (nodoEstas(nodoObjetivo->socket) && (nodoObjetivo->socket!=-1)) {
 			funcion(nodoObjetivo);
 
 		} else
