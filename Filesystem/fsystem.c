@@ -603,7 +603,7 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* nombreArchi
 				exit(1);
 
 			}
-			if(hayLugarEnLosNodos(data) == 0) {
+			if(/*hayLugarEnLosNodos(data) == 0*/1) {
 				//Acá se pone a mandar bloques de arch a nodos y demás
 							envioNodoCorrectamente = mandarBloquesANodos(data, &cantidadBolquesEnviados, &listaDeBloques);
 

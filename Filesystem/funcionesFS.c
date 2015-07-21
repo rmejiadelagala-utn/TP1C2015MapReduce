@@ -55,8 +55,6 @@ int cant=0;
 		t_list* listaNodosAux = duplicarListaNodo(nodosOrdenados);
 		pthread_mutex_unlock(&listaDeNodos);
 
-
-
 		int k = 0;
 		//Acá distribuye las copias dado el algoritmo de dstribucion
 		for (i = 0; i < CANT_COPIAS; i++) {
@@ -138,20 +136,32 @@ static bool ordenarPorMenorUso(t_nodo *data, t_nodo *dataSiguiente) {
 
 static int nodoSeleccionado(t_list *nodosOrdenados, t_nodo **nodoActual, int *posicion) {
 	*nodoActual = list_get(nodosOrdenados, *posicion);
-
-	while (list_size(nodosOrdenados)>= 3) {
+	printf("%f",(*nodoActual)->tamanio);
+			printf("%d",(*nodoActual)->cantidadBloquesOcupados * BLOCK_SIZE);
+			fflush(stdout);
+	int fin = 0;
+	while (list_size(nodosOrdenados)>= 3 && !fin) {
 		*nodoActual = list_get(nodosOrdenados, *posicion);
+		printf("%f",(*nodoActual)->tamanio);
+		printf("%d",(*nodoActual)->cantidadBloquesOcupados * BLOCK_SIZE);
+		fflush(stdout);
 		if (!tieneLugar(*nodoActual)){
 			list_remove_and_destroy_element(nodosOrdenados, *posicion,(void*)liberarNodo);
+			 return -1;
+		}
+		else {
+			fin = 1;
 		}
 		*posicion = *posicion + 1;//con el ++ se quejaba eclipse
 	}
-	if(list_size(nodosOrdenados)>= 3) return -1;
 	return 0;
 }
 
 static bool tieneLugar(t_nodo *unNodo) {
-	return unNodo->tamanio / BLOCK_SIZE >= unNodo->cantidadBloquesOcupados;
+	printf("%f",unNodo->tamanio);
+	printf("%d",unNodo->cantidadBloquesOcupados * BLOCK_SIZE);
+	fflush(stdout);
+	return unNodo->tamanio  >= unNodo->cantidadBloquesOcupados * BLOCK_SIZE;
 }
 
 static int estaActivo(t_nodo* unNodo){

@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-mkdir: no se puede crear el directorio «Nodo/Archivos»: El archivo ya existe
-=======
-mar jul 21 11:18:06 ART 2015
+mar jul 21 18:06:58 ART 2015
 
 Creando data.bin...
 PUERTO_FS=3000
@@ -72,4 +69,3 @@ NODO_NUEVO=SI
 IP_NODO=127.0.0.1
 PUERTO_NODO=5007
 ID=7
->>>>>>> parent of d557e43... Arreglado un bug introducido en el ultimo commit.
