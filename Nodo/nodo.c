@@ -7,9 +7,19 @@
 #include "nodo.h"
 
 //Ruta donde se encuentra el archivo de configuración
-char* ARCHIVO_CONFIG = "../ArchivosVarios/ConfigNodo.txt";
+char* ARCHIVO_CONFIG;
 
-int main() {
+int main(int argc,char *argv[]) {
+	if(argc!=2){
+			printf("Error: Necesito saber que numero de nodo soy, escribi:\n");
+			printf("./Nodo ID, reemplazando ID por el numero de nodo\n");
+			return 1;
+		}
+	char* c=argv[1];
+	char* ARCHIVO_CONFIG = strdup("../Archivos/ConfigNodo");
+	string_append(&ARCHIVO_CONFIG,c);
+	string_append(&ARCHIVO_CONFIG,".txt");
+
 	printf("***************HOLA SOY UN PROCESO NODO\n****************");
 	t_config_nodo* arch_config;
 	pthread_mutex_init(&numeroMap,NULL);
@@ -17,7 +27,7 @@ int main() {
 	pthread_mutex_init(&unMutex,NULL);
 	nodo_logger = log_create("nodo.log", "Nodo", 1, log_level_from_string("TRACE"));
 	log_info(nodo_logger,"Cargando archivo de Configuracion");
-    arch_config= malloc(sizeof(t_config_nodo));
+	arch_config= malloc(sizeof(t_config_nodo));
 	arch_config = leerArchivoConfig(ARCHIVO_CONFIG);
 
 	int sockfs;

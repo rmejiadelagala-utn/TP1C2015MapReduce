@@ -44,7 +44,9 @@ t_config_nodo* leerArchivoConfig(char *path_config) {
 
 	configNodo->IP_FS = strdup(config_get_string_value(config, "IP_FS"));
 	configNodo->PUERTO_FS = config_get_int_value(config, "PUERTO_FS");
-	configNodo->ARCH_BIN = strdup(config_get_string_value(config, "ARCHIVO_BIN"));
+	char* pathDataBin = strdup("../Archivos/");
+	string_append(&pathDataBin,config_get_string_value(config, "ARCHIVO_BIN"));
+	configNodo->ARCH_BIN = pathDataBin;
 	configNodo->DIR_TEMP = strdup(config_get_string_value(config, "DIR_TEMP"));
 	configNodo->NODO_NEW = (config_get_string_value(config, "NODO_NUEVO"))[0];
 	configNodo->IP_NODO = strdup(config_get_string_value(config, "IP_NODO"));
