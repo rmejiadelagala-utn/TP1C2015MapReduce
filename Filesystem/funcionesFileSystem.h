@@ -8,6 +8,7 @@
 #ifndef FUNCIONESFILESYSTEM_H_
 #define FUNCIONESFILESYSTEM_H_
 #define BLOCK_SIZE 20971520 //20* 1024 * 1024;//Probar con menos
+#define  CANT_COPIAS 3
 #include"estructurasFileSystem.h"
 #include "fsystem.h"
 

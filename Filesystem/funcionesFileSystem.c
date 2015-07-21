@@ -18,7 +18,6 @@
 #include <unistd.h>
 #include <stdio.h>
 #include"funcionesFileSystem.h"
-int CANT_COPIAS = 3;
 t_list *listaArchivos;
 t_list *listaNodos;
 t_list *listaDirectorios;

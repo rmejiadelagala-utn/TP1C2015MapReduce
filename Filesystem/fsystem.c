@@ -580,19 +580,18 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* nombreArchi
 	t_archivo *archivoNuevo;
 
 	pthread_mutex_lock(&listaDeNodos);
-	int estaActivo(t_nodo* unNodo){
+	int estaActivo(t_nodo* unNodo) {
 		return unNodo->activo;
 	}
-	t_list* nodosActivos = list_filter(listaNodos,estaActivo);
-	int esMenorA3(t_list* nodosActivos){
-		return list_size(nodosActivos)<3;
+	t_list* nodosActivos = list_filter(listaNodos, estaActivo);
+	int esMenorA3(t_list* nodosActivos) {
+		return list_size(nodosActivos) < 3;
 	}
-	if(detectarError(nodosActivos,esMenorA3,"No hay suficientesNodos activos\n")){
+	if (detectarError(nodosActivos, esMenorA3, "No hay suficientesNodos activos\n")) {
 		pthread_mutex_unlock(&listaDeNodos);
 		return;
 	}
 	pthread_mutex_unlock(&listaDeNodos);
-
 
 	if (pathLocal != NULL) {
 		if ((local_fd = open(pathLocal, O_RDONLY)) != -1) {
@@ -604,37 +603,42 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* nombreArchi
 				exit(1);
 
 			}
+			if(hayLugarEnLosNodos(data) == 0) {
+				//Acá se pone a mandar bloques de arch a nodos y demás
+							envioNodoCorrectamente = mandarBloquesANodos(data, &cantidadBolquesEnviados, &listaDeBloques);
 
-			//Acá se pone a mandar bloques de arch a nodos y demás
-			envioNodoCorrectamente = mandarBloquesANodos(data, &cantidadBolquesEnviados, &listaDeBloques);
+							if (close(local_fd) == -1)
+								perror("close");
 
-			if (close(local_fd) == -1)
-				perror("close");
+							if (envioNodoCorrectamente != -1) {	//si se mando correctamente
+								//agregar a la lista de archivos global el archivo nuevo,
+								//con su correspondiente listaDeBloques, nombre, padre, tamanio,
+								//y estado. (Esto es a las estructuras lógicas)
 
-			if (envioNodoCorrectamente != -1) {	//si se mando correctamente
-				//agregar a la lista de archivos global el archivo nuevo,
-				//con su correspondiente listaDeBloques, nombre, padre, tamanio,
-				//y estado. (Esto es a las estructuras lógicas)
+								archivoNuevo = nuevoArchivo(nombreArchivo, padre, string_length(data), listaDeBloques, 1);
 
-				archivoNuevo = nuevoArchivo(nombreArchivo, padre, string_length(data), listaDeBloques, 1);
+								list_add(listaArchivos, archivoNuevo);
+								log_info(mdfs_logger, "El archivo %s fue copiado correctamente.", nombreArchivo);
+								//	printf("El archivo %s fue copiado correctamente.\n", nombreArchivo);
+							} else {
+								log_error(mdfs_logger, "error al enviar a nodos.");
+								//		printf("error al enviar a nodos\n");
+							}
 
-				list_add(listaArchivos, archivoNuevo);
-				log_info(mdfs_logger,"El archivo %s fue copiado correctamente.", nombreArchivo);
-			//	printf("El archivo %s fue copiado correctamente.\n", nombreArchivo);
-			} else {
-				log_error(mdfs_logger,"error al enviar a nodos.");
-		//		printf("error al enviar a nodos\n");
+							munmap(data, file_stat.st_size);
 			}
-
-			munmap(data, file_stat.st_size);
+			else {
+				munmap(data, file_stat.st_size);
+				log_error(mdfs_logger,"No hay nodos disponibles con espacio para copiar el archivo deseado, se recomienda contratar el servicio PREMIUM FULL HD con nodos ilimitados");
+			}//else de hayLugarEnLosNodos
 
 		} else {
-			log_error(mdfs_logger,"Error al abrir el archivo.");
-		//	printf("Error al abrir el archivo\n");
+			log_error(mdfs_logger, "Error al abrir el archivo.");
+			//	printf("Error al abrir el archivo\n");
 		}
 	} else {
-		log_warning(mdfs_logger,"upload: falta un operando.");
-	//	printf("upload: falta un operando\n");
+		log_warning(mdfs_logger, "upload: falta un operando.");
+		//	printf("upload: falta un operando\n");
 	}
 }
 
@@ -846,5 +850,4 @@ void *interaccionFSNodo(void* sock_ptr) {
 	close(socket);
 	return 0;
 }
-
 
