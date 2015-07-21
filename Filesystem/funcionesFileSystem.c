@@ -118,7 +118,6 @@ int nodoEstaActivo (t_registro_id_ipPuerto* unRegistro){
  */
 
 int mandarBloquesANodos(char* data, int* cantidadBloquesEnviados,
-
 		t_list** listaDeBloques) {
 
 	uint32_t i, fin = 0;

@@ -19,18 +19,23 @@ static int estaActivo(t_nodo* unNodo);
 
 int hayLugarEnLosNodos(char *data) {
 
+log_info(mdfs_logger,"Verificando si hay espacio en los nodos");
+
 int i, fin = 0;
 int comienzoDeBloque = 0, finDeBloque;
 t_nodo *nodoActual;
 int ultimoIndiceDelData = string_length(data)-1;//Juanchi dice que -1 no va
 
-int* cantidadBloquesEnviados = 0;
-int cant=0;
+t_list *nodosOrdenados = list_create();
+pthread_mutex_lock(&listaDeNodos);
+//	list_add_all(nodosOrdenados, listaNodos);//Agrega todos los elementos de la segunda lista en la primera
+nodosOrdenados = list_filter(listaNodos,(void*) estaActivo);
+list_sort(nodosOrdenados, (void*) ordenarPorMenorUso);
+t_list* listaNodosAux = duplicarListaNodo(nodosOrdenados);
+pthread_mutex_unlock(&listaDeNodos);
 
 	while (!fin) {
 
-
-		cant++;
 		finDeBloque = comienzoDeBloque + BLOCK_SIZE;
 
 		if (finDeBloque > ultimoIndiceDelData) {
@@ -47,13 +52,7 @@ int cant=0;
 		//Acá tengo el final del bloque dado, y también donde empieza
 
 		//ordenar lista nodo por cantidad de bloques usados-->sale nodosOrdenados
-		t_list *nodosOrdenados = list_create();
-		pthread_mutex_lock(&listaDeNodos);
-	//	list_add_all(nodosOrdenados, listaNodos);//Agrega todos los elementos de la segunda lista en la primera
-		nodosOrdenados = list_filter(listaNodos,(void*) estaActivo);
-		list_sort(nodosOrdenados, (void*) ordenarPorMenorUso);
-		t_list* listaNodosAux = duplicarListaNodo(nodosOrdenados);
-		pthread_mutex_unlock(&listaDeNodos);
+		list_sort(listaNodosAux, (void*) ordenarPorMenorUso);
 
 		int k = 0;
 		//Acá distribuye las copias dado el algoritmo de dstribucion
@@ -61,7 +60,7 @@ int cant=0;
 			//--Mandar este bloque al nodo que corresponda--
 
 			//nodoActual = nodoElegdoYConLugar(nodosOrdenados);
-			if (nodoSeleccionado(listaNodosAux, &nodoActual,&k) != -1) {//XXX
+			if (nodoSeleccionado(listaNodosAux, &nodoActual,&k) == 0) {//XXX
 				//salio bien el elegir nodo, estando en nodoActual
 			setBloquencio(nodoActual);
 
@@ -73,11 +72,12 @@ int cant=0;
 			k++;
 		}
 		//cambiar el bloque start al siguiente y agrega el Bloque a la lista de bloques
-		(*cantidadBloquesEnviados)++;
 		comienzoDeBloque = finDeBloque + 1;
-		list_destroy_and_destroy_elements(listaNodosAux,(void*)liberarNodo);
-//	}//fin de else
+
 	}
+	list_destroy_and_destroy_elements(listaNodosAux,(void*)liberarNodo);
+	list_destroy(nodosOrdenados);
+	return 0;
 }
 
 
@@ -136,31 +136,24 @@ static bool ordenarPorMenorUso(t_nodo *data, t_nodo *dataSiguiente) {
 
 static int nodoSeleccionado(t_list *nodosOrdenados, t_nodo **nodoActual, int *posicion) {
 	*nodoActual = list_get(nodosOrdenados, *posicion);
-	printf("%f",(*nodoActual)->tamanio);
-			printf("%d",(*nodoActual)->cantidadBloquesOcupados * BLOCK_SIZE);
-			fflush(stdout);
 	int fin = 0;
 	while (list_size(nodosOrdenados)>= 3 && !fin) {
 		*nodoActual = list_get(nodosOrdenados, *posicion);
-		printf("%f",(*nodoActual)->tamanio);
-		printf("%d",(*nodoActual)->cantidadBloquesOcupados * BLOCK_SIZE);
-		fflush(stdout);
 		if (!tieneLugar(*nodoActual)){
 			list_remove_and_destroy_element(nodosOrdenados, *posicion,(void*)liberarNodo);
-			 return -1;
+			*posicion = *posicion - 1;
 		}
 		else {
 			fin = 1;
 		}
 		*posicion = *posicion + 1;//con el ++ se quejaba eclipse
 	}
+	if(list_size(nodosOrdenados)< 3) return -1;
+	*posicion = *posicion - 1;
 	return 0;
 }
 
 static bool tieneLugar(t_nodo *unNodo) {
-	printf("%f",unNodo->tamanio);
-	printf("%d",unNodo->cantidadBloquesOcupados * BLOCK_SIZE);
-	fflush(stdout);
 	return unNodo->tamanio  >= unNodo->cantidadBloquesOcupados * BLOCK_SIZE;
 }
 

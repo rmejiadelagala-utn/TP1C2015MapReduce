@@ -603,8 +603,9 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* nombreArchi
 				exit(1);
 
 			}
-			if(/*hayLugarEnLosNodos(data) == 0*/1) {
+			if(hayLugarEnLosNodos(data) == 0) {
 				//Acá se pone a mandar bloques de arch a nodos y demás
+				log_info(mdfs_logger,"Comenzando a enviar los bloques a los nodos");
 							envioNodoCorrectamente = mandarBloquesANodos(data, &cantidadBolquesEnviados, &listaDeBloques);
 
 							if (close(local_fd) == -1)
@@ -629,7 +630,7 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* nombreArchi
 			}
 			else {
 				munmap(data, file_stat.st_size);
-				log_error(mdfs_logger,"No hay nodos disponibles con espacio para copiar el archivo deseado, se recomienda contratar el servicio PREMIUM FULL HD con nodos ilimitados");
+				log_warning(mdfs_logger,"No hay nodos disponibles con espacio para copiar el archivo deseado, se recomienda contratar el servicio PREMIUM FULL HD con nodos ilimitados");
 			}//else de hayLugarEnLosNodos
 
 		} else {

@@ -10,5 +10,6 @@
 
 #include"fsystem.h"
 
+int hayLugarEnLosNodos(char *data);
 
 #endif /* FUNCIONESFS_H_ */
