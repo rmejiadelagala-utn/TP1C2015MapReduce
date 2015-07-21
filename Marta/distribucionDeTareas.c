@@ -468,7 +468,7 @@ int ordenarReduceAJob(t_DestinoReduce* destinoReduce, t_list* origenesDeReduce, 
 	if (resultado < 0) {
 		log_warning(marta_logger, "No se Pudo enviar la Orden de Reduce al Job");
 	} else {
-		log_warning(marta_logger, "Le mandé la orden de Reduce al job");
+		log_info(marta_logger,"Le mandé la orden de Reduce al job");
 	}
 	return resultado;
 }
@@ -507,7 +507,7 @@ int ordenarUltimoReduceAJob(t_DestinoReduce* destinoReduce, t_list* origenesDeRe
 	if (resultado < 0) {
 		log_warning(marta_logger, "No se Pudo enviar la Orden de Reduce al Job");
 	} else {
-		log_warning(marta_logger, "Le mandé la orden de Reduce al job");
+		log_info(marta_logger, "Le mandé la orden de Reduce al job");
 	}
 	return resultado;
 }
