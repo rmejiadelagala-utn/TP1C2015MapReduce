@@ -183,17 +183,19 @@ int mandarBloquesANodos(char* data, int* cantidadBloquesEnviados, t_list** lista
 }
 
 void enviarCantBloquesDeArch(char* nombreArchivo, int socket) {
+	int huboError=1;
 	void enviarBloquesDeArchivo(t_archivo* unArchivo) {
 		printf("Voy a mandar el archivo %s\n", unArchivo->nombre);
 		fflush(stdout);
 		int cantidad = list_size(unArchivo->bloquesDeArch);
 		printf("La cantidad de bloques mandados fue %d\n", cantidad);
 		sendall(socket, &cantidad, sizeof(int));
+		huboError=0;
 		return;
 	}
-	validarArchivoYEjecutar(nombreArchivo, (void*) enviarBloquesDeArchivo);	//FIXME hardcodeada
-	int error = -1;
-	sendall(socket, &error, sizeof(int));
+
+	validarArchivoYEjecutar(nombreArchivo, (void*) enviarBloquesDeArchivo);//FIXME hardcodeada
+	if(huboError) enviarError(socket);
 
 }
 
