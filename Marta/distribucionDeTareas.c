@@ -158,8 +158,8 @@ t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 	self->ip_nodo = unRegistro->ip.s_addr;
 	self->puerto_nodo = unRegistro->puerto;
 	self->block = copiaSeleccionada->block;
-	self->temp_file_name = string_from_format("map_%i_%i_%i.temp", infoDeJob.idJob, idArchivo,
-			numeroDeBloque);
+	self->temp_file_name = string_from_format("map_%i_%i_%i.temp",
+			infoDeJob.idJob, idArchivo, numeroDeBloque);
 	self->block_size = copiaSeleccionada->size;
 
 	list_destroy_and_destroy_elements(copiasDeBloque,
@@ -318,6 +318,17 @@ void agregarMapPendiente(t_list* mapsPendientes, t_InfoArchivo* infoArchivo,
 		(cargaNodo->cantidadOperacionesEnCurso)++;
 	}
 
+	void mostrarCargaNodo(t_CargaNodo* unaCargaNodo) {
+
+		printf("Nodo: %i ---> Carga: %i\n", unaCargaNodo->id_nodo,
+				unaCargaNodo->cantidadOperacionesEnCurso);
+
+		fflush(stdout);
+	}
+
+	printf("\n");
+	list_iterate(cargaNodos, (void*) mostrarCargaNodo);
+
 //cierro el mutex
 	pthread_mutex_unlock(&mutexListaNodo);
 
@@ -464,6 +475,21 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 						mapPendiente->file->idArchivo, mapPendiente->block,
 						&ultimoIDMap);
 
+				//para agregar la cantidad de operaciones al replanificado
+				int seEncuetraNodo(t_CargaNodo* carga_nodo) {
+					return carga_nodo->id_nodo
+							== mapPendiente->map_dest->id_nodo;
+				}
+
+				t_CargaNodo* cargaNodo = list_find(cargaNodos,
+						(void *) seEncuetraNodo);
+
+				if (cargaNodo == NULL) {
+					printf("No está nodo en lista de cargas\n");
+				} else {
+					(cargaNodo->cantidadOperacionesEnCurso)++;
+				}
+
 				pthread_mutex_unlock(&planificarMapMutex);
 
 				resultado =
@@ -504,7 +530,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 
 					t_MapPendiente* mapPendienteAux = list_find(
 							listaMapsPendientes,
-							(void*)elIdMapDeSuMapDestEsidMap);
+							(void*) elIdMapDeSuMapDestEsidMap);
 
 					return mapPendienteAux->map_dest->id_nodo;
 				}
@@ -1016,8 +1042,7 @@ char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 				"reduce_final_%i_%i.temp", infoJob.idJob,
 				destinoReduce->id_nodo);
 
-		resultado = ordenarReduceAJob(destinoReduce, origenesDeReduce,
-				sockJob);
+		resultado = ordenarReduceAJob(destinoReduce, origenesDeReduce, sockJob);
 
 		if (resultado > 0) {
 			log_info(marta_logger, "Reduce sin combiner enviado exitosamente");
@@ -1058,7 +1083,7 @@ char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 	}
 
 	/*list_destroy_and_destroy_elements(mapsTemporalesDeLosArchivosDelJob,
-			(void*) free);*/
+	 (void*) free);*/
 
 	return archivoFinal;
 }
