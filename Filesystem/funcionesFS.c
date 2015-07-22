@@ -154,7 +154,7 @@ static int nodoSeleccionado(t_list *nodosOrdenados, t_nodo **nodoActual, int *po
 }
 
 static bool tieneLugar(t_nodo *unNodo) {
-	return unNodo->tamanio  >= unNodo->cantidadBloquesOcupados * BLOCK_SIZE;
+	return unNodo->tamanio > (unNodo->cantidadBloquesOcupados * BLOCK_SIZE + BLOCK_SIZE);
 }
 
 static int estaActivo(t_nodo* unNodo){

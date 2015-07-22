@@ -158,7 +158,7 @@ t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 	self->ip_nodo = unRegistro->ip.s_addr;
 	self->puerto_nodo = unRegistro->puerto;
 	self->block = copiaSeleccionada->block;
-	self->temp_file_name = string_from_format("map_%i_%i.temp", infoDeJob.idJob,
+	self->temp_file_name = string_from_format("map_%i_%i_%i.temp", infoDeJob.idJob, idArchivo,
 			numeroDeBloque);
 	self->block_size = copiaSeleccionada->size;
 
