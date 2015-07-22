@@ -1017,7 +1017,7 @@ char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 				destinoReduce->id_nodo);
 
 		resultado = ordenarReduceAJob(destinoReduce, origenesDeReduce,
-				sockJob/*sockJob de la conexion aun no hecha*/);
+				sockJob);
 
 		if (resultado > 0) {
 			log_info(marta_logger, "Reduce sin combiner enviado exitosamente");
@@ -1052,14 +1052,14 @@ char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 			return NULL;
 		}
 
-		//todo mandar a guardar el resultado del reduce al MDFS
 		archivoFinal = strdup(destinoReduce->temp_file_name);
 		free(destinoReduce);
 		list_destroy_and_destroy_elements(origenesDeReduce, (void*) free);
 	}
 
-	list_destroy_and_destroy_elements(mapsTemporalesDeLosArchivosDelJob,
-			(void*) free);
+	/*list_destroy_and_destroy_elements(mapsTemporalesDeLosArchivosDelJob,
+			(void*) free);*/
+
 	return archivoFinal;
 }
 
