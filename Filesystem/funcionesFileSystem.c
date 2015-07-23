@@ -133,6 +133,8 @@ int mandarBloquesANodos(char* data, int* cantidadBloquesEnviados, t_list** lista
 
 	while (!fin) {
 
+
+
 		cant++;
 		bloqueDeArchivo = malloc(sizeof(t_bloqueArch));
 		bloqueDeArchivo->copiasDeBloque = list_create();
@@ -155,10 +157,18 @@ int mandarBloquesANodos(char* data, int* cantidadBloquesEnviados, t_list** lista
 		list_sort(nodosOrdenados, (void*) ordenarPorMenorUso);
 		int k = 0;
 		//Acá distribuye las copias dado el algoritmo de dstribucion
-		for (i = 0; i < CANT_COPIAS; i++) {
+		int cantCopias=CANT_COPIAS;
+		for (i = 0; i < cantCopias; i++) {
 			//--Mandar este bloque al nodo que corresponda--
 
 			//nodoActual = nodoElegdoYConLugar(nodosOrdenados);
+			if(list_size(nodosOrdenados)<CANT_COPIAS){
+				printf("No hay suficientes nodos disponibles para hacer las 3 copias\n");
+				/*cantCopias=list_size(nodosOrdenados); TODO a implementar luego, creo que va a haber que tocar la funcion nodoElegido
+				printf("Voy a limitarme a hacer solo %d copias\n",cantCopias);
+				fflush(stdout);*/
+
+			}
 			if (nodoElegido(nodosOrdenados, &nodoActual, &k) == 0) {
 				//salio bien el elegir nodo, estando en nodoActual
 				int tamanio = 1 + finDeBloque - comienzoDeBloque;
@@ -247,8 +257,14 @@ int setBloque(t_nodo* nodo, char* dataBloque, uint32_t tamanio, uint32_t comienz
 	bloqueEnNodo->tamanioBloque = tamanio;
 	uint32_t resultado = enviarBloqueANodo(nodo->socket, bloqueEnNodo->numeroDeBloqueEnNodo, dataBloque, comienzoDeBloque, tamanio);
 
-	if (resultado == 0)
+	if (resultado == 0){
+		nodo->socket = -1;
+		nodo->activo = 0;
+		log_info(mdfs_logger, "Nodo desconectado.");
 		printf("Problema al enviar\n");
+		return -1;
+	}
+
 
 	//termino de agregar a la lista de archivos, la info nueva del bloque
 
@@ -264,9 +280,11 @@ int setBloque(t_nodo* nodo, char* dataBloque, uint32_t tamanio, uint32_t comienz
 int nodoElegido(t_list *nodosOrdenados, t_nodo **nodoActual, int *posicion) {
 
 	*nodoActual = list_get(nodosOrdenados, *posicion);
+	if (!*nodoActual)return -1;
 	int fin = 0;
 	while (list_size(nodosOrdenados) >= 3 && !fin) {
 		*nodoActual = list_get(nodosOrdenados, *posicion);
+		if(!((*nodoActual)->activo)) return -1;
 		if (!tieneLugar(*nodoActual)) {
 			list_remove(nodosOrdenados, *posicion);
 			*posicion = *posicion - 1;

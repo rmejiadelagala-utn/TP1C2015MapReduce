@@ -33,7 +33,7 @@ int sendall(int socket, void *mensaje, size_t tamanio){
 
 	    tamanio = total; // return number actually sent here
 
-	    return (bytesSent<1) ?-1:bytesSent; // return -1 on failure, 0 on success
+	    return bytesSent;
 
 }
 
@@ -211,6 +211,7 @@ int enviarProtocolo(int protocolo,int socket){
 		bufferAgregarInt(buffer,numeroDeBloque);
 		bufferAgregarString(buffer,dataBloque+comienzoBloque,tamanio);
 		int resultado = enviarBuffer(buffer,socket);
+		if(!resultado) close(socket);
 		return resultado;
 	}
 	int pedirBloqueANodo(int socket, int numeroDeBloque, int protocoloDeRegreso, int tamanioBloque){
