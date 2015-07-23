@@ -176,8 +176,6 @@ int mandarBloquesANodos(char* data, int* cantidadBloquesEnviados, t_list** lista
 				 else*/setBloque(nodoActual, data, tamanio, comienzoDeBloque, bloqueDeArchivo->copiasDeBloque);
 
 			} else {
-				printf("No hay nodos disponibles\n");
-				fflush(stdout);
 				return -1;
 			}
 			k++;
