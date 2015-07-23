@@ -37,14 +37,16 @@ void ls();
 void validarDirectorioYEjecutar(char* unArch,void (*funcion)(void*));
 void validarArchivoYEjecutar(char* unArch,void (*funcion)(void*));
 int comprobarParametros(int cantParametros, char** parametros);
-t_list *directoriosVisiblesDesdeActual(void);
-t_list *archivosVisiblesDesdeActual(void);
+t_list *directoriosVisiblesDesdeDirectorioDado(char*);
+t_list *archivosVisiblesDesdeDirectorioDado(char*);
 int string_to_int(char* string);
 int verBloqueDeArchivo(t_archivo *unArchivo, int nroBloque);
 int funcionCopiarBloque(t_archivo *unArchivo, int nroBloque, int id);
 int descargarArchivo(t_archivo *unArchivo);
 int detectarError(void* cosaAChequear,int (*condicion)(void*),char* mensaje);
 int esNull(void* algo);
+t_directorio* ubicarDirectorio(char* unPath);
+t_list* hijosDelActual(t_directorio* unDirectorio);
 //
 
 enum entrada {
