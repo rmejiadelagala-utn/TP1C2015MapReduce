@@ -19,6 +19,10 @@
 
 int encontrarCopias(char* nombre,int directorioIndex, int numeroDeBloqueEnArchivo, t_list **copias){
 
+	t_directorio* directorioAuxiliar=directorioActual;
+
+	directorioActual = buscarDirPorIndex(directorioIndex);
+
 	int resultado;
 	void foo (t_archivo* archivo){
 
@@ -41,5 +45,6 @@ int encontrarCopias(char* nombre,int directorioIndex, int numeroDeBloqueEnArchiv
 	}
 
 	validarYEjecutar(nombre,validarArchivo,foo);
+	directorioActual = directorioAuxiliar;
 	return resultado;
 }
