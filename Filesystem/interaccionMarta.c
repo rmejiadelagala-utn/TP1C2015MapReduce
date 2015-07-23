@@ -18,21 +18,28 @@
 
 
 int encontrarCopias(char* nombre,int directorioIndex, int numeroDeBloqueEnArchivo, t_list **copias){
-	t_archivo *archivo = buscarArchPorPadreYNombre(directorioIndex, nombre);
+
+	int resultado;
+	void foo (t_archivo* archivo){
+
+
 	if(archivo == NULL){
-		return -1;
+		resultado= -1;
 	}
 	else {
 		t_bloqueArch *UnbloqueArch = list_get(archivo->bloquesDeArch,numeroDeBloqueEnArchivo);
 		if (UnbloqueArch == NULL){
-			return -2;
+			resultado= -2;
 		}
 		else{
 			printf("encontro las copias\n");
 			*copias = UnbloqueArch->copiasDeBloque;
-			return 0;
+			resultado= 0;
 		}
 
 	}
+	}
 
+	validarYEjecutar(nombre,validarArchivo,foo);
+	return resultado;
 }
