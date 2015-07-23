@@ -492,11 +492,13 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 
 				pthread_mutex_unlock(&planificarMapMutex);
 
-				resultado =
-						(mapPendiente->map_dest != NULL) ?
-								ordenarMapAJob(mapPendiente->map_dest,
-										sockjob) :
-								-2;
+				if (mapPendiente) {
+					resultado = ordenarMapAJob(mapPendiente->map_dest, sockjob);
+				} else {
+					int error = -1;
+					sendall(sockjob, &error, sizeof(int));
+					return -2;
+				}
 
 				if (resultado <= 0) {
 					log_info(marta_logger,
