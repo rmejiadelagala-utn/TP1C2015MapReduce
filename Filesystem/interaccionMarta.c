@@ -5,6 +5,7 @@
  *      Author: JuanchiRios
  */
 #include "interaccionMarta.h"
+#include "consolaFS.h"
 
 /*
  * Datos a serializar

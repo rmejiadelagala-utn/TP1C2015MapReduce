@@ -52,6 +52,7 @@ int esNull(void* algo);
 t_directorio* ubicarDirectorio(char* unPath);
 t_list* hijosDelActual(t_directorio* unDirectorio);
 //
+t_directorio *directorioActual;
 
 enum entrada {
 	FORMATEAR,
