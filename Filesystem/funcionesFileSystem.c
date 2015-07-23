@@ -202,7 +202,7 @@ void enviarCantBloquesDeArch(char* nombreArchivo, int socket) {
 		return;
 	}
 
-	validarArchivoYEjecutar(nombreArchivo, (void*) enviarBloquesDeArchivo);//FIXME hardcodeada
+	validarYEjecutar(nombreArchivo,validarArchivo, (void*) enviarBloquesDeArchivo);//FIXME hardcodeada
 	if(huboError) enviarError(socket);
 
 }
@@ -432,7 +432,7 @@ t_archivo *buscarArchPorPadre(int padre) { //probada
 	return arch != NULL ? arch : NULL;
 }
 
-t_directorio *encontrarDirectorioPadre(t_list *listaDirectorios, t_directorio *directorioHijo) {
+t_directorio* encontrarDirectorioPadre(t_list *listaDirectorios, t_directorio *directorioHijo) {
 	return list_find(listaDirectorios, ( {bool esPadre(t_directorio* unDir)
 				{	return esHijo(directorioHijo,unDir);}esPadre;}));
 }

@@ -41,7 +41,8 @@ int consola(void* unListaNodo) {
 	printf("\nBienvenido a la consola: \n");
 
 	do {
-		printf("Socketes:~%s>",direccion);
+
+		mostrarDireccion();
 		int entrada = COMANDO_INVALIDO; //Lo asigno por defecto en caso de que la entrada no coincida con ninguno de los comandos
 		leerComando(comando, 100);
 
@@ -193,8 +194,6 @@ void formatearMDFS() {
 	directorioActual = nuevoDirectorio(1, "root", 0);
 	list_add(listaDirectorios,directorioActual);
 	//Actualizo el string que dice donde estoy parado
-	free(direccion);
-	direccion = string_duplicate(directorioActual->nombre);
 	guardarPersistencia();
 //	printf("El file system ha sido formateado.\n");
 }
@@ -205,7 +204,7 @@ void eliminarArchivo(char *archivo) {
 		eliminarArchivoYreferencias(unArchivo,listaArchivos,listaNodos);
 	}
 
-	validarArchivoYEjecutar(archivo,(void*) eliminarArch);
+	validarYEjecutar(archivo,validarArchivo,(void*) eliminarArch);
 }
 
 void renombrarArchivo(char *archivo, char *nuevoNombre) {
@@ -234,7 +233,7 @@ void eliminarDirectorio(char *directorio) {
 		eliminarDirectorioYContenido(unDirectorio);
 	}
 
-	validarDirectorioYEjecutar(directorio,(void*)eliminarDir);
+	validarYEjecutar(directorio,validarDirectorio,(void*)eliminarDir);
 
 }
 
@@ -244,7 +243,7 @@ void renombrarDirectorio(char *directorio, char* nuevoNombre) {
 		renombrarDirectorioConNombre(nuevoNombre,unDirectorio);
 	}
 
-	validarDirectorioYEjecutar(directorio,(void*) renombrarDir);
+	validarYEjecutar(directorio,validarDirectorio,(void*) renombrarDir);
 
 }
 
@@ -261,7 +260,7 @@ void moverDirectorio(char *directorio, char* padreString) {
 				moverDirectorioConPadre(padre,unDirectorio);
 			}
 		}
-		validarDirectorioYEjecutar(directorio,(void*) moverDir);
+		validarYEjecutar(directorio,validarDirectorio,(void*) moverDir);
 
 	}
 }
@@ -287,7 +286,7 @@ void copiarAFS(char *archivo) {
 		if(resultado>0) log_info(mdfs_logger,"El archivo fue copiado al FileSystem local.");
 		else log_error(mdfs_logger,"Error al copiar el archivo al FileSystem local.");
 }
-	validarArchivoYEjecutar(archivo, (void*)copiarArchAFS);
+	validarYEjecutar(archivo, validarArchivo, (void*)copiarArchAFS);
 
 }
 
@@ -301,7 +300,7 @@ void solicitarMD5(char *archivo) {
 		}
 		else	log_error(mdfs_logger,"Error al copiar el archivo al FileSystem local.");
 }
-	validarArchivoYEjecutar(archivo, (void*)pedirMD5);
+	validarYEjecutar(archivo, validarArchivo, (void*)pedirMD5);
 }
 
 void verBloque(char *archivo, char *numeroBloque) {
@@ -314,7 +313,7 @@ void verBloque(char *archivo, char *numeroBloque) {
 
 	}
 
-	validarArchivoYEjecutar(archivo, (void*)verBloqueArch);
+	validarYEjecutar(archivo,validarArchivo, (void*)verBloqueArch);
 }
 
 void eliminarBloque(char *archivo, char* numeroBloque) {
@@ -337,7 +336,7 @@ void eliminarBloque(char *archivo, char* numeroBloque) {
 
 			}
 
-	validarArchivoYEjecutar(archivo, (void*)eliminarBloqueDeArchivo);
+	validarYEjecutar(archivo,validarArchivo, (void*)eliminarBloqueDeArchivo);
 }
 
 void copiarBloque(char *archivo, char* numeroBloque, char* idNodo) {
@@ -352,7 +351,7 @@ void copiarBloque(char *archivo, char* numeroBloque, char* idNodo) {
 
 	}
 
-		validarArchivoYEjecutar(archivo, (void*)copiarBloque);
+		validarYEjecutar(archivo,validarArchivo, (void*)copiarBloque);
 }
 
 void levantarNodo(char *nodo) {
@@ -446,53 +445,6 @@ void ls(){
 	}
 }
 
-void cd(char* unPath){
-	char** vectorPath = string_split(unPath, "/");
-	int i;
-	for(i=0;vectorPath[i+1]!=NULL;i++);
-	char* nombreDirectorio=vectorPath[i];
-
-	int nombreCoincide (t_directorio *unDirectorio){
-		return !strcmp(unDirectorio->nombre,nombreDirectorio);
-	}
-	if(!strcmp(nombreDirectorio,"..")){
-		if(directorioActual->index > 1) {
-			t_directorio* directorioObjetivo = encontrarDirectorioPadre(listaDirectorios,directorioActual);
-			if(directorioObjetivo!=NULL){
-				directorioActual=directorioObjetivo;
-				//Modifico la salida por pantalla (Socketes:~root/etc)
-				int i=0;
-				for(i=strlen(direccion)-1;direccion[i]!='/';i--);
-				direccion[i]='\0';
-				//
-			}
-		}
-
-	}
-	else {
-		t_list *directoriosVisibles = directoriosVisiblesDesdeDirectorioDado(unPath);
-		if (directoriosVisibles != NULL) {
-			t_directorio *directorioObjetivo = list_find(directoriosVisibles,
-					(void *) nombreCoincide);
-			if (directorioObjetivo != NULL) {
-				directorioActual = directorioObjetivo;
-				for(i=0;vectorPath[i]!=NULL;i++) {
-						if(!strcmp(vectorPath[i],"..")) {
-							if(directorioActual->index > 1) {
-							fflush(stdout);
-							int i=0;
-							for(i=strlen(direccion)-1;direccion[i]!='/';i--);
-							direccion[i]='\0';
-							}
-						}
-						else string_append_with_format(&direccion, "/%s", vectorPath[i]);
-					}
-				}
-				list_destroy(directoriosVisibles);
-
-			}
-		}
-}
 
 void verNodos(){
 	mostrarLista(listaNodos, (void*)mostrarNodo);
@@ -503,7 +455,8 @@ t_list *directoriosVisiblesDesdeDirectorioDado(char* unPath) {
 	if (!strcmp(unPath, "")) {
 		return hijosDelActual(directorioActual);
 	} else {
-		t_directorio* directorioEnQueEstoyParado = ubicarDirectorio(unPath);
+		char** vectorPath = string_split(unPath,"/");
+		t_directorio* directorioEnQueEstoyParado = ubicarseEnDirectorio(vectorPath);
 
 		return hijosDelActual(directorioEnQueEstoyParado);
 
@@ -740,49 +693,141 @@ int esNull(void* algo){
 	return algo==NULL;
 }
 
-t_directorio* ubicarDirectorio(char* unPath){
-char** vectorPath = string_split(unPath, "/");
-		int i;
-		t_directorio* directorioAuxiliar = directorioActual;
-		for (i = 0; vectorPath[i + 1] != NULL; i++) {
-
-			if (!strcmp(vectorPath[i], "..")) {
-				printf("El directorio auxiliar era %s\n",directorioAuxiliar->nombre);
-				if(directorioAuxiliar->index>1){
-				directorioAuxiliar = encontrarDirectorioPadre(listaDirectorios, directorioAuxiliar);
-				printf("Directorio auxiliar ahora es %s\n",directorioAuxiliar->nombre);
-				fflush(stdout);
-				}
-			} else {
-				t_directorio* directorioBuscado = buscarDirPorNombre(vectorPath[i],
-						listaDirectorios);
-				if (!directorioBuscado)
-					return directorioAuxiliar;
-				printf("El directorio buscado es %s\n", directorioBuscado->nombre);
-				fflush(stdout);
-
-				int esIgualAlBuscado(t_directorio* unDirectorio) {
-					return directorioBuscado == unDirectorio;
-				}
-				t_list* listaHijos = hijosDelActual(directorioAuxiliar);
-				if (list_find(listaHijos, esIgualAlBuscado)) {
-					directorioAuxiliar = directorioBuscado;
-					list_destroy(listaHijos);
-				} else {
-					printf("El directorio no existe.\n");
-					list_destroy(listaHijos);
-					return directorioActual;
-				}
-			}
-		}
-
-		for (i = 0; vectorPath[i] != NULL; i++)
-			free(vectorPath[i]);
-		free(vectorPath);
-		return directorioAuxiliar;
-}
 
 t_list* hijosDelActual(t_directorio* unDirectorio) {
 	return list_filter(listaDirectorios, ( {bool esHijoDeActual(t_directorio* unDir)
 				{	return esHijo(unDir,unDirectorio);}esHijoDeActual;}));
+}
+
+int esInvalido(char* unPath){
+	if(!strcmp(unPath,"/")) return 1;
+
+	int i,contadorBarrasSeguidas; //Chequeo si tiene dos / seguidos
+	for(i=0;unPath[i]!='\0';i++){
+		if(unPath[i]=='/') contadorBarrasSeguidas++;
+		else contadorBarrasSeguidas=0;
+		if(contadorBarrasSeguidas>1) return 1;
+	}
+
+	return 0;
+}
+
+
+int validarYEjecutar (char* path, void* (*validador)(void*,void*), void (*funcion)(void*)){
+
+	if(detectarError(path,esInvalido,"El path es invalido\n")) return -1;
+
+	char** vectorPath = string_split(path,"/");
+
+	int i;
+
+	for(i=0;vectorPath[i+1]!=NULL;i++);
+
+	t_directorio* directorioReferencia = ubicarseEnDirectorio(vectorPath);
+
+	if(detectarError(directorioReferencia,esNull,"El path ingresado es invalido\n")) return -1;
+
+	void* objeto = validador(vectorPath[i],directorioReferencia);
+
+	if(detectarError(objeto,esNull,"El archivo pedido no existe\n")) return -1;
+
+	funcion(objeto);
+
+	for(i=0;vectorPath[i]!=NULL;i++) free(vectorPath[i]);
+
+	free(vectorPath);
+
+	return 1;
+
+}
+
+t_directorio* ubicarseEnDirectorio(char** vectorPath){
+	t_directorio* directorioAuxiliar = directorioActual;
+	t_list* hijosDelDirectorioAuxiliar;
+	t_directorio* directorioSiguiente;
+	int i;
+	for(i=0;vectorPath[i+1]!=NULL;i++){
+		if(!strcmp(vectorPath[i],"..")){
+			if(directorioAuxiliar->index>1)
+			directorioAuxiliar = directorioPadreDe(directorioAuxiliar);
+		}
+		else{
+			int esHijo(t_directorio* unDir){
+				return unDir->padre==directorioAuxiliar->index;
+			}
+			hijosDelDirectorioAuxiliar = list_filter(listaDirectorios,esHijo);
+			directorioSiguiente = buscarDirPorNombre(vectorPath[i],hijosDelDirectorioAuxiliar);
+			if(directorioSiguiente==NULL){
+				list_destroy(hijosDelDirectorioAuxiliar);
+				return NULL;
+			}
+			directorioAuxiliar = directorioSiguiente;
+			list_destroy(hijosDelDirectorioAuxiliar);
+		}
+	}
+	return directorioAuxiliar;
+}
+
+t_archivo* validarArchivo(char* nombreArchivo, t_directorio* directorioReferencia){
+	int nombreCoincide(t_archivo* unArch){
+		return !strcmp(unArch->nombre,nombreArchivo);
+	}
+	int estaEnDirectorio(t_archivo* unArch){
+		return unArch->padre == directorioReferencia->index;
+	}
+	t_list* archivosVisibles = list_filter(listaArchivos,estaEnDirectorio);
+	t_archivo* archivoBuscado = list_find(archivosVisibles,nombreCoincide);
+	list_destroy(archivosVisibles);
+	return archivoBuscado;
+}
+
+t_directorio* validarDirectorio(char* nombreDirectorio, t_directorio* directorioReferencia){
+	if(!strcmp(nombreDirectorio,"..")) return directorioPadreDe(directorioReferencia);
+	int nombreCoincide(t_directorio* unDir){
+		return !strcmp(unDir->nombre,nombreDirectorio);
+	}
+	int estaEnDirectorio(t_directorio* unDir){
+		return unDir->padre == directorioReferencia->index;
+	}
+	t_list* directoriosVisibles = list_filter(listaDirectorios,estaEnDirectorio);
+	t_directorio* directorioBuscado = list_find(directoriosVisibles,nombreCoincide);
+	list_destroy(directoriosVisibles);
+	return directorioBuscado;
+}
+
+void posicionarseEnDirectorio(t_directorio* unDirectorio) {
+	directorioActual = unDirectorio;
+}
+
+void cd(char* unPath) {
+
+	if (!strcmp(unPath, "..")) {
+		if (directorioActual->index > 1)
+			directorioActual = directorioPadreDe(directorioActual);
+	}
+
+	else
+		validarYEjecutar(unPath, validarDirectorio, posicionarseEnDirectorio);
+}
+
+
+
+t_directorio* directorioPadreDe(t_directorio* unDirectorio) { //PASAMANOS PORQUE ME GUSTA MAS ESTE NOMBRE
+	return encontrarDirectorioPadre(listaDirectorios, unDirectorio);
+}
+
+
+
+void mostrarDireccion(){
+	printf("Socketes:~root");
+	t_list* direccionActual = list_create();
+	t_directorio* dirAux;
+	for(dirAux=directorioActual;dirAux->index!=1;dirAux=directorioPadreDe(dirAux)) list_add_in_index(direccionActual,0,dirAux);
+	void imprimirDirectorio(t_directorio* unDir){
+		printf("/%s",unDir->nombre);
+	}
+	list_iterate(direccionActual,imprimirDirectorio);
+	printf(">");
+	fflush(stdout);
+	list_destroy(direccionActual);
 }
