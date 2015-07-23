@@ -45,6 +45,8 @@ int funcionCopiarBloque(t_archivo *unArchivo, int nroBloque, int id);
 int descargarArchivo(t_archivo *unArchivo);
 int detectarError(void* cosaAChequear,int (*condicion)(void*),char* mensaje);
 int esNull(void* algo);
+t_directorio* ubicarDirectorio(char* unPath);
+t_list* hijosDelActual(t_directorio* unDirectorio);
 //
 
 enum entrada {

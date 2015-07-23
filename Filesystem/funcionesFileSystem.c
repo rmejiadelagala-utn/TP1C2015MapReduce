@@ -432,9 +432,9 @@ t_archivo *buscarArchPorPadre(int padre) { //probada
 	return arch != NULL ? arch : NULL;
 }
 
-t_directorio *encontrarDirectorioHijo(t_list *listaDirectorios, t_directorio *directorioPadre) {
+t_directorio *encontrarDirectorioPadre(t_list *listaDirectorios, t_directorio *directorioHijo) {
 	return list_find(listaDirectorios, ( {bool esPadre(t_directorio* unDir)
-				{	return esHijo(directorioPadre,unDir);}esPadre;}));
+				{	return esHijo(directorioHijo,unDir);}esPadre;}));
 }
 //Fin de funciones de busqueda
 
