@@ -34,6 +34,10 @@ void cd(char *nombreDirectorio);
 void ls();
 
 //Auxiliares
+t_archivo* validarArchivo(char* nombreArchivo, t_directorio* directorioReferencia);
+t_directorio* validarDirectorio(char* nombreArchivo, t_directorio* directorioReferencia);
+t_directorio* directorioPadreDe(t_directorio* unDirectorio);
+t_directorio* ubicarseEnDirectorio(char** vectorPath);
 void validarDirectorioYEjecutar(char* unArch,void (*funcion)(void*));
 void validarArchivoYEjecutar(char* unArch,void (*funcion)(void*));
 int comprobarParametros(int cantParametros, char** parametros);
