@@ -36,8 +36,6 @@ static void recorrerCopiasDeUnArch(t_archivo *unArchivo,
 static int dirPadre(t_directorio *unDir);
 static int dirIndex(t_directorio *unDir);
 static int archPadre(t_archivo *unArch);
-static void lista_remove_and_destroy_by_condition(t_list *self,
-bool (*condition)(void*), void (*element_destroyer)(void*));
 static bool tieneLugar(t_nodo *unNodo);
 //
 /*
@@ -407,8 +405,9 @@ void eliminarDirectorioVacio(t_directorio *directorioAEliminar) {
 	int directorioConIndiceBuscado(t_directorio *directorio) {
 		return directorioAEliminar->index == directorio->index;
 	}
-	list_remove_and_destroy_by_condition(listaDirectorios,
-			(void*) directorioConIndiceBuscado, (void*) liberarDirectorio);
+
+	lista_remove_and_destroy_by_condition(listaDirectorios, (void*) directorioConIndiceBuscado, (void*) liberarDirectorio);
+
 }
 int dirConSoloArch(t_directorio *unDirectorio) {
 	return dameUnSubArch(unDirectorio) != NULL
@@ -496,8 +495,9 @@ void eliminarArchivoDeLista(t_archivo *unArchivo, t_list *listaArchivos) { //pro
 	bool archivoConNombreBuscado(t_archivo *archivoDeLista) {
 		return (strcmp(archivoDeLista->nombre, unArchivo->nombre) == 0);
 	}
-	return list_remove_and_destroy_by_condition(listaArchivos,
-			(bool*) archivoConNombreBuscado, (void*) liberarArchivo);
+
+	return lista_remove_and_destroy_by_condition(listaArchivos, (bool*) archivoConNombreBuscado, (void*) liberarArchivo);
+
 }
 void activarNodoReconectado(t_nodo *nodoABuscar, t_list *listaNodos) { //probada
 	int i;
@@ -548,8 +548,8 @@ void eliminarNodoDeLista(t_nodo *nodoAEliminar, t_list *listaNodos) { //probada
 		return (nodoAEliminar->id == nodoDeLista->id);
 	}
 
-	list_remove_and_destroy_by_condition(listaNodos, (bool*) mismosNodos,
-			(void*) liberarNodo);
+
+	lista_remove_and_destroy_by_condition(listaNodos, (bool*) mismosNodos, (void*) liberarNodo);
 }
 void eliminarReferencias(t_nodo *nodoAEliminar, t_list *archivos) { //probada
 
@@ -737,12 +737,7 @@ void disminuirNodo(t_bloqueEnNodo *copia) {
 /******************************************/
 /********* PRIVATE FUNCTIONS **************/
 /******************************************/
-static void lista_remove_and_destroy_by_condition(t_list *self,
-bool (*condition)(void*), void (*element_destroyer)(void*)) {
-	void* data = list_remove_by_condition(self, condition);
-	if (data)
-		element_destroyer(data);
-}
+
 static bool ordenarPorMenorUso(t_nodo *data, t_nodo *dataSiguiente) {
 	return dataSiguiente->cantidadBloquesOcupados
 			> data->cantidadBloquesOcupados;

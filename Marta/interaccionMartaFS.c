@@ -44,11 +44,11 @@ void* interaccionMartaFS(void* sock) {
 
 			pthread_mutex_lock(&mutexListaNodo);
 
-			list_remove_and_destroy_by_condition(cargaNodos, (void*) coincideIDNodo, (void*) free);
+			lista_remove_and_destroy_by_condition(cargaNodos, (void*) coincideIDNodo, (void*) free);
 
 			pthread_mutex_unlock(&mutexListaNodo);
 
-			list_remove_and_destroy_by_condition(listaRegistrosIDIP, (void*) coincideIDRegistro,
+			lista_remove_and_destroy_by_condition(listaRegistrosIDIP, (void*) coincideIDRegistro,
 					(void*) free);
 //			printf("Nodos:\n");
 //			list_iterate(cargaNodos,(void*)mostrarCargaNodo);
