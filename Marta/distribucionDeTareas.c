@@ -194,7 +194,7 @@ int rePlanificarMapsDeNodoMuerto(int idNodoMuerto, t_InfoJob infoJob,
 	listaReplanificacionPendientesMuertos = list_filter(listaTemporal,
 			(void*) temporalConIDNodoMuerto);
 
-	list_remove_and_destroy_by_condition(listaTemporal,
+	lista_remove_and_destroy_by_condition(listaTemporal,
 			(void*) temporalConIDNodoMuerto, (void*) eliminarTemporal);
 
 	void rePlanificar(t_MapTemporal* unMapTemporal) {
@@ -371,7 +371,7 @@ void borrarMapPendiente(t_list* mapsPendientes, uint32_t idMap,
 
 	pthread_mutex_unlock(&mutexListaNodo);
 
-	list_remove_and_destroy_by_condition(mapsPendientes,
+	lista_remove_and_destroy_by_condition(mapsPendientes,
 			(void *) encuentraMapPendiente, (void *) liberarMapPendiente);
 }
 
