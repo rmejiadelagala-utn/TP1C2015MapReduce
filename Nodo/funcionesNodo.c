@@ -317,10 +317,19 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma,
 		char *pathArchivoSalida, t_list* archivosAReducir, int idReduce) {
 	FILE *stdin = NULL;
 
+	int reduceFallido = 0;
+
 	char *comando = malloc(
 			strlen(pathPrograma) + 12 + strlen(pathArchivoSalida));
 
 	sprintf(comando, "%s | sort >> %s", pathPrograma, pathArchivoSalida);
+
+	void signal_callback_handler(int signal) {
+		reduceFallido = 1;
+	}
+
+	signal(SIGPIPE, signal_callback_handler);
+
 
 	stdin = popen(comando, "w");
 
@@ -361,6 +370,9 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma,
 		return -1;
 	}
 
+	if(reduceFallido)
+	return -2;
+	else
 	return 1;
 }
 
@@ -378,10 +390,15 @@ int ejecutarMapper(char * path_s, char* path_tmp, char* datos_bloque) {
 
 int ejecutarReduce(char * path_s, char* path_tmp, t_list* archivosAReducir, int idReduce) {
 
-	if ((redireccionar_stdin_stdout_reduce(path_s, path_tmp, archivosAReducir, idReduce))
-			< 1) {
-		log_info(nodo_logger, "Error al ejecutar Reduce");
+	int resultado=redireccionar_stdin_stdout_reduce(path_s, path_tmp, archivosAReducir, idReduce);
+
+	if (resultado==-1) {
+		log_error(nodo_logger, "Error al ejecutar Reduce");
 		return -1;
+	}
+	if (resultado==-2){
+		log_error(nodo_logger, "Error de text file busy");
+		return -2;
 	}
 	return 1;
 

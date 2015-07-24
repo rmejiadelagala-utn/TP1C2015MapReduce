@@ -153,12 +153,17 @@ void* conexionJobs(void* sockJobNodo) {
 		case ENVIO_ARCHIVOS_NODO_NODO:
 			archivoPedido=recibirString(sock_in);
 			int fileArchivoPedido = open(archivoPedido, O_RDONLY);
+
+			if(fileArchivoPedido<0){
+				log_error(nodo_logger,"Error de open");
+				return NULL;
+			}
 			//FILE* fileArchivoPedido = fopen(archivoPedido,"a+");
 			stat(archivoPedido,&datosArch);
 
 
 
-			if ((dataArchivoPedido = (char *) mmap(0, datosArch.st_size, PROT_READ, MAP_PRIVATE, fileArchivoPedido, 0)) == MAP_FAILED) {
+			if ((dataArchivoPedido = (char *) mmap(0, datosArch.st_size, PROT_READ, MAP_SHARED, fileArchivoPedido, 0)) == MAP_FAILED) {
 					log_error(nodo_logger,"Error al iniciar el mapeo de disco. '%s' ", strerror(errno));
 					close(fileArchivoPedido);
 					exit(1);
@@ -184,7 +189,8 @@ void* conexionJobs(void* sockJobNodo) {
 			nomArchSalida = recibirString(sock_in);
 			log_info(nodo_logger,"El archivo de salida recibido es %s\n", nomArchSalida);
 			fflush(stdout);
-
+			resultado=-2;
+			while(resultado==-2){
 			pthread_mutex_lock(&numeroReduce);
 			log_info(nodo_sync_logger,"lock numeroReduce");
 			nombreScript = strdup("tmp/");
@@ -192,15 +198,18 @@ void* conexionJobs(void* sockJobNodo) {
 			string_append(&nombreScript,"reduce");
 			string_append(&nombreScript, string_itoa(numeroDeReduce));
 			string_append(&nombreScript, ".sh");
+
+			crearScriptReduce(script, nombreScript);
+
 			string_append(&archivoSalida, nomArchSalida);
 			numeroReduceActual = numeroDeReduce;
-			crearScriptReduce(script, nombreScript);
 			numeroDeReduce++;
 			pthread_mutex_unlock(&numeroReduce);
 			log_info(nodo_sync_logger,"unlock numeroReduce");
 
-			resultado = ejecutarReduce(nombreScript, archivoSalida, archivosAReducir,numeroReduceActual);
 
+			resultado = ejecutarReduce(nombreScript, archivoSalida, archivosAReducir,numeroReduceActual);
+			}
 			enviarProtocolo(RES_REDUCE,sock_in);
 			if(resultado>0)	enviarProtocolo(OK_REDUCE,sock_in);
 			else enviarProtocolo(NOTOK_REDUCE,sock_in);

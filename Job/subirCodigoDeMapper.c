@@ -16,8 +16,6 @@ char* subirCodigoFromPathToBuffer(char* path) {
 	file=fopen(path,"r");
 	if(file!=NULL){
 		fread(buffer, stat_file.st_size, 1, file);
-		printf("muestro codigo: \n");
-		printf("%s\n",buffer);
 	} else {
 		printf("no pude abrir archivo %s para enviar a Nodo\n",path);
 		return NULL;

@@ -10,7 +10,7 @@ tam_databin_default=$tam_databin_cfg
 mkdir Nodo/Archivos 2>log
 
 function crearDataBin {
-	truncate -s $2K Nodo/Archivos/data$1.bin
+	truncate -s $2M Nodo/Archivos/data$1.bin
 }
 
 function crearConfig {
