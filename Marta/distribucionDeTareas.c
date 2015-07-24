@@ -203,7 +203,8 @@ int rePlanificarMapsDeNodoMuerto(int idNodoMuerto, t_InfoJob infoJob,
 		destinoMap = planificarMap(infoJob, unMapTemporal->idArchivoOrigen,
 				unMapTemporal->bloqueOrigen, &ultimoIDMap);
 
-		list_add(nuevosDestinosDeMapsReplanificados, destinoMap);
+		//XXX ojo con esta lista nuevos... muy raro.
+		list_add(*nuevosDestinosDeMapsReplanificados, destinoMap);
 	}
 
 	list_iterate(listaReplanificacionPendientesMuertos, (void*) rePlanificar);
