@@ -43,10 +43,12 @@ void* interaccionMartaFS(void* sock) {
 			recvall(socket, &id, sizeof(int));
 
 			pthread_mutex_lock(&mutexListaNodo);
+			log_info(marta_sync_logger, "lock mutexListaNodo");
 
 			lista_remove_and_destroy_by_condition(cargaNodos, (void*) coincideIDNodo, (void*) free);
 
 			pthread_mutex_unlock(&mutexListaNodo);
+			log_info(marta_sync_logger, "unlock mutexListaNodo");
 
 			lista_remove_and_destroy_by_condition(listaRegistrosIDIP, (void*) coincideIDRegistro,
 					(void*) free);
@@ -57,14 +59,18 @@ void* interaccionMartaFS(void* sock) {
 			break;
 		case ENVIO_BLOQUEARCH_A_MARTA:
 			sem_post(&funcionesMarta);
+			log_info(marta_sync_logger, "post funcionesMarta");
 			log_info(marta_logger, "El protocolo es %d", protocolo);
-			log_info(marta_logger, "Despertate marta.\n");
+			log_info(marta_logger, "Despertate marta.");
 			sem_wait(&interaccionFS);
+			log_info(marta_sync_logger, "wait interaccionFS");
 			break;
 		case DAME_LISTA_DE_ARCHIVOS_FS:
 			sem_post(&funcionesMarta);
+			log_info(marta_sync_logger, "post funcionesMarta");
 
 			sem_wait(&interaccionFS);
+			log_info(marta_sync_logger, "wait interaccionFS");
 		}
 	}
 

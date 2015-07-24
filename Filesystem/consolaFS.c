@@ -629,6 +629,7 @@ int verBloqueDeArchivo(t_archivo *unArchivo, int nroBloque){
 		pedirBloqueANodo(nodoEncontrado->socket,bloqueEnNodo->numeroDeBloqueEnNodo,VER_BLOQUE_NODO,bloqueEnNodo->tamanioBloque);
 
 		sem_wait(&consola_sem);
+		log_info(mdfs_sync_logger,"wait consola_sem");
 
 		void* buffer;
 
@@ -643,7 +644,7 @@ int verBloqueDeArchivo(t_archivo *unArchivo, int nroBloque){
 		free(buffer);
 
 		sem_post(&escuchar_sem);
-
+		log_info(mdfs_sync_logger,"post escuchar_sem");
 		return 1;
 
 	}
@@ -674,6 +675,7 @@ int funcionCopiarBloque(t_archivo *unArchivo, int nroBloque, int id){
 	pedirBloqueANodo(nodoAlQuePidoBloque->socket,bloqueEnNodo->numeroDeBloqueEnNodo,COPIAR_BLOQUE_NODO,bloqueEnNodo->tamanioBloque);
 
 	sem_wait(&consola_sem);
+	log_info(mdfs_sync_logger,"wait consola_sem");
 
 	void* buffer;
 
@@ -682,6 +684,7 @@ int funcionCopiarBloque(t_archivo *unArchivo, int nroBloque, int id){
 	setBloque(nodoAlQueEnvioBloque, buffer, tamanio, 0,copiasDelBloque);
 
 	sem_post(&escuchar_sem);
+	log_info(mdfs_sync_logger,"post escuchar_sem");
 
 	return 1;
 

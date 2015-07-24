@@ -49,6 +49,7 @@ int numeroDeReduce;
 pthread_mutex_t numeroReduce;
 pthread_mutex_t unMutex;
 t_log* nodo_logger;
+t_log* nodo_sync_logger;
 
 
 
