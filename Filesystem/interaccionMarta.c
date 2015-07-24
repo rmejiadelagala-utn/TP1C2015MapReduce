@@ -37,7 +37,6 @@ int encontrarCopias(char* nombre,int directorioIndex, int numeroDeBloqueEnArchiv
 			resultado= -2;
 		}
 		else{
-			printf("encontro las copias\n");
 			*copias = UnbloqueArch->copiasDeBloque;
 			resultado= 0;
 		}

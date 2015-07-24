@@ -4,9 +4,17 @@
 
 char *direccion;
 int consola(void* unListaNodo) {
+	int esRoot(t_directorio* unDirectorio){
+		return (unDirectorio->index==1 && !strcmp(unDirectorio->nombre,"root") && unDirectorio->padre==0);
+	}
+	if(!list_any_satisfy(listaDirectorios,esRoot)){
 	directorioActual = nuevoDirectorio(1, "root", 0);
 	list_add(listaDirectorios,directorioActual);
 	direccion = string_duplicate(directorioActual->nombre);
+	}
+	else{
+		directorioActual=list_find(listaDirectorios,esRoot);
+	}
 	// // lo defino como un char** porque necesito tener un "array"
 	//con todas las cadenas, donde la primera es el comando y las demas los parametros
 	char **comandoSeparado;
@@ -158,6 +166,7 @@ int consola(void* unListaNodo) {
 	} while (!exit);
 	for (i = 0; i < 21; i++) free(comandosValidos[i]);
 	free(direccion);
+	raise(SIGINT);
 	return 0;
 }
 

@@ -882,7 +882,6 @@ static void recorrerCopiasDeUnArch(t_archivo *unArchivo,
 }
 
 static bool tieneLugar(t_nodo *unNodo) {
-	printf("El tamaño del nodo %d es %f y necesito tener mas de %d\n",unNodo->id,unNodo->tamanio,unNodo->cantidadBloquesOcupados*BLOCK_SIZE+BLOCK_SIZE);
 	fflush(stdout);
 	return unNodo->tamanio
 			> (unNodo->cantidadBloquesOcupados * BLOCK_SIZE + BLOCK_SIZE);

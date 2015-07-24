@@ -96,9 +96,7 @@ int buscarBloquesEnFS(t_InfoJob infoDeJob, uint32_t idArchivo,
 
 	dameBloqueArchFS(socketDeFS, infoDeJob.pathsDeArchivos[idArchivo], 1,
 			numeroDeBloque);
-	log_info(marta_logger, "Me pongo a esperar en el semaforo.");
 	sem_wait(&funcionesMarta);
-	log_info(marta_logger, "Me desperte.");
 	t_list* copias = list_create();
 	if (recibirBloqueArchFS(socketDeFS, copias) < 0)
 		return -1;
@@ -112,8 +110,8 @@ int buscarBloquesEnFS(t_InfoJob infoDeJob, uint32_t idArchivo,
 	list_iterate(copias, (void*) deBloqueEnNodoACopiaDeBloque);
 	//copiasDeBloque = list_map(copias,deBloqueEnNodoACopiaDeBloque);
 	void mostrarBloque(t_CopiaDeBloque* unBloque) {
-		log_info(marta_logger, "ID bloque:%d\nNumero de bloque:%d",
-				unBloque->id_nodo, unBloque->block);
+		//log_info(marta_logger, "ID bloque:%d\nNumero de bloque:%d",
+		//		unBloque->id_nodo, unBloque->block);
 	}
 	list_iterate(copiasDeBloque, (void*) mostrarBloque);
 //	printf("El tamaño de la lista es %d\n", list_size(copiasDeBloque));

@@ -793,7 +793,6 @@ void *interaccionFSNodo(void* sock_ptr) {
 		case ENVIO_BLOQUEARCH_A_MARTA:
 			infoBloquePedido = recibirPedidoDeBloqueArch(socket);
 			//	copias = list_create();
-			log_info(mdfs_logger, "nombreArch: %s\n", infoBloquePedido->nombreArch);
 			resultado = encontrarCopias(infoBloquePedido->nombreArch, infoBloquePedido->padre, infoBloquePedido->numeroDeBloqueArch,
 					&copias);
 			if (resultado == -1) {
@@ -803,7 +802,6 @@ void *interaccionFSNodo(void* sock_ptr) {
 				log_warning(mdfs_logger, "No existe ese numero De Bloque En Archivo");
 				//		printf("No existe ese numero De Bloque En Archivo \n");
 			} else {
-				log_info(mdfs_logger, "Voy a entrar a enviar copia al socket %d\n", socket);
 				//	printf("Voy a entrar a enviar copia al socket %d\n",socket);
 				int suNodoEstaActivo(t_bloqueEnNodo* copiaDeBloque) {
 					t_nodo* unNodo = buscarNodoPorId(copiaDeBloque->id, listaNodos);
