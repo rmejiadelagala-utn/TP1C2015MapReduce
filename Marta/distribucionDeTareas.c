@@ -68,12 +68,14 @@ t_CopiaDeBloque* elegirMejorNodoParaMap(t_list* copiasDeBloque) {
 
 	//ordena las copiasDeBloque por los nodos que menos están trabajando
 	pthread_mutex_lock(&mutexListaNodo);
+	log_info(marta_sync_logger,"lock mutexListaNodo");
 
 //	printf("Voy a ordenar las copias de bloque\n");
 //	fflush(stdout);
 	list_sort(copiasDeBloque, (void*) compararNodosPorMenorCarga);
 
 	pthread_mutex_unlock(&mutexListaNodo);
+	log_info(marta_sync_logger,"unlock mutexListaNodo");
 	int i;
 	t_CopiaDeBloque* copiaElegida;
 	for (i = 0; (copiaElegida = list_get(copiasDeBloque, i)) == NULL; i++)
@@ -98,6 +100,7 @@ int buscarBloquesEnFS(t_InfoJob infoDeJob, uint32_t idArchivo,
 			numeroDeBloque);
 	log_info(marta_logger, "Me pongo a esperar en el semaforo.");
 	sem_wait(&funcionesMarta);
+	log_info(marta_sync_logger,"wait funcionesMarta");
 	log_info(marta_logger, "Me desperte.");
 	t_list* copias = list_create();
 	if (recibirBloqueArchFS(socketDeFS, copias) < 0)
@@ -120,6 +123,7 @@ int buscarBloquesEnFS(t_InfoJob infoDeJob, uint32_t idArchivo,
 //	fflush(stdout);
 	list_destroy_and_destroy_elements(copias, free);
 	sem_post(&interaccionFS);
+	log_info(marta_sync_logger,"post interaccionFS");
 
 	return 1;	//1 salió bien, <= 0 no lo encontró
 }
@@ -306,6 +310,7 @@ void agregarMapPendiente(t_list* mapsPendientes, t_InfoArchivo* infoArchivo,
 	}
 
 	pthread_mutex_lock(&mutexListaNodo);
+	log_info(marta_sync_logger,"lock mutexListaNodo");
 
 	cargaNodo = list_find(cargaNodos, (void *) encuentraNodo);
 
@@ -332,6 +337,7 @@ void agregarMapPendiente(t_list* mapsPendientes, t_InfoArchivo* infoArchivo,
 
 //cierro el mutex
 	pthread_mutex_unlock(&mutexListaNodo);
+	log_info(marta_sync_logger,"unlock mutexListaNodo");
 
 }
 
@@ -361,6 +367,7 @@ void borrarMapPendiente(t_list* mapsPendientes, uint32_t idMap,
 	list_add(listaTemporal, temp_map);
 
 	pthread_mutex_lock(&mutexListaNodo);
+	log_info(marta_sync_logger,"lock mutexListaNodo");
 
 	cargaNodo = list_find(cargaNodos, (void *) seEncuetraNodo);
 
@@ -371,6 +378,7 @@ void borrarMapPendiente(t_list* mapsPendientes, uint32_t idMap,
 	}
 
 	pthread_mutex_unlock(&mutexListaNodo);
+	log_info(marta_sync_logger,"unlock mutexListaNodo");
 
 	lista_remove_and_destroy_by_condition(mapsPendientes,
 			(void *) encuentraMapPendiente, (void *) liberarMapPendiente);
@@ -433,6 +441,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 
 	log_info(marta_logger, "Envie todos los pedidos");
 	pthread_mutex_unlock(&conexionFS);
+	log_info(marta_sync_logger,"unlock conexionFS");
 
 	t_ResultadoMap resultadoDeMap;
 	t_list* nuevosDestinosDeMapsReplanificados;
@@ -492,6 +501,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 				}
 
 				pthread_mutex_unlock(&planificarMapMutex);
+				log_info(marta_sync_logger,"unlock planificarMapMutex");
 
 				if (mapPendiente) {
 					resultado = ordenarMapAJob(mapPendiente->map_dest, sockjob);
@@ -546,6 +556,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 						&nuevosDestinosDeMapsReplanificados);
 
 				pthread_mutex_unlock(&planificarMapMutex);
+				log_info(marta_sync_logger,"unlock planificarMapMutex");
 
 				ordenarARealizarLosRePlanificados(
 						nuevosDestinosDeMapsReplanificados, sockjob);
