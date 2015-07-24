@@ -297,23 +297,19 @@ void cargarPersistencia() {
 }
 
 void guardarPersistencia() {
-	mostrarLista(listaRegistrosIDIP,(void*)mostrarRegistro);
-	 mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
-	 mostrarLista(listaNodos, (void*) mostrarNodo);
-	 mostrarLista(listaArchivos, (void*) mostrarArchivo);
+//	mostrarLista(listaRegistrosIDIP,(void*)mostrarRegistro);
+//	 mostrarLista(listaDirectorios, (void*) mostrarDirectorio);
+//	 mostrarLista(listaNodos, (void*) mostrarNodo);
+//	 mostrarLista(listaArchivos, (void*) mostrarArchivo);
 
 	guardarListaArchivos();
-	printf("guarde lista de archivos\n");
-	fflush(stdout);
+	log_info(mdfs_logger,"guarde lista de archivos\n");
 	guardarListaDirectorios();
-	printf("guarde lista de Directorios\n");
-	fflush(stdout);
+	log_info(mdfs_logger,"guarde lista de Directorios\n");
 	guardarListaNodos();
-	printf("guarde lista de Nodos\n");
-	fflush(stdout);
+	log_info(mdfs_logger,"guarde lista de Nodos\n");
 	guardarListaRegistrosIDIP();
-	printf("guarde lista de RegistrosIDIP\n");
-	fflush(stdout);
+	log_info(mdfs_logger,"guarde lista de RegistrosIDIP\n");
 }
 void signal_callback_handler(int signum) {
 
