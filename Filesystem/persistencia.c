@@ -291,9 +291,13 @@ void cargarPersistenciacfg() {
 //Funciones genéricas
 void cargarPersistencia() {
 	cargarListaArchivos();
+	log_info(mdfs_logger,"cargue lista de archivos\n");
 	cargarListaDirectorios();
+	log_info(mdfs_logger,"cargue lista de Directorios\n");
 	cargarListaNodos();
+	log_info(mdfs_logger,"cargue lista de Nodos\n");
 	cargarListaRegistrosIDIP();
+	log_info(mdfs_logger,"cargue lista de RegistrosIDIP\n");
 }
 
 void guardarPersistencia() {
@@ -313,7 +317,7 @@ void guardarPersistencia() {
 }
 void signal_callback_handler(int signum) {
 
-	printf("\t Caught signal %d\n", signum);
+//	printf("\t Caught signal %d\n", signum);
 	guardarPersistencia();
 	exit(signum);
 
