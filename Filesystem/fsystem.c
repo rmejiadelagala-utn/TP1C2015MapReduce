@@ -19,6 +19,7 @@ int main() {
 	pthread_mutex_init(&listaDeNodos, NULL);
 	pthread_mutex_init(&listaDeRegistros, NULL);
 	mdfs_logger = log_create("filesystem.log", "MDFS", 1, log_level_from_string("TRACE"));
+	mdfs_sync_logger = log_create("mdfs_sync.log", "MDFS", 0, log_level_from_string("TRACE"));
 	cargarPersistencia();
 	// Register signal and signal handler
 	signal(SIGINT, signal_callback_handler);
