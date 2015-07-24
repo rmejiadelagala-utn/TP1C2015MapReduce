@@ -25,6 +25,7 @@ int main(int argc,char *argv[]) {
 	pthread_mutex_init(&numeroReduce,NULL);
 	pthread_mutex_init(&unMutex,NULL);
 	nodo_logger = log_create("nodo.log", "Nodo", 1, log_level_from_string("TRACE"));
+	nodo_sync_logger = log_create("nodo_sync.log", "Nodo", 0, log_level_from_string("TRACE"));
 	log_info(nodo_logger,"Cargando archivo de Configuracion");
 	arch_config= malloc(sizeof(t_config_nodo));
 	arch_config = leerArchivoConfig(ARCHIVO_CONFIG);

@@ -5,6 +5,7 @@ void *interaccionJobs(void* sock_ptr) {
 
 
 	pthread_mutex_lock(&conexionFS);
+	log_info(marta_sync_logger, "lock conexionFS");
 	int sockCliente = *(int*) sock_ptr;
 
 	t_solicitud solicitud = deserealizarSolicitudDeJob(sockCliente);
@@ -21,6 +22,7 @@ void *interaccionJobs(void* sock_ptr) {
 		log_error(marta_logger,"Se produjo un error con el job");
 		close(sockCliente);
 		pthread_mutex_unlock(&conexionFS);
+		log_info(marta_sync_logger, "unlock conexionFS");
 		return NULL;
 	}
 
@@ -89,12 +91,14 @@ t_InfoJob adaptarSolicitudAInfoJob(t_solicitud solicitud) {
 	info_job.combiner = solicitud.combiner;
 
 	pthread_mutex_lock(&contadorJobs);
+	log_info(marta_sync_logger, "lock contadorJobs");
 
 	info_job.idJob = contadorDeIdJob;
 
 	contadorDeIdJob++;
 
 	pthread_mutex_unlock(&contadorJobs);
+	log_info(marta_sync_logger, "unlock contadorJobs");
 
 	info_job.pathDeResultado = solicitud.archivo_resultado;
 

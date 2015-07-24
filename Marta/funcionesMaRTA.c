@@ -18,6 +18,7 @@ t_list* obtenerIDyCantBloquesDeArchivosDelFS(char** archivos,int cantidadArchivo
 
 	dameListaArchFS(socketDeFS,archivos,cantidadArchivos);
 	sem_wait(&funcionesMarta);
+	log_info(marta_sync_logger,"wait funcionesMarta");
 	fflush(stdout);
 	t_list* listaArchivos = list_create();
 	int i;
@@ -32,6 +33,7 @@ t_list* obtenerIDyCantBloquesDeArchivosDelFS(char** archivos,int cantidadArchivo
 		list_add(listaArchivos,infoArchivo);
 	}
 	sem_post(&interaccionFS);
+	log_info(marta_sync_logger,"post interaccionFS");
 	if(huboError) return NULL;
 	return listaArchivos;
 }

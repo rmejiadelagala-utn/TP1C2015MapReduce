@@ -70,6 +70,7 @@ FILE *fpDir;
 FILE *fpNodos;
 FILE *fpReg;
 t_log* mdfs_logger;
+t_log* mdfs_sync_logger;
 
 void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* nombreArchivo, int padre);
 #endif /* FSYSTEM_H_ */

@@ -263,7 +263,6 @@ int enviarProtocolo(int protocolo,int socket){
 			return enviarBuffer(buffer,socket);
 		}
 	int dameBloqueArchFS(int socket,char *nombreArchivo, int padre, int numeroBloqueArch){
-		printf("entro a dameBloqueArh:D\n" );
 		printf("Voy a agregar el string %s\n",nombreArchivo);
 		fflush(stdout);
 		t_buffer *buffer = crearBufferConProtocolo(ENVIO_BLOQUEARCH_A_MARTA);
@@ -392,13 +391,11 @@ int enviarProtocolo(int protocolo,int socket){
 		int cantidadDeCopias;
 		if(recvall(socketAuxiliar,&cantidadDeCopias,sizeof(int))<1) return -1;
 		if(cantidadDeCopias==-1) return -1;
-		printf("\n\nCantidad de copias: %d\n\n",cantidadDeCopias);
 		fflush(stdout);
 		int i;
 		for(i=0;i<cantidadDeCopias;i++){
 			t_bloqueEnNodo* copiaDeBloque=malloc(sizeof(t_bloqueEnNodo));
 			if(recvall(socketAuxiliar,copiaDeBloque,sizeof(t_bloqueEnNodo))<1)return -1;
-			printf("ID de copia: %d\n",copiaDeBloque->id);
 			fflush(stdout);
 			list_add(copiasDeBloque,copiaDeBloque);
 		}

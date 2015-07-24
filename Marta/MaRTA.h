@@ -36,7 +36,7 @@ sem_t funcionesMarta;
 sem_t interaccionFS;
 t_list* listaTemporal;
 t_log* marta_logger;
-
+t_log* marta_sync_logger;
 int contadorDeIdJob;
 
 #endif /* MARTA_H_ */

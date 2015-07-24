@@ -79,11 +79,13 @@ void copiarResultadoAFS(int socket) {
 	bufferAgregarString(buffer, archivoFinal, strlen(archivoFinal) + 1);
 	enviarBuffer(buffer, nodo->socket);
 	sem_wait(&resultadoJob_sem);
+	log_info(mdfs_sync_logger,"wait de resultadoJob_sem");
 	int cantidadBolquesEnviados = 0;
 	t_list* listaDeBloques = list_create();
 	char* data = recibirString(nodo->socket);
 	sem_post(&escuchar_sem);
-	printf("Voy a distribuir el archivo en los nodos\n");
+	log_info(mdfs_sync_logger,"post de escuchar_sem");
+	log_info(mdfs_logger,"Voy a distribuir el archivo en los nodos\n");
 	int resultado = mandarBloquesANodos(data, &cantidadBolquesEnviados,
 			&listaDeBloques);
 
@@ -136,11 +138,13 @@ int mandarBloquesANodos(char* data, int* cantidadBloquesEnviados,
 
 	t_list *nodosOrdenados;
 	pthread_mutex_lock(&listaDeNodos);
+	log_info(mdfs_sync_logger,"lock listaDeNodos");
 	int estaActivo(t_nodo* unNodo) {
 		return unNodo->activo;
 	}
 	nodosOrdenados = list_filter(listaNodos, (void*) estaActivo); //Agrega todos los elementos de la segunda lista en la primera
 	pthread_mutex_unlock(&listaDeNodos);
+	log_info(mdfs_sync_logger,"unlockListaDeNodos");
 
 	while (!fin) {
 
@@ -855,7 +859,7 @@ int obtenerArchivo(t_archivo *archivo) {
 
 		pedirBloqueANodo(nodoEncontrado->socket, bloque->numeroDeBloqueEnNodo,
 				COPIAR_ARCHIVO_A_FS_LOCAL, bloque->tamanioBloque);
-
+		log_info(mdfs_sync_logger,"wait semaforo");
 		sem_wait(&semaforo);
 
 	}
@@ -882,7 +886,6 @@ static void recorrerCopiasDeUnArch(t_archivo *unArchivo,
 }
 
 static bool tieneLugar(t_nodo *unNodo) {
-	printf("El tamaño del nodo %d es %f y necesito tener mas de %d\n",unNodo->id,unNodo->tamanio,unNodo->cantidadBloquesOcupados*BLOCK_SIZE+BLOCK_SIZE);
 	fflush(stdout);
 	return unNodo->tamanio
 			> (unNodo->cantidadBloquesOcupados * BLOCK_SIZE + BLOCK_SIZE);

@@ -4,9 +4,17 @@
 
 char *direccion;
 int consola(void* unListaNodo) {
+	int esRoot(t_directorio* unDirectorio){
+		return (unDirectorio->index==1 && !strcmp(unDirectorio->nombre,"root") && unDirectorio->padre==0);
+	}
+	if(!list_any_satisfy(listaDirectorios,esRoot)){
 	directorioActual = nuevoDirectorio(1, "root", 0);
 	list_add(listaDirectorios,directorioActual);
 	direccion = string_duplicate(directorioActual->nombre);
+	}
+	else{
+		directorioActual=list_find(listaDirectorios,esRoot);
+	}
 	// // lo defino como un char** porque necesito tener un "array"
 	//con todas las cadenas, donde la primera es el comando y las demas los parametros
 	char **comandoSeparado;
@@ -158,6 +166,7 @@ int consola(void* unListaNodo) {
 	} while (!exit);
 	for (i = 0; i < 21; i++) free(comandosValidos[i]);
 	free(direccion);
+	raise(SIGINT);
 	return 0;
 }
 
@@ -620,6 +629,7 @@ int verBloqueDeArchivo(t_archivo *unArchivo, int nroBloque){
 		pedirBloqueANodo(nodoEncontrado->socket,bloqueEnNodo->numeroDeBloqueEnNodo,VER_BLOQUE_NODO,bloqueEnNodo->tamanioBloque);
 
 		sem_wait(&consola_sem);
+		log_info(mdfs_sync_logger,"wait consola_sem");
 
 		void* buffer;
 
@@ -634,7 +644,7 @@ int verBloqueDeArchivo(t_archivo *unArchivo, int nroBloque){
 		free(buffer);
 
 		sem_post(&escuchar_sem);
-
+		log_info(mdfs_sync_logger,"post escuchar_sem");
 		return 1;
 
 	}
@@ -665,6 +675,7 @@ int funcionCopiarBloque(t_archivo *unArchivo, int nroBloque, int id){
 	pedirBloqueANodo(nodoAlQuePidoBloque->socket,bloqueEnNodo->numeroDeBloqueEnNodo,COPIAR_BLOQUE_NODO,bloqueEnNodo->tamanioBloque);
 
 	sem_wait(&consola_sem);
+	log_info(mdfs_sync_logger,"wait consola_sem");
 
 	void* buffer;
 
@@ -673,6 +684,7 @@ int funcionCopiarBloque(t_archivo *unArchivo, int nroBloque, int id){
 	setBloque(nodoAlQueEnvioBloque, buffer, tamanio, 0,copiasDelBloque);
 
 	sem_post(&escuchar_sem);
+	log_info(mdfs_sync_logger,"post escuchar_sem");
 
 	return 1;
 

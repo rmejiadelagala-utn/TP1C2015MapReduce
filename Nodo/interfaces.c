@@ -114,7 +114,9 @@ void* conexionJobs(void* sockJobNodo) {
 			nomArchSalida = recibirString(sock_in);
 			string_append(&archivoSalida, nomArchSalida);
 			log_info(nodo_logger,"El archivo de salida recibido es %s", archivoSalida);
+
 			pthread_mutex_lock(&numeroMap);
+			log_info(nodo_sync_logger,"lock numeroMap");
 			nombreScript = strdup("tmp/");
 			string_append(&nombreScript,string_itoa(arch_config->ID));
 			string_append(&nombreScript,"mapper");
@@ -124,6 +126,8 @@ void* conexionJobs(void* sockJobNodo) {
 			crearScriptMapper(script, nombreScript);
 			numeroDeMap++;
 			pthread_mutex_unlock(&numeroMap);
+			log_info(nodo_sync_logger,"unlock numeroMap");
+
 			char* dataAUX = malloc(tamanioBloque);
 			memcpy(dataAUX, DATOS + (nroBloque * BLKSIZE), tamanioBloque);
 			log_info(nodo_logger,"antes de ejecutar %s", nombreScript);
@@ -180,7 +184,9 @@ void* conexionJobs(void* sockJobNodo) {
 			nomArchSalida = recibirString(sock_in);
 			log_info(nodo_logger,"El archivo de salida recibido es %s\n", nomArchSalida);
 			fflush(stdout);
+
 			pthread_mutex_lock(&numeroReduce);
+			log_info(nodo_sync_logger,"lock numeroReduce");
 			nombreScript = strdup("tmp/");
 			string_append(&nombreScript,string_itoa(arch_config->ID));
 			string_append(&nombreScript,"reduce");
@@ -191,6 +197,7 @@ void* conexionJobs(void* sockJobNodo) {
 			crearScriptReduce(script, nombreScript);
 			numeroDeReduce++;
 			pthread_mutex_unlock(&numeroReduce);
+			log_info(nodo_sync_logger,"unlock numeroReduce");
 
 			resultado = ejecutarReduce(nombreScript, archivoSalida, archivosAReducir,numeroReduceActual);
 

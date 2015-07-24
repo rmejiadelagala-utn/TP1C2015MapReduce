@@ -24,6 +24,7 @@ int main(/*int argc, char *argv[]*/) {
 	pthread_mutex_init(&planificarMapMutex,0);
 	listaTemporal = list_create();
 	marta_logger = log_create("MaRTA.log", "MaRTA", 1, log_level_from_string("TRACE"));
+	marta_sync_logger = log_create("MaRTA_sync.log", "MDFS", 0, log_level_from_string("TRACE"));
 	contadorDeIdJob=0;
 
 
