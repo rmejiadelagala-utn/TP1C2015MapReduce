@@ -314,7 +314,7 @@ int redireccionar_stdin_stdout_mapper(char *pathPrograma,
 
 //TODO hacer esto de forma correcta, obteniendo los path de los de reducir y apareando
 int redireccionar_stdin_stdout_reduce(char *pathPrograma,
-		char *pathArchivoSalida, t_list* archivosAReducir) {
+		char *pathArchivoSalida, t_list* archivosAReducir, int idReduce) {
 	FILE *stdin = NULL;
 
 	char *comando = malloc(
@@ -336,10 +336,12 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma,
 	fflush(stdout);
 
 	if (stdin != NULL) {
-		aparear(archivosAReducir);
-		FILE* archivoAReducir = fopen("/tmp/archivoApareado", "r");
+		aparear(archivosAReducir,idReduce);
+		char* nombreArchAReducir = strdup("/tmp/archivoApareado");
+		string_append_with_format(&nombreArchAReducir,"_%i_%i",arch_config->ID,idReduce);
+		FILE* archivoAReducir = fopen(nombreArchAReducir, "r");
 		struct stat datosArch;
-		stat("/tmp/archivoApareado", &datosArch);
+		stat(nombreArchAReducir, &datosArch);
 		log_info(nodo_logger, "El tamaño del archivo es %d", datosArch.st_size);
 		char* dataArchivoAReducir = mmap((caddr_t) 0, datosArch.st_size,
 				PROT_READ, MAP_SHARED, fileno(archivoAReducir), 0);
@@ -352,6 +354,7 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma,
 			return -1;
 		}
 		free(comando);
+		free(nombreArchAReducir);
 	} else {
 
 		log_error(nodo_logger, "No se pudo ejecutar el programa!");
@@ -373,9 +376,9 @@ int ejecutarMapper(char * path_s, char* path_tmp, char* datos_bloque) {
 
 }
 
-int ejecutarReduce(char * path_s, char* path_tmp, t_list* archivosAReducir) {
+int ejecutarReduce(char * path_s, char* path_tmp, t_list* archivosAReducir, int idReduce) {
 
-	if ((redireccionar_stdin_stdout_reduce(path_s, path_tmp, archivosAReducir))
+	if ((redireccionar_stdin_stdout_reduce(path_s, path_tmp, archivosAReducir, idReduce))
 			< 1) {
 		log_info(nodo_logger, "Error al ejecutar Reduce");
 		return -1;
@@ -400,7 +403,7 @@ int ejecutarReduce(char * path_s, char* path_tmp, t_list* archivosAReducir) {
 //Todos esos registros seleccionados irían concatenados y formarían parte del archivo
 //total a reducir.
 
-void aparear(t_list* archivosAReducir) {
+void aparear(t_list* archivosAReducir, int idReduce) {
 	char* comando = strdup("cat ");
 	//printf("Mi ip es %d, la ip de este archivo es %d",unArchivo->ipNodo,inet_addr(arch_config->IP_NODO));
 	int noLoTengo(t_archivoAReducir* unArchivo) {
@@ -438,7 +441,7 @@ void aparear(t_list* archivosAReducir) {
 		string_append_with_format(&comando, "/tmp/%s ", unArchivo->nombreArch);
 	}
 	list_iterate(archivosAReducir, (void*) concatenar);
-	string_append_with_format(&comando, "|sort > /tmp/archivoApareado");
+	string_append_with_format(&comando, "|sort > /tmp/archivoApareado_%i_%i", arch_config->ID, idReduce);
 	system(comando);
 	log_info(nodo_logger, "Concatenacion correcta");
 }

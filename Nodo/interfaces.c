@@ -176,7 +176,7 @@ void* conexionJobs(void* sockJobNodo) {
 			for (i = 0; i < cantArchReduce; i++) {
 				list_add(archivosAReducir,recibirArchReduce(sock_in) );
 			}
-			log_info(nodo_logger,"Recibi la lista de archivos.");
+			log_info(nodo_logger,"Recibi la lista de archivos.\n");
 			nomArchSalida = recibirString(sock_in);
 			log_info(nodo_logger,"El archivo de salida recibido es %s\n", nomArchSalida);
 			fflush(stdout);
@@ -192,7 +192,7 @@ void* conexionJobs(void* sockJobNodo) {
 			numeroDeReduce++;
 			pthread_mutex_unlock(&numeroReduce);
 
-			resultado = ejecutarReduce(nombreScript, archivoSalida, archivosAReducir);
+			resultado = ejecutarReduce(nombreScript, archivoSalida, archivosAReducir,numeroReduceActual);
 
 			enviarProtocolo(RES_REDUCE,sock_in);
 			if(resultado>0)	enviarProtocolo(OK_REDUCE,sock_in);
