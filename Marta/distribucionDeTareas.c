@@ -866,7 +866,7 @@ char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 				printf("Falló la orden de reduce inermedio %s\n",
 						destinoIntermedioReduce->temp_file_name);
 				fflush(stdout);
-				return -1;
+				return NULL;
 			}
 
 			agregarReducePendiente(listaReducePendientes,
