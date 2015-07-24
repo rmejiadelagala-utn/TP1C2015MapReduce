@@ -1,7 +1,7 @@
 #include "consolaFS.h"
 
 
-t_directorio *directorioActual;
+
 char *direccion;
 int consola(void* unListaNodo) {
 	directorioActual = nuevoDirectorio(1, "root", 0);
