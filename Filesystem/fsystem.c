@@ -62,6 +62,7 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* nombreArchi
 	t_archivo *archivoNuevo;
 
 	pthread_mutex_lock(&listaDeNodos);
+	log_info(mdfs_sync_logger,"lock listaDeNodos");
 	int estaActivo(t_nodo* unNodo) {
 		return unNodo->activo;
 	}
@@ -71,10 +72,11 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* nombreArchi
 	}
 	if (detectarError(nodosActivos, esMenorA3, "No hay suficientesNodos activos\n")) {
 		pthread_mutex_unlock(&listaDeNodos);
+		log_info(mdfs_sync_logger,"unlock listaDeNodos");
 		return;
 	}
 	pthread_mutex_unlock(&listaDeNodos);
-
+	log_info(mdfs_sync_logger,"unlock listaDeNodos");
 	if (pathLocal != NULL) {
 		if ((local_fd = open(pathLocal, O_RDONLY)) != -1) {
 
@@ -159,32 +161,48 @@ void *interaccionFSNodo(void* sock_ptr) {
 
 			case NODO_NUEVO_Y_NO_TENGO_SU_ID:
 				nodo = nuevoNodo(id, (infoNodo->CANT_BLOQUES) * BLOCK_SIZE);
+
 				pthread_mutex_lock(&listaDeNodos);
+				log_info(mdfs_sync_logger,"lock listaDeNodos");
 				list_add(listaNodos, nodo);
 				pthread_mutex_unlock(&listaDeNodos);
+				log_info(mdfs_sync_logger,"unlock listaDeNodos");
+
 				unRegistro->id = id;
 				unRegistro->ip = infoNodo->IP_NODO;
 				unRegistro->puerto = infoNodo->PUERTO_NODO;
+
 				pthread_mutex_lock(&listaDeRegistros);
+				log_info(mdfs_sync_logger,"lock listaDeRegistros");
 				list_add(listaRegistrosIDIP, unRegistro);
 				//	actualizarRegistro(unRegistro, infoNodo->IP_NODO, infoNodo->PUERTO_NODO);
 				pthread_mutex_unlock(&listaDeRegistros);
+				log_info(mdfs_sync_logger,"unlock listaDeRegistros");
+
 				break;
 
 			case NODO_NUEVO_Y_TENGO_SU_ID:
 				free(unRegistro);
 				nodo = nuevoNodo(id, (infoNodo->CANT_BLOQUES) * BLOCK_SIZE);
 				nodoViejo = buscarNodoPorId(id, listaNodos);
+
 				pthread_mutex_lock(&listaDeRegistros);
+				log_info(mdfs_sync_logger,"lock listaDeRegistros");
 				unRegistro = buscarRegistroPorId(id);
 				//	actualizarRegistro(unRegistro, infoNodo->IP_NODO, infoNodo->PUERTO_NODO);
 				unRegistro->ip = infoNodo->IP_NODO;
 				unRegistro->puerto = infoNodo->PUERTO_NODO;
 				pthread_mutex_unlock(&listaDeRegistros);
+				log_info(mdfs_sync_logger,"unlock listaDeRegistros");
+
 				eliminarNodoYReferencias(nodoViejo, listaNodos, listaArchivos);
+
 				pthread_mutex_lock(&listaDeNodos);
+				log_info(mdfs_sync_logger,"lock listaDeNodos");
 				list_add(listaNodos, nodo);
 				pthread_mutex_unlock(&listaDeNodos);
+				log_info(mdfs_sync_logger,"unlock listaDeNodos");
+
 				break;
 			case NODO_VIEJO_Y_NO_TENGO_SU_ID:
 				free(unRegistro);
@@ -194,7 +212,9 @@ void *interaccionFSNodo(void* sock_ptr) {
 				break;
 			case NODO_VIEJO_Y_TENGO_SU_ID:
 				free(unRegistro);
+
 				pthread_mutex_lock(&listaDeRegistros);
+				log_info(mdfs_sync_logger,"lock listaDeRegistros");
 				unRegistro = buscarRegistroPorId(id);
 				//if (!verificarRegistro(unRegistro, infoNodo->IP_NODO, infoNodo->PUERTO_NODO)) {	//Cambió su IP o Puerto
 				//	actualizarRegistro(unRegistro, infoNodo->IP_NODO, infoNodo->PUERTO_NODO);
@@ -202,6 +222,8 @@ void *interaccionFSNodo(void* sock_ptr) {
 				unRegistro->puerto = infoNodo->PUERTO_NODO;
 				//	}
 				pthread_mutex_unlock(&listaDeRegistros);
+				log_info(mdfs_sync_logger,"unlock listaDeRegistros");
+
 				break;
 			}
 
@@ -226,16 +248,21 @@ void *interaccionFSNodo(void* sock_ptr) {
 				write(fileno(archivoReconstruido), buffer, tamanioBloqueRecibido);
 				free(buffer);
 				sem_post(&semaforo);
+				log_info(mdfs_sync_logger,"post semaforo");
 				break;
 			case VER_BLOQUE_NODO:
 				sem_post(&consola_sem);
+				log_info(mdfs_sync_logger,"post consola_sem");
 				//La consola se encarga del resto
 				sem_wait(&escuchar_sem);
+				log_info(mdfs_sync_logger,"wait escuchar_sem");
 				break;
 			case COPIAR_BLOQUE_NODO:
 				sem_post(&consola_sem);
+				log_info(mdfs_sync_logger,"post consola_sem");
 				//La consola se encarga del resto
 				sem_wait(&escuchar_sem);
+				log_info(mdfs_sync_logger,"wait escuchar_sem");
 				break;
 			}
 			break;
@@ -249,11 +276,15 @@ void *interaccionFSNodo(void* sock_ptr) {
 			void actualizarAMarta(t_registro_id_ipPuerto* unRegistro) {
 				actualizarIdIpPuertoEnMarta(socketDeMarta, unRegistro);
 			}
+
 			pthread_mutex_lock(&listaDeRegistros);
+			log_info(mdfs_sync_logger,"lock listaDeRegistros");
 			t_list* registrosActivos = list_filter(listaRegistrosIDIP, (void*) nodoEstaActivo);
 			list_iterate(registrosActivos, (void*) actualizarAMarta);
 			list_destroy(registrosActivos);
 			pthread_mutex_unlock(&listaDeRegistros);
+			log_info(mdfs_sync_logger,"unlock listaDeRegistros");
+
 			//TODO esta bien
 			//Qué bien, me alegro entonces!!!
 			break;
@@ -264,7 +295,9 @@ void *interaccionFSNodo(void* sock_ptr) {
 			break;
 		case NODO_DAME_ARCHIVO_A_FS:
 			sem_post(&resultadoJob_sem);
+			log_info(mdfs_sync_logger,"post resultadoJob_sem");
 			sem_wait(&escuchar_sem);
+			log_info(mdfs_sync_logger,"wait escuchar_sem");
 			break;
 		case ENVIO_BLOQUEARCH_A_MARTA:
 			infoBloquePedido = recibirPedidoDeBloqueArch(socket);

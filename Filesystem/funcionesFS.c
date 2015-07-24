@@ -28,12 +28,13 @@ int ultimoIndiceDelData = string_length(data)-1;//Juanchi dice que -1 no va
 
 t_list *nodosOrdenados = list_create();
 pthread_mutex_lock(&listaDeNodos);
+log_info(mdfs_sync_logger,"lock de listaDeNodos");
 //	list_add_all(nodosOrdenados, listaNodos);//Agrega todos los elementos de la segunda lista en la primera
 nodosOrdenados = list_filter(listaNodos,(void*) estaActivo);
 list_sort(nodosOrdenados, (void*) ordenarPorMenorUso);
 t_list* listaNodosAux = duplicarListaNodo(nodosOrdenados);
 pthread_mutex_unlock(&listaDeNodos);
-
+log_info(mdfs_sync_logger,"unlock de listaDeNodos");
 	while (!fin) {
 
 		finDeBloque = comienzoDeBloque + BLOCK_SIZE;
