@@ -859,23 +859,20 @@ char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 					origenesReduceEnNodo, sockJob);
 
 			if (resReduceEnNodo > 0) {
-				printf("");
+				printf("Mandó orden Reduce Intermedio %s\n",
+						destinoIntermedioReduce->temp_file_name);
+				fflush(stdout);
+			} else {
+				printf("Falló la orden de reduce inermedio %s\n",
+						destinoIntermedioReduce->temp_file_name);
+				fflush(stdout);
+				return NULL;
 			}
 
 			agregarReducePendiente(listaReducePendientes,
 					destinoIntermedioReduce);
 
-			fflush(stdout);
 			list_add(destinosIntermedios, destinoIntermedioReduce);
-
-			void mostrar(t_DestinoReduce* unDestino) {
-				printf("ID REDUCE: %d\n", unDestino->id_reduce);
-				printf("ID NODO: %d\n", unDestino->id_nodo);
-				printf("TEMP FILE NAME: %s\n", unDestino->temp_file_name);
-				fflush(stdout);
-			}
-
-			list_iterate(destinosIntermedios, mostrar);
 
 			//asigno como responsable del reduce final a aquel nodo que sea el útlimo
 			//que aplicó un reduce intermedio. Esto es así porque es más probable
@@ -890,6 +887,17 @@ char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 					(void*) destruirTIdNodo);
 
 		}
+
+		//muestro la lista de intermedios que tengo al salir del while
+		void mostrar(t_DestinoReduce* unDestino) {
+			printf("ID REDUCE: %d\n", unDestino->id_reduce);
+			printf("ID NODO: %d\n", unDestino->id_nodo);
+			printf("TEMP FILE NAME: %s\n", unDestino->temp_file_name);
+			fflush(stdout);
+		}
+
+		list_iterate(destinosIntermedios, (void*) mostrar);
+
 		printf("\nEnvie todos las ordenes de reduce intermedios\n");
 		fflush(stdout);
 		//ojo acá: pthread_mutex_unlock(&conexionFS);
@@ -902,6 +910,7 @@ char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 		}
 
 		void eliminarReducePendiente(t_DestinoReduce* unDestinoReduce) {
+			free(unDestinoReduce->temp_file_name);
 			free(unDestinoReduce);
 		}
 
@@ -934,26 +943,27 @@ char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 				case NODO_NOT_FOUND:
 					log_info(marta_logger, "NO SE ENCONTRO UN NODO");
 					log_info(marta_logger, "CANCELO TODO EL JOB");
+
+					//XXX no se si acá va el return NULL;
+					return NULL;
+
 					break;
 				}
 
 			} else {
+				log_info(marta_logger,
+						"Recibí resultado incorrecto, cancelo Job");
 				/*list_destroy_and_destroy_elements(listaReducePendientes,
-				 (void *) eliminarReducePendiente);*/
+				 (void *) eliminarReducePendiente);
+				 Puede ir list_destroy() solamente. Con esa funcionaría*/
 				return NULL;
 			}
 		}
 
 		printf("Despues de intermedios y antes de hacer finales\n");
 		fflush(stdout);
-		void mostrar(t_DestinoReduce* unDestino) {
-			printf("ID REDUCE: %d\n", unDestino->id_reduce);
-			printf("ID NODO: %d\n", unDestino->id_nodo);
-			printf("TEMP FILE NAME: %s\n", unDestino->temp_file_name);
-			fflush(stdout);
-		}
 
-		list_iterate(destinosIntermedios, mostrar);
+		list_iterate(destinosIntermedios, (void*) mostrar);
 
 		//Una vez realizados todos los reduce intermedios en los nodos
 		//debo aplicar un reduce general y final sobre esos tmp de reduce intermedios
@@ -981,11 +991,12 @@ char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 			log_info(marta_logger,
 					"falló envío de la orden de reduce. Cancelo job");
 			//todo mandar a borrar cosas y eso. No se bien que hacer acá
+			return NULL;
 		}
 
 		//recibir el resultado del reduce final
 		log_info(marta_logger,
-				"Supuestamente, hice todos los reduce intermedios y mande a hacer el final");
+				"Hice todos los reduce intermedios y mande a hacer el final");
 
 		t_ResultadoReduce resultadoFinal;
 
@@ -995,17 +1006,20 @@ char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 		if (resultado > 0) {
 			switch (resultadoFinal.prot) {
 			case OK_REDUCE:
+				log_info(marta_logger, "Reduce final realizado exitosamente");
 
 				break;
 			case NODO_NOT_FOUND:
-				printf("\nNO SE ENCONTRO UN NODO\n");
-				printf("CANCELO TODO EL JOB. LASTIMA ERA EL FINAL\n");
-				fflush(stdout);
-
+				log_info(marta_logger, "NO SE ENCONTRO UN NODO");
+				log_info(marta_logger,
+						"CANCELO TODO EL JOB. LASTIMA ERA EL FINAL");
+				return NULL;
 				break;
 			}
 
 		} else {
+			log_info(marta_logger,
+					"Recibí resultado de orden a reduce incorrecto. Cancelo job");
 			free(destinoFinalReduce);
 			return NULL;
 		}
@@ -1013,12 +1027,15 @@ char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 		void destruirDestinoReduce(t_DestinoReduce* unDestinoReduce) {
 			free(unDestinoReduce);
 		}
+
 		char* archivoFinal = strdup(destinoFinalReduce->temp_file_name);
 		free(destinoFinalReduce);
 
 		list_destroy_and_destroy_elements(destinosIntermedios,
 				(void*) destruirDestinoReduce);
+
 		return archivoFinal;
+
 	} else //Sin combiner
 	{
 		int idNodoDondeAplicarReduce = mejorNodoDondeAplicarReduceSinCombiner(
@@ -1052,11 +1069,12 @@ char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 			log_info(marta_logger,
 					"falló envío de la orden de reduce. Cancelo job");
 			//todo mandar a borrar cosas y eso. No se bien que hacer acá
+			return NULL;
 		}
 
 		//recibir el resultado del reduce final
 		log_info(marta_logger,
-				"Supuestamente, hice todos los reduce intermedios y mande a hacer el final");
+				"Hice todos los reduce intermedios y mande a hacer el final");
 
 		t_ResultadoReduce resultadoFinal;
 
@@ -1066,20 +1084,27 @@ char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 		if (resultado > 0) {
 			switch (resultadoFinal.prot) {
 			case OK_REDUCE:
+				log_info(marta_logger,
+						"Reduce final sin combiner realizado exitosamente");
 
 				break;
 			case NODO_NOT_FOUND:
 				log_info(marta_logger, "NO SE ENCONTRO UN NODO");
 				log_info(marta_logger, "CANCELO TODO EL JOB.");
+				return NULL;
+
 				break;
 			}
 
 		} else {
+			log_info(marta_logger,
+					"Recibí resultado de orden a reduce incorrecto. Cancelo job");
 			free(destinoReduce);
 			return NULL;
 		}
 
 		archivoFinal = strdup(destinoReduce->temp_file_name);
+
 		free(destinoReduce);
 		list_destroy_and_destroy_elements(origenesDeReduce, (void*) free);
 	}

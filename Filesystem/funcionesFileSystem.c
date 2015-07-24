@@ -27,9 +27,12 @@ static bool existeEseIndiceComoPadre(t_list *listaDirectorios, int padre);
 static int indiceNuevo(t_list *listaDirectorio);
 static char* dirNombre(t_directorio *unDir);
 static char* archNombre(t_archivo *unArch);
-static void *buscarEnListaPorStrKey(t_list *lista, char *key, char *keyGetter(void*));
-static void *buscarEnListaPorIntKey(t_list *lista, int key, int *keyGetter(void*));
-static void recorrerCopiasDeUnArch(t_archivo *unArchivo, void (*accionACopia)(t_bloqueEnNodo*));
+static void *buscarEnListaPorStrKey(t_list *lista, char *key,
+		char *keyGetter(void*));
+static void *buscarEnListaPorIntKey(t_list *lista, int key,
+		int *keyGetter(void*));
+static void recorrerCopiasDeUnArch(t_archivo *unArchivo,
+		void (*accionACopia)(t_bloqueEnNodo*));
 static int dirPadre(t_directorio *unDir);
 static int dirIndex(t_directorio *unDir);
 static int archPadre(t_archivo *unArch);
@@ -81,12 +84,21 @@ void copiarResultadoAFS(int socket) {
 	char* data = recibirString(nodo->socket);
 	sem_post(&escuchar_sem);
 	printf("Voy a distribuir el archivo en los nodos\n");
-	int resultado = mandarBloquesANodos(data, &cantidadBolquesEnviados, &listaDeBloques);
+	int resultado = mandarBloquesANodos(data, &cantidadBolquesEnviados,
+			&listaDeBloques);
+
+	if (cantidadBolquesEnviados < 3) {
+		printf("No llegó a enviar 3 copias\n");
+		fflush(stdout);
+	}
+
 	if (resultado != -1) {
-		t_archivo* archivoNuevo = nuevoArchivo(archivoFinal, 1, string_length(data), listaDeBloques, 1);
+		t_archivo* archivoNuevo = nuevoArchivo(archivoFinal, 1,
+				string_length(data), listaDeBloques, 1);
 
 		list_add(listaArchivos, archivoNuevo);
-		log_info(mdfs_logger, "El archivo %s fue copiado correctamente.", archivoFinal);
+		log_info(mdfs_logger, "El archivo %s fue copiado correctamente.",
+				archivoFinal);
 		//	printf("El archivo %s fue copiado correctamente.\n", nombreArchivo);
 	} else {
 		log_error(mdfs_logger, "error al enviar a nodos.");
@@ -109,7 +121,8 @@ int nodoEstaActivo(t_registro_id_ipPuerto* unRegistro) {
  * y hay un /n tambien tira segment fault. Por lo cual es importante arreglarlo
  */
 
-int mandarBloquesANodos(char* data, int* cantidadBloquesEnviados, t_list** listaDeBloques) {
+int mandarBloquesANodos(char* data, int* cantidadBloquesEnviados,
+		t_list** listaDeBloques) {
 
 	uint32_t i, fin = 0;
 	uint32_t comienzoDeBloque = 0, finDeBloque;
@@ -126,12 +139,10 @@ int mandarBloquesANodos(char* data, int* cantidadBloquesEnviados, t_list** lista
 	int estaActivo(t_nodo* unNodo) {
 		return unNodo->activo;
 	}
-	nodosOrdenados = list_filter(listaNodos,(void*) estaActivo);	//Agrega todos los elementos de la segunda lista en la primera
+	nodosOrdenados = list_filter(listaNodos, (void*) estaActivo); //Agrega todos los elementos de la segunda lista en la primera
 	pthread_mutex_unlock(&listaDeNodos);
 
 	while (!fin) {
-
-
 
 		cant++;
 		bloqueDeArchivo = malloc(sizeof(t_bloqueArch));
@@ -155,23 +166,26 @@ int mandarBloquesANodos(char* data, int* cantidadBloquesEnviados, t_list** lista
 		list_sort(nodosOrdenados, (void*) ordenarPorMenorUso);
 		int k = 0;
 		//Acá distribuye las copias dado el algoritmo de dstribucion
-		int cantCopias=CANT_COPIAS;
+		int cantCopias = CANT_COPIAS;
 		for (i = 0; i < cantCopias; i++) {
 			//--Mandar este bloque al nodo que corresponda--
 
 			//nodoActual = nodoElegdoYConLugar(nodosOrdenados);
-			if(list_size(nodosOrdenados)<CANT_COPIAS){
-				printf("No hay suficientes nodos disponibles para hacer las 3 copias\n");
+			if (list_size(nodosOrdenados) < CANT_COPIAS) {
+				printf(
+						"No hay suficientes nodos disponibles para hacer las 3 copias\n");
+				fflush(stdout);
 				/*cantCopias=list_size(nodosOrdenados); TODO a implementar luego, creo que va a haber que tocar la funcion nodoElegido
-				printf("Voy a limitarme a hacer solo %d copias\n",cantCopias);
-				fflush(stdout);*/
+				 printf("Voy a limitarme a hacer solo %d copias\n",cantCopias);
+				 fflush(stdout);*/
 
 			}
 			if (nodoElegido(nodosOrdenados, &nodoActual, &k) == 0) {
 				//salio bien el elegir nodo, estando en nodoActual
 				int tamanio = 1 + finDeBloque - comienzoDeBloque;
 				/*if(fin) setUltimoBloque(nodoActual,data,tamanio,comienzoDeBloque,bloqueDeArchivo->copiasDeBloque);
-				 else*/setBloque(nodoActual, data, tamanio, comienzoDeBloque, bloqueDeArchivo->copiasDeBloque);
+				 else*/setBloque(nodoActual, data, tamanio, comienzoDeBloque,
+						bloqueDeArchivo->copiasDeBloque);
 
 			} else {
 				return -1;
@@ -189,23 +203,26 @@ int mandarBloquesANodos(char* data, int* cantidadBloquesEnviados, t_list** lista
 }
 
 void enviarCantBloquesDeArch(char* nombreArchivo, int socket) {
-	int huboError=1;
+	int huboError = 1;
 	void enviarBloquesDeArchivo(t_archivo* unArchivo) {
 		printf("Voy a mandar el archivo %s\n", unArchivo->nombre);
 		fflush(stdout);
 		int cantidad = list_size(unArchivo->bloquesDeArch);
 		printf("La cantidad de bloques mandados fue %d\n", cantidad);
 		sendall(socket, &cantidad, sizeof(int));
-		huboError=0;
+		huboError = 0;
 		return;
 	}
 
-	validarYEjecutar(nombreArchivo,validarArchivo, (void*) enviarBloquesDeArchivo);//FIXME hardcodeada
-	if(huboError) enviarError(socket);
+	validarYEjecutar(nombreArchivo, validarArchivo,
+			(void*) enviarBloquesDeArchivo);	//FIXME hardcodeada
+	if (huboError)
+		enviarError(socket);
 
 }
 
-int setUltimoBloque(t_nodo* nodo, char* dataBloque, uint32_t tamanio, uint32_t comienzoDeBloque, t_list *copias) {
+int setUltimoBloque(t_nodo* nodo, char* dataBloque, uint32_t tamanio,
+		uint32_t comienzoDeBloque, t_list *copias) {
 	int posicionEnNodo;
 	int *aux;
 	t_bloqueEnNodo *bloqueEnNodo;
@@ -220,7 +237,9 @@ int setUltimoBloque(t_nodo* nodo, char* dataBloque, uint32_t tamanio, uint32_t c
 	nodo->cantidadBloquesOcupados++;
 	bloqueEnNodo = nuevoBloqueEnNodo(nodo->id, posicionEnNodo);
 
-	int resultado = enviarUltimoBloqueANodo(nodo->socket, bloqueEnNodo->numeroDeBloqueEnNodo, dataBloque, comienzoDeBloque, tamanio);
+	int resultado = enviarUltimoBloqueANodo(nodo->socket,
+			bloqueEnNodo->numeroDeBloqueEnNodo, dataBloque, comienzoDeBloque,
+			tamanio);
 
 	if (resultado == 0)
 		printf("Problema al enviar\n");
@@ -228,7 +247,8 @@ int setUltimoBloque(t_nodo* nodo, char* dataBloque, uint32_t tamanio, uint32_t c
 	//termino de agregar a la lista de archivos, la info nueva del bloque
 
 	if (resultado == (-1)) {
-		printf("No se pudo enviar el bloque correctamente al nodo. Error en funcion SET BLOQUE.\n");
+		printf(
+				"No se pudo enviar el bloque correctamente al nodo. Error en funcion SET BLOQUE.\n");
 		return resultado; //ERROR
 	}
 
@@ -236,7 +256,8 @@ int setUltimoBloque(t_nodo* nodo, char* dataBloque, uint32_t tamanio, uint32_t c
 	return resultado;
 }
 
-int setBloque(t_nodo* nodo, char* dataBloque, uint32_t tamanio, uint32_t comienzoDeBloque, t_list *copias) {
+int setBloque(t_nodo* nodo, char* dataBloque, uint32_t tamanio,
+		uint32_t comienzoDeBloque, t_list *copias) {
 	int posicionEnNodo;
 	int *aux;
 	t_bloqueEnNodo *bloqueEnNodo;
@@ -251,9 +272,11 @@ int setBloque(t_nodo* nodo, char* dataBloque, uint32_t tamanio, uint32_t comienz
 	nodo->cantidadBloquesOcupados++;
 	bloqueEnNodo = nuevoBloqueEnNodo(nodo->id, posicionEnNodo);
 	bloqueEnNodo->tamanioBloque = tamanio;
-	uint32_t resultado = enviarBloqueANodo(nodo->socket, bloqueEnNodo->numeroDeBloqueEnNodo, dataBloque, comienzoDeBloque, tamanio);
+	uint32_t resultado = enviarBloqueANodo(nodo->socket,
+			bloqueEnNodo->numeroDeBloqueEnNodo, dataBloque, comienzoDeBloque,
+			tamanio);
 
-	if (resultado == 0){
+	if (resultado == 0) {
 		nodo->socket = -1;
 		nodo->activo = 0;
 		log_info(mdfs_logger, "Nodo desconectado.");
@@ -261,11 +284,11 @@ int setBloque(t_nodo* nodo, char* dataBloque, uint32_t tamanio, uint32_t comienz
 		return -1;
 	}
 
-
 	//termino de agregar a la lista de archivos, la info nueva del bloque
 
 	if (resultado == (-1)) {
-		printf("No se pudo enviar el bloque correctamente al nodo. Error en funcion SET BLOQUE.\n");
+		printf(
+				"No se pudo enviar el bloque correctamente al nodo. Error en funcion SET BLOQUE.\n");
 		return resultado; //ERROR
 	}
 
@@ -276,11 +299,19 @@ int setBloque(t_nodo* nodo, char* dataBloque, uint32_t tamanio, uint32_t comienz
 int nodoElegido(t_list *nodosOrdenados, t_nodo **nodoActual, int *posicion) {
 
 	*nodoActual = list_get(nodosOrdenados, *posicion);
-	if (!*nodoActual)return -1;
+	if (!*nodoActual) {
+		printf("En linea 288 nodo actual da null\n");
+		fflush(stdout);
+		return -1;
+	}
 	int fin = 0;
 	while (list_size(nodosOrdenados) >= 3 && !fin) {
 		*nodoActual = list_get(nodosOrdenados, *posicion);
-		if(!((*nodoActual)->activo)) return -1;
+		if (!((*nodoActual)->activo)) {
+			printf("En linea 312 nodo actual da incactivo\n");
+			fflush(stdout);
+			return -1;
+		}
 		if (!tieneLugar(*nodoActual)) {
 			list_remove(nodosOrdenados, *posicion);
 			*posicion = *posicion - 1;
@@ -289,8 +320,12 @@ int nodoElegido(t_list *nodosOrdenados, t_nodo **nodoActual, int *posicion) {
 		}
 		*posicion = *posicion + 1; //con el ++ se quejaba eclipse
 	}
-	if (list_size(nodosOrdenados) < 3)
+	if (list_size(nodosOrdenados) < 3) {
+		printf("En linea 325 hay menos de 3 nodos\n");
+		mostrarLista(nodosOrdenados,mostrarNodo);
+		fflush(stdout);
 		return -1;
+	}
 	*posicion = *posicion - 1;
 	return 0;
 }
@@ -309,7 +344,7 @@ void distribuirBloquesEnNodos(t_list *bloquesEnArch, t_list *nodos) { //Probada 
 	t_list *nodosOrdenados = list_create();
 	//fin de variables auxs
 
-	list_add_all(nodosOrdenados, nodos);	//Agrega todos los elementos de la segunda lista en la primera
+	list_add_all(nodosOrdenados, nodos);//Agrega todos los elementos de la segunda lista en la primera
 	list_sort(nodosOrdenados, (void*) ordenarPorMenorUso);
 
 	for (i = 0; i < list_size(bloquesEnArch); i++) {
@@ -353,7 +388,7 @@ void eliminarDirectorioYContenido(t_directorio *directorioAEliminar) { //probada
 			t_directorio *subDir = dameUnSubdir(unDirectorio);
 			eliminarDirRecursivamente(subDir);
 		} else {	//esta vacio y es el directorio a Eliminar
-			eliminarDirectorioVacio(directorioAEliminar);	//en este caso directorioAEliminar y unDirectorio son iguales y esta vacio
+			eliminarDirectorioVacio(directorioAEliminar);//en este caso directorioAEliminar y unDirectorio son iguales y esta vacio
 			printf("Se elimino todo el directorio con su contenido\n");
 		}
 
@@ -370,13 +405,17 @@ void eliminarDirectorioVacio(t_directorio *directorioAEliminar) {
 	int directorioConIndiceBuscado(t_directorio *directorio) {
 		return directorioAEliminar->index == directorio->index;
 	}
+
 	lista_remove_and_destroy_by_condition(listaDirectorios, (void*) directorioConIndiceBuscado, (void*) liberarDirectorio);
+
 }
 int dirConSoloArch(t_directorio *unDirectorio) {
-	return dameUnSubArch(unDirectorio) != NULL && dameUnSubdir(unDirectorio) == NULL;
+	return dameUnSubArch(unDirectorio) != NULL
+			&& dameUnSubdir(unDirectorio) == NULL;
 }
 int dirVacio(t_directorio *unDirectorio) {
-	return dameUnSubArch(unDirectorio) == NULL && dameUnSubdir(unDirectorio) == NULL;
+	return dameUnSubArch(unDirectorio) == NULL
+			&& dameUnSubdir(unDirectorio) == NULL;
 }
 int dirConSubdir(t_directorio *unDirectorio) {
 	return dameUnSubdir(unDirectorio) != NULL;
@@ -389,12 +428,15 @@ t_archivo *dameUnSubArch(t_directorio *unDirectorio) {
 }
 //fin de funciones auxiliares de eliminar recursivamente
 //Funciones de busqueda
-bool verificarRegistro(t_registro_id_ipPuerto* unRegistro, struct in_addr ip, int puerto) {
-	return ((unRegistro->puerto == puerto) && (unRegistro->ip.s_addr == ip.s_addr));
+bool verificarRegistro(t_registro_id_ipPuerto* unRegistro, struct in_addr ip,
+		int puerto) {
+	return ((unRegistro->puerto == puerto)
+			&& (unRegistro->ip.s_addr == ip.s_addr));
 }
 
 t_registro_id_ipPuerto* buscarRegistroPorId(int id) {
-	t_registro_id_ipPuerto* unReg = buscarEnListaPorIntKey(listaRegistrosIDIP, id, (int*) registroID);
+	t_registro_id_ipPuerto* unReg = buscarEnListaPorIntKey(listaRegistrosIDIP,
+			id, (int*) registroID);
 	return unReg != NULL ? unReg : NULL;
 }
 
@@ -402,35 +444,42 @@ t_nodo *buscarNodoPorId(int id, t_list *listaNodos) {	//probada
 	t_nodo *nodo = buscarEnListaPorIntKey(listaNodos, id, (int*) nodoID);
 	return nodo != NULL ? nodo : NULL;
 }
-t_directorio *buscarDirPorNombre(char *nombre, t_list *listaDirectorios) {	//probada
-	t_archivo *dir = buscarEnListaPorStrKey(listaDirectorios, nombre, (char*) dirNombre);
+t_directorio *buscarDirPorNombre(char *nombre, t_list *listaDirectorios) {//probada
+	t_archivo *dir = buscarEnListaPorStrKey(listaDirectorios, nombre,
+			(char*) dirNombre);
 	return dir != NULL ? dir : NULL;
 }
 t_directorio *buscarDirPorIndex(int index) { //probada
-	t_archivo *dir = buscarEnListaPorIntKey(listaDirectorios, index, (int*) dirIndex);
+	t_archivo *dir = buscarEnListaPorIntKey(listaDirectorios, index,
+			(int*) dirIndex);
 	return dir != NULL ? dir : NULL;
 }
 t_directorio *buscarDirPorPadre(int padre) { //probada
-	t_archivo *dir = buscarEnListaPorIntKey(listaDirectorios, padre, (int*) dirPadre);
+	t_archivo *dir = buscarEnListaPorIntKey(listaDirectorios, padre,
+			(int*) dirPadre);
 	return dir != NULL ? dir : NULL;
 }
 t_archivo *buscarArchPorPadreYNombre(int padre, char *nombre) {
 	bool _mismoNombreYPadre(t_archivo *unArchivo) {
-		return (unArchivo->padre == padre) && (strcmp(unArchivo->nombre, nombre) == 0);
+		return (unArchivo->padre == padre)
+				&& (strcmp(unArchivo->nombre, nombre) == 0);
 	}
 	return list_find(listaArchivos, (bool*) _mismoNombreYPadre);
 
 }
 t_archivo *buscarArchPorNombre(char *nombre, t_list* listaArchivos) { //probada
-	t_archivo *arch = buscarEnListaPorStrKey(listaArchivos, nombre, (char*) archNombre);
+	t_archivo *arch = buscarEnListaPorStrKey(listaArchivos, nombre,
+			(char*) archNombre);
 	return arch != NULL ? arch : NULL;
 }
 t_archivo *buscarArchPorPadre(int padre) { //probada
-	t_archivo *arch = buscarEnListaPorIntKey(listaArchivos, padre, (int*) archPadre);
+	t_archivo *arch = buscarEnListaPorIntKey(listaArchivos, padre,
+			(int*) archPadre);
 	return arch != NULL ? arch : NULL;
 }
 
-t_directorio* encontrarDirectorioPadre(t_list *listaDirectorios, t_directorio *directorioHijo) {
+t_directorio* encontrarDirectorioPadre(t_list *listaDirectorios,
+		t_directorio *directorioHijo) {
 	return list_find(listaDirectorios, ( {bool esPadre(t_directorio* unDir)
 				{	return esHijo(directorioHijo,unDir);}esPadre;}));
 }
@@ -446,7 +495,9 @@ void eliminarArchivoDeLista(t_archivo *unArchivo, t_list *listaArchivos) { //pro
 	bool archivoConNombreBuscado(t_archivo *archivoDeLista) {
 		return (strcmp(archivoDeLista->nombre, unArchivo->nombre) == 0);
 	}
+
 	return lista_remove_and_destroy_by_condition(listaArchivos, (bool*) archivoConNombreBuscado, (void*) liberarArchivo);
+
 }
 void activarNodoReconectado(t_nodo *nodoABuscar, t_list *listaNodos) { //probada
 	int i;
@@ -462,7 +513,8 @@ void activarNodoReconectado(t_nodo *nodoABuscar, t_list *listaNodos) { //probada
 
 }
 
-void actualizarRegistro(t_registro_id_ipPuerto* unRegistro, struct in_addr ip, uint16_t puerto) {
+void actualizarRegistro(t_registro_id_ipPuerto* unRegistro, struct in_addr ip,
+		uint16_t puerto) {
 	unRegistro->ip = ip;
 	unRegistro->puerto = puerto;
 }
@@ -496,6 +548,7 @@ void eliminarNodoDeLista(t_nodo *nodoAEliminar, t_list *listaNodos) { //probada
 		return (nodoAEliminar->id == nodoDeLista->id);
 	}
 
+
 	lista_remove_and_destroy_by_condition(listaNodos, (bool*) mismosNodos, (void*) liberarNodo);
 }
 void eliminarReferencias(t_nodo *nodoAEliminar, t_list *archivos) { //probada
@@ -527,7 +580,8 @@ void formatear(t_list **listaNodos, t_list **listaArchivos,	//probada
 	log_info(mdfs_logger, "Format FS.");
 	list_destroy_and_destroy_elements(*listaArchivos, (void*) liberarArchivo);
 	list_destroy_and_destroy_elements(*listaNodos, (void*) liberarNodo);
-	list_destroy_and_destroy_elements(*listaDirectorios, (void*) liberarDirectorio);
+	list_destroy_and_destroy_elements(*listaDirectorios,
+			(void*) liberarDirectorio);
 	list_destroy_and_destroy_elements(listaRegistrosIDIP, (void*) free);
 	*listaNodos = list_create();
 	*listaArchivos = list_create();
@@ -543,7 +597,8 @@ void renombrarArchivoPorNombre(char *nombreBuscado, char *nuevoNombre, //probada
 	}
 
 //Busco cual es el archivo a modificar, dado el nombre
-	t_archivo *archivoAModificar = list_find(listaArchivos, (void*) archivoConNombreBuscado);
+	t_archivo *archivoAModificar = list_find(listaArchivos,
+			(void*) archivoConNombreBuscado);
 	if (!archivoAModificar) {
 		printf("el archivo %s no se encuentra en el sistema\n", nombreBuscado);
 	} else {
@@ -551,7 +606,8 @@ void renombrarArchivoPorNombre(char *nombreBuscado, char *nuevoNombre, //probada
 		free(archivoAModificar->nombre);
 		archivoAModificar->nombre = malloc(strlen(nuevoNombre) + 1);
 		strcpy(archivoAModificar->nombre, nuevoNombre);
-		printf("el archivo %s fue renombrado a %s\n", nombreBuscado, nuevoNombre);
+		printf("el archivo %s fue renombrado a %s\n", nombreBuscado,
+				nuevoNombre);
 	}
 }
 
@@ -573,12 +629,15 @@ void moverArchivoPorNombreYPadre(char *nombreBuscado, t_list *listaArchivos, //p
 		}
 		t_archivo *archivoAModificarPadre;
 
-		archivoAModificarPadre = list_find(listaArchivos, (void*) archivoConNombreBuscado);
+		archivoAModificarPadre = list_find(listaArchivos,
+				(void*) archivoConNombreBuscado);
 
 		if (!archivoAModificarPadre) {
-			printf("el archivo %s no se encuentra en el sistema\n", nombreBuscado);
+			printf("el archivo %s no se encuentra en el sistema\n",
+					nombreBuscado);
 		} else {
-			printf("el archivo %s fue movido al directorio con indice %d\n", nombreBuscado, padre);
+			printf("el archivo %s fue movido al directorio con indice %d\n",
+					nombreBuscado, padre);
 			archivoAModificarPadre->padre = padre;
 		}
 	}
@@ -592,7 +651,8 @@ void crearDirectorioDadoPadreYNom(char *nombre, int padre, //probada
 		printf("No se pueden cargar mas de 1024\n");
 	} else {
 		//genero el nuevo directorio con sus datos, y le pongo el indice del ultimo + 1
-		t_directorio *directorioNuevo = nuevoDirectorio(indiceNuevo(listaDirectorio), nombre, padre);
+		t_directorio *directorioNuevo = nuevoDirectorio(
+				indiceNuevo(listaDirectorio), nombre, padre);
 		list_add(listaDirectorio, directorioNuevo);
 		printf("El directorio se creo bien\n");
 	}
@@ -654,7 +714,8 @@ void archivoEstaActivoPorLogica(t_archivo *unArchivo) {
 		return list_is_empty(unBloqueArch->copiasDeBloque);
 	}
 
-	if (list_all_satisfy(unArchivo->bloquesDeArch, (bool*) _tieneAlMenosUnaCopia)) {
+	if (list_all_satisfy(unArchivo->bloquesDeArch,
+			(bool*) _tieneAlMenosUnaCopia)) {
 		unArchivo->estado = 1;
 	} else {
 		unArchivo->estado = 0;
@@ -678,16 +739,19 @@ void disminuirNodo(t_bloqueEnNodo *copia) {
 /******************************************/
 
 static bool ordenarPorMenorUso(t_nodo *data, t_nodo *dataSiguiente) {
-	return dataSiguiente->cantidadBloquesOcupados > data->cantidadBloquesOcupados;
+	return dataSiguiente->cantidadBloquesOcupados
+			> data->cantidadBloquesOcupados;
 }
-static void *buscarEnListaPorStrKey(t_list *lista, char *key, char *keyGetter(void*)) {
+static void *buscarEnListaPorStrKey(t_list *lista, char *key,
+		char *keyGetter(void*)) {
 	bool _comparacion(void* data) {
 		return (strcmp(keyGetter(data), key)) == 0;
 	}
 
 	return list_find(lista, (bool*) _comparacion);
 }
-static void *buscarEnListaPorIntKey(t_list *lista, int key, int *keyGetter(void*)) {
+static void *buscarEnListaPorIntKey(t_list *lista, int key,
+		int *keyGetter(void*)) {
 	bool _comparacion(void* data) {
 		return keyGetter(data) == key;
 	}
@@ -768,14 +832,16 @@ int obtenerArchivo(t_archivo *archivo) {
 			return -1;
 		}
 
-		huboError = detectarError(bloqueDeArchivo->copiasDeBloque, list_is_empty,
-				"El archivo no está disponible. Faltan las copias de alguno de sus bloques en los nodos.\n");
+		huboError =
+				detectarError(bloqueDeArchivo->copiasDeBloque, list_is_empty,
+						"El archivo no está disponible. Faltan las copias de alguno de sus bloques en los nodos.\n");
 
 		if (huboError) {
 			printf("Hubo un error\n");
 			return -1;
 		}
-		t_bloqueEnNodo *bloque = encontrarBloqueDisponible(bloqueDeArchivo->copiasDeBloque);
+		t_bloqueEnNodo *bloque = encontrarBloqueDisponible(
+				bloqueDeArchivo->copiasDeBloque);
 
 		if (!bloque) {
 			huboError = 1;
@@ -787,7 +853,8 @@ int obtenerArchivo(t_archivo *archivo) {
 		if (!nodoEncontrado)
 			return -1;
 
-		pedirBloqueANodo(nodoEncontrado->socket, bloque->numeroDeBloqueEnNodo, COPIAR_ARCHIVO_A_FS_LOCAL, bloque->tamanioBloque);
+		pedirBloqueANodo(nodoEncontrado->socket, bloque->numeroDeBloqueEnNodo,
+				COPIAR_ARCHIVO_A_FS_LOCAL, bloque->tamanioBloque);
 
 		sem_wait(&semaforo);
 
@@ -806,7 +873,8 @@ t_bloqueEnNodo* encontrarBloqueDisponible(t_list* copiasDelBloque) {
 	return list_find(copiasDelBloque, bloqueEstaDisponible);
 }
 
-static void recorrerCopiasDeUnArch(t_archivo *unArchivo, void (*accionACopia)(t_bloqueEnNodo*)) {
+static void recorrerCopiasDeUnArch(t_archivo *unArchivo,
+		void (*accionACopia)(t_bloqueEnNodo*)) {
 	void _recorrerCopias(t_bloqueArch *bloqueArchivo) {
 		list_iterate(bloqueArchivo->copiasDeBloque, (void*) accionACopia);
 	}
@@ -814,5 +882,8 @@ static void recorrerCopiasDeUnArch(t_archivo *unArchivo, void (*accionACopia)(t_
 }
 
 static bool tieneLugar(t_nodo *unNodo) {
-	return unNodo->tamanio > (unNodo->cantidadBloquesOcupados * BLOCK_SIZE + BLOCK_SIZE);
+	printf("El tamaño del nodo %d es %f y necesito tener mas de %d\n",unNodo->id,unNodo->tamanio,unNodo->cantidadBloquesOcupados*BLOCK_SIZE+BLOCK_SIZE);
+	fflush(stdout);
+	return unNodo->tamanio
+			> (unNodo->cantidadBloquesOcupados * BLOCK_SIZE + BLOCK_SIZE);
 }
