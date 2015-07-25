@@ -227,29 +227,14 @@ void crearScriptMapper(const char* codigo_script, char* nombre) {
 
 void crearScriptReduce(const char* codigo_script, char* nombre) {
 
-//	FILE* fd;
+
 	FILE* scriptReduce;
-//	char texto[100];
 
-//	if((fd =fopen("/home/utnso/Escritorio/TPSO-2015/reduce.pl","r"))==NULL){
-//		perror("Error al abrir el script del reduce");
-//		exit(1);
-//	}
-
-//	while (feof(fd) == 0) {
-//		fgets(texto,100,fd);
-//		printf( "%s",texto );
-//	}
 
 	if ((scriptReduce = fopen(nombre, "w+")) == NULL) {
 		perror("Error al crear el script del Reduce");
 		exit(1);
 	}
-
-//	while (feof(fd) == 0) {
-//		fgets(texto,100,fd);
-//		fputs(texto,scriptReduce);
-//	}
 
 	fputs(codigo_script, scriptReduce);
 
@@ -283,11 +268,7 @@ int redireccionar_stdin_stdout_mapper(char *pathPrograma,
 	snprintf(comando, tamanioComando, "%s | sort > %s", pathPrograma,
 			pathArchivoSalida);
 
-	void signal_callback_handler(int signal) {
-		mapFallido = 1;
-	}
-
-	signal(SIGPIPE, signal_callback_handler);
+	signal(SIGPIPE, SIG_IGN);
 
 	pipeMapper = popen(comando, "w");
 
@@ -296,16 +277,21 @@ int redireccionar_stdin_stdout_mapper(char *pathPrograma,
 		fflush(stdout);
 		return -1;
 	}
-	fflush(stdout);
 
-	fputs(data_bloque, pipeMapper);
+	if(fputs(data_bloque, pipeMapper)<1){
+		printf("Señal ignorada pero text busy atrapado\n");
+		fflush(stdout);
+		return -1;
+	}
+
 	int closear = pclose(pipeMapper);
 	if (closear < 0) {
 		printf("No se pudo peclosear bien\n");
 		fflush(stdout);
 		return -1;
 	}
-
+	printf("Map fallido dio %d en el mapper %s\n",mapFallido,pathPrograma);
+	fflush(stdout);
 	if (mapFallido)
 		return -1;
 	else
@@ -317,19 +303,12 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma,
 		char *pathArchivoSalida, t_list* archivosAReducir, int idReduce) {
 	FILE *stdin = NULL;
 
-	int reduceFallido = 0;
-
 	char *comando = malloc(
 			strlen(pathPrograma) + 12 + strlen(pathArchivoSalida));
 
 	sprintf(comando, "%s | sort >> %s", pathPrograma, pathArchivoSalida);
 
-	void signal_callback_handler(int signal) {
-		reduceFallido = 1;
-	}
-
-	signal(SIGPIPE, signal_callback_handler);
-
+	signal(SIGPIPE, SIG_IGN);
 
 	stdin = popen(comando, "w");
 
@@ -352,10 +331,16 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma,
 		struct stat datosArch;
 		stat(nombreArchAReducir, &datosArch);
 		log_info(nodo_logger, "El tamaño del archivo es %d", datosArch.st_size);
-		char* dataArchivoAReducir = mmap((caddr_t) 0, datosArch.st_size,
-				PROT_READ, MAP_SHARED, fileno(archivoAReducir), 0);
+
+		char* dataArchivoAReducir;
+		if((dataArchivoAReducir = mmap((caddr_t) 0, datosArch.st_size,
+				PROT_READ, MAP_SHARED, fileno(archivoAReducir), 0))==MAP_FAILED){
+			printf("Error al mmapear el archivo a reducir.\n Error: %s\n",strerror(errno));
+			exit(1);
+		}
 		if (fprintf(stdin, "%s", dataArchivoAReducir) < 0) {
-			log_error(nodo_logger, "Error al enviar archivo al reduce");
+			log_error(nodo_logger, "Error de text file busy\n");
+			return -2;
 		}
 		if (pclose(stdin) < 0) {
 			printf("Error al cerrar con pclose\n");
@@ -369,10 +354,6 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma,
 		log_error(nodo_logger, "No se pudo ejecutar el programa!");
 		return -1;
 	}
-
-	if(reduceFallido)
-	return -2;
-	else
 	return 1;
 }
 

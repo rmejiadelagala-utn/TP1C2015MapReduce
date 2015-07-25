@@ -274,6 +274,12 @@ void moverDirectorio(char *directorio, char* padreString) {
 	}
 }
 void copiarAMDFS(char *archivoDestino, char *archivoACopiar) {
+	if(!strcmp(archivoACopiar,"*hourly.txt")){
+		copiarAMDFS("201301hourly.txt","201301hourly.txt");
+		copiarAMDFS("201302hourly.txt","201302hourly.txt");
+		copiarAMDFS("201303hourly.txt","201303hourly.txt");
+		copiarAMDFS("201304hourly.txt","201304hourly.txt");
+	}
 	t_list *archivosVisibles  = archivosVisiblesDesdeDirectorioDado("");
 	int seLlamaIgual(t_archivo* unArchivo){
 		return !strcmp(unArchivo->nombre,archivoDestino);

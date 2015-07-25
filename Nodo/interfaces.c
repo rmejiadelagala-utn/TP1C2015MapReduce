@@ -100,6 +100,7 @@ void* conexionJobs(void* sockJobNodo) {
 	char* dataArchivoPedido;
 	void* buffer;
 	int resultado;
+	char* dataAUX;
 
 	while ((recibido = recvall(sock_in, &protocolo, sizeof(int))) > 1) {
 		switch (protocolo) {
@@ -128,7 +129,11 @@ void* conexionJobs(void* sockJobNodo) {
 			pthread_mutex_unlock(&numeroMap);
 			log_info(nodo_sync_logger,"unlock numeroMap");
 
-			char* dataAUX = malloc(tamanioBloque);
+			if((dataAUX = malloc(tamanioBloque))==NULL){
+				printf("Error al malloquear el dataAUX\n.Error: %s",strerror(errno));
+				fflush(stdout);
+				exit(1);
+			}
 			memcpy(dataAUX, DATOS + (nroBloque * BLKSIZE), tamanioBloque);
 			log_info(nodo_logger,"antes de ejecutar %s", nombreScript);
 			resultado=ejecutarMapper(nombreScript, archivoSalida, dataAUX);
