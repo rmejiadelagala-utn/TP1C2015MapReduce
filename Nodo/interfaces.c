@@ -45,6 +45,7 @@ void* conexionFS(void* arg) {
 		case SET_BLOQUE:
 			recibido = setBloqueDeFileSystem(socket, DATOS, BLKSIZE); //Si devuelve 0 es porque recibio todo
 			msync(ptr->ARCH_BIN, strlen(DATOS), MS_SYNC);
+			printf("La cantidad de bytes recibidos fue %d",recibido);
 			respuestaSetBloque(socket, recibido);
 			fflush(stdout);
 			break;
@@ -194,7 +195,11 @@ void* conexionJobs(void* sockJobNodo) {
 			for (i = 0; i < cantArchReduce; i++) {
 				list_add(archivosAReducir,recibirArchReduce(sock_in) );
 			}
-			nomArchSalida = recibirString(sock_in);
+			char *nomArchSalidaConBarras = recibirString(sock_in);
+			char **vectorNombre = string_split(nomArchSalidaConBarras,"/");
+			int j=0;
+			for(j=0;vectorNombre[j+1]!=NULL;j++);
+			nomArchSalida=vectorNombre[j];
 			fflush(stdout);
 			resultado=-2;
 			while(resultado==-2){
@@ -250,7 +255,11 @@ t_archivoAReducir* recibirArchReduce(int socket) {
 	t_archivoAReducir* unArch = malloc(sizeof(t_archivoAReducir));
 	unArch->puertoNodo = recibirInt(socket);
 	unArch->ipNodo = recibirInt(socket);
-	unArch->nombreArch = recibirString(socket);
+	char* nombreConBarras = recibirString(socket);
+	char** vectorNombre = string_split(nombreConBarras,"/");
+	int i;
+	for(i=0;vectorNombre[i+1]!=NULL;i++);
+	unArch->nombreArch = vectorNombre[i];
 	return unArch;
 }
 

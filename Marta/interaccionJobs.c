@@ -37,11 +37,12 @@ void *interaccionJobs(void* sock_ptr) {
 	list_iterate(listaTemporal, (void*) mostrarListaTemporal);
 
 	char* archivoResultado;
+	int idNodoArchFinal;
 
-	if(archivoResultado=planificarTodosLosReduce(info_job, listaTemporal, sockCliente)){
+	if(archivoResultado=planificarTodosLosReduce(info_job, listaTemporal, &idNodoArchFinal, sockCliente)){
 		printf("Envio el archivo %s al filesystem",archivoResultado);
 		fflush(stdout);
-		copiarAMDFS(archivoResultado,socketDeFS);
+		copiarAMDFS(archivoResultado, idNodoArchFinal, socketDeFS);
 
 	}
 
@@ -116,18 +117,10 @@ t_InfoJob adaptarSolicitudAInfoJob(t_solicitud solicitud) {
 }
 
 
-int copiarAMDFS(char* elArchivo, int socket) {
+int copiarAMDFS(char* elArchivo, int idNodoArchFinal, int socket) {
 	t_buffer* buffer = crearBufferConProtocolo(COPIATE_RESULTADO);
 
-	char** nombreArchivoSeparadoPorGuionBajo;
-
-	nombreArchivoSeparadoPorGuionBajo = string_split(elArchivo, "_");
-
-	char* stringIdNodo = nombreArchivoSeparadoPorGuionBajo[3];
-
-	int idNodo = atoi(stringIdNodo);
-
 	bufferAgregarString(buffer, elArchivo, strlen(elArchivo)+1);
-	bufferAgregarInt(buffer, idNodo);
+	bufferAgregarInt(buffer, idNodoArchFinal);
 	return enviarBuffer(buffer,socket);
 }

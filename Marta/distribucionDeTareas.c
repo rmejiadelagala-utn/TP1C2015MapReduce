@@ -466,7 +466,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 						ListaTemporal, &ultimoIDTemporal);
 				break;
 
-			case NODO_NOT_FOUND:		//este sería el NOTOK_MAP
+			case NOTOK_MAP:		//este sería el NOTOK_MAP
 				log_warning(marta_logger, "ERROR AL REALIZAR UN MAP");
 				fflush(stdout);
 
@@ -520,7 +520,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 				}
 				break;
 
-			case NOTOK_MAP:
+			case NODO_NOT_FOUND:
 
 				log_warning(marta_logger, "NO SE ENCONTRO UN NODO");
 				fflush(stdout);
@@ -726,7 +726,7 @@ void agregarReducePendiente(t_list* reducePendientes,
 
 }
 
-char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
+char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales, int* idNodoArchivoFinal,
 		int sockJob) {
 	char* archivoFinal;
 	int idJobAlQueAplica = infoJob.idJob;
@@ -994,6 +994,8 @@ char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 				destinoFinalReduce->id_nodo);*/
 		destinoFinalReduce->temp_file_name = strdup(infoJob.pathDeResultado);
 
+		*idNodoArchivoFinal = destinoFinalReduce->id_nodo;
+
 		resultadoReduceFinal = ordenarUltimoReduceAJob(destinoFinalReduce,
 				destinosIntermedios, sockJob);
 
@@ -1073,6 +1075,8 @@ char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 				"reduce_final_%i_%i.temp", infoJob.idJob,
 				destinoReduce->id_nodo);*/
 		destinoReduce->temp_file_name = strdup(infoJob.pathDeResultado);
+
+		*idNodoArchivoFinal = destinoReduce->id_nodo;
 
 		resultado = ordenarReduceAJob(destinoReduce, origenesDeReduce, sockJob);
 

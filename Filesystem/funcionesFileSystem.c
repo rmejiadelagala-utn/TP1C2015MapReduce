@@ -72,11 +72,18 @@ static bool tieneLugar(t_nodo *unNodo);
  */
 
 void copiarResultadoAFS(int socket) {
-	char* archivoFinal = recibirString(socket);
+	char* path = recibirString(socket);
+	char** vectorPath = string_split(path,"/");
+	int i;
+	for(i=0;vectorPath[i+1]!=NULL;i++);
+	char* archivoFinal = vectorPath[i];
 	int idNodo = recibirInt(socket);
 	t_nodo* nodo = buscarNodoPorId(idNodo, listaNodos);
 	t_buffer* buffer = crearBufferConProtocolo(NODO_DAME_ARCHIVO_A_FS);
 	bufferAgregarString(buffer, archivoFinal, strlen(archivoFinal) + 1);
+	/*printf("El path recibido es %s",path);
+	printf("El nodo al que le mando el archivo es %d",idNodo);
+	printf("El nombre dle archivo que le pido al nodo es %s",archivoFinal);*/
 	enviarBuffer(buffer, nodo->socket);
 	sem_wait(&resultadoJob_sem);
 	log_info(mdfs_sync_logger,"wait de resultadoJob_sem");
@@ -89,13 +96,13 @@ void copiarResultadoAFS(int socket) {
 	int resultado = mandarBloquesANodos(data, &cantidadBolquesEnviados,
 			&listaDeBloques);
 
-	if (cantidadBolquesEnviados < 3) {
-		printf("No llegó a enviar 3 copias\n");
-		fflush(stdout);
-	}
-
 	if (resultado != -1) {
-		t_archivo* archivoNuevo = nuevoArchivo(archivoFinal, 1,
+		t_directorio* directorioDelArchivo = ubicarseEnDirectorio(vectorPath);
+		if(directorioDelArchivo==NULL){
+			log_error(mdfs_logger,"No existe el directorio en el cual guardar el archivo.");
+			return;
+		}
+		t_archivo* archivoNuevo = nuevoArchivo(archivoFinal, directorioDelArchivo->index,
 				string_length(data), listaDeBloques, 1);
 
 		list_add(listaArchivos, archivoNuevo);
