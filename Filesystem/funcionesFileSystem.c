@@ -96,11 +96,6 @@ void copiarResultadoAFS(int socket) {
 	int resultado = mandarBloquesANodos(data, &cantidadBolquesEnviados,
 			&listaDeBloques);
 
-	if (cantidadBolquesEnviados < 3) {
-		printf("No llegó a enviar 3 copias\n");
-		fflush(stdout);
-	}
-
 	if (resultado != -1) {
 		t_directorio* directorioDelArchivo = ubicarseEnDirectorio(vectorPath);
 		if(directorioDelArchivo==NULL){
