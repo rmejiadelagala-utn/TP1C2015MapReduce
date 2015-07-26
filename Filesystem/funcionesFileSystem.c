@@ -81,6 +81,9 @@ void copiarResultadoAFS(int socket) {
 	t_nodo* nodo = buscarNodoPorId(idNodo, listaNodos);
 	t_buffer* buffer = crearBufferConProtocolo(NODO_DAME_ARCHIVO_A_FS);
 	bufferAgregarString(buffer, archivoFinal, strlen(archivoFinal) + 1);
+	/*printf("El path recibido es %s",path);
+	printf("El nodo al que le mando el archivo es %d",idNodo);
+	printf("El nombre dle archivo que le pido al nodo es %s",archivoFinal);*/
 	enviarBuffer(buffer, nodo->socket);
 	sem_wait(&resultadoJob_sem);
 	log_info(mdfs_sync_logger,"wait de resultadoJob_sem");
