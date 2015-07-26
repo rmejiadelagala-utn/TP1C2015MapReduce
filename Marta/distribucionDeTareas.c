@@ -466,7 +466,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 						ListaTemporal, &ultimoIDTemporal);
 				break;
 
-			case NODO_NOT_FOUND:		//este sería el NOTOK_MAP
+			case NOTOK_MAP:		//este sería el NOTOK_MAP
 				log_warning(marta_logger, "ERROR AL REALIZAR UN MAP");
 				fflush(stdout);
 
@@ -520,7 +520,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 				}
 				break;
 
-			case NOTOK_MAP:
+			case NODO_NOT_FOUND:
 
 				log_warning(marta_logger, "NO SE ENCONTRO UN NODO");
 				fflush(stdout);
