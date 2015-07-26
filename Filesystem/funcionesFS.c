@@ -120,8 +120,10 @@ static t_nodo* duplicarNodo(t_nodo* unNodo) {
 static t_queue* duplicarColaInt(t_queue* cola) {
 	t_queue* colaDuplicada = queue_create();
 
-	void agregarEnteros(int *numero) {//XXX ojito
-		queue_push(colaDuplicada, numero);
+	void agregarEnteros(int *numero) {//XXX ojito, gracias juanchi del pasado
+		int* numeroDuplicado = malloc(sizeof(int));
+		*numeroDuplicado = *numero;
+		queue_push(colaDuplicada, numeroDuplicado);
 	}
 
 	list_iterate(cola->elements, (void*)agregarEnteros);
