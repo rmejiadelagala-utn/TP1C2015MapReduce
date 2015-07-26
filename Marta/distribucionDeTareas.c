@@ -989,9 +989,10 @@ char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 		destinoFinalReduce->ip_nodo = ipDeNodo(idNodoDondeAplicarReduceFinal);
 		destinoFinalReduce->puerto_nodo = puertoDeNodo(
 				idNodoDondeAplicarReduceFinal);
-		destinoFinalReduce->temp_file_name = string_from_format(
+		/*destinoFinalReduce->temp_file_name = string_from_format(
 				"reduce_final_%i_%i.temp", infoJob.idJob,
-				destinoFinalReduce->id_nodo);
+				destinoFinalReduce->id_nodo);*/
+		destinoFinalReduce->temp_file_name = strdup(infoJob.pathDeResultado);
 
 		resultadoReduceFinal = ordenarUltimoReduceAJob(destinoFinalReduce,
 				destinosIntermedios, sockJob);
@@ -1068,9 +1069,10 @@ char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 		destinoReduce->id_nodo = idNodoDondeAplicarReduce;
 		destinoReduce->ip_nodo = ipDeNodo(idNodoDondeAplicarReduce);
 		destinoReduce->puerto_nodo = puertoDeNodo(idNodoDondeAplicarReduce);
-		destinoReduce->temp_file_name = string_from_format(
+		/*destinoReduce->temp_file_name = string_from_format(
 				"reduce_final_%i_%i.temp", infoJob.idJob,
-				destinoReduce->id_nodo);
+				destinoReduce->id_nodo);*/
+		destinoReduce->temp_file_name = strdup(infoJob.pathDeResultado);
 
 		resultado = ordenarReduceAJob(destinoReduce, origenesDeReduce, sockJob);
 

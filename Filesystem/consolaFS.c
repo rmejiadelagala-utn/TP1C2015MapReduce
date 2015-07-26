@@ -274,23 +274,27 @@ void moverDirectorio(char *directorio, char* padreString) {
 	}
 }
 void copiarAMDFS(char *archivoDestino, char *archivoACopiar) {
+
 	if(!strcmp(archivoACopiar,"*hourly.txt")){
 		copiarAMDFS("201301hourly.txt","201301hourly.txt");
 		copiarAMDFS("201302hourly.txt","201302hourly.txt");
 		copiarAMDFS("201303hourly.txt","201303hourly.txt");
 		copiarAMDFS("201304hourly.txt","201304hourly.txt");
 	}
+
 	t_list *archivosVisibles  = archivosVisiblesDesdeDirectorioDado("");
+
 	int seLlamaIgual(t_archivo* unArchivo){
 		return !strcmp(unArchivo->nombre,archivoDestino);
 	}
-	if(list_find(archivosVisibles,seLlamaIgual)){
-	printf("Ya existe un archivo con ese nombre en el File System\n");
+
+	if(list_find(archivosVisibles,(void*)seLlamaIgual)){
+		printf("Ya existe un archivo con ese nombre en el File System\n");
 	}
 	else{
-	char* path = strdup("../Archivos/");
-	string_append(&path,archivoACopiar);
-	levantarArchivoAMemoriaYDistribuirANodos(path, archivoDestino, directorioActual->index);
+		char* path = strdup("../Archivos/");
+		string_append(&path,archivoACopiar);
+		levantarArchivoAMemoriaYDistribuirANodos(path, archivoDestino, directorioActual->index);
 	}
 	list_destroy(archivosVisibles);
 }
