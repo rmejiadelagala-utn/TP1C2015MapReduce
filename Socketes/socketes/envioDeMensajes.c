@@ -240,21 +240,22 @@ int enviarProtocolo(int protocolo,int socket){
 		return enviarBuffer(buffer,socket);
 	}
 	int enviarCopiasAMarta(int socket, t_list* copias){
+		int resultado=1;
 		int protocolo=ENVIO_BLOQUEARCH_A_MARTA;
-		sendall(socket,&protocolo,sizeof(int));
-		printf("Mande el protocolo: %d.\n",protocolo);
+		int enviado = sendall(socket,&protocolo,sizeof(int));
+		if(enviado<=0) return enviado;
 
 		int cantidad = list_size(copias);
-		sendall(socket,&cantidad,sizeof(int));
+		enviado=sendall(socket,&cantidad,sizeof(int));
+		if(enviado<=0) return enviado;
 
 		void enviarCopia(t_bloqueEnNodo* unBloque){
-			printf("ID bloque:%d\n",unBloque->id);
-			fflush(stdout);
-			sendall(socket,unBloque,sizeof(t_bloqueEnNodo));
+			enviado = sendall(socket,unBloque,sizeof(t_bloqueEnNodo));
+			if(enviado<=0) resultado=enviado;
 		}
 
 		list_iterate(copias,(void*)enviarCopia);
-		return 1; //TODO VALIDACIONES
+		return resultado; //TODO VALIDACIONES
 	}
 //Marta
 	//A Filesystem

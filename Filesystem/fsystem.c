@@ -318,7 +318,9 @@ void *interaccionFSNodo(void* sock_ptr) {
 					return unNodo->activo;
 				}
 				t_list * copiasConNodoActivo = list_filter(copias, (void*) suNodoEstaActivo);
-				enviarCopiasAMarta(socket, copiasConNodoActivo);
+				if(enviarCopiasAMarta(socket, copiasConNodoActivo)<0){
+					log_error(mdfs_logger,"Error al enviar las copias de bloques a MaRTA.");
+				}
 				//	list_destroy_and_destroy_elements(copias,(void*)liberarBloqueEnNodo);
 				//	free(copias);
 				//	list_destroy_and_destroy_elements(copiasConNodoActivo,(void*)liberarBloqueEnNodo);

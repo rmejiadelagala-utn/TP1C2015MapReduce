@@ -255,8 +255,6 @@ void crearScriptReduce(const char* codigo_script, char* nombre) {
 int redireccionar_stdin_stdout_mapper(char *pathPrograma,
 		char *pathArchivoSalida, char* data_bloque) {
 
-	int mapFallido = 0;
-
 	FILE *pipeMapper = NULL;
 
 	size_t tamanioComando = strlen(pathPrograma) + 11
@@ -273,44 +271,52 @@ int redireccionar_stdin_stdout_mapper(char *pathPrograma,
 	pipeMapper = popen(comando, "w");
 
 	if (!pipeMapper) {
-		printf("Error al popenear\n");
+		log_error(nodo_logger,"Error de popen.");
 		fflush(stdout);
 		return -1;
 	}
 
 	if(fputs(data_bloque, pipeMapper)<1){
-		printf("Señal ignorada pero text busy atrapado\n");
-		fflush(stdout);
+		log_error(nodo_logger,"Text file busy.");
 		return -1;
 	}
 
 	int closear = pclose(pipeMapper);
 	if (closear < 0) {
-		printf("No se pudo peclosear bien\n");
+		log_error(nodo_logger,"Error de pclose.");
 		fflush(stdout);
 		return -1;
 	}
-	printf("Map fallido dio %d en el mapper %s\n",mapFallido,pathPrograma);
-	fflush(stdout);
-	if (mapFallido)
-		return -1;
-	else
 		return 1;
 }
 
 //TODO hacer esto de forma correcta, obteniendo los path de los de reducir y apareando
 int redireccionar_stdin_stdout_reduce(char *pathPrograma,
 		char *pathArchivoSalida, t_list* archivosAReducir, int idReduce) {
+
+	aparear(archivosAReducir,idReduce);
+
 	FILE *stdin = NULL;
 
+	char* nombreArchAReducir = strdup("/tmp/archivoApareado");
+	string_append_with_format(&nombreArchAReducir,"_%i_%i",arch_config->ID,idReduce);
+
 	char *comando = malloc(
+			4 + strlen(pathPrograma) + 3 + strlen(pathArchivoSalida) + 11 + strlen(nombreArchAReducir));
+
+	sprintf(comando, "cat %s | %s | sort >> %s", nombreArchAReducir, pathPrograma, pathArchivoSalida);
+
+	/*
+	 * char *comando = malloc(
 			strlen(pathPrograma) + 12 + strlen(pathArchivoSalida));
 
-	sprintf(comando, "%s | sort >> %s", pathPrograma, pathArchivoSalida);
+	sprintf(comando, " %s | sort >> %s", pathPrograma, pathArchivoSalida);
+	 *stdin = popen(comando, "w");
+	 */
 
 	signal(SIGPIPE, SIG_IGN);
 
-	stdin = popen(comando, "w");
+
 
 	log_info(nodo_logger, "Voy a vaciar el archivo truncado");
 	char* archivoATruncar = string_new();
@@ -323,37 +329,25 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma,
 	system(comandoParaTruncar);
 	fflush(stdout);
 
-	if (stdin != NULL) {
-		aparear(archivosAReducir,idReduce);
-		char* nombreArchAReducir = strdup("/tmp/archivoApareado");
-		string_append_with_format(&nombreArchAReducir,"_%i_%i",arch_config->ID,idReduce);
-		FILE* archivoAReducir = fopen(nombreArchAReducir, "r");
-		struct stat datosArch;
-		stat(nombreArchAReducir, &datosArch);
-		log_info(nodo_logger, "El tamaño del archivo es %d", datosArch.st_size);
-
-		char* dataArchivoAReducir;
-		if((dataArchivoAReducir = mmap((caddr_t) 0, datosArch.st_size,
-				PROT_READ, MAP_SHARED, fileno(archivoAReducir), 0))==MAP_FAILED){
-			printf("Error al mmapear el archivo a reducir.\n Error: %s\n",strerror(errno));
+	system(comando);
+		/*if ((dataArchivoAReducir = mmap((caddr_t) 0, datosArch.st_size,
+		PROT_READ, MAP_SHARED, fileno(archivoAReducir), 0)) == MAP_FAILED) {
+			printf("Trate de mapear %d\n", datosArch.st_size);
+			printf("Error al mmapear el archivo a reducir.\n Error: %s\n", strerror(errno));
 			exit(1);
 		}
 		if (fprintf(stdin, "%s", dataArchivoAReducir) < 0) {
 			log_error(nodo_logger, "Error de text file busy\n");
 			return -2;
-		}
+		};
 		if (pclose(stdin) < 0) {
 			printf("Error al cerrar con pclose\n");
 			fflush(stdout);
 			return -1;
-		}
+		}*/
 		free(comando);
 		free(nombreArchAReducir);
-	} else {
 
-		log_error(nodo_logger, "No se pudo ejecutar el programa!");
-		return -1;
-	}
 	return 1;
 }
 

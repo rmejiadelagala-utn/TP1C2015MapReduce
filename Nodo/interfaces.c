@@ -114,8 +114,6 @@ void* conexionJobs(void* sockJobNodo) {
 			archivoSalida = strdup("/tmp/");
 			nomArchSalida = recibirString(sock_in);
 			string_append(&archivoSalida, nomArchSalida);
-			log_info(nodo_logger,"El archivo de salida recibido es %s", archivoSalida);
-
 			pthread_mutex_lock(&numeroMap);
 			log_info(nodo_sync_logger,"lock numeroMap");
 			nombreScript = strdup("tmp/");
@@ -135,23 +133,30 @@ void* conexionJobs(void* sockJobNodo) {
 				exit(1);
 			}
 			memcpy(dataAUX, DATOS + (nroBloque * BLKSIZE), tamanioBloque);
-			log_info(nodo_logger,"antes de ejecutar %s", nombreScript);
+			log_info(nodo_logger,"Generando %s...", nomArchSalida);
 			resultado=ejecutarMapper(nombreScript, archivoSalida, dataAUX);
-			log_info(nodo_logger,"ejecute %s", nombreScript);
+			if (enviarProtocolo(RES_MAP, sock_in) <= 0) {
+				log_info(nodo_logger, "Job desconectado.");
+				return NULL;
+			}
+			if (resultado > 0) {
+				log_info(nodo_logger, "El map %s fue exitoso.", nomArchSalida);
+				if (enviarProtocolo(OK_MAP, sock_in) <= 0) {
+					log_info(nodo_logger, "Job desconectado.");
+					return NULL;
+				}
+			} else {
+				log_info(nodo_logger, "El map %s tuvo un error.", nomArchSalida);
+				if (enviarProtocolo(NOTOK_MAP, sock_in) <= 0) {
+					log_info(nodo_logger, "Job desconectado.");
+					return NULL;
+				}
+			}
 			free(script);
 			free(dataAUX);
 			free(nombreScript);
 			free(nomArchSalida);
 			free(archivoSalida);
-			enviarProtocolo(RES_MAP,sock_in);
-			if(resultado>0){
-				log_info(nodo_logger,"El map nº %d fue exitoso.", numeroMapActual);
-				enviarProtocolo(OK_MAP,sock_in);
-			}
-			else{
-				log_info(nodo_logger,"El map nº %d tuvo un error.", numeroMapActual);
-				enviarProtocolo(NOTOK_MAP,sock_in);
-			}
 			pthread_exit(NULL);
 			break;
 
@@ -186,13 +191,10 @@ void* conexionJobs(void* sockJobNodo) {
 			script = recibirString(sock_in);
 			cantArchReduce = recibirInt(sock_in);
 			archivoSalida = strdup("/tmp/");
-			log_info(nodo_logger,"Voy a recibir una lista de archivos de tamaño %d",cantArchReduce);
 			for (i = 0; i < cantArchReduce; i++) {
 				list_add(archivosAReducir,recibirArchReduce(sock_in) );
 			}
-			log_info(nodo_logger,"Recibi la lista de archivos.\n");
 			nomArchSalida = recibirString(sock_in);
-			log_info(nodo_logger,"El archivo de salida recibido es %s\n", nomArchSalida);
 			fflush(stdout);
 			resultado=-2;
 			while(resultado==-2){
@@ -212,12 +214,22 @@ void* conexionJobs(void* sockJobNodo) {
 			pthread_mutex_unlock(&numeroReduce);
 			log_info(nodo_sync_logger,"unlock numeroReduce");
 
-
+			log_info(nodo_logger,"Generando %s...", nomArchSalida);
 			resultado = ejecutarReduce(nombreScript, archivoSalida, archivosAReducir,numeroReduceActual);
 			}
-			enviarProtocolo(RES_REDUCE,sock_in);
-			if(resultado>0)	enviarProtocolo(OK_REDUCE,sock_in);
-			else enviarProtocolo(NOTOK_REDUCE,sock_in);
+			if(enviarProtocolo(RES_REDUCE,sock_in)<=0){
+				log_info(nodo_logger,"Job desconectado.");
+			}
+			if(resultado>0){
+				if(enviarProtocolo(OK_REDUCE,sock_in)<=0){
+					log_info(nodo_logger,"Job desconectado.");
+				}
+			}
+			else{
+				if(enviarProtocolo(NOTOK_REDUCE,sock_in)<=0){
+					log_info(nodo_logger,"Job desconectado.");
+				}
+			}
 			break;
 
 		}
@@ -236,13 +248,9 @@ t_archivoAReducir* nuevoArchReduce(int ip, int puerto, char* nombre) {
 
 t_archivoAReducir* recibirArchReduce(int socket) {
 	t_archivoAReducir* unArch = malloc(sizeof(t_archivoAReducir));
-	printf("Recibo puerto nodo\n");
 	unArch->puertoNodo = recibirInt(socket);
-	printf("Recibo ip nodo\n");
 	unArch->ipNodo = recibirInt(socket);
-
 	unArch->nombreArch = recibirString(socket);
-	printf("Recibo nombre archivo:%s\n",unArch->nombreArch);
 	return unArch;
 }
 

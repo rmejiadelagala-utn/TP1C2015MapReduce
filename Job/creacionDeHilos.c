@@ -16,20 +16,34 @@
 #include<stdbool.h>
 #include <pthread.h>
 
-int recibirResultadoFromNodo(int sockNodo){
-		uint32_t recibido, protocolo, rptaNodoAJob;
-		if((recibido=recvall(sockNodo,&protocolo,sizeof(uint32_t)))<0){
+int recibirResultadoFromNodo(int sockNodo) {
+	uint32_t recibido, protocolo, rptaNodoAJob;
+	recibido = recvall(sockNodo, &protocolo, sizeof(uint32_t));
+	if (recibido == 0) {
+		printf("Se desconectó un nodo\n");
+		return -1;
+	}
+	if (recibido < 0) {
+		printf("Se produjo un error con el nodo\n");
+		return -1;
+	}
+	if (protocolo == RES_MAP || protocolo == RES_REDUCE) {
+		recibido = recvall(sockNodo, &rptaNodoAJob, sizeof(uint32_t));
+		if (recibido == 0) {
+			printf("Se desconectó un nodo\n");
 			return -1;
 		}
-		if(protocolo==RES_MAP || protocolo==RES_REDUCE){
-			recvall(sockNodo,&rptaNodoAJob,sizeof(uint32_t));
-		}else {
-			//printf("PROTOCOLO RECIBIDO: %d\n",protocolo);
-			printf("no entiendo el protocolo, usa: RES_MAP");
+		if (recibido < 0) {
+			printf("Se produjo un error con el nodo\n");
+			return -1;
 		}
-		return rptaNodoAJob;
-
+	} else {
+		//printf("PROTOCOLO RECIBIDO: %d\n",protocolo);
+		printf("no entiendo el protocolo, usa: RES_MAP");
 	}
+	return rptaNodoAJob;
+
+}
 
 
 /**********************************************************
@@ -80,13 +94,13 @@ void* hilo_mapper (void* arg_thread){
 		void* buffer = crearBufferConProtocolo(NODO_NOT_FOUND);
 		bufferAgregarInt(buffer,ordenMapper.id_map);
 		enviarBuffer(buffer,sockMarta);
-		return -1;
+		return NULL;
 	}
 	//Enviamos rutina mapper a Nodo
 
 	res=enviarMapperANodo(sockNodo,codigoMapper,block,block_size,tmp_file_name);
 	if(res<0){
-		printf("todo mal, no pude enviar mapper a Nodo: %d", ip_nodo_char);
+		printf("todo mal, no pude enviar mapper a Nodo: %s\n", ip_nodo_char);
 	}
 	//recibir resultado de la Operacion mapper desde el Nodo
 	resOper=recibirResultadoFromNodo(sockNodo);
