@@ -726,7 +726,7 @@ void agregarReducePendiente(t_list* reducePendientes,
 
 }
 
-char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales, int idNodoArchivoFinal,
+char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales, int* idNodoArchivoFinal,
 		int sockJob) {
 	char* archivoFinal;
 	int idJobAlQueAplica = infoJob.idJob;
@@ -994,7 +994,7 @@ char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales, i
 				destinoFinalReduce->id_nodo);*/
 		destinoFinalReduce->temp_file_name = strdup(infoJob.pathDeResultado);
 
-		idNodoArchivoFinal = destinoFinalReduce->id_nodo;
+		*idNodoArchivoFinal = destinoFinalReduce->id_nodo;
 
 		resultadoReduceFinal = ordenarUltimoReduceAJob(destinoFinalReduce,
 				destinosIntermedios, sockJob);
@@ -1076,7 +1076,7 @@ char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales, i
 				destinoReduce->id_nodo);*/
 		destinoReduce->temp_file_name = strdup(infoJob.pathDeResultado);
 
-		idNodoArchivoFinal = destinoReduce->id_nodo;
+		*idNodoArchivoFinal = destinoReduce->id_nodo;
 
 		resultado = ordenarReduceAJob(destinoReduce, origenesDeReduce, sockJob);
 
