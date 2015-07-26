@@ -356,14 +356,8 @@ int enviarProtocolo(int protocolo,int socket){
 	int setBloqueDeFileSystem(int socket, char* dataBin, int block_size){
 		int tamanio;
 		int nroBloque;
-		if(recvall(socket,&nroBloque,4)<1){
-			printf("Recibi mal el numero de bloque\n");
-			return -1;
-		}
-		if(recvall(socket,&tamanio,4)<1){
-			printf("Recibi mal el tamaño de bloque\n");
-			return -1;
-		}
+		if(recvall(socket,&nroBloque,4)<1) return -1;
+		if(recvall(socket,&tamanio,4)<1) return -1;
 		int tamanioEnKB = tamanio/1024;
 		printf("Recibo un bloque de %dKiB\n",tamanioEnKB);
 		return recvall(socket,dataBin+(block_size*nroBloque),tamanio);

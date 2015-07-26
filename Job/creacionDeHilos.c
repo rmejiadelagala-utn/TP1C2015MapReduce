@@ -21,21 +21,21 @@ int recibirResultadoFromNodo(int sockNodo) {
 	recibido = recvall(sockNodo, &protocolo, sizeof(uint32_t));
 	if (recibido == 0) {
 		printf("Se desconectó un nodo\n");
-		return NODO_NOT_FOUND;
+		return -1;
 	}
 	if (recibido < 0) {
 		printf("Se produjo un error con el nodo\n");
-		return NODO_NOT_FOUND;
+		return -1;
 	}
 	if (protocolo == RES_MAP || protocolo == RES_REDUCE) {
 		recibido = recvall(sockNodo, &rptaNodoAJob, sizeof(uint32_t));
 		if (recibido == 0) {
 			printf("Se desconectó un nodo\n");
-			return NODO_NOT_FOUND;
+			return -1;
 		}
 		if (recibido < 0) {
 			printf("Se produjo un error con el nodo\n");
-			return NODO_NOT_FOUND;
+			return -1;
 		}
 	} else {
 		//printf("PROTOCOLO RECIBIDO: %d\n",protocolo);
@@ -55,7 +55,10 @@ int recibirResultadoFromNodo(int sockNodo) {
 int responderOrdenMapAMarta(int sockMarta,t_ordenMap ordenMapper, int resOper){
 	int result_envio;
 	t_buffer* buffer = crearBuffer();//crearBufferConProtocolo(RES_MAP);
-	bufferAgregarInt(buffer,resOper);
+	if(resOper==OK_MAP){
+		bufferAgregarInt(buffer,OK_MAP);
+	} else
+		bufferAgregarInt(buffer,NODO_NOT_FOUND);
 	bufferAgregarInt(buffer,ordenMapper.id_map);
 	//bufferAgregarInt(buffer,ordenMapper.id_nodo);
 	result_envio=enviarBuffer(buffer,sockMarta);

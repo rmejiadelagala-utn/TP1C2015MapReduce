@@ -234,10 +234,10 @@ void *interaccionFSNodo(void* sock_ptr) {
 			break;
 		case RTA_SET_BLOQUE:
 			if (recvall(socket, &respuestaSetBloque, 4) <= 0)
-				log_error(mdfs_logger, "Hubo un problema al escribir el archivo. No se recibio respuesta del nodo.");
+				log_error(mdfs_logger, "Hubo un problema al escribir el archivo.");
 			//		printf("Hubo un problema al escribir el archivo.\n");
 			else if (respuestaSetBloque <= 0)
-				log_error(mdfs_logger, "Hubo un problema al escribir el archivo. Se recibio una respuesta corrupta del nodo.");
+				log_error(mdfs_logger, "Hubo un problema al escribir el archivo.");
 			//	printf("Hubo un problema al escribir el archivo.\n");
 			break;
 		case GET_BLOQUE:
