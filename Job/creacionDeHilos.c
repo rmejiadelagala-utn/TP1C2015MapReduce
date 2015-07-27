@@ -97,9 +97,11 @@ void* hilo_mapper (void* arg_thread){
 	//Enviamos rutina mapper a Nodo
 
 	res=enviarMapperANodo(sockNodo,codigoMapper,block,block_size,tmp_file_name);
+
 	if(res<0){
 		printf("Todo mal, no pude enviar mapper a Nodo: %s\n", ip_nodo_char);
 	}
+	else printf("Envie un map al nodo %d\n",ordenMapper.id_nodo);
 	//recibir resultado de la Operacion mapper desde el Nodo
 	resOper=recibirResultadoFromNodo(sockNodo);
 	//printf("le mando a marta el protocolo %d\n", resOper);
@@ -114,7 +116,6 @@ void* hilo_mapper (void* arg_thread){
 	if(envioRes<0){
 		printf("no pude enviar la respuesta a marta, algo pasó\n");
 	}
-	else printf("Le envie un map al nodo %d\n",ordenMapper.id_nodo);
 	close(sockNodo);
 
 	pthread_exit(NULL);
