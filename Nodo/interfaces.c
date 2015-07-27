@@ -102,7 +102,7 @@ void* conexionJobs(void* sockJobNodo) {
 	char* dataArchivoPedido;
 	void* buffer;
 	int resultado;
-	char* dataAUX;
+//	char* dataAUX;
 
 	while ((recibido = recvall(sock_in, &protocolo, sizeof(int))) > 1) {
 		switch (protocolo) {

@@ -42,8 +42,11 @@ int main() {
 		char* ipNodo=strdup(inet_ntoa(registroDelNodo->ip));
 		uint16_t puertoNodo = registroDelNodo->puerto;
 		int sockNodo = crearCliente(ipNodo,puertoNodo);
-		if(sockNodo>0)	enviarProtocolo(NODO_A_MI,sockNodo);
+		if(sockNodo>0)	{
+			enviarProtocolo(NODO_A_MI,sockNodo);
+
 		close(sockNodo);
+		}
 		free(ipNodo);
 	}
 	if(list_size(listaNodos)>0)
