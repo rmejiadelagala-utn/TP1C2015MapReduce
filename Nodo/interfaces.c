@@ -69,7 +69,6 @@ void* conexionFS(void* arg) {
 		}
 
 	}
-
 	return 0;
 }
 
@@ -305,5 +304,7 @@ int enviarArchivoPedido(char* archivo, int sock_in) {
 	buffer = crearBufferConProtocolo(NODO_DAME_ARCHIVO_A_FS);
 	fflush(stdout);
 	bufferAgregarString(buffer, dataArchivoPedido, datosArch.st_size);
-	return enviarBuffer(buffer, sock_in);
+	int resultado= enviarBuffer(buffer, sock_in);
+	munmap(dataArchivoPedido,datosArch.st_size);
+	return resultado;
 }
