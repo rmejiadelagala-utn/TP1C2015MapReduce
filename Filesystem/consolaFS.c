@@ -722,10 +722,11 @@ t_list* hijosDelActual(t_directorio* unDirectorio) {
 }
 
 int esInvalido(char* unPath){
+
 	if(!strcmp(unPath,"/")) return 1;
 
 	int i,contadorBarrasSeguidas; //Chequeo si tiene dos / seguidos
-	for(i=0;unPath[i]!='\0';i++){
+	for(i=contadorBarrasSeguidas=0;unPath[i]!='\0';i++){
 		if(unPath[i]=='/') contadorBarrasSeguidas++;
 		else contadorBarrasSeguidas=0;
 		if(contadorBarrasSeguidas>1) return 1;
