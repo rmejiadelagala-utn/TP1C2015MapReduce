@@ -301,8 +301,12 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma,
 	char* nombreArchAReducir = strdup("/tmp/archivoApareado");
 	string_append_with_format(&nombreArchAReducir,"_%i_%i",arch_config->ID,idReduce);
 
-	char *comando = malloc(
-			4 + strlen(pathPrograma) + 3 + strlen(pathArchivoSalida) + 11 + strlen(nombreArchAReducir));
+	char *comando;
+	if((comando = malloc(
+			4 + strlen(pathPrograma) + 3 + strlen(pathArchivoSalida) + 11 + strlen(nombreArchAReducir) + 1))==NULL){
+		printf("No pude malloquear el comando del reduce\n");
+		exit(1);
+	}
 
 	sprintf(comando, "cat %s | %s | sort >> %s", nombreArchAReducir, pathPrograma, pathArchivoSalida);
 
@@ -319,12 +323,10 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma,
 
 
 	log_info(nodo_logger, "Voy a vaciar el archivo truncado");
-	char* archivoATruncar = string_new();
+	char* archivoATruncar = strdup(pathArchivoSalida);
 	fflush(stdout);
-	string_append(&archivoATruncar, pathArchivoSalida);
 	log_info(nodo_logger, "Arme el nombre del archivo");
-	char* comandoParaTruncar = string_new();
-	string_append(&comandoParaTruncar, "truncate -s 0 ");
+	char* comandoParaTruncar = strdup("truncate -s 0 ");
 	string_append(&comandoParaTruncar, archivoATruncar);
 	system(comandoParaTruncar);
 	fflush(stdout);
@@ -345,8 +347,6 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma,
 			fflush(stdout);
 			return -1;
 		}*/
-		free(comando);
-		free(nombreArchAReducir);
 
 	return 1;
 }

@@ -93,7 +93,7 @@ int buscarBloquesEnFS(t_InfoJob infoDeJob, uint32_t idArchivo, uint32_t numeroDe
 //	printf("El nombre del archivo es %s\n",
 //			infoDeJob.pathsDeArchivos[idArchivo]);
 //	printf("El numero de bloque es %d\n", numeroDeBloque);
-
+	pthread_mutex_lock(&conexionFS);
 	dameBloqueArchFS(socketDeFS, infoDeJob.pathsDeArchivos[idArchivo], 1, numeroDeBloque);
 	sem_wait(&funcionesMarta);
 	log_info(marta_sync_logger, "wait funcionesMarta");
