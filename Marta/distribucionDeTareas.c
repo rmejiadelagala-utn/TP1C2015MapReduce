@@ -560,26 +560,13 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos, t_list* 
 				else
 					log_warning(marta_logger, "El resultado del map es null");
 
-				int tomarIDNodoDadoElIDMap(t_list* listaMapsPendientes, int idMap) {
-
-					bool elIdMapDeSuMapDestEsidMap(t_MapPendiente* mapPendiente) {
-						return mapPendiente->map_dest->id_map == idMap;
-					}
-
-					t_MapPendiente* mapPendienteAux = list_find(listaMapsPendientes,
-							(void*) elIdMapDeSuMapDestEsidMap);
-
-					return mapPendienteAux->map_dest->id_nodo;
-				}
-
-				int idNodoFallido = tomarIDNodoDadoElIDMap(listaMapsPendientes,
-						resultadoDeMap.id_map);
+				int idNodoFallido = mapPendiente->map_dest->id_map;
 
 				int cargaNodoDelNodoFAllido(t_CargaNodo* carga_nodo) {
 					return idNodoFallido == carga_nodo->id_nodo;
 				}
 
-				t_CargaNodo* cargaNodo = list_find(cargaNodos, (void *) tomarIDNodoDadoElIDMap);
+				t_CargaNodo* cargaNodo = list_find(cargaNodos, (void *) cargaNodoDelNodoFAllido);
 
 				if (cargaNodo == NULL) {
 					printf("No está nodo en lista de cargas\n");
@@ -640,6 +627,20 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos, t_list* 
 					pthread_mutex_unlock(&planificarMapMutex);
 					break;
 				}
+
+
+				int tomarIDNodoDadoElIDMap(t_list* listaMapsPendientes, int idMap) {
+
+					bool elIdMapDeSuMapDestEsidMap(t_MapPendiente* mapPendiente) {
+						return mapPendiente->map_dest->id_map == idMap;
+					}
+
+					t_MapPendiente* mapPendienteAux = list_find(listaMapsPendientes,
+							(void*) elIdMapDeSuMapDestEsidMap);
+
+					return mapPendienteAux->map_dest->id_nodo;
+				}
+
 
 				int idNodoMuerto = tomarIDNodoDadoElIDMap(listaMapsPendientes,
 						resultadoDeMap.id_map);
