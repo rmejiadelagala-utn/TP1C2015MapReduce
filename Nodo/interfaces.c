@@ -158,7 +158,10 @@ void* conexionJobs(void* sockJobNodo) {
 			free(nombreScript);
 			free(nomArchSalida);
 			free(archivoSalida);
-			return NULL;
+
+			close(sock_in);
+
+			pthread_exit(NULL);
 			break;
 
 		case ENVIO_ARCHIVOS_NODO_NODO:
@@ -184,7 +187,10 @@ void* conexionJobs(void* sockJobNodo) {
 			fflush(stdout);
 			bufferAgregarString(buffer,dataArchivoPedido,datosArch.st_size);
 			enviarBuffer(buffer,sock_in);
-			return NULL;
+
+			close(sock_in);
+
+			pthread_exit(NULL);
 			break;
 
 		case ORDER_REDUCE:
@@ -236,7 +242,10 @@ void* conexionJobs(void* sockJobNodo) {
 					log_info(nodo_logger,"Job desconectado.");
 				}
 			}
-			return NULL;
+
+			close(sock_in);
+
+			pthread_exit(NULL);
 			break;
 
 		}
