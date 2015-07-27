@@ -64,6 +64,8 @@ int responderOrdenMapAMarta(int sockMarta,t_ordenMap ordenMapper, int resOper){
 
 void* hilo_mapper (void* arg_thread){
 
+
+
 	t_arg_hilo_map ordenToNodo;
 	t_ordenMap ordenMapper;
 	ordenToNodo= *((t_arg_hilo_map*)arg_thread);
@@ -113,7 +115,10 @@ void* hilo_mapper (void* arg_thread){
 	if(envioRes<0){
 		printf("no pude enviar la respuesta a marta, algo pasó\n");
 	}
-	return NULL;
+
+	close(sockNodo);
+
+	pthread_exit(NULL);
 }
 
 void crearHiloMapper(int sockMarta, char* pathMapper) {
@@ -215,6 +220,8 @@ int enviarReduceANodo(int sockNodo,char* codigoReduce, int cantArchivos,
 
 
 void* hilo_reduce (void* arg_thread){
+
+
 	t_arg_hilo_reduce ordenToNodo;
 	t_ordenReduce ordenReduce;
 	ordenToNodo= *((t_arg_hilo_reduce*)arg_thread);//copio contenido de arg_thread a ordenToNodo
@@ -261,7 +268,10 @@ void* hilo_reduce (void* arg_thread){
 		printf("no pude enviar la respuesta a marta, algo pasó\n");
 	}
 	free(codigoReduce);
-	return NULL;
+
+	close(sockNodo);
+
+	pthread_exit(NULL);
 }
 
 
@@ -274,6 +284,7 @@ void crearHiloReduce(int sockMarta, char* pathReduce) {
 	arg_thread->pathReduce=strdup(pathReduce);
 	arg_thread->ordenReduce=ordenReduce;
 	pthread_create (&thread_reduce, NULL, hilo_reduce,(void*)arg_thread);
+	pthread_detach(thread_reduce);
 	//free(ordenReduce); No puedo liberar aca sino me va a liberar antes de
 	//free(arg_thread);  que termine el hilo, muy malo!!!!
 	//capaz tenga que hacer un join_pthread. Averiguar!!!
