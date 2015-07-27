@@ -226,7 +226,7 @@ void moverArchivo(char *archivo, char* padreString) {
 	if (padre!=(-1)) {
 		t_list *archivosVisibles = archivosVisiblesDesdeDirectorioDado(archivo);
 		moverArchivoPorNombreYPadre(archivo, archivosVisibles,	listaDirectorios, padre);
-		free(archivosVisibles);
+		list_destroy(archivosVisibles);
 	}
 }
 
