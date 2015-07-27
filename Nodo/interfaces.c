@@ -187,6 +187,7 @@ void* conexionJobs(void* sockJobNodo) {
 			fflush(stdout);
 			bufferAgregarString(buffer,dataArchivoPedido,datosArch.st_size);
 			enviarBuffer(buffer,sock_in);
+			munmap(dataArchivoPedido,datosArch.st_size);
 
 			close(sock_in);
 
