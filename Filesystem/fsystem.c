@@ -36,6 +36,7 @@ int main() {
 
 	listaNodo = list_create();
 
+
 	pthread_t consola_hilo;
 	if (pthread_create(&consola_hilo, NULL, consola, (void*) listaNodo) < 0) {
 		perror("could not create thread");

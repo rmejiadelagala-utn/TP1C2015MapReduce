@@ -76,7 +76,6 @@ void* hilo_mapper (void* arg_thread){
 	char* ip_nodo_char;
 	int block_size;
 	sockMarta=ordenToNodo.sockMarta;
-	printf("El path del codigo mapper es %s\n",ordenToNodo.pathMapper);
 	codigoMapper=subirCodigoFromPathToBuffer(ordenToNodo.pathMapper);
 	ordenMapper=*(ordenToNodo.ordenMapper);
 	tmp_file_name=strdup(ordenMapper.temp_file_name);
@@ -98,9 +97,11 @@ void* hilo_mapper (void* arg_thread){
 	//Enviamos rutina mapper a Nodo
 
 	res=enviarMapperANodo(sockNodo,codigoMapper,block,block_size,tmp_file_name);
+
 	if(res<0){
-		printf("todo mal, no pude enviar mapper a Nodo: %s\n", ip_nodo_char);
+		printf("Todo mal, no pude enviar mapper a Nodo: %s\n", ip_nodo_char);
 	}
+	else printf("Envie un map al nodo %d\n",ordenMapper.id_nodo);
 	//recibir resultado de la Operacion mapper desde el Nodo
 	resOper=recibirResultadoFromNodo(sockNodo);
 	//printf("le mando a marta el protocolo %d\n", resOper);
@@ -115,7 +116,6 @@ void* hilo_mapper (void* arg_thread){
 	if(envioRes<0){
 		printf("no pude enviar la respuesta a marta, algo pasó\n");
 	}
-
 	close(sockNodo);
 
 	pthread_exit(NULL);
@@ -127,16 +127,9 @@ void crearHiloMapper(int sockMarta, char* pathMapper) {
 	t_arg_hilo_map* arg_thread;
 	ordenMapper=recibirOrdenMapDeMarta(sockMarta);
 	//Muestro lo que recibo de marta
-	printf("Muestro lo que recibo de marta\n");
-	printf("id_map:%d\n",ordenMapper->id_map);
-	printf("id_nodo:%d\n",ordenMapper->id_nodo);
-	printf("ip_nodo:%d\n",ordenMapper->ip_nodo);
 	fflush(stdout);
 	struct in_addr addr;
 	addr.s_addr=ordenMapper->ip_nodo;
-	printf("muestro ip en formato de numeros y puntos: %s\n",inet_ntoa(addr));
-	printf("puerto_nodo:%d\n",ordenMapper->puerto_nodo);
-	printf("tmp_arch: %s\n",ordenMapper->temp_file_name);
 	arg_thread=(t_arg_hilo_map*)malloc(sizeof(t_arg_hilo_map));
 	arg_thread->sockMarta=sockMarta;
 	arg_thread->pathMapper=strdup(pathMapper);
@@ -187,7 +180,6 @@ t_ordenReduce* recibirOrdenReduceDeMarta(int sockMarta){
 			recvall(sockMarta,&(ordenReduce->nodosArchTmp[i]->ip_nodo),sizeof(uint32_t));
 			recvall(sockMarta,&(ordenReduce->nodosArchTmp[i]->puerto_nodo),sizeof(uint32_t));
 			ordenReduce->nodosArchTmp[i]->archTmp=recibirString(sockMarta);
-			printf("\n\n\nRecibi un arch temporal de nombre: %s\n\n\n\n",ordenReduce->nodosArchTmp[i]->archTmp);
 			i++;
 		}
 		return ordenReduce;
@@ -201,17 +193,15 @@ int enviarReduceANodo(int sockNodo,char* codigoReduce, int cantArchivos,
     bufferAgregarInt(buffer,cantArchivos);
     int i;
     for(i=0;i < cantArchivos;i++){
-    	printf("Agrego ip nodo\n");
     	fflush(stdout);
     	bufferAgregarInt(buffer,nodosArchTmp[i]->ip_nodo);
-    	printf("Agrego puerto nodo\n");
     	    	fflush(stdout);
     	bufferAgregarInt(buffer,nodosArchTmp[i]->puerto_nodo);
     	    	    	fflush(stdout);
     	bufferAgregarString(buffer,nodosArchTmp[i]->archTmp,strlen(nodosArchTmp[i]->archTmp)+1);
-    	printf("Agrego nombre archivo temporal:%s\n",nodosArchTmp[i]->archTmp);
+    	printf("Mando a crear el reduce:%s\n",nodosArchTmp[i]->archTmp);
     }
-    printf("Agrego nombre archivo resultado\n");
+
     fflush(stdout);
     bufferAgregarString(buffer,archResultado,strlen(archResultado)+1);
 	int resultado = enviarBuffer(buffer,sockNodo);
@@ -231,7 +221,6 @@ void* hilo_reduce (void* arg_thread){
 	char* codigoReduce;
 	char* ip_nodo_char;
 	sockMarta=ordenToNodo.sockMarta;
-	printf("El path del codigo reduce es %s\n",ordenToNodo.pathReduce);
 	codigoReduce=subirCodigoFromPathToBuffer(ordenToNodo.pathReduce);
 	ordenReduce=*(ordenToNodo.ordenReduce);
 	archResultado=strdup(ordenReduce.archResultado);
