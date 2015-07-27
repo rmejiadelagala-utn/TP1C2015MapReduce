@@ -470,6 +470,23 @@ t_RegistroArch* apareoDeRegistros(t_list* Lista_reg) {
 	return datosReg;
 }
 
+
+void conectarseAlFileSystem(){
+	t_hilofs paramHiloFS;
+	pthread_t hiloFS;
+	int sockfs = crearCliente(arch_config->IP_FS,arch_config->PUERTO_FS);
+
+	paramHiloFS.socket = sockfs;
+	paramHiloFS.IP_NODO = arch_config->IP_NODO;
+	paramHiloFS.PUERTO_NODO = arch_config->PUERTO_NODO;
+	paramHiloFS.ARCH_BIN = arch_config->ARCH_BIN;
+	paramHiloFS.NODO_NEW = arch_config->NODO_NEW;
+	paramHiloFS.DIR_TEMP = arch_config->DIR_TEMP;
+	paramHiloFS.ID = arch_config->ID;
+
+	pthread_create(&hiloFS, NULL, (void*)conexionFS, (void*) &paramHiloFS);
+}
+
 /*char* aparear_registros(char* datos_archivo){
 
  char** reg_archivo;

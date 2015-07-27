@@ -36,6 +36,20 @@ int main() {
 
 	listaNodo = list_create();
 
+	void reconectar(t_nodo* unNodo){
+		t_registro_id_ipPuerto* registroDelNodo = buscarRegistroPorId(unNodo->id);
+		if(!registroDelNodo) return;
+		char* ipNodo=strdup(inet_ntoa(registroDelNodo->ip));
+		uint16_t puertoNodo = registroDelNodo->puerto;
+		int sockNodo = crearCliente(ipNodo,puertoNodo);
+		if(sockNodo>0)	enviarProtocolo(NODO_A_MI,sockNodo);
+		close(sockNodo);
+		free(ipNodo);
+	}
+	if(list_size(listaNodos)>0)
+	log_info(mdfs_logger,"Nodos a mi.");
+	list_iterate(listaNodos,reconectar);
+
 	pthread_t consola_hilo;
 	if (pthread_create(&consola_hilo, NULL, consola, (void*) listaNodo) < 0) {
 		perror("could not create thread");
