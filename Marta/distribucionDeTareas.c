@@ -364,6 +364,7 @@ int ordenarMapAJob(t_DestinoMap* destinoDeMap, int socket) {
 int recibirResultadoDeMap(int sockjob, t_ResultadoMap* resultadoMap) {
 
 	resultadoMap->prot = recibirInt(sockjob);
+	resultadoMap->id_map = recibirInt(sockjob);
 
 	switch (resultadoMap->prot) {
 	case OK_MAP:
@@ -392,11 +393,11 @@ int recibirResultadoDeMap(int sockjob, t_ResultadoMap* resultadoMap) {
 	default:
 		log_warning(marta_logger, "Protocolo Inesperado %i",
 				resultadoMap->prot);
+		resultadoMap->prot=NODO_NOT_FOUND;
 		return -1;
 		break;
 	}
 
-	resultadoMap->id_map = recibirInt(sockjob);
 	return 1;
 }
 
@@ -708,6 +709,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 			}
 
 		} else {
+
 			list_destroy_and_destroy_elements(listaMapsPendientes,
 					(void *) liberarMapPendiente);
 			return -1;
@@ -825,6 +827,7 @@ int ordenarUltimoReduceAJob(t_DestinoReduce* destinoReduce,
 int recibirResultadoDeReduce(int sockjob, t_ResultadoReduce* resultadoReduce) {
 
 	resultadoReduce->prot = recibirInt(sockjob);
+	resultadoReduce->id_reduce = recibirInt(sockjob);
 
 	switch (resultadoReduce->prot) {
 	case OK_REDUCE:
@@ -852,7 +855,6 @@ int recibirResultadoDeReduce(int sockjob, t_ResultadoReduce* resultadoReduce) {
 		break;
 	}
 
-	resultadoReduce->id_reduce = recibirInt(sockjob);
 	return 1;
 }
 

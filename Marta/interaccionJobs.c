@@ -26,7 +26,10 @@ void *interaccionJobs(void* sock_ptr) {
 		return NULL;
 	}
 
-	planificarTodosLosMaps(info_job, listaDeArchivos, listaTemporal, sockCliente);
+	if(planificarTodosLosMaps(info_job, listaDeArchivos, listaTemporal, sockCliente)<0){
+		log_error(marta_logger,"Error fatal en el map.");
+		return NULL;
+	}
 
 	void mostrarListaTemporal(t_MapTemporal* unMapTemporal) {
 		log_info(marta_logger,"bloqueOrigen: %d; idArchivoOrigen: %d; idMapTemporal: %d; idNodo: %d; path:%s \n",
