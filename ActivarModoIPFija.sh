@@ -11,7 +11,7 @@ echo "iface lo inet loopback" >> interfaces
 # The primary network interface
 echo "auto eth0" >> interfaces
 echo "iface eth0 inet static" >> interfaces
-echo "	address $ip"  >> interfaces
+echo "	address 192.168.0.$ip"  >> interfaces
 echo "	network 192.168.0.0" >> interfaces
 echo "	netmask 255.255.255.0" >> interfaces
 echo "	broadcast 192.168.0.255" >> interfaces
