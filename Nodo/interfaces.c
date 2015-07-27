@@ -66,11 +66,9 @@ void* conexionFS(void* arg) {
 			printf("Envie el archivo\n");
 			break;
 
-
 		}
 
 	}
-	munmap(DATOS,tam_disco);
 	return 0;
 }
 
@@ -247,12 +245,6 @@ void* conexionJobs(void* sockJobNodo) {
 
 			close(sock_in);
 
-			pthread_exit(NULL);
-			break;
-
-		case NODO_A_MI:
-			conectarseAlFileSystem();
-			close(sock_in);
 			pthread_exit(NULL);
 			break;
 
