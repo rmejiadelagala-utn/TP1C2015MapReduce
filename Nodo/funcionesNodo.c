@@ -253,7 +253,7 @@ void crearScriptReduce(const char* codigo_script, char* nombre) {
 }
 
 int redireccionar_stdin_stdout_mapper(char *pathPrograma,
-		char *pathArchivoSalida, char* data_bloque) {
+		char *pathArchivoSalida, char* data_bloque, int nroBloque, uint32_t tamanioBloque) {
 
 	FILE *pipeMapper = NULL;
 
@@ -276,7 +276,7 @@ int redireccionar_stdin_stdout_mapper(char *pathPrograma,
 		return -1;
 	}
 
-	if(fputs(data_bloque, pipeMapper)<1){
+	if(fwrite(data_bloque+(nroBloque*BLKSIZE), tamanioBloque, 1,pipeMapper)<1){
 		log_error(nodo_logger,"Text file busy.");
 		return -1;
 	}
@@ -351,9 +351,9 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma,
 	return 1;
 }
 
-int ejecutarMapper(char * path_s, char* path_tmp, char* datos_bloque) {
+int ejecutarMapper(char * path_s, char* path_tmp, char* datos_bloque, int nroBloque, uint32_t tamanioBloque) {
 
-	if ((redireccionar_stdin_stdout_mapper(path_s, path_tmp, datos_bloque))
+	if ((redireccionar_stdin_stdout_mapper(path_s, path_tmp, datos_bloque, nroBloque, tamanioBloque))
 			< 1) {
 
 		log_info(nodo_logger, "Error al ejecutar Mapper");

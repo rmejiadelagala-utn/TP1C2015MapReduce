@@ -128,14 +128,14 @@ void* conexionJobs(void* sockJobNodo) {
 			pthread_mutex_unlock(&numeroMap);
 			log_info(nodo_sync_logger,"unlock numeroMap");
 
-			if((dataAUX = malloc(tamanioBloque))==NULL){
+			/*if((dataAUX = malloc(tamanioBloque))==NULL){
 				printf("Error al malloquear el dataAUX\n.Error: %s",strerror(errno));
 				fflush(stdout);
 				exit(1);
 			}
-			memcpy(dataAUX, DATOS + (nroBloque * BLKSIZE), tamanioBloque);
+			memcpy(dataAUX, DATOS + (nroBloque * BLKSIZE), tamanioBloque);*/
 			log_info(nodo_logger,"Generando %s...", nomArchSalida);
-			resultado=ejecutarMapper(nombreScript, archivoSalida, dataAUX);
+			resultado=ejecutarMapper(nombreScript, archivoSalida, DATOS, nroBloque, tamanioBloque);
 			if (enviarProtocolo(RES_MAP, sock_in) <= 0) {
 				log_info(nodo_logger, "Job desconectado.");
 				return NULL;
@@ -154,7 +154,7 @@ void* conexionJobs(void* sockJobNodo) {
 				}
 			}
 			free(script);
-			free(dataAUX);
+			//free(dataAUX);
 			free(nombreScript);
 			free(nomArchSalida);
 			free(archivoSalida);
