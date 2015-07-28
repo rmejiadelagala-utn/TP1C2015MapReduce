@@ -23,6 +23,7 @@ int main() {
 	cargarPersistencia();
 	// Register signal and signal handler
 	signal(SIGINT, signal_callback_handler);
+	signal(SIGTSTP, signal_callback_handler_persistencia);
 
 	system("clear");
 

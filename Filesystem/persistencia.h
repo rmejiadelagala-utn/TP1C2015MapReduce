@@ -70,5 +70,6 @@ void cargarPersistenciacfg();
 void cargarPersistencia();
 void guardarPersistencia();
 void signal_callback_handler(int signum);
+void signal_callback_handler_persistencia(int signum);
 
 #endif /* PERSISTENCIA_H_ */
