@@ -322,6 +322,10 @@ void signal_callback_handler(int signum) {
 	exit(signum);
 
 }
+void signal_callback_handler_persistencia(int signum) {
+	guardarPersistencia();
+	return;
+}
 
 /**********************************************************************/
 /*********************** PRIVATE FUNCTIONS ****************************/
