@@ -393,7 +393,7 @@ int recibirResultadoDeMap(int sockjob, t_ResultadoMap* resultadoMap) {
 	default:
 		log_warning(marta_logger, "Protocolo Inesperado %i",
 				resultadoMap->prot);
-		resultadoMap->prot=NODO_NOT_FOUND;
+		resultadoMap->prot = NODO_NOT_FOUND;
 		return -1;
 		break;
 	}
@@ -603,6 +603,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 				} else {
 					(cargaNodo->cantidadOperacionesEnCurso)--;
 				}
+				//TODO al parecer, no le resta carga al nodo que hizo fallar un map.
 
 				liberarDestinoMap(mapPendiente->map_dest);
 
@@ -698,13 +699,15 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 						ultimoIDMap, sockjob, listaTemporal,
 						listaMapsPendientes, listaDeArchivos);
 
-				rePlanificarMapsPendientesDeNodoMuerto(idNodoMuerto, info_job,
-						ultimoIDMap, sockjob, listaMapsPendientes,
-						listaDeArchivos);
+				if (rePlanificarMapsPendientesDeNodoMuerto(idNodoMuerto,
+						info_job, ultimoIDMap, sockjob, listaMapsPendientes,
+						listaDeArchivos) < 0) {
+					printf("Fallo replanificar map pendiente de nodo muerto\n");
+					return -1;
+				}
 
 				pthread_mutex_unlock(&planificarMapMutex);
 				log_info(marta_sync_logger, "unlock planificarMapMutex");
-				//todo falta poner mutex y retornar/agarrar errores
 				break;
 			}
 
@@ -1193,6 +1196,20 @@ char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 		list_destroy_and_destroy_elements(destinosIntermedios,
 				(void*) destruirDestinoReduce);
 
+		bool mapsYaHechos(t_MapTemporal* mapTemporal) {
+
+			bool esElMismoMap(t_MapTemporal* otroMapTemporal) {
+				return otroMapTemporal == mapTemporal;
+			}
+
+			return list_any_satisfy(mapsTemporalesDeLosArchivosDelJob,
+					(void*) esElMismoMap);
+		}
+
+		while (list_remove_by_condition(listaMapsTemporales,
+				(void*) mapsYaHechos))
+			;
+
 		return archivoFinal;
 
 	} else //Sin combiner
@@ -1270,6 +1287,19 @@ char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 		free(destinoReduce);
 		list_destroy_and_destroy_elements(origenesDeReduce, (void*) free);
 	}
+
+	bool mapsYaHechos(t_MapTemporal* mapTemporal) {
+
+		bool esElMismoMap(t_MapTemporal* otroMapTemporal) {
+			return otroMapTemporal == mapTemporal;
+		}
+
+		return list_any_satisfy(mapsTemporalesDeLosArchivosDelJob,
+				(void*) esElMismoMap);
+	}
+
+	while (list_remove_by_condition(listaMapsTemporales, (void*) mapsYaHechos))
+		;
 
 	/*list_destroy_and_destroy_elements(mapsTemporalesDeLosArchivosDelJob,
 	 (void*) free);*/
