@@ -260,6 +260,9 @@ int rePlanificarMapsPendientesDeNodoMuerto(int idNodoMuerto, t_InfoJob infoJob,
 	//A estos, mandarlos a planificar como se hace normalmente.
 	//Guardar los mapTemporales replanificados a listaReplanificacionPendientesMuertos.
 
+
+
+
 	bool pendienteConIDNodoMuerto(t_MapPendiente* unMapPendiente) {
 		return unMapPendiente->map_dest->id_nodo == idNodoMuerto;
 	}
@@ -306,6 +309,9 @@ int rePlanificarMapsPendientesDeNodoMuerto(int idNodoMuerto, t_InfoJob infoJob,
 
 			//elemina todos los maps pendientes, porque no se puede realizar
 			//este job
+
+			log_info(marta_logger, "Resultado de la orden de Map dio MALLLLLLL.");
+
 			list_destroy_and_destroy_elements(listaMapsPendientes,
 					(void *) liberarMapPendiente);
 			return -1;
@@ -450,12 +456,22 @@ void agregarMapPendiente(t_list* mapsPendientes, t_InfoArchivo* infoArchivo,
 void borrarMapPendiente(t_list* mapsPendientes, uint32_t idMap,
 		t_list* listaTemporal, uint32_t* ultimoIdTemporal) {
 
+	printf("EL id del map exitoso que me llego es %d\n", idMap);
+
+
 	int encuentraMapPendiente(t_MapPendiente* mapPendiente) {
 		return mapPendiente->map_dest->id_map == idMap;
 	}
 
 	t_MapPendiente* mapPendiente = list_find(mapsPendientes,
 			(void *) encuentraMapPendiente);
+
+	if(mapPendiente == NULL){
+		printf("El map pendiente es null\n\n");
+		fflush(stdout);
+	}
+
+
 	t_CargaNodo* cargaNodo;
 
 	int seEncuetraNodo(t_CargaNodo* carga_nodo) {
@@ -643,6 +659,8 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 				break;
 
 			case NODO_NOT_FOUND:
+				//todo cuando matas un segundo nodo, encuentra mal el id del nodo muerto
+				//cuando le llega el map ok de un nodo que estaba vivo.
 
 				log_warning(marta_logger, "NO SE ENCONTRO UN NODO");
 				fflush(stdout);
@@ -675,6 +693,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 
 				int idNodoMuerto = tomarIDNodoDadoElIDMap(listaMapsPendientes,
 						resultadoDeMap.id_map);
+
 				log_info(marta_logger, "El id del nodo muerto es %d",
 						idNodoMuerto);
 
