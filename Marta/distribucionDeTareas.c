@@ -189,10 +189,6 @@ int rePlanificarMapsHechosDeNodoMuerto(int idNodoMuerto, t_InfoJob infoJob,
 		return unMapTemporal->id_nodo == idNodoMuerto;
 	}
 
-	bool pendienteConIDNodoMuerto(t_MapPendiente* unMapPendiente) {
-		return unMapPendiente->map_dest->id_nodo == idNodoMuerto;
-	}
-
 	void eliminarTemporal(t_MapTemporal* unMapTemporal) {
 		free(unMapTemporal->path);
 		free(unMapTemporal);
@@ -685,7 +681,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 				int cargaNodoDelNodoMuerto(t_CargaNodo* carga_nodo) {
 					return idNodoMuerto == carga_nodo->id_nodo;
 				}
-
+/*
 				t_CargaNodo* cargaNodoMuerto = list_find(cargaNodos,
 						(void *) cargaNodoDelNodoMuerto);
 
@@ -694,10 +690,15 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 				} else {
 					cargaNodoMuerto->cantidadOperacionesEnCurso = 0;
 				}
+*/
+				list_remove_by_condition(cargaNodos, (void*) cargaNodoDelNodoMuerto);
 
-				rePlanificarMapsHechosDeNodoMuerto(idNodoMuerto, info_job,
+				if (rePlanificarMapsHechosDeNodoMuerto(idNodoMuerto, info_job,
 						ultimoIDMap, sockjob, listaTemporal,
-						listaMapsPendientes, listaDeArchivos);
+						listaMapsPendientes, listaDeArchivos) < 0) {
+					printf("Fallo replanificar map terminado de nodo muerto\n");
+					return -1;
+				}
 
 				if (rePlanificarMapsPendientesDeNodoMuerto(idNodoMuerto,
 						info_job, ultimoIDMap, sockjob, listaMapsPendientes,
