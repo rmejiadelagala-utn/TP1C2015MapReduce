@@ -43,3 +43,15 @@ weather
 
 #log
 log
+*.log
+*.cfg
+
+#persistencia
+Filesystem/archivos
+Filesystem/directorios
+Filesystem/nodos
+Filesystem/registrosIDIP
+
+#otros
+.cproject
+
