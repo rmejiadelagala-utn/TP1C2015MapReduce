@@ -2,7 +2,7 @@
 
 void *interaccionJobs(void* sock_ptr) {
 
-	pthread_mutex_lock(&conexionFS);
+
 	log_info(marta_sync_logger, "lock conexionFS");
 	int sockCliente = *(int*) sock_ptr;
 
@@ -36,7 +36,7 @@ void *interaccionJobs(void* sock_ptr) {
 				unMapTemporal->path);
 	}
 
-	//list_iterate(listaTemporal, (void*) mostrarListaTemporal);
+	list_iterate(listaTemporal, (void*) mostrarListaTemporal);
 
 	char* archivoResultado;
 	int idNodoArchFinal;

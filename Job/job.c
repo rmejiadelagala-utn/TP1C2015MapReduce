@@ -14,6 +14,8 @@ int main(int argc,char *argv[]) {
 	t_config_job* info_config;
 	t_solicitud* solicitud;
 	t_rutinas* rutinas;
+	pthread_mutex_init(&contadorMappersDebug_mutex,0);
+	contadorMappersDebug=0;
 
 	solicitud =(t_solicitud*)malloc(sizeof(t_solicitud));
 	rutinas =(t_rutinas*)malloc(sizeof(t_rutinas));

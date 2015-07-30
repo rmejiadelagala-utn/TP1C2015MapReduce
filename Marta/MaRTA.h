@@ -31,6 +31,7 @@ int socketDeFS; //socket cliente del FS
 pthread_mutex_t contadorJobs;
 pthread_mutex_t conexionFS;
 pthread_mutex_t planificarMapMutex;
+pthread_mutex_t mutexListaTemporal;
 t_config *config;
 sem_t funcionesMarta;
 sem_t interaccionFS;
