@@ -190,14 +190,6 @@ int rePlanificarMapsHechosDeNodoMuerto(int idNodoMuerto, t_InfoJob infoJob, int 
 
 		int resultado = atoi(stringIdJob);
 
-		free(stringIdJob);
-
-		int i;
-
-		for(i=0;archivoTemporalSeparadoPorGuionBajo[i]!=NULL;i++) free(archivoTemporalSeparadoPorGuionBajo[i]);
-
-		free(archivoTemporalSeparadoPorGuionBajo);
-
 		return resultado;
 	}
 
@@ -676,8 +668,7 @@ while (!list_is_empty(listaMapsPendientes)) {
 				return idNodoMuerto == carga_nodo->id_nodo;
 			}
 
-			while (list_remove_by_condition(cargaNodos, (void*) cargaNodoDelNodoMuerto))
-				;
+			while (list_remove_by_condition(cargaNodos, (void*) cargaNodoDelNodoMuerto));
 
 			/*
 			 t_CargaNodo* cargaNodoMuerto = list_find(cargaNodos,
