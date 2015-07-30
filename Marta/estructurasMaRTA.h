@@ -108,6 +108,7 @@ typedef struct {
 typedef struct {
 	uint32_t prot;
 	uint32_t id_map;
+	uint32_t id_nodo;
 } t_ResultadoMap;
 
 typedef struct {

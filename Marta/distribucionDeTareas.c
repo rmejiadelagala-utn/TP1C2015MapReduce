@@ -260,9 +260,6 @@ int rePlanificarMapsPendientesDeNodoMuerto(int idNodoMuerto, t_InfoJob infoJob,
 	//A estos, mandarlos a planificar como se hace normalmente.
 	//Guardar los mapTemporales replanificados a listaReplanificacionPendientesMuertos.
 
-
-
-
 	bool pendienteConIDNodoMuerto(t_MapPendiente* unMapPendiente) {
 		return unMapPendiente->map_dest->id_nodo == idNodoMuerto;
 	}
@@ -310,7 +307,8 @@ int rePlanificarMapsPendientesDeNodoMuerto(int idNodoMuerto, t_InfoJob infoJob,
 			//elemina todos los maps pendientes, porque no se puede realizar
 			//este job
 
-			log_info(marta_logger, "Resultado de la orden de Map dio MALLLLLLL.");
+			log_info(marta_logger,
+					"Resultado de la orden de Map dio MALLLLLLL.");
 
 			list_destroy_and_destroy_elements(listaMapsPendientes,
 					(void *) liberarMapPendiente);
@@ -367,6 +365,7 @@ int recibirResultadoDeMap(int sockjob, t_ResultadoMap* resultadoMap) {
 
 	resultadoMap->prot = recibirInt(sockjob);
 	resultadoMap->id_map = recibirInt(sockjob);
+	resultadoMap->id_nodo = recibirInt(sockjob);
 
 	switch (resultadoMap->prot) {
 	case OK_MAP:
@@ -458,7 +457,6 @@ void borrarMapPendiente(t_list* mapsPendientes, uint32_t idMap,
 
 	printf("EL id del map exitoso que me llego es %d\n", idMap);
 
-
 	int encuentraMapPendiente(t_MapPendiente* mapPendiente) {
 		return mapPendiente->map_dest->id_map == idMap;
 	}
@@ -466,11 +464,10 @@ void borrarMapPendiente(t_list* mapsPendientes, uint32_t idMap,
 	t_MapPendiente* mapPendiente = list_find(mapsPendientes,
 			(void *) encuentraMapPendiente);
 
-	if(mapPendiente == NULL){
+	if (mapPendiente == NULL) {
 		printf("El map pendiente es null\n\n");
 		fflush(stdout);
 	}
-
 
 	t_CargaNodo* cargaNodo;
 
@@ -665,6 +662,13 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 				log_warning(marta_logger, "NO SE ENCONTRO UN NODO");
 				fflush(stdout);
 
+				log_info(marta_logger,
+						"El id del Map que no se pudo hacer por NODO_NOT_FOUND es %d",
+						resultadoDeMap.id_map);
+				log_info(marta_logger,
+						"El id del Nodo que no se pudo hacer por NODO_NOT_FOUND es %d",
+						resultadoDeMap.id_nodo);
+
 				mapPendiente = list_find(listaMapsPendientes,
 						(void *) encuentreMapPendiente);
 
@@ -677,22 +681,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 					break;
 				}
 
-				int tomarIDNodoDadoElIDMap(t_list* listaMapsPendientes,
-						int idMap) {
-
-					bool elIdMapDeSuMapDestEsidMap(t_MapPendiente* mapPendiente) {
-						return mapPendiente->map_dest->id_map == idMap;
-					}
-
-					t_MapPendiente* mapPendienteAux = list_find(
-							listaMapsPendientes,
-							(void*) elIdMapDeSuMapDestEsidMap);
-
-					return mapPendienteAux->map_dest->id_nodo;
-				}
-
-				int idNodoMuerto = tomarIDNodoDadoElIDMap(listaMapsPendientes,
-						resultadoDeMap.id_map);
+				int idNodoMuerto = resultadoDeMap.id_nodo;
 
 				log_info(marta_logger, "El id del nodo muerto es %d",
 						idNodoMuerto);
@@ -700,17 +689,21 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 				int cargaNodoDelNodoMuerto(t_CargaNodo* carga_nodo) {
 					return idNodoMuerto == carga_nodo->id_nodo;
 				}
-/*
-				t_CargaNodo* cargaNodoMuerto = list_find(cargaNodos,
-						(void *) cargaNodoDelNodoMuerto);
 
-				if (cargaNodoMuerto == NULL) {
-					printf("No está nodo en lista de cargas\n");
-				} else {
-					cargaNodoMuerto->cantidadOperacionesEnCurso = 0;
-				}
-*/
-				list_remove_by_condition(cargaNodos, (void*) cargaNodoDelNodoMuerto);
+				while (list_remove_by_condition(cargaNodos,
+						(void*) cargaNodoDelNodoMuerto))
+					;
+
+				/*
+				 t_CargaNodo* cargaNodoMuerto = list_find(cargaNodos,
+				 (void *) cargaNodoDelNodoMuerto);
+
+				 if (cargaNodoMuerto == NULL) {
+				 printf("No está nodo en lista de cargas\n");
+				 } else {
+				 cargaNodoMuerto->cantidadOperacionesEnCurso = 0;
+				 }
+				 */
 
 				if (rePlanificarMapsHechosDeNodoMuerto(idNodoMuerto, info_job,
 						ultimoIDMap, sockjob, listaTemporal,

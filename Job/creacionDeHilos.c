@@ -57,7 +57,7 @@ int responderOrdenMapAMarta(int sockMarta,t_ordenMap ordenMapper, int resOper){
 	t_buffer* buffer = crearBuffer();//crearBufferConProtocolo(RES_MAP);
 	bufferAgregarInt(buffer,resOper);
 	bufferAgregarInt(buffer,ordenMapper.id_map);
-	//bufferAgregarInt(buffer,ordenMapper.id_nodo);
+	bufferAgregarInt(buffer,ordenMapper.id_nodo);
 	result_envio=enviarBuffer(buffer,sockMarta);
 	return result_envio;
 }
