@@ -43,9 +43,8 @@ void* conexionFS(void* arg) {
 
 		switch (protocolo) {
 		case SET_BLOQUE:
-			recibido = setBloqueDeFileSystem(socket, DATOS, BLKSIZE); //Si devuelve 0 es porque recibio todo
+			recibido = setBloqueDeFileSystem(socket, DATOS, BLKSIZE);
 			msync(ptr->ARCH_BIN, strlen(DATOS), MS_SYNC);
-			printf("La cantidad de bytes recibidos fue %d",recibido);
 			respuestaSetBloque(socket, recibido);
 			fflush(stdout);
 			break;

@@ -84,6 +84,8 @@ typedef struct {
 } t_arg_hilo_reduce;
 
 
+int contadorMappersDebug;
+pthread_mutex_t contadorMappersDebug_mutex;
 void crearHiloMapper(int , char*);
 void crearHiloReduce(int , char*);
 t_config_job* leer_archivo_configuracion(char* arch);
