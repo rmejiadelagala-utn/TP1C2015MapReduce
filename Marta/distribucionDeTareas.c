@@ -365,7 +365,6 @@ int recibirResultadoDeMap(int sockjob, t_ResultadoMap* resultadoMap) {
 
 	resultadoMap->prot = recibirInt(sockjob);
 	resultadoMap->id_map = recibirInt(sockjob);
-	resultadoMap->id_nodo = recibirInt(sockjob);
 
 	switch (resultadoMap->prot) {
 	case OK_MAP:
@@ -398,6 +397,8 @@ int recibirResultadoDeMap(int sockjob, t_ResultadoMap* resultadoMap) {
 		return -1;
 		break;
 	}
+
+	resultadoMap->id_nodo = recibirInt(sockjob);
 
 	return 1;
 }
@@ -598,7 +599,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 				else
 					log_warning(marta_logger, "El resultado del map es null");
 
-				int idNodoFallido = mapPendiente->map_dest->id_map;
+				int idNodoFallido = resultadoDeMap.id_nodo;
 
 				int cargaNodoDelNodoFAllido(t_CargaNodo* carga_nodo) {
 					return idNodoFallido == carga_nodo->id_nodo;
@@ -682,6 +683,7 @@ int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
 				}
 
 				int idNodoMuerto = resultadoDeMap.id_nodo;
+				//int idNodoMuerto = mapPendiente->map_dest->id_nodo;
 
 				log_info(marta_logger, "El id del nodo muerto es %d",
 						idNodoMuerto);
