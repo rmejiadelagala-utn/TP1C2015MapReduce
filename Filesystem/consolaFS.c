@@ -233,7 +233,7 @@ void moverArchivo(char *archivo, char* padreString) {
 			return;
 		}
 		unArchivo->padre=padre;
-		log_info(mdfs_logger,"El directorio ha sido movido");
+		log_info(mdfs_logger,"El archivo ha sido movido");
 		}
 		validarYEjecutar(archivo,validarArchivo,moverArchivo);
 	}
@@ -241,7 +241,13 @@ void moverArchivo(char *archivo, char* padreString) {
 
 void crearDirectorio(char *nomDirectorio) {
 
-		crearDirectorioDadoPadreYNom(nomDirectorio, directorioActual->index, listaDirectorios);
+		char** vectorPath = string_split(nomDirectorio,"/");
+		t_directorio* unDir = ubicarseEnDirectorio(vectorPath);
+		int i;
+		for(i=0;vectorPath[i+1]!=NULL;i++);
+
+		crearDirectorioDadoPadreYNom(vectorPath[i], unDir->index, listaDirectorios);
+
 
 }
 
@@ -761,7 +767,7 @@ int validarYEjecutar (char* path, void* (*validador)(void*,void*), void (*funcio
 
 	void* objeto = validador(vectorPath[i],directorioReferencia);
 
-	if(detectarError(objeto,esNull,"El archivo pedido no existe\n")) return -1;
+	if(detectarError(objeto,esNull,"El directorio pedido no existe\n")) return -1;
 
 	funcion(objeto);
 
