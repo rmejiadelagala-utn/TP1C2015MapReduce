@@ -91,6 +91,7 @@ void* hilo_mapper (void* arg_thread){
 		fflush(stdout);
 		void* buffer = crearBufferConProtocolo(NODO_NOT_FOUND);
 		bufferAgregarInt(buffer,ordenMapper.id_map);
+		bufferAgregarInt(buffer,ordenMapper.id_nodo);
 		enviarBuffer(buffer,sockMarta);
 		return NULL;
 	}
