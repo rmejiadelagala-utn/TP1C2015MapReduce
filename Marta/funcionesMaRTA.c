@@ -26,9 +26,11 @@ t_list* obtenerIDyCantBloquesDeArchivosDelFS(char** archivos,int cantidadArchivo
 	for (i=0;i<cantidadArchivos;i++){
 		t_InfoArchivo* infoArchivo= malloc(sizeof(t_InfoArchivo));
 		recvall(socketDeFS,&(infoArchivo->cantidadDeBloques),sizeof(int));
-		printf("La cantidad de bloques recibidos fue %d",infoArchivo->cantidadDeBloques);
-		fflush(stdout);
-		if(infoArchivo->cantidadDeBloques==-1) huboError=1;
+		if(infoArchivo->cantidadDeBloques==-1){
+			huboError=1;
+			log_error(marta_logger,"No se encontro el archivo %s.",archivos[i]);
+		}
+		else	log_info(marta_logger,"La cantidad de bloques recibidos fue %d.",infoArchivo->cantidadDeBloques);
 		infoArchivo->idArchivo=i;
 		list_add(listaArchivos,infoArchivo);
 	}

@@ -218,7 +218,7 @@ void eliminarArchivo(char *archivo) {
 
 void renombrarArchivo(char *archivo, char *nuevoNombre) {
 	void renombrar(t_archivo* unArchivo){
-		unArchivo->nombre=nuevoNombre;
+		unArchivo->nombre=strdup(nuevoNombre);
 	}
 	validarYEjecutar(archivo,validarArchivo,renombrar);
 }

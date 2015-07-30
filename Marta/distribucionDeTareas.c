@@ -237,6 +237,9 @@ int rePlanificar(t_MapTemporal* unMapTemporal) {
 
 		//elemina todos los maps pendientes, porque no se puede realizar
 		//este job
+
+		log_error(marta_logger, "Error al recibir map de job");
+
 		list_destroy_and_destroy_elements(listaMapsPendientes, (void *) liberarMapPendiente);
 		return -1;
 	}
@@ -246,7 +249,7 @@ int rePlanificar(t_MapTemporal* unMapTemporal) {
 
 list_iterate(listaReplanificacionHechosMuertos, (int*) rePlanificar);
 
-list_destroy_and_destroy_elements(listaReplanificacionHechosMuertos, (void*) eliminarTemporal);
+//list_destroy_and_destroy_elements(listaReplanificacionHechosMuertos, (void*) eliminarTemporal);
 
 return 1;
 }
@@ -538,6 +541,9 @@ for (i = 0; i < cantidadDeArchivos; i++) {
 
 			//elemina todos los maps pendientes, porque no se puede realizar
 			//este job
+
+			log_error(marta_logger, "No se puede realizar orden a Job");
+
 			list_destroy_and_destroy_elements(listaMapsPendientes, (void *) liberarMapPendiente);
 			return -1;
 		}
@@ -699,6 +705,8 @@ while (!list_is_empty(listaMapsPendientes)) {
 		}
 
 	} else {
+
+		log_error(marta_logger, "Error al recibir resultado de map");
 
 		list_destroy_and_destroy_elements(listaMapsPendientes, (void *) liberarMapPendiente);
 		return -1;

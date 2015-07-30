@@ -293,9 +293,15 @@ void guardarPersistencia() {
 	guardarListaRegistrosIDIP();
 	log_info(mdfs_logger,"guarde lista de RegistrosIDIP\n");
 }
+
+
 void signal_callback_handler(int signum) {
 
 //	printf("\t Caught signal %d\n", signum);
+	void desconectarSocket(t_nodo* unNodo){
+		unNodo->socket=-1;
+	}
+	list_iterate(listaNodos,desconectarSocket);
 	guardarPersistencia();
 	exit(signum);
 
