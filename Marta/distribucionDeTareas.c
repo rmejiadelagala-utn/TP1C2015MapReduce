@@ -50,8 +50,7 @@ t_CopiaDeBloque* elegirMejorNodoParaMap(t_list* copiasDeBloque) {
 		return cargaNodo->id_nodo == idNodoBloqueEvaluado;
 	}
 
-	bool compararNodosPorMenorCarga(t_CopiaDeBloque *unBloque,
-			t_CopiaDeBloque *bloqueSiguiente) {
+	bool compararNodosPorMenorCarga(t_CopiaDeBloque *unBloque, t_CopiaDeBloque *bloqueSiguiente) {
 
 		idNodoBloqueEvaluado = unBloque->id_nodo;
 		cargaNodo = list_find(cargaNodos, (void *) encuentraNodoDeId);
@@ -83,27 +82,28 @@ t_CopiaDeBloque* elegirMejorNodoParaMap(t_list* copiasDeBloque) {
 
 	//elijo la primera de las copias de la lista ordena por menor carga.
 	//t_CopiaDeBloque* copiaElegida = list_get(copiasDeBloque, 0);
-	log_info(marta_logger, "La copia elegida tiene id %d\n",
-			copiaElegida->id_nodo);
+	log_info(marta_logger, "La copia elegida tiene id %d\n", copiaElegida->id_nodo);
 	return list_get(copiasDeBloque, 0);
 }
 
-int buscarBloquesEnFS(t_InfoJob infoDeJob, uint32_t idArchivo,
-		uint32_t numeroDeBloque, t_list *copiasDeBloque) {
+int buscarBloquesEnFS(t_InfoJob infoDeJob, uint32_t idArchivo, uint32_t numeroDeBloque,
+		t_list *copiasDeBloque) {
 
 //	printf("El id del archivo es %d\n", idArchivo);
 //	printf("El nombre del archivo es %s\n",
 //			infoDeJob.pathsDeArchivos[idArchivo]);
 //	printf("El numero de bloque es %d\n", numeroDeBloque);
-
-	dameBloqueArchFS(socketDeFS, infoDeJob.pathsDeArchivos[idArchivo], 1,
-			numeroDeBloque);
+	pthread_mutex_lock(&conexionFS);
+	dameBloqueArchFS(socketDeFS, infoDeJob.pathsDeArchivos[idArchivo], 1, numeroDeBloque);
 	sem_wait(&funcionesMarta);
 	log_info(marta_sync_logger, "wait funcionesMarta");
 
 	t_list* copias = list_create();
-	if (recibirBloqueArchFS(socketDeFS, copias) < 0)
+	if (recibirBloqueArchFS(socketDeFS, copias) < 0) {
+		pthread_mutex_unlock(&conexionFS);
+		sem_post(&interaccionFS);
 		return -1;
+	}
 	void deBloqueEnNodoACopiaDeBloque(t_bloqueEnNodo* bloqueEnNodo) {
 		t_CopiaDeBloque* copiaDeBloque = malloc(sizeof(t_CopiaDeBloque));
 		copiaDeBloque->block = bloqueEnNodo->numeroDeBloqueEnNodo;
@@ -122,26 +122,24 @@ int buscarBloquesEnFS(t_InfoJob infoDeJob, uint32_t idArchivo,
 //	fflush(stdout);
 	list_destroy_and_destroy_elements(copias, free);
 	sem_post(&interaccionFS);
+	pthread_mutex_unlock(&conexionFS);
 	log_info(marta_sync_logger, "post interaccionFS");
 
 	return 1;	//1 salió bien, <= 0 no lo encontró
 }
 //planifica un map de los que tiene que hacer el job
-t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
-		uint32_t numeroDeBloque, uint32_t* ultimoIDMap) {
+t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo, uint32_t numeroDeBloque,
+		uint32_t* ultimoIDMap) {
 
 	t_CopiaDeBloque* copiaSeleccionada;
 	t_DestinoMap* self;
 
 	t_list* copiasDeBloque = list_create();
 
-	if (buscarBloquesEnFS(infoDeJob, idArchivo, numeroDeBloque, copiasDeBloque)
-			<= 0) {
-		log_warning(marta_logger,
-				"No se encontraron las copias del Archivo: %i, Bloque: %i",
+	if (buscarBloquesEnFS(infoDeJob, idArchivo, numeroDeBloque, copiasDeBloque) <= 0) {
+		log_warning(marta_logger, "No se encontraron las copias del Archivo: %i, Bloque: %i",
 				idArchivo, numeroDeBloque);
-		list_destroy_and_destroy_elements(copiasDeBloque,
-				(void *) liberarCopiaDeBloque);
+		list_destroy_and_destroy_elements(copiasDeBloque, (void *) liberarCopiaDeBloque);
 		return NULL;
 	}
 	log_info(marta_logger, "Voy a buscar la mejor copia\n");
@@ -149,8 +147,7 @@ t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 	copiaSeleccionada = elegirMejorNodoParaMap(copiasDeBloque);
 
 	//XXX ojo acá hay warning feo. Me parece que no estaría funcionando bien esto.
-	t_registro_id_ipPuerto* unRegistro = buscarRegistroPorId(
-			copiaSeleccionada->id_nodo);
+	t_registro_id_ipPuerto* unRegistro = buscarRegistroPorId(copiaSeleccionada->id_nodo);
 
 	if (!unRegistro)
 		return NULL;
@@ -161,12 +158,11 @@ t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 	self->ip_nodo = unRegistro->ip.s_addr;
 	self->puerto_nodo = unRegistro->puerto;
 	self->block = copiaSeleccionada->block;
-	self->temp_file_name = string_from_format("map_%i_%i_%i.temp",
-			infoDeJob.idJob, idArchivo, numeroDeBloque);
+	self->temp_file_name = string_from_format("map_%i_%i_%i.temp", infoDeJob.idJob, idArchivo,
+			numeroDeBloque);
 	self->block_size = copiaSeleccionada->size;
 
-	list_destroy_and_destroy_elements(copiasDeBloque,
-			(void *) liberarCopiaDeBloque);
+	list_destroy_and_destroy_elements(copiasDeBloque, (void *) liberarCopiaDeBloque);
 
 	fflush(stdout);
 
@@ -174,9 +170,8 @@ t_DestinoMap* planificarMap(t_InfoJob infoDeJob, uint32_t idArchivo,
 
 }
 
-int rePlanificarMapsHechosDeNodoMuerto(int idNodoMuerto, t_InfoJob infoJob,
-		int ultimoIDMap, int sockJob, t_list* listaTemporal,
-		t_list* listaMapsPendientes, t_list* listaDeArchivos) {
+int rePlanificarMapsHechosDeNodoMuerto(int idNodoMuerto, t_InfoJob infoJob, int ultimoIDMap,
+		int sockJob, t_list* listaTemporal, t_list* listaMapsPendientes, t_list* listaDeArchivos) {
 
 	t_list* listaReplanificacionHechosMuertos;
 	int resultado = 1;
@@ -185,1123 +180,977 @@ int rePlanificarMapsHechosDeNodoMuerto(int idNodoMuerto, t_InfoJob infoJob,
 	//A estos, mandarlos a planificar como se hace normalmente.
 	//Guardar los mapTemporales replanificados a listaReplanificacionPendientesMuertos.
 
+	int obtenerIdJobDelMapTemporal(t_MapTemporal* unMapTemporal) {
+
+		char** archivoTemporalSeparadoPorGuionBajo;
+
+		archivoTemporalSeparadoPorGuionBajo = string_split(unMapTemporal->path, "_");
+
+		char* stringIdJob = archivoTemporalSeparadoPorGuionBajo[1];
+
+		int resultado = atoi(stringIdJob);
+
+		return resultado;
+	}
+
 	bool temporalConIDNodoMuerto(t_MapTemporal* unMapTemporal) {
-		return unMapTemporal->id_nodo == idNodoMuerto;
+	return (unMapTemporal->id_nodo == idNodoMuerto) && (obtenerIdJobDelMapTemporal(unMapTemporal) == infoJob.idJob);
+}
+
+void eliminarTemporal(t_MapTemporal* unMapTemporal) {
+	free(unMapTemporal->path);
+	free(unMapTemporal);
+}
+
+//XXX ojo, puede que al eliminar la listaTemporal, se elimine la listaReplanifi
+
+listaReplanificacionHechosMuertos = list_filter(listaTemporal, (void*) temporalConIDNodoMuerto);
+
+log_info(marta_logger, "Hay %d maps a replanificar que habian sido terminados.",
+		list_size(listaReplanificacionHechosMuertos));
+
+while (list_remove_by_condition(listaTemporal, (void*) temporalConIDNodoMuerto))
+	;
+
+int rePlanificar(t_MapTemporal* unMapTemporal) {
+	t_DestinoMap* destinoMap;
+
+	destinoMap = planificarMap(infoJob, unMapTemporal->idArchivoOrigen, unMapTemporal->bloqueOrigen,
+			&ultimoIDMap);
+
+	//Si obtiene un destino, le ordena al job realizar el map en ese destino
+	if (destinoMap) {
+		resultado = ordenarMapAJob(destinoMap, sockJob);
+	} else {
+		int error = -1;
+		sendall(sockJob, &error, sizeof(int));
+		return -2;
 	}
 
-	void eliminarTemporal(t_MapTemporal* unMapTemporal) {
-		free(unMapTemporal->path);
-		free(unMapTemporal);
+	if (resultado > 0) {
+		t_InfoArchivo* infoArchivo = list_get(listaDeArchivos, unMapTemporal->idArchivoOrigen);
+
+		agregarMapPendiente(listaMapsPendientes, infoArchivo, unMapTemporal->bloqueOrigen,
+				destinoMap);
+
+	} else {
+
+		//elemina todos los maps pendientes, porque no se puede realizar
+		//este job
+		list_destroy_and_destroy_elements(listaMapsPendientes, (void *) liberarMapPendiente);
+		return -1;
 	}
-
-	//XXX ojo, puede que al eliminar la listaTemporal, se elimine la listaReplanifi
-
-	listaReplanificacionHechosMuertos = list_filter(listaTemporal,
-			(void*) temporalConIDNodoMuerto);
-
-	log_info(marta_logger,
-			"Hay %d maps a replanificar que habian sido terminados.",
-			list_size(listaReplanificacionHechosMuertos));
-
-	while (list_remove_by_condition(listaTemporal,
-			(void*) temporalConIDNodoMuerto))
-		;
-
-	int rePlanificar(t_MapTemporal* unMapTemporal) {
-		t_DestinoMap* destinoMap;
-
-		destinoMap = planificarMap(infoJob, unMapTemporal->idArchivoOrigen,
-				unMapTemporal->bloqueOrigen, &ultimoIDMap);
-
-		//Si obtiene un destino, le ordena al job realizar el map en ese destino
-		if (destinoMap) {
-			resultado = ordenarMapAJob(destinoMap, sockJob);
-		} else {
-			int error = -1;
-			sendall(sockJob, &error, sizeof(int));
-			return -2;
-		}
-
-		if (resultado > 0) {
-			t_InfoArchivo* infoArchivo = list_get(listaDeArchivos,
-					unMapTemporal->idArchivoOrigen);
-
-			agregarMapPendiente(listaMapsPendientes, infoArchivo,
-					unMapTemporal->bloqueOrigen, destinoMap);
-
-		} else {
-
-			//elemina todos los maps pendientes, porque no se puede realizar
-			//este job
-			list_destroy_and_destroy_elements(listaMapsPendientes,
-					(void *) liberarMapPendiente);
-			return -1;
-		}
-
-		return 1;
-	}
-
-	list_iterate(listaReplanificacionHechosMuertos, (int*) rePlanificar);
-
-	list_destroy_and_destroy_elements(listaReplanificacionHechosMuertos,
-			(void*) eliminarTemporal);
 
 	return 1;
 }
 
-int rePlanificarMapsPendientesDeNodoMuerto(int idNodoMuerto, t_InfoJob infoJob,
-		int ultimoIDMap, int sockJob, t_list* listaMapsPendientes,
-		t_list* listaDeArchivos) {
+list_iterate(listaReplanificacionHechosMuertos, (int*) rePlanificar);
 
-	t_list* listaReplanificacionPendientesMuertos;
-	int resultado = 1;
+list_destroy_and_destroy_elements(listaReplanificacionHechosMuertos, (void*) eliminarTemporal);
 
-	//tomar de la listaTemporal, aquellos maps que sean de idNodoMuerto.
-	//A estos, mandarlos a planificar como se hace normalmente.
-	//Guardar los mapTemporales replanificados a listaReplanificacionPendientesMuertos.
+return 1;
+}
 
-	bool pendienteConIDNodoMuerto(t_MapPendiente* unMapPendiente) {
-		return unMapPendiente->map_dest->id_nodo == idNodoMuerto;
+int rePlanificarMapsPendientesDeNodoMuerto(int idNodoMuerto, t_InfoJob infoJob, int ultimoIDMap,
+	int sockJob, t_list* listaMapsPendientes, t_list* listaDeArchivos) {
+
+t_list* listaReplanificacionPendientesMuertos;
+int resultado = 1;
+
+//tomar de la listaTemporal, aquellos maps que sean de idNodoMuerto.
+//A estos, mandarlos a planificar como se hace normalmente.
+//Guardar los mapTemporales replanificados a listaReplanificacionPendientesMuertos.
+
+bool pendienteConIDNodoMuerto(t_MapPendiente* unMapPendiente) {
+	return unMapPendiente->map_dest->id_nodo == idNodoMuerto;
+}
+
+void eliminarTemporal(t_MapTemporal* unMapTemporal) {
+	free(unMapTemporal->path);
+	free(unMapTemporal);
+}
+
+listaReplanificacionPendientesMuertos = list_filter(listaMapsPendientes,
+		(void*) pendienteConIDNodoMuerto);
+
+while (list_remove_by_condition(listaMapsPendientes, (void*) pendienteConIDNodoMuerto))
+	;
+
+log_info(marta_logger, "Hay %d maps a replanificar que habian estaban pendientes.",
+		list_size(listaReplanificacionPendientesMuertos));
+
+int rePlanificar(t_MapPendiente* unMapPendiente) {
+	t_DestinoMap* destinoMap;
+
+	destinoMap = planificarMap(infoJob, unMapPendiente->file->idArchivo, unMapPendiente->block,
+			&ultimoIDMap);
+
+	//Si obtiene un destino, le ordena al job realizar el map en ese destino
+	if (destinoMap) {
+		resultado = ordenarMapAJob(destinoMap, sockJob);
+	} else {
+		int error = -1;
+		sendall(sockJob, &error, sizeof(int));
+		return -2;
 	}
 
-	void eliminarTemporal(t_MapTemporal* unMapTemporal) {
-		free(unMapTemporal->path);
-		free(unMapTemporal);
+	if (resultado > 0) {
+		t_InfoArchivo* infoArchivo = list_get(listaDeArchivos, unMapPendiente->file->idArchivo);
+
+		agregarMapPendiente(listaMapsPendientes, infoArchivo, unMapPendiente->block, destinoMap);
+
+	} else {
+
+		//elemina todos los maps pendientes, porque no se puede realizar
+		//este job
+
+		log_info(marta_logger, "Resultado de la orden de Map dio MALLLLLLL.");
+
+		list_destroy_and_destroy_elements(listaMapsPendientes, (void *) liberarMapPendiente);
+		return -1;
 	}
-
-	listaReplanificacionPendientesMuertos = list_filter(listaMapsPendientes,
-			(void*) pendienteConIDNodoMuerto);
-
-	while (list_remove_by_condition(listaMapsPendientes,
-			(void*) pendienteConIDNodoMuerto))
-		;
-
-	log_info(marta_logger,
-			"Hay %d maps a replanificar que habian estaban pendientes.",
-			list_size(listaReplanificacionPendientesMuertos));
-
-	int rePlanificar(t_MapPendiente* unMapPendiente) {
-		t_DestinoMap* destinoMap;
-
-		destinoMap = planificarMap(infoJob, unMapPendiente->file->idArchivo,
-				unMapPendiente->block, &ultimoIDMap);
-
-		//Si obtiene un destino, le ordena al job realizar el map en ese destino
-		if (destinoMap) {
-			resultado = ordenarMapAJob(destinoMap, sockJob);
-		} else {
-			int error = -1;
-			sendall(sockJob, &error, sizeof(int));
-			return -2;
-		}
-
-		if (resultado > 0) {
-			t_InfoArchivo* infoArchivo = list_get(listaDeArchivos,
-					unMapPendiente->file->idArchivo);
-
-			agregarMapPendiente(listaMapsPendientes, infoArchivo,
-					unMapPendiente->block, destinoMap);
-
-		} else {
-
-			//elemina todos los maps pendientes, porque no se puede realizar
-			//este job
-
-			log_info(marta_logger,
-					"Resultado de la orden de Map dio MALLLLLLL.");
-
-			list_destroy_and_destroy_elements(listaMapsPendientes,
-					(void *) liberarMapPendiente);
-			return -1;
-		}
-
-		return 1;
-	}
-
-	list_iterate(listaReplanificacionPendientesMuertos, (int*) rePlanificar);
 
 	return 1;
 }
 
-int ordenarARealizarLosRePlanificados(
-		t_list* nuevosDestinosDeMapsReplanificados, int socketJob) {
+list_iterate(listaReplanificacionPendientesMuertos, (int*) rePlanificar);
 
-	void ordenarMap(t_DestinoMap* unDestino) {
-		ordenarMapAJob(unDestino, socketJob);
-	}
+return 1;
+}
 
-	list_iterate(nuevosDestinosDeMapsReplanificados, (void*) ordenarMap);
+int ordenarARealizarLosRePlanificados(t_list* nuevosDestinosDeMapsReplanificados, int socketJob) {
 
-	return 1;
+void ordenarMap(t_DestinoMap* unDestino) {
+	ordenarMapAJob(unDestino, socketJob);
+}
+
+list_iterate(nuevosDestinosDeMapsReplanificados, (void*) ordenarMap);
+
+return 1;
 }
 
 int ordenarMapAJob(t_DestinoMap* destinoDeMap, int socket) {
 
-	int result;
+int result;
 
 //mostrar_map_dest(destinoDeMap);
-	t_buffer* map_order = crearBufferConProtocolo(ORDER_MAP);
+t_buffer* map_order = crearBufferConProtocolo(ORDER_MAP);
 
-	bufferAgregarInt(map_order, destinoDeMap->id_map);
-	bufferAgregarInt(map_order, destinoDeMap->id_nodo);
-	bufferAgregarInt(map_order, destinoDeMap->ip_nodo);
-	bufferAgregarInt(map_order, destinoDeMap->puerto_nodo);
-	bufferAgregarInt(map_order, destinoDeMap->block);
-	bufferAgregarInt(map_order, destinoDeMap->block_size);
-	bufferAgregarString(map_order, destinoDeMap->temp_file_name,
-			strlen(destinoDeMap->temp_file_name) + 1);
+bufferAgregarInt(map_order, destinoDeMap->id_map);
+bufferAgregarInt(map_order, destinoDeMap->id_nodo);
+bufferAgregarInt(map_order, destinoDeMap->ip_nodo);
+bufferAgregarInt(map_order, destinoDeMap->puerto_nodo);
+bufferAgregarInt(map_order, destinoDeMap->block);
+bufferAgregarInt(map_order, destinoDeMap->block_size);
+bufferAgregarString(map_order, destinoDeMap->temp_file_name,
+		strlen(destinoDeMap->temp_file_name) + 1);
 
-	result = enviarBuffer(map_order, socket);
+result = enviarBuffer(map_order, socket);
 
-	if (result < 0) {
-		log_warning(marta_logger, "No se Pudo enviar la Orden de Map al Job");
-	} else {
-		log_info(marta_logger, "Le mandé la orden al job");
-	}
-	return result;
+if (result < 0) {
+	log_warning(marta_logger, "No se Pudo enviar la Orden de Map al Job");
+} else {
+	log_info(marta_logger, "Le mandé la orden al job");
+}
+return result;
 }
 
 int recibirResultadoDeMap(int sockjob, t_ResultadoMap* resultadoMap) {
 
-	resultadoMap->prot = recibirInt(sockjob);
-	resultadoMap->id_map = recibirInt(sockjob);
+resultadoMap->prot = recibirInt(sockjob);
+resultadoMap->id_map = recibirInt(sockjob);
+resultadoMap->id_nodo = recibirInt(sockjob);
 
-	switch (resultadoMap->prot) {
-	case OK_MAP:
-		log_info(marta_logger, "Map realizado con exito");
-		break;
+switch (resultadoMap->prot) {
+case OK_MAP:
+	log_info(marta_logger, "Map realizado con exito");
+	break;
 
-	case NOTOK_MAP:
-		log_info(marta_logger, "Map fallido, replanifico");
-		break;
+case NOTOK_MAP:
+	log_info(marta_logger, "Map fallido, replanifico");
+	break;
 
-	case NODO_NOT_FOUND:
-		log_warning(marta_logger,
-				"No se encontró el nodo donde mapear, replanifico");
-		break;
+case NODO_NOT_FOUND:
+	log_warning(marta_logger, "No se encontró el nodo donde mapear, replanifico");
+	break;
 
-	case 0:
-		log_warning(marta_logger, "Job se desconectó de forma inesperada");
-		return -1;
-		break;
+case 0:
+	log_warning(marta_logger, "Job se desconectó de forma inesperada");
+	return -1;
+	break;
 
-	case -1:
-		log_warning(marta_logger, "No se pudo recibir el resultado del Map");
-		return -1;
-		break;
+case -1:
+	log_warning(marta_logger, "No se pudo recibir el resultado del Map");
+	return -1;
+	break;
 
-	default:
-		log_warning(marta_logger, "Protocolo Inesperado %i",
-				resultadoMap->prot);
-		resultadoMap->prot = NODO_NOT_FOUND;
-		return -1;
-		break;
-	}
+default:
+	log_warning(marta_logger, "Protocolo Inesperado %i", resultadoMap->prot);
+	resultadoMap->prot = NODO_NOT_FOUND;
+	break;
+}
 
-	resultadoMap->id_nodo = recibirInt(sockjob);
-
-	return 1;
+return 1;
 }
 
 void agregarMapPendiente(t_list* mapsPendientes, t_InfoArchivo* infoArchivo,
-		uint32_t numeroDeBloque, t_DestinoMap* destinoMap) {
+	uint32_t numeroDeBloque, t_DestinoMap* destinoMap) {
 
-	t_MapPendiente* mapPendiente;
+t_MapPendiente* mapPendiente;
 
-	t_CargaNodo* cargaNodo;
+t_CargaNodo* cargaNodo;
 
-	mapPendiente = malloc(sizeof(t_MapPendiente));
-	mapPendiente->file = infoArchivo;
-	mapPendiente->block = numeroDeBloque;
-	mapPendiente->map_dest = destinoMap;
+mapPendiente = malloc(sizeof(t_MapPendiente));
+mapPendiente->file = infoArchivo;
+mapPendiente->block = numeroDeBloque;
+mapPendiente->map_dest = destinoMap;
 
-	list_add(mapsPendientes, mapPendiente);
+list_add(mapsPendientes, mapPendiente);
 
-	int encuentraNodo(t_CargaNodo* carga_nodo) {
-		return carga_nodo->id_nodo == destinoMap->id_nodo;
-	}
+int encuentraNodo(t_CargaNodo* carga_nodo) {
+	return carga_nodo->id_nodo == destinoMap->id_nodo;
+}
 
-	pthread_mutex_lock(&mutexListaNodo);
-	log_info(marta_sync_logger, "lock mutexListaNodo");
+pthread_mutex_lock(&mutexListaNodo);
+log_info(marta_sync_logger, "lock mutexListaNodo");
 
-	cargaNodo = list_find(cargaNodos, (void *) encuentraNodo);
+cargaNodo = list_find(cargaNodos, (void *) encuentraNodo);
 
-	if (cargaNodo == NULL) {
-		cargaNodo = malloc(sizeof(t_CargaNodo));
-		cargaNodo->id_nodo = destinoMap->id_nodo;
-		cargaNodo->cantidadOperacionesEnCurso = 1;
+if (cargaNodo == NULL) {
+	cargaNodo = malloc(sizeof(t_CargaNodo));
+	cargaNodo->id_nodo = destinoMap->id_nodo;
+	cargaNodo->cantidadOperacionesEnCurso = 1;
 
-		list_add(cargaNodos, cargaNodo);
-	} else {
-		(cargaNodo->cantidadOperacionesEnCurso)++;
-	}
+	list_add(cargaNodos, cargaNodo);
+} else {
+	(cargaNodo->cantidadOperacionesEnCurso)++;
+}
 
-	void mostrarCargaNodo(t_CargaNodo* unaCargaNodo) {
+void mostrarCargaNodo(t_CargaNodo* unaCargaNodo) {
 
-		printf("Nodo: %i ---> Carga: %i\n", unaCargaNodo->id_nodo,
-				unaCargaNodo->cantidadOperacionesEnCurso);
+	printf("Nodo: %i ---> Carga: %i\n", unaCargaNodo->id_nodo,
+			unaCargaNodo->cantidadOperacionesEnCurso);
 
-		fflush(stdout);
-	}
+	fflush(stdout);
+}
 
-	printf("\n");
-	list_iterate(cargaNodos, (void*) mostrarCargaNodo);
+printf("\n");
+list_iterate(cargaNodos, (void*) mostrarCargaNodo);
 
 //cierro el mutex
-	pthread_mutex_unlock(&mutexListaNodo);
-	log_info(marta_sync_logger, "unlock mutexListaNodo");
+pthread_mutex_unlock(&mutexListaNodo);
+log_info(marta_sync_logger, "unlock mutexListaNodo");
 
 }
 
-void borrarMapPendiente(t_list* mapsPendientes, uint32_t idMap,
-		t_list* listaTemporal, uint32_t* ultimoIdTemporal) {
+void borrarMapPendiente(t_list* mapsPendientes, uint32_t idMap, t_list* listaTemporal,
+	uint32_t* ultimoIdTemporal) {
 
-	printf("EL id del map exitoso que me llego es %d\n", idMap);
+printf("EL id del map exitoso que me llego es %d\n", idMap);
 
-	int encuentraMapPendiente(t_MapPendiente* mapPendiente) {
-		return mapPendiente->map_dest->id_map == idMap;
-	}
+int encuentraMapPendiente(t_MapPendiente* mapPendiente) {
+	return mapPendiente->map_dest->id_map == idMap;
+}
 
-	t_MapPendiente* mapPendiente = list_find(mapsPendientes,
-			(void *) encuentraMapPendiente);
+t_MapPendiente* mapPendiente = list_find(mapsPendientes, (void *) encuentraMapPendiente);
 
-	if (mapPendiente == NULL) {
-		printf("El map pendiente es null\n\n");
-		fflush(stdout);
-	}
+if (mapPendiente == NULL) {
+	printf("El map pendiente es null\n\n");
+	fflush(stdout);
+}
 
-	t_CargaNodo* cargaNodo;
+t_CargaNodo* cargaNodo;
 
-	int seEncuetraNodo(t_CargaNodo* carga_nodo) {
-		return carga_nodo->id_nodo == mapPendiente->map_dest->id_nodo;
-	}
+int seEncuetraNodo(t_CargaNodo* carga_nodo) {
+	return carga_nodo->id_nodo == mapPendiente->map_dest->id_nodo;
+}
 
-	t_MapTemporal* temp_map = malloc(sizeof(t_MapTemporal));
+t_MapTemporal* temp_map = malloc(sizeof(t_MapTemporal));
 
-	temp_map->idMapTemporal = ++(*ultimoIdTemporal);
-	temp_map->path = strdup(mapPendiente->map_dest->temp_file_name);
-	temp_map->id_nodo = mapPendiente->map_dest->id_nodo;
-	temp_map->idArchivoOrigen = mapPendiente->file->idArchivo;
-	temp_map->bloqueOrigen = mapPendiente->block;
+temp_map->idMapTemporal = ++(*ultimoIdTemporal);
+temp_map->path = strdup(mapPendiente->map_dest->temp_file_name);
+temp_map->id_nodo = mapPendiente->map_dest->id_nodo;
+temp_map->idArchivoOrigen = mapPendiente->file->idArchivo;
+temp_map->bloqueOrigen = mapPendiente->block;
+pthread_mutex_lock(&mutexListaTemporal);
+list_add(listaTemporal, temp_map);
+pthread_mutex_unlock(&mutexListaTemporal);
+pthread_mutex_lock(&mutexListaNodo);
+log_info(marta_sync_logger, "lock mutexListaNodo");
 
-	list_add(listaTemporal, temp_map);
+cargaNodo = list_find(cargaNodos, (void *) seEncuetraNodo);
 
-	pthread_mutex_lock(&mutexListaNodo);
-	log_info(marta_sync_logger, "lock mutexListaNodo");
+if (cargaNodo == NULL) {
+	printf("No está nodo en lista de cargas");
+} else {
+	(cargaNodo->cantidadOperacionesEnCurso)--;
+}
 
-	cargaNodo = list_find(cargaNodos, (void *) seEncuetraNodo);
+pthread_mutex_unlock(&mutexListaNodo);
+log_info(marta_sync_logger, "unlock mutexListaNodo");
 
-	if (cargaNodo == NULL) {
-		printf("No está nodo en lista de cargas");
-	} else {
-		(cargaNodo->cantidadOperacionesEnCurso)--;
-	}
-
-	pthread_mutex_unlock(&mutexListaNodo);
-	log_info(marta_sync_logger, "unlock mutexListaNodo");
-
-	lista_remove_and_destroy_by_condition(mapsPendientes,
-			(void *) encuentraMapPendiente, (void *) liberarMapPendiente);
+lista_remove_and_destroy_by_condition(mapsPendientes, (void *) encuentraMapPendiente,
+		(void *) liberarMapPendiente);
 }
 
 //la función que planifica todos los map de un job determinado.
-int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos,
-		t_list* ListaTemporal, int sockjob) {
+int planificarTodosLosMaps(t_InfoJob info_job, t_list* listaDeArchivos, t_list* ListaTemporal,
+	int sockjob) {
 
-	t_list* listaMapsPendientes = list_create();
-	t_MapPendiente* mapPendiente;
-	t_DestinoMap* destinoMap;
+t_list* listaMapsPendientes = list_create();
+t_MapPendiente* mapPendiente;
+t_DestinoMap* destinoMap;
 
-	int resultado = 1;
-	int i, j, cantidadDeArchivos = list_size(listaDeArchivos);
+int resultado = 1;
+int i, j, cantidadDeArchivos = list_size(listaDeArchivos);
 
-	t_InfoArchivo* infoArchivo;
-	uint32_t ultimoIDMap = 0;
-	uint32_t ultimoIDTemporal = 0;
+t_InfoArchivo* infoArchivo;
+uint32_t ultimoIDMap = 0;
+uint32_t ultimoIDTemporal = 0;
 
-	for (i = 0; i < cantidadDeArchivos; i++) {
-		infoArchivo = list_get(listaDeArchivos, i);
+for (i = 0; i < cantidadDeArchivos; i++) {
+	infoArchivo = list_get(listaDeArchivos, i);
 
-		for (j = 0; j < infoArchivo->cantidadDeBloques; j++) {
+	for (j = 0; j < infoArchivo->cantidadDeBloques; j++) {
 
-			//Aca dada la información que le manda job, la info del primer
-			//archivo de la lista de archivos a mapear, elige el destino del map
-			//Al que debe mandar hacer ese map
-			printf("Planifico el map para el archivo de id %d",
-					infoArchivo->idArchivo);
-			destinoMap = planificarMap(info_job, infoArchivo->idArchivo, j,
-					&ultimoIDMap);
+		//Aca dada la información que le manda job, la info del primer
+		//archivo de la lista de archivos a mapear, elige el destino del map
+		//Al que debe mandar hacer ese map
+		printf("Planifico el map para el archivo de id %d", infoArchivo->idArchivo);
+		destinoMap = planificarMap(info_job, infoArchivo->idArchivo, j, &ultimoIDMap);
 
-			//Si obtiene un destino, le ordena al job realizar el map en ese destino
-			if (destinoMap) {
-				resultado = ordenarMapAJob(destinoMap, sockjob);
+		//Si obtiene un destino, le ordena al job realizar el map en ese destino
+		if (destinoMap) {
+			resultado = ordenarMapAJob(destinoMap, sockjob);
+		} else {
+			int error = -1;
+			sendall(sockjob, &error, sizeof(int));
+			return -2;
+		}
+
+		if (resultado > 0) {
+			//agrega a la lista de maps pendientes ese map, con la info
+			//del archivo a mapear, la posicion y el destino
+
+			agregarMapPendiente(listaMapsPendientes, infoArchivo, j, destinoMap);
+
+		} else {
+
+			//elemina todos los maps pendientes, porque no se puede realizar
+			//este job
+			list_destroy_and_destroy_elements(listaMapsPendientes, (void *) liberarMapPendiente);
+			return -1;
+		}
+	}
+}
+
+log_info(marta_logger, "Envie todos los pedidos");
+
+log_info(marta_sync_logger, "unlock conexionFS");
+
+t_ResultadoMap resultadoDeMap;
+t_list* nuevosDestinosDeMapsReplanificados = list_create();
+
+int encuentreMapPendiente(t_MapPendiente* pending_map) {
+	return pending_map->map_dest->id_map == resultadoDeMap.id_map;
+}
+
+while (!list_is_empty(listaMapsPendientes)) {
+	//se queda esperando los resultados de los job mientras que la lista
+	//de pendientes no esté vacía
+
+	//recibe el resultado de un map por parte del job
+	resultado = recibirResultadoDeMap(sockjob, &resultadoDeMap);
+	fflush(stdout);
+
+	//En base al resultado, realiza las tareas que le corresponden
+	if (resultado > 0) {
+
+		switch (resultadoDeMap.prot) {
+		case OK_MAP:
+			borrarMapPendiente(listaMapsPendientes, resultadoDeMap.id_map, ListaTemporal,
+					&ultimoIDTemporal);
+			break;
+
+		case NOTOK_MAP:		//este sería el NOTOK_MAP
+			log_warning(marta_logger, "ERROR AL REALIZAR UN MAP");
+			fflush(stdout);
+
+			mapPendiente = list_find(listaMapsPendientes, (void *) encuentreMapPendiente);
+
+			if (mapPendiente)
+				log_info(marta_logger, "El resultado del map no es null");
+			else
+				log_warning(marta_logger, "El resultado del map es null");
+
+			int idNodoFallido = resultadoDeMap.id_nodo;
+
+			int cargaNodoDelNodoFAllido(t_CargaNodo* carga_nodo) {
+				return idNodoFallido == carga_nodo->id_nodo;
+			}
+
+			t_CargaNodo* cargaNodo = list_find(cargaNodos, (void *) cargaNodoDelNodoFAllido);
+
+			if (cargaNodo == NULL) {
+				printf("No está nodo en lista de cargas\n");
+			} else {
+				(cargaNodo->cantidadOperacionesEnCurso)--;
+			}
+			//TODO al parecer, no le resta carga al nodo que hizo fallar un map.
+
+			liberarDestinoMap(mapPendiente->map_dest);
+
+			mapPendiente->map_dest = planificarMap(info_job, mapPendiente->file->idArchivo,
+					mapPendiente->block, &ultimoIDMap);
+
+			//para agregar la cantidad de operaciones al replanificado
+			int seEncuetraNodo(t_CargaNodo* carga_nodo) {
+				return carga_nodo->id_nodo == mapPendiente->map_dest->id_nodo;
+			}
+
+			cargaNodo = list_find(cargaNodos, (void *) seEncuetraNodo);
+
+			if (cargaNodo == NULL) {
+				printf("No está nodo en lista de cargas\n");
+			} else {
+				(cargaNodo->cantidadOperacionesEnCurso)++;
+			}
+
+			pthread_mutex_unlock(&planificarMapMutex);
+			log_info(marta_sync_logger, "unlock planificarMapMutex");
+
+			if (mapPendiente) {
+				resultado = ordenarMapAJob(mapPendiente->map_dest, sockjob);
 			} else {
 				int error = -1;
 				sendall(sockjob, &error, sizeof(int));
 				return -2;
 			}
 
-			if (resultado > 0) {
-				//agrega a la lista de maps pendientes ese map, con la info
-				//del archivo a mapear, la posicion y el destino
-
-				agregarMapPendiente(listaMapsPendientes, infoArchivo, j,
-						destinoMap);
-
-			} else {
-
-				//elemina todos los maps pendientes, porque no se puede realizar
-				//este job
+			if (resultado <= 0) {
+				log_info(marta_logger, " VOY A DESTRUIR TODOS LOS MAPS PENDIENTES");
+				fflush(stdout);
 				list_destroy_and_destroy_elements(listaMapsPendientes,
 						(void *) liberarMapPendiente);
 				return -1;
 			}
-		}
-	}
+			break;
 
-	log_info(marta_logger, "Envie todos los pedidos");
-	pthread_mutex_unlock(&conexionFS);
-	log_info(marta_sync_logger, "unlock conexionFS");
+		case NODO_NOT_FOUND:
+			//todo cuando matas un segundo nodo, encuentra mal el id del nodo muerto
+			//cuando le llega el map ok de un nodo que estaba vivo.
 
-	t_ResultadoMap resultadoDeMap;
-	t_list* nuevosDestinosDeMapsReplanificados = list_create();
+			log_warning(marta_logger, "NO SE ENCONTRO UN NODO");
+			fflush(stdout);
 
-	int encuentreMapPendiente(t_MapPendiente* pending_map) {
-		return pending_map->map_dest->id_map == resultadoDeMap.id_map;
-	}
+			log_info(marta_logger, "El id del Map que no se pudo hacer por NODO_NOT_FOUND es %d",
+					resultadoDeMap.id_map);
+			log_info(marta_logger, "El id del Nodo que no se pudo hacer por NODO_NOT_FOUND es %d",
+					resultadoDeMap.id_nodo);
 
-	while (!list_is_empty(listaMapsPendientes)) {
-		//se queda esperando los resultados de los job mientras que la lista
-		//de pendientes no esté vacía
+			mapPendiente = list_find(listaMapsPendientes, (void *) encuentreMapPendiente);
 
-		//recibe el resultado de un map por parte del job
-		resultado = recibirResultadoDeMap(sockjob, &resultadoDeMap);
-		fflush(stdout);
-
-		//En base al resultado, realiza las tareas que le corresponden
-		if (resultado > 0) {
-
-			switch (resultadoDeMap.prot) {
-			case OK_MAP:
-				borrarMapPendiente(listaMapsPendientes, resultadoDeMap.id_map,
-						ListaTemporal, &ultimoIDTemporal);
-				break;
-
-			case NOTOK_MAP:		//este sería el NOTOK_MAP
-				log_warning(marta_logger, "ERROR AL REALIZAR UN MAP");
-				fflush(stdout);
-
-				mapPendiente = list_find(listaMapsPendientes,
-						(void *) encuentreMapPendiente);
-
-				if (mapPendiente)
-					log_info(marta_logger, "El resultado del map no es null");
-				else
-					log_warning(marta_logger, "El resultado del map es null");
-
-				int idNodoFallido = resultadoDeMap.id_nodo;
-
-				int cargaNodoDelNodoFAllido(t_CargaNodo* carga_nodo) {
-					return idNodoFallido == carga_nodo->id_nodo;
-				}
-
-				t_CargaNodo* cargaNodo = list_find(cargaNodos,
-						(void *) cargaNodoDelNodoFAllido);
-
-				if (cargaNodo == NULL) {
-					printf("No está nodo en lista de cargas\n");
-				} else {
-					(cargaNodo->cantidadOperacionesEnCurso)--;
-				}
-				//TODO al parecer, no le resta carga al nodo que hizo fallar un map.
-
-				liberarDestinoMap(mapPendiente->map_dest);
-
-				mapPendiente->map_dest = planificarMap(info_job,
-						mapPendiente->file->idArchivo, mapPendiente->block,
-						&ultimoIDMap);
-
-				//para agregar la cantidad de operaciones al replanificado
-				int seEncuetraNodo(t_CargaNodo* carga_nodo) {
-					return carga_nodo->id_nodo
-							== mapPendiente->map_dest->id_nodo;
-				}
-
-				cargaNodo = list_find(cargaNodos, (void *) seEncuetraNodo);
-
-				if (cargaNodo == NULL) {
-					printf("No está nodo en lista de cargas\n");
-				} else {
-					(cargaNodo->cantidadOperacionesEnCurso)++;
-				}
-
-				pthread_mutex_unlock(&planificarMapMutex);
+			if (mapPendiente)
+				log_info(marta_logger, "El resultado del map no es null");
+			else {
+				log_warning(marta_logger, "El resultado del map es null");
 				log_info(marta_sync_logger, "unlock planificarMapMutex");
-
-				if (mapPendiente) {
-					resultado = ordenarMapAJob(mapPendiente->map_dest, sockjob);
-				} else {
-					int error = -1;
-					sendall(sockjob, &error, sizeof(int));
-					return -2;
-				}
-
-				if (resultado <= 0) {
-					log_info(marta_logger,
-							" VOY A DESTRUIR TODOS LOS MAPS PENDIENTES");
-					fflush(stdout);
-					list_destroy_and_destroy_elements(listaMapsPendientes,
-							(void *) liberarMapPendiente);
-					return -1;
-				}
-				break;
-
-			case NODO_NOT_FOUND:
-				//todo cuando matas un segundo nodo, encuentra mal el id del nodo muerto
-				//cuando le llega el map ok de un nodo que estaba vivo.
-
-				log_warning(marta_logger, "NO SE ENCONTRO UN NODO");
-				fflush(stdout);
-
-				log_info(marta_logger,
-						"El id del Map que no se pudo hacer por NODO_NOT_FOUND es %d",
-						resultadoDeMap.id_map);
-				log_info(marta_logger,
-						"El id del Nodo que no se pudo hacer por NODO_NOT_FOUND es %d",
-						resultadoDeMap.id_nodo);
-
-				mapPendiente = list_find(listaMapsPendientes,
-						(void *) encuentreMapPendiente);
-
-				if (mapPendiente)
-					log_info(marta_logger, "El resultado del map no es null");
-				else {
-					log_warning(marta_logger, "El resultado del map es null");
-					log_info(marta_sync_logger, "unlock planificarMapMutex");
-					pthread_mutex_unlock(&planificarMapMutex);
-					break;
-				}
-
-				int idNodoMuerto = resultadoDeMap.id_nodo;
-				//int idNodoMuerto = mapPendiente->map_dest->id_nodo;
-
-				log_info(marta_logger, "El id del nodo muerto es %d",
-						idNodoMuerto);
-
-				int cargaNodoDelNodoMuerto(t_CargaNodo* carga_nodo) {
-					return idNodoMuerto == carga_nodo->id_nodo;
-				}
-
-				while (list_remove_by_condition(cargaNodos,
-						(void*) cargaNodoDelNodoMuerto))
-					;
-
-				/*
-				 t_CargaNodo* cargaNodoMuerto = list_find(cargaNodos,
-				 (void *) cargaNodoDelNodoMuerto);
-
-				 if (cargaNodoMuerto == NULL) {
-				 printf("No está nodo en lista de cargas\n");
-				 } else {
-				 cargaNodoMuerto->cantidadOperacionesEnCurso = 0;
-				 }
-				 */
-
-				if (rePlanificarMapsHechosDeNodoMuerto(idNodoMuerto, info_job,
-						ultimoIDMap, sockjob, listaTemporal,
-						listaMapsPendientes, listaDeArchivos) < 0) {
-					printf("Fallo replanificar map terminado de nodo muerto\n");
-					return -1;
-				}
-
-				if (rePlanificarMapsPendientesDeNodoMuerto(idNodoMuerto,
-						info_job, ultimoIDMap, sockjob, listaMapsPendientes,
-						listaDeArchivos) < 0) {
-					printf("Fallo replanificar map pendiente de nodo muerto\n");
-					return -1;
-				}
-
 				pthread_mutex_unlock(&planificarMapMutex);
-				log_info(marta_sync_logger, "unlock planificarMapMutex");
 				break;
 			}
 
-		} else {
+			int idNodoMuerto = resultadoDeMap.id_nodo;
+			//int idNodoMuerto = mapPendiente->map_dest->id_nodo;
 
-			list_destroy_and_destroy_elements(listaMapsPendientes,
-					(void *) liberarMapPendiente);
-			return -1;
+			log_info(marta_logger, "El id del nodo muerto es %d", idNodoMuerto);
+
+			int cargaNodoDelNodoMuerto(t_CargaNodo* carga_nodo) {
+				return idNodoMuerto == carga_nodo->id_nodo;
+			}
+
+			while (list_remove_by_condition(cargaNodos, (void*) cargaNodoDelNodoMuerto));
+
+			/*
+			 t_CargaNodo* cargaNodoMuerto = list_find(cargaNodos,
+			 (void *) cargaNodoDelNodoMuerto);
+
+			 if (cargaNodoMuerto == NULL) {
+			 printf("No está nodo en lista de cargas\n");
+			 } else {
+			 cargaNodoMuerto->cantidadOperacionesEnCurso = 0;
+			 }
+			 */
+
+			if (rePlanificarMapsHechosDeNodoMuerto(idNodoMuerto, info_job, ultimoIDMap, sockjob,
+					listaTemporal, listaMapsPendientes, listaDeArchivos) < 0) {
+				printf("Fallo replanificar map terminado de nodo muerto\n");
+				return -1;
+			}
+
+			if (rePlanificarMapsPendientesDeNodoMuerto(idNodoMuerto, info_job, ultimoIDMap, sockjob,
+					listaMapsPendientes, listaDeArchivos) < 0) {
+				printf("Fallo replanificar map pendiente de nodo muerto\n");
+				return -1;
+			}
+
+			pthread_mutex_unlock(&planificarMapMutex);
+			log_info(marta_sync_logger, "unlock planificarMapMutex");
+			break;
 		}
+
+	} else {
+
+		list_destroy_and_destroy_elements(listaMapsPendientes, (void *) liberarMapPendiente);
+		return -1;
 	}
+}
 
 //termina toda la planificacion, destruyendo lo que quedo de las listas pendientes
 //de map
-	list_destroy_and_destroy_elements(listaMapsPendientes,
-			(void *) liberarMapPendiente);
-	return 1;
+list_destroy_and_destroy_elements(listaMapsPendientes, (void *) liberarMapPendiente);
+return 1;
 }
 
 int ipDeNodo(int idNodo) {
 
-	t_registro_id_ipPuerto* registroIpPuerto = buscarRegistroPorId(idNodo);
+t_registro_id_ipPuerto* registroIpPuerto = buscarRegistroPorId(idNodo);
 
-	int ipDelNodo = registroIpPuerto->ip.s_addr;
+int ipDelNodo = registroIpPuerto->ip.s_addr;
 
-	return ipDelNodo;
+return ipDelNodo;
 }
 
 int puertoDeNodo(int idNodo) {
 
 //XXX ver warning. No lo entiendo bien
-	t_registro_id_ipPuerto* registroIpPuerto = buscarRegistroPorId(idNodo);
+t_registro_id_ipPuerto* registroIpPuerto = buscarRegistroPorId(idNodo);
 
-	int puertoDelNodo = registroIpPuerto->puerto;
+int puertoDelNodo = registroIpPuerto->puerto;
 
-	return puertoDelNodo;
+return puertoDelNodo;
 }
 
-int ordenarReduceAJob(t_DestinoReduce* destinoReduce, t_list* origenesDeReduce,
-		int sockJob) {
+int ordenarReduceAJob(t_DestinoReduce* destinoReduce, t_list* origenesDeReduce, int sockJob) {
 
-	int resultado;
+int resultado;
 
 //mostrar_map_dest(destinoDeMap);
-	t_buffer* reduce_order = crearBufferConProtocolo(ORDER_REDUCE);
+t_buffer* reduce_order = crearBufferConProtocolo(ORDER_REDUCE);
 
 //XXX decir si sse mandaono id_Reduce
-	bufferAgregarInt(reduce_order, destinoReduce->id_reduce);
-	bufferAgregarInt(reduce_order, destinoReduce->ip_nodo);
-	bufferAgregarInt(reduce_order, destinoReduce->puerto_nodo);
-	bufferAgregarString(reduce_order, destinoReduce->temp_file_name,
-			strlen(destinoReduce->temp_file_name) + 1);
-	bufferAgregarInt(reduce_order, list_size(origenesDeReduce));
+bufferAgregarInt(reduce_order, destinoReduce->id_reduce);
+bufferAgregarInt(reduce_order, destinoReduce->ip_nodo);
+bufferAgregarInt(reduce_order, destinoReduce->puerto_nodo);
+bufferAgregarString(reduce_order, destinoReduce->temp_file_name,
+		strlen(destinoReduce->temp_file_name) + 1);
+bufferAgregarInt(reduce_order, list_size(origenesDeReduce));
 
-	void bufferAgregarOrigenesReduce(t_OrigenReduce* unOrigenReduce) {
+void bufferAgregarOrigenesReduce(t_OrigenReduce* unOrigenReduce) {
 
-		//	printf("el id de nodo es %i\n", unOrigenReduce->id_nodo);
-		//	printf("y el nombre del archivo es %s", unOrigenReduce->temp_file_name);
-		//	fflush(stdout);
+	//	printf("el id de nodo es %i\n", unOrigenReduce->id_nodo);
+	//	printf("y el nombre del archivo es %s", unOrigenReduce->temp_file_name);
+	//	fflush(stdout);
 
-		bufferAgregarInt(reduce_order, puertoDeNodo(unOrigenReduce->id_nodo));
-		bufferAgregarInt(reduce_order, ipDeNodo(unOrigenReduce->id_nodo));
-		bufferAgregarString(reduce_order, unOrigenReduce->temp_file_name,
-				strlen(unOrigenReduce->temp_file_name) + 1);
-	}
-
-	list_iterate(origenesDeReduce, (void*) bufferAgregarOrigenesReduce);
-
-	resultado = enviarBuffer(reduce_order, sockJob);
-
-	if (resultado < 0) {
-		log_warning(marta_logger,
-				"No se Pudo enviar la Orden de Reduce al Job");
-	} else {
-		log_info(marta_logger, "Le mandé la orden de Reduce al job");
-	}
-	return resultado;
+	bufferAgregarInt(reduce_order, puertoDeNodo(unOrigenReduce->id_nodo));
+	bufferAgregarInt(reduce_order, ipDeNodo(unOrigenReduce->id_nodo));
+	bufferAgregarString(reduce_order, unOrigenReduce->temp_file_name,
+			strlen(unOrigenReduce->temp_file_name) + 1);
 }
 
-int ordenarUltimoReduceAJob(t_DestinoReduce* destinoReduce,
-		t_list* origenesDeReduce, int sockJob) {
+list_iterate(origenesDeReduce, (void*) bufferAgregarOrigenesReduce);
 
-	int resultado;
+resultado = enviarBuffer(reduce_order, sockJob);
+
+if (resultado < 0) {
+	log_warning(marta_logger, "No se Pudo enviar la Orden de Reduce al Job");
+} else {
+	log_info(marta_logger, "Le mandé la orden de Reduce al job");
+}
+return resultado;
+}
+
+int ordenarUltimoReduceAJob(t_DestinoReduce* destinoReduce, t_list* origenesDeReduce, int sockJob) {
+
+int resultado;
 
 //mostrar_map_dest(destinoDeMap);
-	t_buffer* reduce_order = crearBufferConProtocolo(ORDER_REDUCE);
+t_buffer* reduce_order = crearBufferConProtocolo(ORDER_REDUCE);
 
 //XXX decir si sse mandaono id_Reduce
-	bufferAgregarInt(reduce_order, destinoReduce->id_reduce);
-	bufferAgregarInt(reduce_order, destinoReduce->ip_nodo);
-	bufferAgregarInt(reduce_order, destinoReduce->puerto_nodo);
-	bufferAgregarString(reduce_order, destinoReduce->temp_file_name,
-			strlen(destinoReduce->temp_file_name) + 1);
-	bufferAgregarInt(reduce_order, list_size(origenesDeReduce));
+bufferAgregarInt(reduce_order, destinoReduce->id_reduce);
+bufferAgregarInt(reduce_order, destinoReduce->ip_nodo);
+bufferAgregarInt(reduce_order, destinoReduce->puerto_nodo);
+bufferAgregarString(reduce_order, destinoReduce->temp_file_name,
+		strlen(destinoReduce->temp_file_name) + 1);
+bufferAgregarInt(reduce_order, list_size(origenesDeReduce));
 
-	void bufferAgregarOrigenesReduce(t_DestinoReduce* unOrigenReduce) {
+void bufferAgregarOrigenesReduce(t_DestinoReduce* unOrigenReduce) {
 
-		//	printf("el id de nodo es %i\n", unOrigenReduce->id_nodo);
-		//	printf("y el nombre del archivo es %s", unOrigenReduce->temp_file_name);
-		//	fflush(stdout);
+	//	printf("el id de nodo es %i\n", unOrigenReduce->id_nodo);
+	//	printf("y el nombre del archivo es %s", unOrigenReduce->temp_file_name);
+	//	fflush(stdout);
 
-		bufferAgregarInt(reduce_order, puertoDeNodo(unOrigenReduce->id_nodo));
-		bufferAgregarInt(reduce_order, ipDeNodo(unOrigenReduce->id_nodo));
-		bufferAgregarString(reduce_order, unOrigenReduce->temp_file_name,
-				strlen(unOrigenReduce->temp_file_name) + 1);
-	}
+	bufferAgregarInt(reduce_order, puertoDeNodo(unOrigenReduce->id_nodo));
+	bufferAgregarInt(reduce_order, ipDeNodo(unOrigenReduce->id_nodo));
+	bufferAgregarString(reduce_order, unOrigenReduce->temp_file_name,
+			strlen(unOrigenReduce->temp_file_name) + 1);
+}
 
-	list_iterate(origenesDeReduce, (void*) bufferAgregarOrigenesReduce);
+list_iterate(origenesDeReduce, (void*) bufferAgregarOrigenesReduce);
 
-	resultado = enviarBuffer(reduce_order, sockJob);
+resultado = enviarBuffer(reduce_order, sockJob);
 
-	if (resultado < 0) {
-		log_warning(marta_logger,
-				"No se Pudo enviar la Orden de Reduce al Job");
-	} else {
-		log_info(marta_logger, "Le mandé la orden de Reduce al job");
-	}
-	return resultado;
+if (resultado < 0) {
+	log_warning(marta_logger, "No se Pudo enviar la Orden de Reduce al Job");
+} else {
+	log_info(marta_logger, "Le mandé la orden de Reduce al job");
+}
+return resultado;
 }
 
 int recibirResultadoDeReduce(int sockjob, t_ResultadoReduce* resultadoReduce) {
 
-	resultadoReduce->prot = recibirInt(sockjob);
-	resultadoReduce->id_reduce = recibirInt(sockjob);
+resultadoReduce->prot = recibirInt(sockjob);
+resultadoReduce->id_reduce = recibirInt(sockjob);
 
-	switch (resultadoReduce->prot) {
-	case OK_REDUCE:
-		log_info(marta_logger, "Reduce realizado con exito");
-		break;
+switch (resultadoReduce->prot) {
+case OK_REDUCE:
+	log_info(marta_logger, "Reduce realizado con exito");
+	break;
 
-	case NODO_NOT_FOUND:
-		log_info(marta_logger, "No se encontró el nodo donde hacer reduce");
-		break;
+case NODO_NOT_FOUND:
+	log_info(marta_logger, "No se encontró el nodo donde hacer reduce");
+	break;
 
-	case 0:
-		log_warning(marta_logger, "Job se desconectó de forma inesperada");
-		return -1;
-		break;
+case 0:
+	log_warning(marta_logger, "Job se desconectó de forma inesperada");
+	return -1;
+	break;
 
-	case -1:
-		log_warning(marta_logger, "No se pudo recibir el resultado del Reduce");
-		return -1;
-		break;
+case -1:
+	log_warning(marta_logger, "No se pudo recibir el resultado del Reduce");
+	return -1;
+	break;
 
-	default:
-		log_warning(marta_logger, "Protocolo Inesperado %i",
-				resultadoReduce->prot);
-		return -1;
-		break;
-	}
-
-	return 1;
+default:
+	log_warning(marta_logger, "Protocolo Inesperado %i", resultadoReduce->prot);
+	return -1;
+	break;
 }
 
-void agregarReducePendiente(t_list* reducePendientes,
-		t_DestinoReduce* destinoReduce) {
+return 1;
+}
 
-	t_ReducePendiente* reducePendiente;
+void agregarReducePendiente(t_list* reducePendientes, t_DestinoReduce* destinoReduce) {
 
-	reducePendiente = malloc(sizeof(t_ReducePendiente));
-	reducePendiente->numeroDeReducePendiente = destinoReduce->id_reduce;
-	reducePendiente->map_dest = destinoReduce;
+t_ReducePendiente* reducePendiente;
 
-	list_add(reducePendientes, reducePendiente);
+reducePendiente = malloc(sizeof(t_ReducePendiente));
+reducePendiente->numeroDeReducePendiente = destinoReduce->id_reduce;
+reducePendiente->map_dest = destinoReduce;
+
+list_add(reducePendientes, reducePendiente);
 
 }
 
 char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
-		int* idNodoArchivoFinal, int sockJob) {
-	char* archivoFinal;
-	int idJobAlQueAplica = infoJob.idJob;
-	uint32_t ultimoIDReduce = 0;
+	int* idNodoArchivoFinal, int sockJob) {
+char* archivoFinal;
+int idJobAlQueAplica = infoJob.idJob;
+uint32_t ultimoIDReduce = 0;
 
-	t_list* listaIdNodosDondeAplicarReduce = list_create();
+t_list* listaIdNodosDondeAplicarReduce = list_create();
 
 //FIXME esto es inecesario, pero queria usar el t_list y con esto lo soluciono por ahora
-	typedef struct {
-		int idNodo;
-	} t_idNodo;
+typedef struct {
+	int idNodo;
+} t_idNodo;
 
 //funciones auxiliares
-	int obtenerIdJobDelMapTemporal(t_MapTemporal* unMapTemporal) {
+int obtenerIdJobDelMapTemporal(t_MapTemporal* unMapTemporal) {
 
-		char** archivoTemporalSeparadoPorGuionBajo;
+	char** archivoTemporalSeparadoPorGuionBajo;
 
-		archivoTemporalSeparadoPorGuionBajo = string_split(unMapTemporal->path,
-				"_");
+	archivoTemporalSeparadoPorGuionBajo = string_split(unMapTemporal->path, "_");
 
-		char* stringIdJob = archivoTemporalSeparadoPorGuionBajo[1];
+	char* stringIdJob = archivoTemporalSeparadoPorGuionBajo[1];
 
-		return atoi(stringIdJob);
-	}
+	return atoi(stringIdJob);
+}
 
-	bool temporalesDelJobTrabajado(t_MapTemporal* unMapTemporal) {
-		return idJobAlQueAplica == obtenerIdJobDelMapTemporal(unMapTemporal);
-	}
+bool temporalesDelJobTrabajado(t_MapTemporal* unMapTemporal) {
+	return idJobAlQueAplica == obtenerIdJobDelMapTemporal(unMapTemporal);
+}
 
-	int mejorNodoDondeAplicarReduceSinCombiner(t_list *mapsTemporales) { //XXX testear. Puede fallar feo
-		int maxTemporalesPorNodo = 0;
-		int idMejorNodo = -1;
-		int cantidadDeApariciones = 0;
+int mejorNodoDondeAplicarReduceSinCombiner(t_list *mapsTemporales) { //XXX testear. Puede fallar feo
+	int maxTemporalesPorNodo = 0;
+	int idMejorNodo = -1;
+	int cantidadDeApariciones = 0;
 
-		void elegirNodoConMasTemporales(t_MapTemporal* unMapTemporal) {
+	void elegirNodoConMasTemporales(t_MapTemporal* unMapTemporal) {
 
-			bool apareceNodoAEvaluar(t_MapTemporal* otroMapTemporal) {
-				return otroMapTemporal->id_nodo == unMapTemporal->id_nodo;
-			}
-
-			cantidadDeApariciones = list_count_satisfying(mapsTemporales,
-					(void*) apareceNodoAEvaluar);
-
-			if (cantidadDeApariciones > maxTemporalesPorNodo) {
-				idMejorNodo = unMapTemporal->id_nodo;
-				maxTemporalesPorNodo = cantidadDeApariciones;
-				cantidadDeApariciones = 0;
-			}
-
+		bool apareceNodoAEvaluar(t_MapTemporal* otroMapTemporal) {
+			return otroMapTemporal->id_nodo == unMapTemporal->id_nodo;
 		}
 
-		list_iterate(mapsTemporales, (void*) elegirNodoConMasTemporales);
+		cantidadDeApariciones = list_count_satisfying(mapsTemporales, (void*) apareceNodoAEvaluar);
 
-		return idMejorNodo; //si devuelve -1, no selecciono ningun nodo. Error de algoritmo
-	}
-
-	void tomarIdsNodo(t_MapTemporal* unMapTemporal) {
-
-		t_idNodo* tIdNodo = malloc(sizeof(t_idNodo));
-		tIdNodo->idNodo = unMapTemporal->id_nodo;
-
-		bool estaEseNodoCargado(t_idNodo* idCargado) {
-			return unMapTemporal->id_nodo == idCargado->idNodo;
+		if (cantidadDeApariciones > maxTemporalesPorNodo) {
+			idMejorNodo = unMapTemporal->id_nodo;
+			maxTemporalesPorNodo = cantidadDeApariciones;
+			cantidadDeApariciones = 0;
 		}
 
-		if (!list_any_satisfy(listaIdNodosDondeAplicarReduce,
-				(void*) estaEseNodoCargado)) {
-
-			list_add(listaIdNodosDondeAplicarReduce, tIdNodo);
-
-		}
 	}
+
+	list_iterate(mapsTemporales, (void*) elegirNodoConMasTemporales);
+
+	return idMejorNodo; //si devuelve -1, no selecciono ningun nodo. Error de algoritmo
+}
+
+void tomarIdsNodo(t_MapTemporal* unMapTemporal) {
+
+	t_idNodo* tIdNodo = malloc(sizeof(t_idNodo));
+	tIdNodo->idNodo = unMapTemporal->id_nodo;
+
+	bool estaEseNodoCargado(t_idNodo* idCargado) {
+		return unMapTemporal->id_nodo == idCargado->idNodo;
+	}
+
+	if (!list_any_satisfy(listaIdNodosDondeAplicarReduce, (void*) estaEseNodoCargado)) {
+
+		list_add(listaIdNodosDondeAplicarReduce, tIdNodo);
+
+	}
+}
 
 //FIXME Job necesitaría ip-Puerto del nodo con ese id, eso debería sacarlo MaRTA
 //de sus listas de nodos. No se si eso se hace acá o en otro lado.
 //Si es así, hay que agregar esos campos en t_DestinoReduce
-	t_OrigenReduce* convertirAEstructuraNecesaria(t_MapTemporal* unMapTemporal) {
+t_OrigenReduce* convertirAEstructuraNecesaria(t_MapTemporal* unMapTemporal) {
 
-		t_OrigenReduce* origenReduce = malloc(sizeof(t_OrigenReduce));
+	t_OrigenReduce* origenReduce = malloc(sizeof(t_OrigenReduce));
 
-		origenReduce->id_nodo = unMapTemporal->id_nodo;
-		origenReduce->temp_file_name = unMapTemporal->path;
+	origenReduce->id_nodo = unMapTemporal->id_nodo;
+	origenReduce->temp_file_name = unMapTemporal->path;
 
-		return origenReduce;
-	}
+	return origenReduce;
+}
 //fin funciones auxiliares
 
-	t_list* mapsTemporalesDeLosArchivosDelJob = list_filter(listaMapsTemporales,
-			(void*) temporalesDelJobTrabajado);
+t_list* mapsTemporalesDeLosArchivosDelJob = list_filter(listaMapsTemporales,
+		(void*) temporalesDelJobTrabajado);
 
-	if (infoJob.combiner == 1) {	//Con combiner
+if (infoJob.combiner == 1) {	//Con combiner
 
-		//debo aplicar reduce dentro de cada nodo que tenga maps temporales
-		//Es decir, debo agarrar y mandar a reducir todos las archivos tmp que tenga
-		//cada uno de esos nodos. Una vez terminados todos estos reduce en cada nodo
-		//hacer un reduce general con todos los tmp auxiliares de reduce generados
+	//debo aplicar reduce dentro de cada nodo que tenga maps temporales
+	//Es decir, debo agarrar y mandar a reducir todos las archivos tmp que tenga
+	//cada uno de esos nodos. Una vez terminados todos estos reduce en cada nodo
+	//hacer un reduce general con todos los tmp auxiliares de reduce generados
 
-		//con esto cargo la lista listaIdNodosDondeAplicarReduce con los
-		//distintos idNodo que estan involucrados en este reduce combiner
-		list_iterate(mapsTemporalesDeLosArchivosDelJob, (void*) tomarIdsNodo);
+	//con esto cargo la lista listaIdNodosDondeAplicarReduce con los
+	//distintos idNodo que estan involucrados en este reduce combiner
+	list_iterate(mapsTemporalesDeLosArchivosDelJob, (void*) tomarIdsNodo);
 
-		t_list* listaReducePendientes = list_create();
-		t_list* destinosIntermedios = list_create();
-		int idNodoDondeAplicarReduceFinal;
+	t_list* listaReducePendientes = list_create();
+	t_list* destinosIntermedios = list_create();
+	int idNodoDondeAplicarReduceFinal;
 
-		while (!list_is_empty(listaIdNodosDondeAplicarReduce)) {
-			t_list* mapsTemporalesDondeHacerReduceEnNodo;
-			t_list* origenesReduceEnNodo;
+	while (!list_is_empty(listaIdNodosDondeAplicarReduce)) {
+		t_list* mapsTemporalesDondeHacerReduceEnNodo;
+		t_list* origenesReduceEnNodo;
 
-			t_idNodo* idAux = list_get(listaIdNodosDondeAplicarReduce, 0);
-			int resReduceEnNodo;
+		t_idNodo* idAux = list_get(listaIdNodosDondeAplicarReduce, 0);
+		int resReduceEnNodo;
 
-			bool destinosDelNodoAAplicarReduceLocal(
-					t_MapTemporal* unMapTemporal) {
+		bool destinosDelNodoAAplicarReduceLocal(t_MapTemporal* unMapTemporal) {
 
-				return unMapTemporal->id_nodo == idAux->idNodo;
-			}
-
-			mapsTemporalesDondeHacerReduceEnNodo = list_filter(
-					mapsTemporalesDeLosArchivosDelJob,
-					(void*) destinosDelNodoAAplicarReduceLocal);
-
-			origenesReduceEnNodo = list_map(
-					mapsTemporalesDondeHacerReduceEnNodo,
-					(void*) convertirAEstructuraNecesaria);
-
-			//XXX ojo, malloc dentro de while. Al finalizar, hago free de la lista que los contiene
-			t_DestinoReduce* destinoIntermedioReduce = malloc(
-					sizeof(t_DestinoReduce));
-
-			//XXX el nombre del reduce no se si siempre será único. supuestamente si
-			destinoIntermedioReduce->id_reduce = ++(ultimoIDReduce);
-			destinoIntermedioReduce->id_nodo = idAux->idNodo;
-			destinoIntermedioReduce->ip_nodo = ipDeNodo(idAux->idNodo);
-			destinoIntermedioReduce->puerto_nodo = puertoDeNodo(idAux->idNodo);
-			destinoIntermedioReduce->temp_file_name = string_from_format(
-					"reduce_intermedio_%i_%i.temp", infoJob.idJob,
-					destinoIntermedioReduce->id_reduce);
-
-			resReduceEnNodo = ordenarReduceAJob(destinoIntermedioReduce,
-					origenesReduceEnNodo, sockJob);
-
-			if (resReduceEnNodo > 0) {
-				printf("Mandó orden Reduce Intermedio %s\n",
-						destinoIntermedioReduce->temp_file_name);
-				fflush(stdout);
-			} else {
-				printf("Falló la orden de reduce inermedio %s\n",
-						destinoIntermedioReduce->temp_file_name);
-				fflush(stdout);
-				return NULL;
-			}
-
-			agregarReducePendiente(listaReducePendientes,
-					destinoIntermedioReduce);
-
-			list_add(destinosIntermedios, destinoIntermedioReduce);
-
-			//asigno como responsable del reduce final a aquel nodo que sea el útlimo
-			//que aplicó un reduce intermedio. Esto es así porque es más probable
-			//que si ese acaba de ser exitoso, siga activo ¿?
-			idNodoDondeAplicarReduceFinal = idAux->idNodo;
-
-			void destruirTIdNodo(t_idNodo* unTIdNodo) {
-				free(unTIdNodo);
-			}
-
-			list_remove_and_destroy_element(listaIdNodosDondeAplicarReduce, 0,
-					(void*) destruirTIdNodo);
-
+			return unMapTemporal->id_nodo == idAux->idNodo;
 		}
 
-		//muestro la lista de intermedios que tengo al salir del while
-		void mostrar(t_DestinoReduce* unDestino) {
-			printf("ID REDUCE: %d\n", unDestino->id_reduce);
-			printf("ID NODO: %d\n", unDestino->id_nodo);
-			printf("TEMP FILE NAME: %s\n", unDestino->temp_file_name);
-			fflush(stdout);
-		}
+		mapsTemporalesDondeHacerReduceEnNodo = list_filter(mapsTemporalesDeLosArchivosDelJob,
+				(void*) destinosDelNodoAAplicarReduceLocal);
 
-		list_iterate(destinosIntermedios, (void*) mostrar);
-
-		printf("\nEnvie todos las ordenes de reduce intermedios\n");
-		fflush(stdout);
-		//ojo acá: pthread_mutex_unlock(&conexionFS);
-
-		t_ResultadoReduce resultadoDeReduce;
-		int resultado;
-
-		bool encuentraReducePendiente(t_DestinoReduce* unDestinoReduce) {
-			return unDestinoReduce->id_reduce == resultadoDeReduce.id_reduce;
-		}
-
-		void eliminarReducePendiente(t_DestinoReduce* unDestinoReduce) {
-			free(unDestinoReduce->temp_file_name);
-			free(unDestinoReduce);
-		}
-
-		void mostrarReducePendientes(t_ReducePendiente* reducePendiente) {
-			printf("\nReduce pendiente: %i \n",
-					reducePendiente->numeroDeReducePendiente);
-			fflush(stdout);
-		}
-
-		//aca recibir resultado de reduce intermedios que se van haciendo
-		while (!list_is_empty(listaReducePendientes)) {
-
-			resultado = recibirResultadoDeReduce(sockJob, &resultadoDeReduce);
-
-			list_iterate(listaReducePendientes,
-					(void*) mostrarReducePendientes);
-			fflush(stdout);
-
-			//En base al resultado, realiza las tareas que le corresponden
-			if (resultado > 0) {
-				switch (resultadoDeReduce.prot) {
-				case OK_REDUCE:
-
-					log_info(marta_logger, "Resultado de reduce: %i",
-							resultadoDeReduce.id_reduce);
-
-					list_remove_by_condition(listaReducePendientes,
-							(void*) encuentraReducePendiente);
-					break;
-				case NODO_NOT_FOUND:
-					log_info(marta_logger, "NO SE ENCONTRO UN NODO");
-					log_info(marta_logger, "CANCELO TODO EL JOB");
-
-					//XXX no se si acá va el return NULL;
-					return NULL;
-
-					break;
-				}
-
-			} else {
-				log_info(marta_logger,
-						"Recibí resultado incorrecto, cancelo Job");
-				/*list_destroy_and_destroy_elements(listaReducePendientes,
-				 (void *) eliminarReducePendiente);
-				 Puede ir list_destroy() solamente. Con esa funcionaría*/
-				return NULL;
-			}
-		}
-
-		printf("Despues de intermedios y antes de hacer finales\n");
-		fflush(stdout);
-
-		list_iterate(destinosIntermedios, (void*) mostrar);
-
-		//Una vez realizados todos los reduce intermedios en los nodos
-		//debo aplicar un reduce general y final sobre esos tmp de reduce intermedios
-		//Sería como hacer un reduce sinCombiner en la lista tmp de reduce del job
-		int resultadoReduceFinal;
-
-		t_DestinoReduce* destinoFinalReduce = malloc(sizeof(t_DestinoReduce));
-
-		//XXX el nombre del reduce no se si siempre será único. supuestamente si
-		destinoFinalReduce->id_reduce = ++(ultimoIDReduce);
-		destinoFinalReduce->id_nodo = idNodoDondeAplicarReduceFinal;
-		destinoFinalReduce->ip_nodo = ipDeNodo(idNodoDondeAplicarReduceFinal);
-		destinoFinalReduce->puerto_nodo = puertoDeNodo(
-				idNodoDondeAplicarReduceFinal);
-		/*destinoFinalReduce->temp_file_name = string_from_format(
-		 "reduce_final_%i_%i.temp", infoJob.idJob,
-		 destinoFinalReduce->id_nodo);*/
-		destinoFinalReduce->temp_file_name = strdup(infoJob.pathDeResultado);
-
-		*idNodoArchivoFinal = destinoFinalReduce->id_nodo;
-
-		resultadoReduceFinal = ordenarUltimoReduceAJob(destinoFinalReduce,
-				destinosIntermedios, sockJob);
-
-		if (resultadoReduceFinal > 0) {
-			log_info(marta_logger, "Reduce con combiner enviado exitosamente");
-		} else {
-			log_info(marta_logger,
-					"falló envío de la orden de reduce. Cancelo job");
-			//todo mandar a borrar cosas y eso. No se bien que hacer acá
-			return NULL;
-		}
-
-		//recibir el resultado del reduce final
-		log_info(marta_logger,
-				"Hice todos los reduce intermedios y mande a hacer el final");
-
-		t_ResultadoReduce resultadoFinal;
-
-		resultado = recibirResultadoDeReduce(sockJob, &resultadoFinal);
-
-		//En base al resultado, realiza las tareas que le corresponden
-		if (resultado > 0) {
-			switch (resultadoFinal.prot) {
-			case OK_REDUCE:
-				log_info(marta_logger, "Reduce final realizado exitosamente");
-
-				break;
-			case NODO_NOT_FOUND:
-				log_info(marta_logger, "NO SE ENCONTRO UN NODO");
-				log_info(marta_logger,
-						"CANCELO TODO EL JOB. LASTIMA ERA EL FINAL");
-				return NULL;
-				break;
-			}
-
-		} else {
-			log_info(marta_logger,
-					"Recibí resultado de orden a reduce incorrecto. Cancelo job");
-			free(destinoFinalReduce);
-			return NULL;
-		}
-
-		void destruirDestinoReduce(t_DestinoReduce* unDestinoReduce) {
-			free(unDestinoReduce);
-		}
-
-		char* archivoFinal = strdup(destinoFinalReduce->temp_file_name);
-		free(destinoFinalReduce);
-
-		list_destroy_and_destroy_elements(destinosIntermedios,
-				(void*) destruirDestinoReduce);
-
-		bool mapsYaHechos(t_MapTemporal* mapTemporal) {
-
-			bool esElMismoMap(t_MapTemporal* otroMapTemporal) {
-				return otroMapTemporal == mapTemporal;
-			}
-
-			return list_any_satisfy(mapsTemporalesDeLosArchivosDelJob,
-					(void*) esElMismoMap);
-		}
-
-		while (list_remove_by_condition(listaMapsTemporales,
-				(void*) mapsYaHechos))
-			;
-
-		return archivoFinal;
-
-	} else //Sin combiner
-	{
-		int idNodoDondeAplicarReduce = mejorNodoDondeAplicarReduceSinCombiner(
-				mapsTemporalesDeLosArchivosDelJob);
-
-		//ahora le tengo que decir al job, que en el nodo idNodoDondeAplicarRedecu,
-		//aplique reduce sobre nodo-tal, nodo-tal.Archtemp
-
-		int resultado;
-		t_list* origenesDeReduce; //lista de: (idNodo, archivoTemporal)
-
-		origenesDeReduce = list_map(mapsTemporalesDeLosArchivosDelJob,
+		origenesReduceEnNodo = list_map(mapsTemporalesDondeHacerReduceEnNodo,
 				(void*) convertirAEstructuraNecesaria);
 
-		t_DestinoReduce* destinoReduce = malloc(sizeof(t_DestinoReduce));
+		//XXX ojo, malloc dentro de while. Al finalizar, hago free de la lista que los contiene
+		t_DestinoReduce* destinoIntermedioReduce = malloc(sizeof(t_DestinoReduce));
 
 		//XXX el nombre del reduce no se si siempre será único. supuestamente si
-		destinoReduce->id_reduce = ++(ultimoIDReduce);
-		destinoReduce->id_nodo = idNodoDondeAplicarReduce;
-		destinoReduce->ip_nodo = ipDeNodo(idNodoDondeAplicarReduce);
-		destinoReduce->puerto_nodo = puertoDeNodo(idNodoDondeAplicarReduce);
-		/*destinoReduce->temp_file_name = string_from_format(
-		 "reduce_final_%i_%i.temp", infoJob.idJob,
-		 destinoReduce->id_nodo);*/
-		destinoReduce->temp_file_name = strdup(infoJob.pathDeResultado);
+		destinoIntermedioReduce->id_reduce = ++(ultimoIDReduce);
+		destinoIntermedioReduce->id_nodo = idAux->idNodo;
+		destinoIntermedioReduce->ip_nodo = ipDeNodo(idAux->idNodo);
+		destinoIntermedioReduce->puerto_nodo = puertoDeNodo(idAux->idNodo);
+		destinoIntermedioReduce->temp_file_name = string_from_format("reduce_intermedio_%i_%i.temp",
+				infoJob.idJob, destinoIntermedioReduce->id_reduce);
 
-		*idNodoArchivoFinal = destinoReduce->id_nodo;
+		resReduceEnNodo = ordenarReduceAJob(destinoIntermedioReduce, origenesReduceEnNodo, sockJob);
 
-		resultado = ordenarReduceAJob(destinoReduce, origenesDeReduce, sockJob);
-
-		if (resultado > 0) {
-			log_info(marta_logger, "Reduce sin combiner enviado exitosamente");
+		if (resReduceEnNodo > 0) {
+			printf("Mandó orden Reduce Intermedio %s\n", destinoIntermedioReduce->temp_file_name);
+			fflush(stdout);
 		} else {
-			log_info(marta_logger,
-					"falló envío de la orden de reduce. Cancelo job");
-			//todo mandar a borrar cosas y eso. No se bien que hacer acá
+			printf("Falló la orden de reduce inermedio %s\n",
+					destinoIntermedioReduce->temp_file_name);
+			fflush(stdout);
 			return NULL;
 		}
 
-		//recibir el resultado del reduce final
-		log_info(marta_logger,
-				"Hice todos los reduce intermedios y mande a hacer el final");
+		agregarReducePendiente(listaReducePendientes, destinoIntermedioReduce);
 
-		t_ResultadoReduce resultadoFinal;
+		list_add(destinosIntermedios, destinoIntermedioReduce);
 
-		resultado = recibirResultadoDeReduce(sockJob, &resultadoFinal);
+		//asigno como responsable del reduce final a aquel nodo que sea el útlimo
+		//que aplicó un reduce intermedio. Esto es así porque es más probable
+		//que si ese acaba de ser exitoso, siga activo ¿?
+		idNodoDondeAplicarReduceFinal = idAux->idNodo;
+
+		void destruirTIdNodo(t_idNodo* unTIdNodo) {
+			free(unTIdNodo);
+		}
+
+		list_remove_and_destroy_element(listaIdNodosDondeAplicarReduce, 0, (void*) destruirTIdNodo);
+
+	}
+
+	//muestro la lista de intermedios que tengo al salir del while
+	void mostrar(t_DestinoReduce* unDestino) {
+		printf("ID REDUCE: %d\n", unDestino->id_reduce);
+		printf("ID NODO: %d\n", unDestino->id_nodo);
+		printf("TEMP FILE NAME: %s\n", unDestino->temp_file_name);
+		fflush(stdout);
+	}
+
+	list_iterate(destinosIntermedios, (void*) mostrar);
+
+	printf("\nEnvie todos las ordenes de reduce intermedios\n");
+	fflush(stdout);
+	//ojo acá: pthread_mutex_unlock(&conexionFS);
+
+	t_ResultadoReduce resultadoDeReduce;
+	int resultado;
+
+	bool encuentraReducePendiente(t_DestinoReduce* unDestinoReduce) {
+		return unDestinoReduce->id_reduce == resultadoDeReduce.id_reduce;
+	}
+
+	void eliminarReducePendiente(t_DestinoReduce* unDestinoReduce) {
+		free(unDestinoReduce->temp_file_name);
+		free(unDestinoReduce);
+	}
+
+	void mostrarReducePendientes(t_ReducePendiente* reducePendiente) {
+		printf("\nReduce pendiente: %i \n", reducePendiente->numeroDeReducePendiente);
+		fflush(stdout);
+	}
+
+	//aca recibir resultado de reduce intermedios que se van haciendo
+	while (!list_is_empty(listaReducePendientes)) {
+
+		resultado = recibirResultadoDeReduce(sockJob, &resultadoDeReduce);
+
+		list_iterate(listaReducePendientes, (void*) mostrarReducePendientes);
+		fflush(stdout);
 
 		//En base al resultado, realiza las tareas que le corresponden
 		if (resultado > 0) {
-			switch (resultadoFinal.prot) {
+			switch (resultadoDeReduce.prot) {
 			case OK_REDUCE:
-				log_info(marta_logger,
-						"Reduce final sin combiner realizado exitosamente");
 
+				log_info(marta_logger, "Resultado de reduce: %i", resultadoDeReduce.id_reduce);
+
+				list_remove_by_condition(listaReducePendientes, (void*) encuentraReducePendiente);
 				break;
 			case NODO_NOT_FOUND:
 				log_info(marta_logger, "NO SE ENCONTRO UN NODO");
-				log_info(marta_logger, "CANCELO TODO EL JOB.");
+				log_info(marta_logger, "CANCELO TODO EL JOB");
+
+				//XXX no se si acá va el return NULL;
 				return NULL;
 
 				break;
 			}
 
 		} else {
-			log_info(marta_logger,
-					"Recibí resultado de orden a reduce incorrecto. Cancelo job");
-			free(destinoReduce);
+			log_info(marta_logger, "Recibí resultado incorrecto, cancelo Job");
+			/*list_destroy_and_destroy_elements(listaReducePendientes,
+			 (void *) eliminarReducePendiente);
+			 Puede ir list_destroy() solamente. Con esa funcionaría*/
 			return NULL;
 		}
-
-		archivoFinal = strdup(destinoReduce->temp_file_name);
-
-		free(destinoReduce);
-		list_destroy_and_destroy_elements(origenesDeReduce, (void*) free);
 	}
+
+	printf("Despues de intermedios y antes de hacer finales\n");
+	fflush(stdout);
+
+	list_iterate(destinosIntermedios, (void*) mostrar);
+
+	//Una vez realizados todos los reduce intermedios en los nodos
+	//debo aplicar un reduce general y final sobre esos tmp de reduce intermedios
+	//Sería como hacer un reduce sinCombiner en la lista tmp de reduce del job
+	int resultadoReduceFinal;
+
+	t_DestinoReduce* destinoFinalReduce = malloc(sizeof(t_DestinoReduce));
+
+	//XXX el nombre del reduce no se si siempre será único. supuestamente si
+	destinoFinalReduce->id_reduce = ++(ultimoIDReduce);
+	destinoFinalReduce->id_nodo = idNodoDondeAplicarReduceFinal;
+	destinoFinalReduce->ip_nodo = ipDeNodo(idNodoDondeAplicarReduceFinal);
+	destinoFinalReduce->puerto_nodo = puertoDeNodo(idNodoDondeAplicarReduceFinal);
+	/*destinoFinalReduce->temp_file_name = string_from_format(
+	 "reduce_final_%i_%i.temp", infoJob.idJob,
+	 destinoFinalReduce->id_nodo);*/
+	destinoFinalReduce->temp_file_name = strdup(infoJob.pathDeResultado);
+
+	*idNodoArchivoFinal = destinoFinalReduce->id_nodo;
+
+	resultadoReduceFinal = ordenarUltimoReduceAJob(destinoFinalReduce, destinosIntermedios,
+			sockJob);
+
+	if (resultadoReduceFinal > 0) {
+		log_info(marta_logger, "Reduce con combiner enviado exitosamente");
+	} else {
+		log_info(marta_logger, "falló envío de la orden de reduce. Cancelo job");
+		//todo mandar a borrar cosas y eso. No se bien que hacer acá
+		return NULL;
+	}
+
+	//recibir el resultado del reduce final
+	log_info(marta_logger, "Hice todos los reduce intermedios y mande a hacer el final");
+
+	t_ResultadoReduce resultadoFinal;
+
+	resultado = recibirResultadoDeReduce(sockJob, &resultadoFinal);
+
+	//En base al resultado, realiza las tareas que le corresponden
+	if (resultado > 0) {
+		switch (resultadoFinal.prot) {
+		case OK_REDUCE:
+			log_info(marta_logger, "Reduce final realizado exitosamente");
+
+			break;
+		case NODO_NOT_FOUND:
+			log_info(marta_logger, "NO SE ENCONTRO UN NODO");
+			log_info(marta_logger, "CANCELO TODO EL JOB. LASTIMA ERA EL FINAL");
+			return NULL;
+			break;
+		}
+
+	} else {
+		log_info(marta_logger, "Recibí resultado de orden a reduce incorrecto. Cancelo job");
+		free(destinoFinalReduce);
+		return NULL;
+	}
+
+	void destruirDestinoReduce(t_DestinoReduce* unDestinoReduce) {
+		free(unDestinoReduce);
+	}
+
+	char* archivoFinal = strdup(destinoFinalReduce->temp_file_name);
+	free(destinoFinalReduce);
+
+	list_destroy_and_destroy_elements(destinosIntermedios, (void*) destruirDestinoReduce);
 
 	bool mapsYaHechos(t_MapTemporal* mapTemporal) {
 
@@ -1309,16 +1158,101 @@ char* planificarTodosLosReduce(t_InfoJob infoJob, t_list* listaMapsTemporales,
 			return otroMapTemporal == mapTemporal;
 		}
 
-		return list_any_satisfy(mapsTemporalesDeLosArchivosDelJob,
-				(void*) esElMismoMap);
+		return list_any_satisfy(mapsTemporalesDeLosArchivosDelJob, (void*) esElMismoMap);
 	}
 
 	while (list_remove_by_condition(listaMapsTemporales, (void*) mapsYaHechos))
 		;
 
-	/*list_destroy_and_destroy_elements(mapsTemporalesDeLosArchivosDelJob,
-	 (void*) free);*/
-
 	return archivoFinal;
+
+} else //Sin combiner
+{
+	int idNodoDondeAplicarReduce = mejorNodoDondeAplicarReduceSinCombiner(
+			mapsTemporalesDeLosArchivosDelJob);
+
+	//ahora le tengo que decir al job, que en el nodo idNodoDondeAplicarRedecu,
+	//aplique reduce sobre nodo-tal, nodo-tal.Archtemp
+
+	int resultado;
+	t_list* origenesDeReduce; //lista de: (idNodo, archivoTemporal)
+
+	origenesDeReduce = list_map(mapsTemporalesDeLosArchivosDelJob,
+			(void*) convertirAEstructuraNecesaria);
+
+	t_DestinoReduce* destinoReduce = malloc(sizeof(t_DestinoReduce));
+
+	//XXX el nombre del reduce no se si siempre será único. supuestamente si
+	destinoReduce->id_reduce = ++(ultimoIDReduce);
+	destinoReduce->id_nodo = idNodoDondeAplicarReduce;
+	destinoReduce->ip_nodo = ipDeNodo(idNodoDondeAplicarReduce);
+	destinoReduce->puerto_nodo = puertoDeNodo(idNodoDondeAplicarReduce);
+	/*destinoReduce->temp_file_name = string_from_format(
+	 "reduce_final_%i_%i.temp", infoJob.idJob,
+	 destinoReduce->id_nodo);*/
+	destinoReduce->temp_file_name = strdup(infoJob.pathDeResultado);
+
+	*idNodoArchivoFinal = destinoReduce->id_nodo;
+
+	resultado = ordenarReduceAJob(destinoReduce, origenesDeReduce, sockJob);
+
+	if (resultado > 0) {
+		log_info(marta_logger, "Reduce sin combiner enviado exitosamente");
+	} else {
+		log_info(marta_logger, "falló envío de la orden de reduce. Cancelo job");
+		//todo mandar a borrar cosas y eso. No se bien que hacer acá
+		return NULL;
+	}
+
+	//recibir el resultado del reduce final
+	log_info(marta_logger, "Hice todos los reduce intermedios y mande a hacer el final");
+
+	t_ResultadoReduce resultadoFinal;
+
+	resultado = recibirResultadoDeReduce(sockJob, &resultadoFinal);
+
+	//En base al resultado, realiza las tareas que le corresponden
+	if (resultado > 0) {
+		switch (resultadoFinal.prot) {
+		case OK_REDUCE:
+			log_info(marta_logger, "Reduce final sin combiner realizado exitosamente");
+
+			break;
+		case NODO_NOT_FOUND:
+			log_info(marta_logger, "NO SE ENCONTRO UN NODO");
+			log_info(marta_logger, "CANCELO TODO EL JOB.");
+			return NULL;
+
+			break;
+		}
+
+	} else {
+		log_info(marta_logger, "Recibí resultado de orden a reduce incorrecto. Cancelo job");
+		free(destinoReduce);
+		return NULL;
+	}
+
+	archivoFinal = strdup(destinoReduce->temp_file_name);
+
+	free(destinoReduce);
+	list_destroy_and_destroy_elements(origenesDeReduce, (void*) free);
+}
+
+bool mapsYaHechos(t_MapTemporal* mapTemporal) {
+
+	bool esElMismoMap(t_MapTemporal* otroMapTemporal) {
+		return otroMapTemporal == mapTemporal;
+	}
+
+	return list_any_satisfy(mapsTemporalesDeLosArchivosDelJob, (void*) esElMismoMap);
+}
+
+while (list_remove_by_condition(listaMapsTemporales, (void*) mapsYaHechos))
+	;
+
+/*list_destroy_and_destroy_elements(mapsTemporalesDeLosArchivosDelJob,
+ (void*) free);*/
+
+return archivoFinal;
 }
 

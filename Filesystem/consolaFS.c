@@ -217,16 +217,25 @@ void eliminarArchivo(char *archivo) {
 }
 
 void renombrarArchivo(char *archivo, char *nuevoNombre) {
-	renombrarArchivoPorNombre(archivo, nuevoNombre,archivosVisiblesDesdeDirectorioDado(archivo));
+	void renombrar(t_archivo* unArchivo){
+		unArchivo->nombre=nuevoNombre;
+	}
+	validarYEjecutar(archivo,validarArchivo,renombrar);
 }
 
 void moverArchivo(char *archivo, char* padreString) {
 
 	int padre = string_to_int(padreString);
 	if (padre!=(-1)) {
-		t_list *archivosVisibles = archivosVisiblesDesdeDirectorioDado(archivo);
-		moverArchivoPorNombreYPadre(archivo, archivosVisibles,	listaDirectorios, padre);
-		list_destroy(archivosVisibles);
+		void moverArchivo(t_archivo* unArchivo){
+		if(!buscarDirPorIndex(padre)){
+			log_error(mdfs_logger,"Error. No existe el directorio.");
+			return;
+		}
+		unArchivo->padre=padre;
+		log_info(mdfs_logger,"El directorio ha sido movido");
+		}
+		validarYEjecutar(archivo,validarArchivo,moverArchivo);
 	}
 }
 

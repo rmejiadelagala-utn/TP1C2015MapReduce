@@ -91,6 +91,7 @@ void* hilo_mapper (void* arg_thread){
 		fflush(stdout);
 		void* buffer = crearBufferConProtocolo(NODO_NOT_FOUND);
 		bufferAgregarInt(buffer,ordenMapper.id_map);
+		bufferAgregarInt(buffer,ordenMapper.id_nodo);
 		enviarBuffer(buffer,sockMarta);
 		return NULL;
 	}
@@ -101,7 +102,13 @@ void* hilo_mapper (void* arg_thread){
 	if(res<0){
 		printf("Todo mal, no pude enviar mapper a Nodo: %s\n", ip_nodo_char);
 	}
-	else printf("Envie un map al nodo %d\n",ordenMapper.id_nodo);
+	else {
+		printf("Envie un map al nodo %d\n",ordenMapper.id_nodo);
+		pthread_mutex_lock(&contadorMappersDebug_mutex);
+		contadorMappersDebug++;
+		printf("Llevo enviados %d maps \n",contadorMappersDebug);
+		pthread_mutex_unlock(&contadorMappersDebug_mutex);
+	}
 	//recibir resultado de la Operacion mapper desde el Nodo
 	resOper=recibirResultadoFromNodo(sockNodo);
 	//printf("le mando a marta el protocolo %d\n", resOper);
