@@ -100,14 +100,16 @@ void* conexionJobs(void* sockJobNodo) {
 	void* buffer;
 	int resultado;
 //	char* dataAUX;
-
+	int tamanioScript;
 	while ((recibido = recvall(sock_in, &protocolo, sizeof(int))) > 1) {
 		switch (protocolo) {
 		case ORDER_MAP:
 			//Dejo que el nodo conteste que todo esta bien por ahora, despues hay que hacer el map aca
 
 			log_info(nodo_logger,"Recibi una orden de map, esta todo OK.");
-			script = recibirString(sock_in);
+			tamanioScript = recibirInt(sock_in);
+			script=malloc(tamanioScript);
+			recvall(sock_in,script,tamanioScript);
 			nroBloque = recibirInt(sock_in);
 			tamanioBloque = recibirInt(sock_in);
 			archivoSalida = strdup("/tmp/");
@@ -121,7 +123,7 @@ void* conexionJobs(void* sockJobNodo) {
 			string_append(&nombreScript, string_itoa(numeroDeMap));
 			string_append(&nombreScript, ".sh");
 			numeroMapActual = numeroDeMap;
-			crearScriptMapper(script, nombreScript);
+			crearScriptMapper(script, nombreScript, tamanioScript);
 			numeroDeMap++;
 			pthread_mutex_unlock(&numeroMap);
 			log_info(nodo_sync_logger,"unlock numeroMap");
@@ -195,7 +197,9 @@ void* conexionJobs(void* sockJobNodo) {
 		case ORDER_REDUCE:
 			log_info(nodo_logger,"Me llego una orden reduce");
 			archivosAReducir = list_create();
-			script = recibirString(sock_in);
+			tamanioScript = recibirInt(sock_in);
+			script=malloc(tamanioScript);
+			recvall(sock_in,script,tamanioScript);
 			cantArchReduce = recibirInt(sock_in);
 			archivoSalida = strdup("/tmp/");
 			for (i = 0; i < cantArchReduce; i++) {
@@ -217,7 +221,7 @@ void* conexionJobs(void* sockJobNodo) {
 			string_append(&nombreScript, string_itoa(numeroDeReduce));
 			string_append(&nombreScript, ".sh");
 
-			crearScriptReduce(script, nombreScript);
+			crearScriptReduce(script, nombreScript,tamanioScript);
 
 			string_append(&archivoSalida, nomArchSalida);
 			numeroReduceActual = numeroDeReduce;

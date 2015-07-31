@@ -307,7 +307,7 @@ void copiarAMDFS(char *archivoDestino, char *archivoACopiar) {
 		printf("Ya existe un archivo con ese nombre en el File System\n");
 	}
 	else{
-		char* path = strdup("../Archivos/");
+		char* path = strdup("../Archivos/");//TODO hacer que se pueda mandar desde cualquier lado
 		string_append(&path,archivoACopiar);
 		levantarArchivoAMemoriaYDistribuirANodos(path, archivoDestino, directorioActual->index);
 	}

@@ -15,6 +15,7 @@
 #include<socketes/envioDeMensajes.h>
 #include<stdbool.h>
 #include <pthread.h>
+#include <sys/stat.h>
 
 int recibirResultadoFromNodo(int sockNodo) {
 	uint32_t recibido, protocolo, rptaNodoAJob;
@@ -97,7 +98,7 @@ void* hilo_mapper (void* arg_thread){
 	}
 	//Enviamos rutina mapper a Nodo
 
-	res=enviarMapperANodo(sockNodo,codigoMapper,block,block_size,tmp_file_name);
+	res=enviarMapperANodo(sockNodo,codigoMapper,block,block_size,tmp_file_name,tamanioScript(ordenToNodo.pathMapper));
 
 	if(res<0){
 		printf("Todo mal, no pude enviar mapper a Nodo: %s\n", ip_nodo_char);
@@ -123,6 +124,8 @@ void* hilo_mapper (void* arg_thread){
 	if(envioRes<0){
 		printf("no pude enviar la respuesta a marta, algo pasó\n");
 	}
+	munmap(ordenToNodo.pathMapper,tamanioScript(ordenToNodo.pathMapper));
+
 	close(sockNodo);
 
 	pthread_exit(NULL);
@@ -194,9 +197,9 @@ t_ordenReduce* recibirOrdenReduceDeMarta(int sockMarta){
 
 
 int enviarReduceANodo(int sockNodo,char* codigoReduce, int cantArchivos,
-					  t_nodoArchTmp** nodosArchTmp,char* archResultado){
+					  t_nodoArchTmp** nodosArchTmp,char* archResultado, int tamanioScript){
 	t_buffer* buffer = crearBufferConProtocolo(ORDER_REDUCE);
-    bufferAgregarString(buffer,codigoReduce,strlen(codigoReduce)+1); //FIX si esto fuese un binario, no funcionaria
+    bufferAgregarString(buffer,codigoReduce,tamanioScript);
     bufferAgregarInt(buffer,cantArchivos);
     int i;
     for(i=0;i < cantArchivos;i++){
@@ -246,7 +249,7 @@ void* hilo_reduce (void* arg_thread){
 	}
 	//Enviamos rutina reduce a Nodo
 	fflush(stdout);
-	res=enviarReduceANodo(sockNodo,codigoReduce,ordenReduce.cantArchAreducir,ordenReduce.nodosArchTmp,archResultado);
+	res=enviarReduceANodo(sockNodo,codigoReduce,ordenReduce.cantArchAreducir,ordenReduce.nodosArchTmp,archResultado,tamanioScript(ordenToNodo.pathReduce));
 	if(res<0){
 		printf("todo mal, no pude enviar reduce a Nodo: %s\n", ip_nodo_char);
 		exit(-1);
@@ -263,7 +266,7 @@ void* hilo_reduce (void* arg_thread){
 	if(envioRes<0){
 		printf("no pude enviar la respuesta a marta, algo pasó\n");
 	}
-	free(codigoReduce);
+	munmap(ordenToNodo.pathReduce,tamanioScript(ordenToNodo.pathReduce));
 
 	close(sockNodo);
 
@@ -287,3 +290,11 @@ void crearHiloReduce(int sockMarta, char* pathReduce) {
 	return;
 }
 
+
+
+
+int tamanioScript(char* pathScript){
+	struct stat unStat;
+	stat(pathScript,&unStat);
+	return unStat.st_size;
+}

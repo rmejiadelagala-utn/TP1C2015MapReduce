@@ -137,7 +137,7 @@ int enviarProtocolo(int protocolo,int socket);
 
 //Job
 	//A Nodo
-	int enviarMapperANodo(int socket, char* mapper, int nroDeBloqueNodo, uint32_t block_size, char* nombreArchivoTmp );
+	int enviarMapperANodo(int socket, char* mapper, int nroDeBloqueNodo, uint32_t block_size, char* nombreArchivoTmp, int tamanioMapper );
 
 //Deserializar mensajes
 

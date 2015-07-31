@@ -194,7 +194,7 @@ char* getFileContent(char* nombreFile, char * ruta_archivo) {
 	return fileMaped;
 }
 
-void crearScriptMapper(const char* codigo_script, char* nombre) {
+void crearScriptMapper(const char* codigo_script, char* nombre, int tamanioScript) {
 
 	fflush(stdout);
 
@@ -205,7 +205,7 @@ void crearScriptMapper(const char* codigo_script, char* nombre) {
 		exit(1);
 	}
 
-	fputs(codigo_script, scriptMapper);
+	fwrite(codigo_script, tamanioScript, 1, scriptMapper);
 
 	int fileDes = fileno(scriptMapper);
 
@@ -225,7 +225,7 @@ void crearScriptMapper(const char* codigo_script, char* nombre) {
 	return;
 }
 
-void crearScriptReduce(const char* codigo_script, char* nombre) {
+void crearScriptReduce(const char* codigo_script, char* nombre, int tamanioScript) {
 
 
 	FILE* scriptReduce;
@@ -236,7 +236,7 @@ void crearScriptReduce(const char* codigo_script, char* nombre) {
 		exit(1);
 	}
 
-	fputs(codigo_script, scriptReduce);
+	fwrite(codigo_script, tamanioScript, 1,scriptReduce);
 
 	char *permisosCommand = string_new();
 

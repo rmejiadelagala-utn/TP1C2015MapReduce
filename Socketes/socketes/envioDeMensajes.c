@@ -287,11 +287,11 @@ int enviarProtocolo(int protocolo,int socket){
 	}
 //Job
 	//A Nodo
-	int enviarMapperANodo(int socket, char* mapper, int nroDeBloqueNodo, uint32_t tamanioBloque, char* nombreArchivoTmp ){
+	int enviarMapperANodo(int socket, char* mapper, int nroDeBloqueNodo, uint32_t tamanioBloque, char* nombreArchivoTmp, int tamanioScript ){
 		//t_buffer* buffer = crearBufferConProtocolo(CONEXION_JOB_A_NODO);
 		//bufferAgregarInt(buffer,ORDER_MAP);
 		t_buffer* buffer = crearBufferConProtocolo(ORDER_MAP);
-        bufferAgregarString(buffer,mapper,strlen(mapper)+1);
+        bufferAgregarString(buffer,mapper,tamanioScript);
 		bufferAgregarInt(buffer,nroDeBloqueNodo);
 		bufferAgregarInt(buffer,tamanioBloque);
         bufferAgregarString(buffer,nombreArchivoTmp,strlen(nombreArchivoTmp)+1);
