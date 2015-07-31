@@ -5,6 +5,7 @@
 int crearServerMultiHilo(uint16_t puerto, void* funcion_hilo)
 {
 	pthread_mutex_t mutexAccept;
+	pthread_mutex_init(&mutexAccept,0);
     int socket_desc , client_sock , c , *new_sock;
     struct sockaddr_in server , client; int yes=1;
 
