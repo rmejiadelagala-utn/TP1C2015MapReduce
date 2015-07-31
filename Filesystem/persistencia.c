@@ -272,10 +272,12 @@ void cargarPersistencia() {
 	log_info(mdfs_logger,"cargue lista de archivos\n");
 	cargarListaDirectorios();
 	log_info(mdfs_logger,"cargue lista de Directorios\n");
-	cargarListaNodos();
+	listaRegistrosIDIP = list_create();
+	listaNodos = list_create();
+/*	cargarListaNodos();
 	log_info(mdfs_logger,"cargue lista de Nodos\n");
 	cargarListaRegistrosIDIP();
-	log_info(mdfs_logger,"cargue lista de RegistrosIDIP\n");
+	log_info(mdfs_logger,"cargue lista de RegistrosIDIP\n");*/
 }
 
 void guardarPersistencia() {
@@ -288,10 +290,10 @@ void guardarPersistencia() {
 	log_info(mdfs_logger,"guarde lista de archivos\n");
 	guardarListaDirectorios();
 	log_info(mdfs_logger,"guarde lista de Directorios\n");
-	guardarListaNodos();
+/*	guardarListaNodos();
 	log_info(mdfs_logger,"guarde lista de Nodos\n");
 	guardarListaRegistrosIDIP();
-	log_info(mdfs_logger,"guarde lista de RegistrosIDIP\n");
+	log_info(mdfs_logger,"guarde lista de RegistrosIDIP\n");*/
 }
 
 
