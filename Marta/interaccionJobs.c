@@ -68,16 +68,17 @@ void *interaccionJobs(void* sock_ptr) {
 t_solicitud deserealizarSolicitudDeJob(int sockCliente) {
 	int i;
 
-	t_solicitud solicitud;
+	t_solicitud *coso=malloc(sizeof(t_solicitud));
+	t_solicitud solicitud=*coso;
 	solicitud.cantArchivos = recibirInt(sockCliente);
 
 	log_info(marta_logger, "La cantidad de archivos recibidos es de %d",
 			solicitud.cantArchivos);
 
-	solicitud.archivos = malloc(solicitud.cantArchivos);
+
+	solicitud.archivos = malloc(sizeof(int)*solicitud.cantArchivos);
 
 	for (i = 0; i < solicitud.cantArchivos; i++) {
-
 		solicitud.archivos[i] = recibirString(sockCliente);
 
 	}

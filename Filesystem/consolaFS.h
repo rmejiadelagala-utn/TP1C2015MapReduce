@@ -37,7 +37,7 @@ void ls();
 t_archivo* validarArchivo(char* nombreArchivo, t_directorio* directorioReferencia);
 t_directorio* validarDirectorio(char* nombreArchivo, t_directorio* directorioReferencia);
 t_directorio* directorioPadreDe(t_directorio* unDirectorio);
-t_directorio* ubicarseEnDirectorio(char** vectorPath);
+t_directorio* ubicarseEnDirectorio(char** vectorPath, int dirEsAbsoluto);
 void validarDirectorioYEjecutar(char* unArch,void (*funcion)(void*));
 void validarArchivoYEjecutar(char* unArch,void (*funcion)(void*));
 int comprobarParametros(int cantParametros, char** parametros);

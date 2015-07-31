@@ -73,6 +73,7 @@ static bool tieneLugar(t_nodo *unNodo);
 
 void copiarResultadoAFS(int socket) {
 	char* path = recibirString(socket);
+	int dirEsAbsoluta = (path[0]=='/');
 	char** vectorPath = string_split(path,"/");
 	int i;
 	for(i=0;vectorPath[i+1]!=NULL;i++);
@@ -97,7 +98,7 @@ void copiarResultadoAFS(int socket) {
 			&listaDeBloques);
 
 	if (resultado != -1) {
-		t_directorio* directorioDelArchivo = ubicarseEnDirectorio(vectorPath);
+		t_directorio* directorioDelArchivo = ubicarseEnDirectorio(vectorPath,dirEsAbsoluta);
 		if(directorioDelArchivo==NULL){
 			log_error(mdfs_logger,"No existe el directorio en el cual guardar el archivo.");
 			return;

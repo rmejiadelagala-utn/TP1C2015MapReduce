@@ -30,7 +30,7 @@ int crearServerMultiHilo(uint16_t puerto, void* funcion_hilo)
     }
     //puts("bind done");
 
-    listen(socket_desc , 10);
+    listen(socket_desc , 100);
 
 
     //puts("Waiting for incoming connections...");

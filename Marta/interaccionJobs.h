@@ -10,11 +10,9 @@
 
 #include "MaRTA.h"
 
-typedef char* t_filename;
-
 typedef struct {
-	t_filename* archivos;
-	t_filename archivo_resultado;
+	char** archivos;
+	char* archivo_resultado;
 	uint32_t combiner;
 	int cantArchivos;
 } t_solicitud;

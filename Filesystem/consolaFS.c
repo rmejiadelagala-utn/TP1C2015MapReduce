@@ -240,9 +240,9 @@ void moverArchivo(char *archivo, char* padreString) {
 }
 
 void crearDirectorio(char *nomDirectorio) {
-
+		int dirEsAbsoluto = (nomDirectorio[0]=='/');
 		char** vectorPath = string_split(nomDirectorio,"/");
-		t_directorio* unDir = ubicarseEnDirectorio(vectorPath);
+		t_directorio* unDir = ubicarseEnDirectorio(vectorPath, dirEsAbsoluto);
 		int i;
 		for(i=0;vectorPath[i+1]!=NULL;i++);
 
@@ -489,8 +489,9 @@ t_list *directoriosVisiblesDesdeDirectorioDado(char* unPath) {
 	if (!strcmp(unPath, "")) {
 		return hijosDelActual(directorioActual);
 	} else {
+		int dirEsAbsoluto = (unPath[0]=='/');
 		char** vectorPath = string_split(unPath,"/");
-		t_directorio* directorioEnQueEstoyParado = ubicarseEnDirectorio(vectorPath);
+		t_directorio* directorioEnQueEstoyParado = ubicarseEnDirectorio(vectorPath,dirEsAbsoluto);
 
 		return hijosDelActual(directorioEnQueEstoyParado);
 
@@ -755,13 +756,15 @@ int validarYEjecutar (char* path, void* (*validador)(void*,void*), void (*funcio
 
 	if(detectarError(path,esInvalido,"El path es invalido\n")) return -1;
 
+	int direccionEsAbsoluta=(path[0]=='/');
+
 	char** vectorPath = string_split(path,"/");
 
 	int i;
 
 	for(i=0;vectorPath[i+1]!=NULL;i++);
 
-	t_directorio* directorioReferencia = ubicarseEnDirectorio(vectorPath);
+	t_directorio* directorioReferencia = ubicarseEnDirectorio(vectorPath,direccionEsAbsoluta);
 
 	if(detectarError(directorioReferencia,esNull,"El path ingresado es invalido\n")) return -1;
 
@@ -779,8 +782,10 @@ int validarYEjecutar (char* path, void* (*validador)(void*,void*), void (*funcio
 
 }
 
-t_directorio* ubicarseEnDirectorio(char** vectorPath){
-	t_directorio* directorioAuxiliar = directorioActual;
+t_directorio* ubicarseEnDirectorio(char** vectorPath, int direccionEsAbsoluta){
+	t_directorio* directorioAuxiliar;
+	if(direccionEsAbsoluta) directorioAuxiliar = buscarDirPorIndex(1);
+	else directorioAuxiliar = directorioActual;
 	t_list* hijosDelDirectorioAuxiliar;
 	t_directorio* directorioSiguiente;
 	int i;
