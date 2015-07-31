@@ -8,6 +8,7 @@ puerto_default=$puerto_cfg
 tam_databin_default=$tam_databin_cfg
 
 mkdir Nodo/Archivos 2>log
+mkdir Nodo/Debug/tmp 2>log
 
 function crearDataBin {
 	truncate -s $2M Nodo/Archivos/data$1.bin
