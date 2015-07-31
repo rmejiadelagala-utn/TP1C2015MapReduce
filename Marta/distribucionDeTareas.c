@@ -1255,8 +1255,7 @@ bool mapsYaHechos(t_MapTemporal* mapTemporal) {
 	return list_any_satisfy(mapsTemporalesDeLosArchivosDelJob, (void*) esElMismoMap);
 }
 
-while (list_remove_by_condition(listaMapsTemporales, (void*) mapsYaHechos))
-	;
+while (list_remove_by_condition(listaMapsTemporales, (void*) mapsYaHechos));
 
 /*list_destroy_and_destroy_elements(mapsTemporalesDeLosArchivosDelJob,
  (void*) free);*/

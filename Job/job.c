@@ -8,7 +8,6 @@
 #include"job.h"
 
 int main(int argc,char *argv[]) {
-
 	char *c;
 	int sockMarta,result;
 	t_config_job* info_config;
