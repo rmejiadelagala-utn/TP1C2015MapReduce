@@ -7,7 +7,7 @@
 
 #include "fsystem.h"
 
-void *interaccionFSNodo(void*);
+void *interaccionFSNodo(void**);
 
 int main() {
 
@@ -130,13 +130,14 @@ void levantarArchivoAMemoriaYDistribuirANodos(char* pathLocal, char* nombreArchi
 	}
 }
 
-void *interaccionFSNodo(void* sock_ptr) {
+void *interaccionFSNodo(void** sock_ptr) {
+
 
 	int tamanioBloqueRecibido;
-
 	int tamanioPosta;
 	int esMarta = 0;
-	int socket = *(int*) sock_ptr;
+	int socket = *(int*) sock_ptr[0];
+	pthread_mutex_unlock(sock_ptr[1]);
 	int protocolo;
 	int recibido;
 	int id;

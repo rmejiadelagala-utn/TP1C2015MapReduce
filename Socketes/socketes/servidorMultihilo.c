@@ -4,6 +4,7 @@
 
 int crearServerMultiHilo(uint16_t puerto, void* funcion_hilo)
 {
+	pthread_mutex_t mutexAccept;
     int socket_desc , client_sock , c , *new_sock;
     struct sockaddr_in server , client; int yes=1;
 
@@ -38,12 +39,15 @@ int crearServerMultiHilo(uint16_t puerto, void* funcion_hilo)
     while( (client_sock = accept(socket_desc, (struct sockaddr *)&client, (socklen_t*)&c)) )
     {
         //puts("Connection accepted");
-
+    	pthread_mutex_lock(&mutexAccept);
         pthread_t hilo;
         new_sock = malloc(sizeof(int));
         *new_sock = client_sock;
+        void *argumentos[2];
+		argumentos[0] = new_sock;
+		argumentos[1] = &mutexAccept;
 
-        if( pthread_create( &hilo , NULL ,  funcion_hilo , (void*) new_sock) < 0)
+        if( pthread_create( &hilo , NULL ,  funcion_hilo , (void*) argumentos) < 0)
                     {
                         perror("could not create thread");
                         return 1;

@@ -17,7 +17,7 @@ typedef struct {
 	int cantArchivos;
 } t_solicitud;
 
-void *interaccionJobs(void* sock_ptr);
+void *interaccionJobs(void** sock_ptr);
 
 t_solicitud deserealizarSolicitudDeJob(int sockCliente);
 t_InfoJob adaptarSolicitudAInfoJob(t_solicitud solicitud);

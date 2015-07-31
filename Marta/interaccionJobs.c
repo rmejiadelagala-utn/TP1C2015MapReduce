@@ -1,10 +1,12 @@
 #include "interaccionJobs.h"
 
-void *interaccionJobs(void* sock_ptr) {
+void *interaccionJobs(void** sock_ptr) {
 
 
 	log_info(marta_sync_logger, "lock conexionFS");
-	int sockCliente = *(int*) sock_ptr;
+	int sockCliente = *(int*) sock_ptr[0];
+	pthread_mutex_unlock(sock_ptr[1]);
+
 
 	t_solicitud solicitud = deserealizarSolicitudDeJob(sockCliente);
 

@@ -8,6 +8,7 @@
 
 
 #include <socketes/paquetesNodo.h>
+#include<pthread.h>
 char *DATOS;
 
 void* conexionFS(void* arg) {
@@ -71,11 +72,12 @@ void* conexionFS(void* arg) {
 	return 0;
 }
 
-void* conexionJobs(void* sockJobNodo) {
+void* conexionJobs(void** sockJobNodo) {
 
 	pthread_detach(pthread_self());
 
-	int sock_in = *(int*) sockJobNodo;
+	int sock_in = *(int*) sockJobNodo[0];
+	pthread_mutex_unlock(sockJobNodo[1]);
 	int recibido;
 	int i;
 	int protocolo;
