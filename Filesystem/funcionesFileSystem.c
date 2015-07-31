@@ -591,14 +591,14 @@ void formatear(t_list **listaNodos, t_list **listaArchivos,	//probada
 	//FIXME no destruir los nodos quizas
 	log_info(mdfs_logger, "Format FS.");
 	list_destroy_and_destroy_elements(*listaArchivos, (void*) liberarArchivo);
-//	list_destroy_and_destroy_elements(*listaNodos, (void*) liberarNodo);
+	list_destroy_and_destroy_elements(*listaNodos, (void*) liberarNodo);
 	list_destroy_and_destroy_elements(*listaDirectorios,
 			(void*) liberarDirectorio);
-//	list_destroy_and_destroy_elements(listaRegistrosIDIP, (void*) free);
-//	*listaNodos = list_create();
+	list_destroy_and_destroy_elements(listaRegistrosIDIP, (void*) free);
+	*listaNodos = list_create();
 	*listaArchivos = list_create();
 	*listaDirectorios = list_create();
-//	listaRegistrosIDIP = list_create();
+	listaRegistrosIDIP = list_create();
 }
 
 void renombrarArchivoPorNombre(char *nombreBuscado, char *nuevoNombre, //probada
