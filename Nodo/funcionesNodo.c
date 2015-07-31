@@ -294,7 +294,7 @@ int redireccionar_stdin_stdout_mapper(char *pathPrograma,
 int redireccionar_stdin_stdout_reduce(char *pathPrograma,
 		char *pathArchivoSalida, t_list* archivosAReducir, int idReduce) {
 
-	aparear(archivosAReducir,idReduce);
+	if(aparear(archivosAReducir,idReduce)==-1) return -1;
 
 	FILE *stdin = NULL;
 
@@ -328,10 +328,13 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma,
 	log_info(nodo_logger, "Arme el nombre del archivo");
 	char* comandoParaTruncar = strdup("truncate -s 0 ");
 	string_append(&comandoParaTruncar, archivoATruncar);
-	system(comandoParaTruncar);
+	if(system(comandoParaTruncar)!=0) exit(1);
 	fflush(stdout);
 
-	system(comando);
+	if(system(comando)!=0){
+	log_error(nodo_logger,"Error al reducir");
+	exit(1);
+	}
 		/*if ((dataArchivoAReducir = mmap((caddr_t) 0, datosArch.st_size,
 		PROT_READ, MAP_SHARED, fileno(archivoAReducir), 0)) == MAP_FAILED) {
 			printf("Trate de mapear %d\n", datosArch.st_size);
@@ -434,7 +437,10 @@ void aparear(t_list* archivosAReducir, int idReduce) {
 	}
 	list_iterate(archivosAReducir, (void*) concatenar);
 	string_append_with_format(&comando, "|sort > /tmp/archivoApareado_%i_%i", arch_config->ID, idReduce);
-	system(comando);
+	if(system(coman
+	log_error(nodo_logger, "Error al reducir");
+	exit(1);
+	}
 	log_info(nodo_logger, "Concatenacion correcta");
 }
 
