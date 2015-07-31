@@ -66,7 +66,7 @@ int responderOrdenMapAMarta(int sockMarta,t_ordenMap ordenMapper, int resOper){
 void* hilo_mapper (void* arg_thread){
 
 
-
+	pthread_detach(pthread_self());
 	t_arg_hilo_map ordenToNodo;
 	t_ordenMap ordenMapper;
 	ordenToNodo= *((t_arg_hilo_map*)arg_thread);
@@ -128,7 +128,7 @@ void* hilo_mapper (void* arg_thread){
 
 	close(sockNodo);
 
-	pthread_exit(NULL);
+	return NULL;
 }
 
 void crearHiloMapper(int sockMarta, char* pathMapper) {
@@ -148,7 +148,6 @@ void crearHiloMapper(int sockMarta, char* pathMapper) {
 	arg_thread->ordenMapper=ordenMapper;
 
 	pthread_create (&thread_map, NULL, hilo_mapper, (void*)arg_thread);
-	pthread_detach(thread_map);
 	return ;
 }
 
