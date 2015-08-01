@@ -16,6 +16,9 @@
 #include<stdbool.h>
 #include <pthread.h>
 #include <sys/stat.h>
+#include <sys/mman.h>
+
+static int tamanioScript(char* pathScript);
 
 int recibirResultadoFromNodo(int sockNodo) {
 	uint32_t recibido, protocolo, rptaNodoAJob;
@@ -147,7 +150,10 @@ void crearHiloMapper(int sockMarta, char* pathMapper) {
 	arg_thread->ordenMapper=malloc(tamanioDeLaOrden);
 	arg_thread->ordenMapper=ordenMapper;
 
-	pthread_create (&thread_map, NULL, hilo_mapper, (void*)arg_thread);
+	if(pthread_create (&thread_map, NULL, hilo_mapper, (void*)arg_thread)!=0){
+		printf("Error al crear el job");
+		return;
+	}
 	return ;
 }
 
@@ -281,7 +287,10 @@ void crearHiloReduce(int sockMarta, char* pathReduce) {
 	arg_thread->sockMarta=sockMarta;
 	arg_thread->pathReduce=strdup(pathReduce);
 	arg_thread->ordenReduce=ordenReduce;
-	pthread_create (&thread_reduce, NULL, hilo_reduce,(void*)arg_thread);
+	if(pthread_create (&thread_reduce, NULL, hilo_reduce,(void*)arg_thread)!=0){
+		printf("Error al crear reduce");
+		return;
+	}
 	pthread_detach(thread_reduce);
 	//free(ordenReduce); No puedo liberar aca sino me va a liberar antes de
 	//free(arg_thread);  que termine el hilo, muy malo!!!!
