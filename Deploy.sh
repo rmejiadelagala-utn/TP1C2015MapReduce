@@ -55,8 +55,8 @@ do
 	echo "ARCHIVO_BIN=data"$i".bin" >> Nodo/Archivos/ConfigNodo$i.txt
 	echo "DIR_TEMP=/TMP" >> Nodo/Archivos/ConfigNodo$i.txt
 	echo "NODO_NUEVO="SI >> Nodo/Archivos/ConfigNodo$i.txt
-	echo "IP_NODO=" >> Nodo/Archivos/ConfigNodo$i.txt	
-	ip route get 1 | awk '{print $NF;exit}' >> Nodo/Archivos/ConfigNodo$i.txt
+	VAR_IP_NODO=`ip route get 1 | awk '{print $NF;exit}'`
+	echo "IP_NODO=$VAR_IP_NODO" >> Nodo/Archivos/ConfigNodo$i.txt
 	echo "PUERTO_NODO=500"$i >> Nodo/Archivos/ConfigNodo$i.txt
 	echo "ID="$i >> Nodo/Archivos/ConfigNodo$i.txt
 done
@@ -96,5 +96,11 @@ function makear {
 	cd ../..
 }
 
+
+
+
 crearConfigs
 makear
+sudo apt-get cowsay
+
+echo "Deploy realizado exitosamente" | cowsay -f stegosaur
