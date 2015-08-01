@@ -398,7 +398,7 @@ int ejecutarReduce(char * path_s, char* path_tmp, t_list* archivosAReducir, int 
 //Todos esos registros seleccionados irían concatenados y formarían parte del archivo
 //total a reducir.
 
-void aparear(t_list* archivosAReducir, int idReduce) {
+int aparear(t_list* archivosAReducir, int idReduce) {
 	char* comando = strdup("cat ");
 	//printf("Mi ip es %d, la ip de este archivo es %d",unArchivo->ipNodo,inet_addr(arch_config->IP_NODO));
 	int noLoTengo(t_archivoAReducir* unArchivo) {
@@ -437,7 +437,7 @@ void aparear(t_list* archivosAReducir, int idReduce) {
 	}
 	list_iterate(archivosAReducir, (void*) concatenar);
 	string_append_with_format(&comando, "|sort > /tmp/archivoApareado_%i_%i", arch_config->ID, idReduce);
-	if(system(coman
+	if(system(comando)!=0){	
 	log_error(nodo_logger, "Error al reducir");
 	exit(1);
 	}

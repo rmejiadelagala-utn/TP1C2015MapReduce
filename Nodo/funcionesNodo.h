@@ -32,6 +32,6 @@ char* aparear_registros(char*);
 void guardarEnDisco(t_archivoTemporal* unArchivo);
 void liberarArchivoTemporal(t_archivoTemporal* unArchivo);
 t_RegistroArch* apareoDeRegistros(t_list*);
-void aparear(t_list* archivosAReducir, int idReduce);
+int aparear(t_list* archivosAReducir, int idReduce);
 
 #endif /* FUNCIONESNODO_H_ */
