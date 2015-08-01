@@ -442,6 +442,7 @@ int aparear(t_list* archivosAReducir, int idReduce) {
 	exit(1);
 	}
 	log_info(nodo_logger, "Concatenacion correcta");
+	return 1;
 }
 
 t_RegistroArch* apareoDeRegistros(t_list* Lista_reg) {
