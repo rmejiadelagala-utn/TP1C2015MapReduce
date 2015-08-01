@@ -101,6 +101,7 @@ function makear {
 
 crearConfigs
 makear
+
 sudo apt-get install fortune cowsay
 
 echo "Deploy realizado exitosamente" | cowsay -f stegosaurus
