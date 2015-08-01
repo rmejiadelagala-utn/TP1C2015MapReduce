@@ -1213,7 +1213,7 @@ if (infoJob.combiner == 1) {	//Con combiner
 	}
 
 	//recibir el resultado del reduce final
-	log_info(marta_logger, "Hice todos los reduce intermedios y mande a hacer el final");
+	log_info(marta_logger, "Mando a hacer el reduce sin combiner.");
 
 	t_ResultadoReduce resultadoFinal;
 

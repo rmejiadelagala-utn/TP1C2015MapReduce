@@ -60,8 +60,6 @@ void* interaccionMartaFS(void* sock) {
 		case ENVIO_BLOQUEARCH_A_MARTA:
 			sem_post(&funcionesMarta);
 			log_info(marta_sync_logger, "post funcionesMarta");
-			log_info(marta_logger, "El protocolo es %d", protocolo);
-			log_info(marta_logger, "Despertate marta.");
 			sem_wait(&interaccionFS);
 			log_info(marta_sync_logger, "wait interaccionFS");
 			break;
