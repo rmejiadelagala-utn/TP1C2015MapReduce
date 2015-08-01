@@ -397,7 +397,7 @@ int enviarProtocolo(int protocolo,int socket){
 	int recibirBloqueArchFS(int socketAuxiliar,t_list* copiasDeBloque){ //TODO retornar un resultado
 		int cantidadDeCopias;
 		if(recvall(socketAuxiliar,&cantidadDeCopias,sizeof(int))<1) return -1;
-		if(cantidadDeCopias==-1) return -1;
+		if(cantidadDeCopias==-1 || cantidadDeCopias==0) return -1;
 		fflush(stdout);
 		int i;
 		for(i=0;i<cantidadDeCopias;i++){
