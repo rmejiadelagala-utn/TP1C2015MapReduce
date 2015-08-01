@@ -329,8 +329,10 @@ int redireccionar_stdin_stdout_reduce(char *pathPrograma,
 	char* comandoParaTruncar = strdup("truncate -s 0 ");
 	string_append(&comandoParaTruncar, archivoATruncar);
 	if(system(comandoParaTruncar)!=0) exit(1);
-	fflush(stdout);
-
+	char* cat = strdup("cat ");
+	string_append(&cat,archivoATruncar);
+	system(cat);
+	//sleep(3);
 	if(system(comando)!=0){
 	log_error(nodo_logger,"Error al reducir");
 	exit(1);
