@@ -26,7 +26,7 @@ function crearConfigJob {
 	echo 	REDUCE=../Scripts/LetterCount/reducer >> Job/job4.cfg
 	echo 	COMBINER=SI >> Job/job4.cfg
 	echo 	ARCHIVOS=[/mr/textos/gutenberg.txt,/mr/textos/linux.txt,/mr/textos/kernel.txt] >> Job/job4.cfg
-	echo 	RESULTADO=/output/job4/rep-letras.tx >> Job/job4.cfg
+	echo 	RESULTADO=/output/job4/rep-letras.txt >> Job/job4.cfg
 	echo 	IP=$1 > Job/job5.cfg
 	echo 	PORT=4000 >> Job/job5.cfg
 	echo 	MAPPER=../Scripts/Twitter/basic_sentiment_analysis.py >> Job/job5.cfg

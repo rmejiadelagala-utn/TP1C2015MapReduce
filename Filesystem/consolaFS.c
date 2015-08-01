@@ -296,6 +296,22 @@ void copiarAMDFS(char *archivoDestino, char *archivoACopiar) {
 		copiarAMDFS("201303hourly.txt","201303hourly.txt");
 		copiarAMDFS("201304hourly.txt","201304hourly.txt");
 	}
+	else if(!strcmp(archivoACopiar,"tweet*")){
+		copiarAMDFS("tweet-1.csv","tweet-1.csv");
+		copiarAMDFS("tweet-2.csv","tweet-2.csv");
+		copiarAMDFS("tweet-3.csv","tweet-3.csv");
+		copiarAMDFS("tweet-4.csv","tweet-4.csv");
+		copiarAMDFS("tweet-5.csv","tweet-5.csv");
+		copiarAMDFS("tweet-6.csv","tweet-6.csv");
+		copiarAMDFS("tweet-7.csv","tweet-7.csv");
+		copiarAMDFS("tweet-8.csv","tweet-8.csv");
+		copiarAMDFS("tweet-9.csv","tweet-9.csv");
+		copiarAMDFS("tweet-10.csv","tweet-10.csv");
+		copiarAMDFS("tweet-11.csv","tweet-11.csv");
+		copiarAMDFS("tweet-12.csv","tweet-12.csv");
+		copiarAMDFS("tweet-13.csv","tweet-13.csv");
+	}
+	else{
 
 	t_list *archivosVisibles  = archivosVisiblesDesdeDirectorioDado("");
 
@@ -312,6 +328,7 @@ void copiarAMDFS(char *archivoDestino, char *archivoACopiar) {
 		levantarArchivoAMemoriaYDistribuirANodos(path, archivoDestino, directorioActual->index);
 	}
 	list_destroy(archivosVisibles);
+	}
 }
 
 void copiarAFS(char *archivo) {
