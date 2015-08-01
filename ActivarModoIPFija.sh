@@ -15,7 +15,7 @@ echo "	address 192.168.0.$ip"  >> interfaces
 echo "	network 192.168.0.0" >> interfaces
 echo "	netmask 255.255.255.0" >> interfaces
 echo "	broadcast 192.168.0.255" >> interfaces
-echo "	gateaway 192.168.0.1" >> interfaces
+echo "	gateway 192.168.0.1" >> interfaces
 
 echo "dns-nameservers 8.8.8.8" >> interfaces
 sudo cp interfaces /etc/network/interfaces

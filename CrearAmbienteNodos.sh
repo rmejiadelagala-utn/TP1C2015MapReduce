@@ -15,7 +15,7 @@ function crearDataBin {
 }
 
 function crearConfig {
-	echo "#ConfigNodo"$1 > Nodo/Archivos/ConfigNodo$1.txt
+	truncate -s 0 Nodo/Archivos/ConfigNodo$1.txt
 	mostrarResultado $1 $2 $3 $4 $5 $6 $7 $8 >> Nodo/Archivos/ConfigNodo$1.txt
 }
 
@@ -58,13 +58,13 @@ do
 	echo "¿De qué tamaño es el data.bin de este nodo? (En megas)"
 	read databin
 	echo "¿Es el nodo nuevo?"
-	read nuevo	
-	generarNodo $i $puerto_fs $ip_fs $databin $nuevo $ip $puerto $id 
+	read nuevo
+	generarNodo $i $puerto_fs $ip_fs $databin $nuevo $ip $puerto $id
 	echo "Presione enter para continuar..."
 	read enter
 done
 	echo "Los nodos fueron creados correctamente."
-	
+
 }
 
 function CrearAmbienteDeCero {
@@ -100,14 +100,14 @@ if [ "$respuesta" == "TODOS" ];then
 	read nuevo
 	for ((i=1;i<=$cantNodosActuales;i++))
 	do
-	sed -i 6s/.*/NODO_NUEVO=$nuevo/ Nodo/Archivos/ConfigNodo$i.txt
+	sed -i 5s/.*/NODO_NUEVO=$nuevo/ Nodo/Archivos/ConfigNodo$i.txt
 	done
 else
 	for ((i=1;i<=$cantNodosActuales;i++))
 	do
 	echo "Ingrese valor para el nodo"$i
 	read nuevo
-	sed -i 6s/.*/NODO_NUEVO=$nuevo/ Nodo/Archivos/ConfigNodo$i.txt
+	sed -i 5s/.*/NODO_NUEVO=$nuevo/ Nodo/Archivos/ConfigNodo$i.txt
 	done
 fi
 echo "Nodos setteados."
